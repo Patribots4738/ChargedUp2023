@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  DriveSubsystem swerve;
+  Swerve swerve;
   XboxController driver;
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our Robot. This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    swerve = new DriveSubsystem();
+    swerve = new Swerve();
     driver = new XboxController(0);
   }
 

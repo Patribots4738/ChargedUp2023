@@ -14,7 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.Constants.DriveConstants;
 
-public class DriveSubsystem {
+public class Swerve {
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
@@ -50,7 +50,7 @@ public class DriveSubsystem {
       });
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public Swerve() {
   }
 
   public void periodic() {
