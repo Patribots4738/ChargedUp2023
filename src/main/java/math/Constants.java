@@ -153,7 +153,7 @@ public final class Constants {
     public static final double lowerRatio = 60;
 
     // The gear ratio of the upper arm is 150:1
-    public static final double lowerRatio = 150;
+    public static final double upperRatio = 150;
 
     // The amount of degrees that the upper arm can rotate
     public static final double upperFreedom = 200;
