@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import hardware.*;
 import math.*;
+import math.Constants.OIConstants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -34,8 +35,8 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     swerve = new Swerve();
 
-    driver = new XboxController(Constants.kDriverControllerPort);
-    operator = new XboxController(Constants.kOperatorControllerPort);
+    driver = new XboxController(OIConstants.kDriverControllerPort);
+    operator = new XboxController(OIConstants.kOperatorControllerPort);
   
     // arm = new Arm();
    
