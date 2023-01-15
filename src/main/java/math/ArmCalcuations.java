@@ -43,7 +43,7 @@ public class ArmCalcuations {
         
         double q2 = Math.acos (
             (x * x + y * y) - (ArmConstants.a1 * ArmConstants.a1 + ArmConstants.a2 * ArmConstants.a2)
-            / (2 * ArmConstants.a1 * ArmConstants.a2))
+            / (2 * ArmConstants.a1 * ArmConstants.a2));
         
         // Need to code
 
