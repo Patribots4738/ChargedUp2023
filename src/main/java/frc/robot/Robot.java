@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import hardware.*;
@@ -19,7 +21,7 @@ import math.Constants.OIConstants;
 public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
+  CANSparkMax motor;
   Swerve swerve;
   XboxController driver;
   XboxController operator;
@@ -87,9 +89,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {}
+  public void testInit() {
+    motor = new CANSparkMax(1, CANSparkMax.MotorType.kBrushless);
+  }
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    // motor.set((driver.getAButton()) ? 0.1 : (driver.getYButton()) ? -0.1 : 0);
+    
+  }
 }
