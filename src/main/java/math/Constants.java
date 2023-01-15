@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package math;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -133,5 +133,32 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+  } 
+
+  public static final class ArmConstants {
+
+    // The length of the first pivot point to the second pivot point, in inches
+    public static final double a1 = 30;
+
+    // The length of the second pivot point to the claw, in inches
+    public static final double a2 = 24;
+
+    // The max reach of the bot horizontally, in inches
+    public static final double maxReachX = 48;
+
+    // The max reach of the bot vertically, in inches
+    public static final double maxReachY = 48;
+
+    // The gear ratio of the lower arm is 60:1
+    public static final double lowerRatio = 60;
+
+    // The gear ratio of the upper arm is 150:1
+    public static final double lowerRatio = 150;
+
+    // The amount of degrees that the upper arm can rotate
+    public static final double upperFreedom = 200;
+
+    // The amount of degrees that the upper arm can rotate
+    public static final double lowerFreedom = 150;
   }
 }

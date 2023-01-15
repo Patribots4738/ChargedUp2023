@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import hardware.*;
+// import math.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,6 +21,9 @@ public class Robot extends TimedRobot {
 
   Swerve swerve;
   XboxController driver;
+  XboxController operator;
+
+  // Arm arm;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -29,7 +33,12 @@ public class Robot extends TimedRobot {
     // Instantiate our Robot. This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     swerve = new Swerve();
+
     driver = new XboxController(0);
+    operator = new XboxController(1);
+  
+    // arm = new Arm();
+   
   }
 
   /**
@@ -71,6 +80,9 @@ public class Robot extends TimedRobot {
     // Drive the robot
     //               SpeedX             SpeedY            Rotation         Field Relative
     swerve.drive(driver.getLeftX(), driver.getLeftY(), driver.getRightX(), isAutonomous());
+    
+    // arm.drive(operator.getRightX(), operator.getRightY());
+
   }
 
   @Override
