@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import hardware.*;
-// import math.*;
+import math.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -34,8 +34,8 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     swerve = new Swerve();
 
-    driver = new XboxController(0);
-    operator = new XboxController(1);
+    driver = new XboxController(Constants.kDriverControllerPort);
+    operator = new XboxController(Constants.kOperatorControllerPort);
   
     // arm = new Arm();
    
