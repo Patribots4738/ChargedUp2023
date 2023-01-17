@@ -6,19 +6,31 @@ import math.*;
 
 public class Arm {
 
-    ArmCalcuations ArmCalculations = new ArmCalcuations();
+  /**
+   * What the arm positions look like and the index in the array
+   *         4
+   * O        __     8
+   *  1      |      7
+   *       3 | 5
+   *    2  |||||  6
+   */
 
-    CANSparkMax lowerArm = new CANSparkMax(9, MotorType.kBrushless);
-    CANSparkMax upperArm = new CANSparkMax(10, MotorType.kBrushless);
+  int[][] armPos = {{0, 2}, {1, 1}, {2, 0}, {3, 1}, {4, 4}, {5, 1}, {6, 0}, {7, 2}, {8, 3}};
+  int armPosIndex = 0;
+  
+  ArmCalcuations ArmCalculations = new ArmCalcuations();
 
-    public void drive(double armX, double armY) {
+  CANSparkMax lowerArm = new CANSparkMax(9, MotorType.kBrushless);
+  CANSparkMax upperArm = new CANSparkMax(10, MotorType.kBrushless);
 
-        double Q2 = ArmCalculations.getQ2(armX, armY);
-        double Q1 = ArmCalculations.getQ1(armX, armY, Q2);
+  public void drive(double armX, double armY) {
+
+      double Q2 = ArmCalculations.getQ2(armX, armY);
+      double Q1 = ArmCalculations.getQ1(armX, armY, Q2);
 
 
-        // lowerArm.set();
-        // upperArm.set();
-    }
+      // lowerArm.set();
+      // upperArm.set();
+  }
     
 }
