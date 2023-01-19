@@ -48,6 +48,7 @@ public class Robot extends TimedRobot {
   XboxController driver;
   XboxController operator;
   MAXSwerveModule module;
+
   // Arm arm;
   HolonomicDriveController autoController;
   Trajectory trajectory;
