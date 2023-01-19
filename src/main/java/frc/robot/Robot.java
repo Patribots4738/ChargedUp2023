@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
   XboxController driver;
   XboxController operator;
   
-  Auto auto;
+  AutoWaypoints autoWaypoints;
   HolonomicDriveController autoController;
 
   Trajectory trajectory;
@@ -90,12 +90,18 @@ public class Robot extends TimedRobot {
     // Update the odometry for the swerve drive
     swerve.periodic();
 
+    // Update the logger for shuffleboard
     Logger.updateEntries();
 
   }
   
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+
+    // Set the swerve drive to coast mode
+    
+
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -103,9 +109,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    autoPath = new TestPath(swerve);
-
-    autoController = auto.getAutoController();
+    SwerveTrajectory.resetTrajectoryStatus();
     
   }
 
@@ -113,22 +117,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    Trajectory trajectory = autoPath.getPath();
-
-    // Get a list of states from the trajectory to follow. (G-Code)
-    List<State> goal = trajectory.getStates();
-
-    // Get the adjusted speeds. Here, we want the robot to be facing
-    // 45 degrees (in the field-relative coordinate system).
-    ChassisSpeeds adjustedSpeeds = autoController.calculate(
-    swerve.getPose(), goal.get(1), goal.get(1).poseMeters.getRotation());
+    autoWaypoints.autoPeriodic();
     
-    SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(adjustedSpeeds);
-    
-    swerve.setModuleStates(moduleStates);
-
-    debug.debugPeriodic(adjustedSpeeds.vyMetersPerSecond);
-    System.out.println("Swerve pos: " + swerve.getPose().getX());    
+    SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
   }
 

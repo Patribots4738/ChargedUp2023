@@ -73,6 +73,11 @@ public class Swerve {
     return m_odometry.getPoseMeters();
   }
 
+  // Get the odometry object
+  public SwerveDriveOdometry getOdometry() {
+    return m_odometry;
+  }
+
   /**
    * Resets the odometry to the specified pose.
    *
