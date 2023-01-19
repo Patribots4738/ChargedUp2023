@@ -57,7 +57,6 @@ public class Robot extends TimedRobot {
 
     // Drivetrain instantiation
     swerve = new Swerve();
-
     // Zero the IMU for field-oriented driving
     swerve.zeroHeading();
 
@@ -68,9 +67,6 @@ public class Robot extends TimedRobot {
     // Arm Instantiation
     // arm = new Arm();
     
-    // Auto instantiation
-    auto = new Auto();
-
     // The first argument is the root container
     // The second argument is whether logging and config should be given separate tabs
     Logger.configureLoggingAndConfig(this, false);
