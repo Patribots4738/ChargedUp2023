@@ -1,3 +1,4 @@
+// Refrenced from https://github.com/Stampede3630/2022-Code/blob/MK3Practice/src/main/java/frc/robot/SwerveTrajectory.java
 package auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -24,10 +25,9 @@ public class SwerveTrajectory implements Loggable {
 
   public static double elapsedTime;
 
-  public static SwerveTrajectory getInstance(){
+  public static SwerveTrajectory getInstance() {
       return SINGLE_INSTANCE;
   }
-
 
   /**
    * Returns a new HolonomicDriveController with constant PID gains.
@@ -73,17 +73,22 @@ public class SwerveTrajectory implements Loggable {
    * @param _odometry SwerveDrive.java's odometry
    * @param _rotation2d Pass in the current angle of the robot
    */
-  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, SwerveDriveOdometry _odometry, Rotation2d _rotation2d){
-      elapsedTime = Timer.getFPGATimestamp()-timetrajectoryStarted;
+  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, SwerveDriveOdometry _odometry, Rotation2d _rotation2d) {
+
+      elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
+
       switch (trajectoryStatus) {
+
           case "setup":
               //swerve.resetOdometry(((PathPlannerState) _pathTraj.getInitialState()).poseMeters, ((PathPlannerState) _pathTraj.getInitialState()).poseMeters.getRotation()); 
               timetrajectoryStarted = Timer.getFPGATimestamp();
               trajectoryStatus = "execute";
               break;
+
           case "execute":
               
-              if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds){
+              if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds) {
+
                   ChassisSpeeds _speeds = HDC.calculate(
                       _odometry.getPoseMeters(), 
                       ((PathPlannerState) _pathTraj.sample(elapsedTime)),((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
@@ -92,20 +97,27 @@ public class SwerveTrajectory implements Loggable {
                   _speeds.omegaRadiansPerSecond,false);
                   
               } else {
+
                   swerve.drive(0,0,0,false);
                   // swerve.setHoldRobotAngleSetpoint(((PathPlannerState) _pathTraj.getEndState()).holonomicRotation.getRadians());
                   trajectoryStatus = "done";
 
               }
+
               break;
+
           default:
+
               swerve.drive(0,0,0,false);
               break;
+
       }
   }
 
-  public static void resetTrajectoryStatus(){
+  public static void resetTrajectoryStatus() {
+
       trajectoryStatus = "setup";
+  
   }
     
 }
