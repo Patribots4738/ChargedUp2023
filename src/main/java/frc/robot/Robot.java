@@ -65,6 +65,9 @@ public class Robot extends TimedRobot {
     // Arm Instantiation
     // arm = new Arm();
     
+    //AutoWaypoints Instantiation
+    autoWaypoints = new AutoWaypoints();
+
     // The first argument is the root container
     // The second argument is whether logging and config should be given separate tabs
     Logger.configureLoggingAndConfig(this, false);
@@ -102,6 +105,8 @@ public class Robot extends TimedRobot {
   
   @Override
   public void autonomousInit() {
+
+    autoWaypoints.init(swerve);
 
     SwerveTrajectory.resetTrajectoryStatus();
     
