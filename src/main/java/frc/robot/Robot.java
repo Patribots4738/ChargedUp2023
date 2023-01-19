@@ -114,6 +114,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
 
     Trajectory trajectory = autoPath.getPath();
+
     // Get a list of states from the trajectory to follow. (G-Code)
     List<State> goal = trajectory.getStates();
 
@@ -121,7 +122,6 @@ public class Robot extends TimedRobot {
     // 45 degrees (in the field-relative coordinate system).
     ChassisSpeeds adjustedSpeeds = autoController.calculate(
     swerve.getPose(), goal.get(1), goal.get(1).poseMeters.getRotation());
-    
     
     SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(adjustedSpeeds);
     
