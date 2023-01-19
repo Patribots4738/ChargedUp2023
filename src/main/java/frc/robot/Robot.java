@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import io.github.oblarg.oblog.Logger;
 import hardware.*;
 import math.*;
 import math.Constants.*;
@@ -54,7 +55,6 @@ public class Robot extends TimedRobot {
 
   Trajectory trajectory;
   TestPath autoPath;
-
 
   Debug debug;
 
@@ -84,6 +84,10 @@ public class Robot extends TimedRobot {
     
     // Auto instantiation
     auto = new Auto();
+
+    // The first argument is the root container
+    // The second argument is whether logging and config should be given separate tabs
+    Logger.configureLoggingAndConfig(this, false);
   }
 
   /**
@@ -98,6 +102,8 @@ public class Robot extends TimedRobot {
 
     // Update the odometry for the swerve drive
     swerve.periodic();
+    
+    Logger.updateEntries();
 
   }
   
@@ -112,9 +118,6 @@ public class Robot extends TimedRobot {
 
     autoPath = new TestPath(swerve);
 
-    // Here, our rotation profile constraints were a max velocity
-    // of 1 rotation per second and a max acceleration of 180 degrees
-    // per second squared.
     autoController = auto.getAutoController();
     
   }
@@ -134,7 +137,7 @@ public class Robot extends TimedRobot {
     // Get the adjusted speeds. Here, we want the robot to be facing
     // 45 degrees (in the field-relative coordinate system).
     ChassisSpeeds adjustedSpeeds = autoController.calculate(
-    swerve.getPose(), goal.get(), goal.get().poseMeters.getRotation());
+    swerve.getPose(), goal.get(1), goal.get(1).poseMeters.getRotation());
     
     
     SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(adjustedSpeeds);

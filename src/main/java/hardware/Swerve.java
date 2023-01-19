@@ -50,8 +50,7 @@ public class Swerve {
       });
 
   /** Creates a new DriveSubsystem. */
-  public Swerve() {
-  }
+  public Swerve() {}
 
   public void periodic() {
     // Update the odometry in the periodic block
