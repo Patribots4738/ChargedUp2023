@@ -9,14 +9,9 @@ import hardware.*;
 import math.Constants.*;
 import auto.*;
 
-import java.util.List;
-
 import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.XboxController;
 
 import io.github.oblarg.oblog.Logger;
@@ -50,7 +45,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     
-    // Instantiate our Robot. This will perform all our button bindings, and put our
+    // Instantiate our Robot. This acts as a dictionary for all of our subsystems
     
     // Debug class so we can use shuffleboard
     debug = new Debug();
