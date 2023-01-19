@@ -31,6 +31,9 @@ public class Robot extends TimedRobot {
   XboxController operator;
   
   AutoWaypoints autoWaypoints;
+
+  // Arm arm;
+  
   HolonomicDriveController autoController;
 
   Trajectory trajectory;
