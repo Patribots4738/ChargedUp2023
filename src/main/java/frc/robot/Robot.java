@@ -4,37 +4,22 @@
 
 package frc.robot;
 
+import debug.*;
+import hardware.*;
+import math.Constants.*;
+import auto.*;
+
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.text.Position;
-
-import com.revrobotics.CANSparkMax;
-
-import debug.Debug;
 import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.Trajectory.State;
-import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 import io.github.oblarg.oblog.Logger;
-import hardware.*;
-import math.*;
-import math.Constants.*;
-import auto.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -64,6 +49,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    
     // Instantiate our Robot. This will perform all our button bindings, and put our
     
     // Debug class so we can use shuffleboard
@@ -88,6 +74,7 @@ public class Robot extends TimedRobot {
     // The first argument is the root container
     // The second argument is whether logging and config should be given separate tabs
     Logger.configureLoggingAndConfig(this, false);
+
   }
 
   /**
@@ -102,7 +89,7 @@ public class Robot extends TimedRobot {
 
     // Update the odometry for the swerve drive
     swerve.periodic();
-    
+
     Logger.updateEntries();
 
   }
@@ -125,11 +112,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    // autoController = new HolonomicDriveController(
-    //   new PIDController(kP.getDouble(1.0), kI.getDouble(0.0), kD.getDouble(0.0)),
-    //   new PIDController(kP.getDouble(1.0), kI.getDouble(0.0), kD.getDouble(0.0)),
-    //   new ProfiledPIDController(kP2.getDouble(1.0), kI2.getDouble(0.0), kD2.getDouble(0.0),
-    //     new TrapezoidProfile.Constraints(1, 2)));
+
     Trajectory trajectory = autoPath.getPath();
     // Get a list of states from the trajectory to follow. (G-Code)
     List<State> goal = trajectory.getStates();
@@ -160,6 +143,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
+
     double leftY = driver.getLeftX();
     double leftX = driver.getLeftY();
     double rightX = driver.getRightX();
@@ -189,9 +173,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
-    
-  }
+  public void testInit() {}
 
   /** This function is called periodically during test mode. */
   @Override
