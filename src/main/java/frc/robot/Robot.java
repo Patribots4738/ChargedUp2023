@@ -11,6 +11,7 @@ import javax.swing.text.Position;
 
 import com.revrobotics.CANSparkMax;
 
+import debug.Debug;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -29,10 +30,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.autos.*;
 import hardware.*;
 import math.*;
 import math.Constants.*;
+import auto.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -43,18 +44,19 @@ import math.Constants.*;
 public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   // ExampleSubsystem exampleSubsystem; 
-  CANSparkMax motor;
   Swerve swerve;
+
   XboxController driver;
   XboxController operator;
-  MAXSwerveModule module;
-  // Arm arm;
+  
+  Auto auto;
   HolonomicDriveController autoController;
+
   Trajectory trajectory;
   TestPath autoPath;
 
-  GenericEntry kP; GenericEntry kI; GenericEntry kD; GenericEntry kP2; GenericEntry kI2; GenericEntry kD2; GenericEntry m_speed;
-  int autoStates = 0;
+
+  Debug debug;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -63,62 +65,25 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // Instantiate our Robot. This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
+    
+    // Debug class so we can use shuffleboard
+    debug = new Debug();
+
+    // Drivetrain instantiation
     swerve = new Swerve();
 
+    // Zero the IMU for field-oriented driving
+    swerve.zeroHeading();
+
+    // Setup controllers
     driver = new XboxController(OIConstants.kDriverControllerPort);
     operator = new XboxController(OIConstants.kOperatorControllerPort);
 
-    // swerve.resetOdometry(new Pose2d(0.0, 0.0, 0));
-
-    // module = new MAXSwerveModule(1, 2, 0)
-    
-    
+    // Arm Instantiation
     // arm = new Arm();
-
-          
-    kP = Shuffleboard.getTab("Drive")
-      .add("P", 1)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
-      .getEntry();
-
-    kI = Shuffleboard.getTab("Drive")
-      .add("I", 0)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
-      .getEntry();
-
-    kD = Shuffleboard.getTab("Drive")
-      .add("D", 0)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
-      .getEntry();
-   
-    kP2 = Shuffleboard.getTab("Turn")
-      .add("P", 0.22)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -5, "max", 5)) // specify widget properties here
-      .getEntry();
-
-    kI2 = Shuffleboard.getTab("Turn")
-      .add("I", 0)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
-      .getEntry();
-
-    kD2 = Shuffleboard.getTab("Turn")
-      .add("D", 0.74)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
-      .getEntry();
-
-    m_speed = Shuffleboard.getTab("Turn")
-      .add("Speed", 0)
-      .withWidget(BuiltInWidgets.kGraph)
-      .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
-      .getEntry();
-
+    
+    // Auto instantiation
+    auto = new Auto();
   }
 
   /**
@@ -150,13 +115,10 @@ public class Robot extends TimedRobot {
     // Here, our rotation profile constraints were a max velocity
     // of 1 rotation per second and a max acceleration of 180 degrees
     // per second squared.
-    autoController = new HolonomicDriveController(
-      new PIDController(kP.getDouble(1.0), kI.getDouble(0.0), kD.getDouble(0.0)),
-      new PIDController(kP.getDouble(1.0), kI.getDouble(0.0), kD.getDouble(0.0)),
-      //  new ProfiledPIDController(kP2.getDouble(0.22), kI2.getDouble(0.0), kD2.getDouble(0.74),
-        new ProfiledPIDController(kP2.getDouble(3.596), kI2.getDouble(0.0), kD2.getDouble(0),
-        // new TrapezoidProfile.Constraints(6.28, 1)));
-        new TrapezoidProfile.Constraints(0.5, 0.5)));
+    autoController = auto.getAutoController(Constants.AutoConstants.kXCorrectionP, Constants.AutoConstants.kXCorrectionI, Constants.AutoConstants.kXCorrectionD, 
+      Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD,
+      Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
+      Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared);
     
   }
 
@@ -175,17 +137,15 @@ public class Robot extends TimedRobot {
     // Get the adjusted speeds. Here, we want the robot to be facing
     // 45 degrees (in the field-relative coordinate system).
     ChassisSpeeds adjustedSpeeds = autoController.calculate(
-    swerve.getPose(), goal.get(autoStates), goal.get(autoStates).poseMeters.getRotation());
+    swerve.getPose(), goal.get(auto.getAutoStates()), goal.get(auto.getAutoStates()).poseMeters.getRotation());
     
-    
-
-    System.out.println("Swerve pos: " + swerve.getPose().getX());    
     
     SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(adjustedSpeeds);
-
-    m_speed.setDouble(adjustedSpeeds.vyMetersPerSecond);
     
     swerve.setModuleStates(moduleStates);
+
+    debug.debugPeriodic(adjustedSpeeds.vyMetersPerSecond);
+    System.out.println("Swerve pos: " + swerve.getPose().getX());    
 
   }
 
