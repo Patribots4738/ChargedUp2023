@@ -115,10 +115,7 @@ public class Robot extends TimedRobot {
     // Here, our rotation profile constraints were a max velocity
     // of 1 rotation per second and a max acceleration of 180 degrees
     // per second squared.
-    autoController = auto.getAutoController(Constants.AutoConstants.kXCorrectionP, Constants.AutoConstants.kXCorrectionI, Constants.AutoConstants.kXCorrectionD, 
-      Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD,
-      Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
-      Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared);
+    autoController = auto.getAutoController();
     
   }
 
@@ -131,13 +128,13 @@ public class Robot extends TimedRobot {
     //   new ProfiledPIDController(kP2.getDouble(1.0), kI2.getDouble(0.0), kD2.getDouble(0.0),
     //     new TrapezoidProfile.Constraints(1, 2)));
     Trajectory trajectory = autoPath.getPath();
-    // Sample the trajectory at half of the length
+    // Get a list of states from the trajectory to follow. (G-Code)
     List<State> goal = trajectory.getStates();
 
     // Get the adjusted speeds. Here, we want the robot to be facing
     // 45 degrees (in the field-relative coordinate system).
     ChassisSpeeds adjustedSpeeds = autoController.calculate(
-    swerve.getPose(), goal.get(auto.getAutoStates()), goal.get(auto.getAutoStates()).poseMeters.getRotation());
+    swerve.getPose(), goal.get(), goal.get().poseMeters.getRotation());
     
     
     SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(adjustedSpeeds);
