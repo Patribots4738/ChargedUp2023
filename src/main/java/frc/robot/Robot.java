@@ -52,10 +52,12 @@ public class Robot extends TimedRobot {
     
     // Debug class so we can use shuffleboard
     debug = new Debug();
+    debug.debugInit();
 
     // Drivetrain instantiation
     swerve = new Swerve();
     // Zero the IMU for field-oriented driving
+    swerve.resetEncoders();
     swerve.zeroHeading();
 
     // Setup controllers
@@ -97,7 +99,6 @@ public class Robot extends TimedRobot {
 
     // Set the swerve drive to coast mode
     
-
   }
 
   @Override
@@ -120,6 +121,7 @@ public class Robot extends TimedRobot {
     
     SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
+
   }
 
   @Override
@@ -137,7 +139,7 @@ public class Robot extends TimedRobot {
     double leftY = driver.getLeftX();
     double leftX = driver.getLeftY();
     double rightX = driver.getRightX();
-    double deadZone = 0.5;
+    double deadZone = 0.15;
     
     if (Math.abs(leftY) < deadZone) {
       leftY = 0;
@@ -156,7 +158,7 @@ public class Robot extends TimedRobot {
     {
       // Drive the robot  
       //           SpeedX SpeedY Rotation
-      swerve.drive(leftX, leftY, rightX, true);
+      swerve.drive(leftX*0.25, leftY*0.25, rightX*0.25, true);
     }
     // arm.drive(operator.getRightX(), operator.getRightY());
 

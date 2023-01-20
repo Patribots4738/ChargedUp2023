@@ -8,54 +8,74 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 public class Debug {
 
-  GenericEntry kP; GenericEntry kI; GenericEntry kD; GenericEntry kP2; GenericEntry kI2; GenericEntry kD2; GenericEntry m_speed;
+  public static GenericEntry xP; public static GenericEntry xD; 
+  public static GenericEntry yP; public static GenericEntry yD; 
+  public static GenericEntry rotP; public static GenericEntry rotD; 
+  public static GenericEntry xDiff; public static GenericEntry yDiff; public static GenericEntry rotDiff;
 
   public void debugInit() {
-    kP = Shuffleboard.getTab("Drive")
-      .add("P", 1)
+
+    xP = Shuffleboard.getTab("Drive")
+      .add("xP", 1)
       .withWidget(BuiltInWidgets.kNumberSlider)
       .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
       .getEntry();
 
-    kI = Shuffleboard.getTab("Drive")
-      .add("I", 0)
+    xD = Shuffleboard.getTab("Drive")
+      .add("xD", 0)
       .withWidget(BuiltInWidgets.kNumberSlider)
       .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
       .getEntry();
 
-    kD = Shuffleboard.getTab("Drive")
-      .add("D", 0)
+    yP = Shuffleboard.getTab("Drive")
+    .add("yP", 1)
+    .withWidget(BuiltInWidgets.kNumberSlider)
+    .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
+    .getEntry();
+
+    yD = Shuffleboard.getTab("Drive")
+      .add("yD", 0)
       .withWidget(BuiltInWidgets.kNumberSlider)
       .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
       .getEntry();
    
-    kP2 = Shuffleboard.getTab("Turn")
-      .add("P", 0.22)
+    rotP = Shuffleboard.getTab("Turn")
+      .add("rotP", 0.22)
       .withWidget(BuiltInWidgets.kNumberSlider)
       .withProperties(Map.of("min", -5, "max", 5)) // specify widget properties here
       .getEntry();
 
-    kI2 = Shuffleboard.getTab("Turn")
-      .add("I", 0)
+    rotD = Shuffleboard.getTab("Turn")
+      .add("rotD", 0.74)
       .withWidget(BuiltInWidgets.kNumberSlider)
       .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
       .getEntry();
 
-    kD2 = Shuffleboard.getTab("Turn")
-      .add("D", 0.74)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
+    xDiff = Shuffleboard.getTab("Drive")
+      .add("xDiff", 0)
+      .withWidget(BuiltInWidgets.kGraph)
+      .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
       .getEntry();
 
-    m_speed = Shuffleboard.getTab("Turn")
-      .add("Speed", 0)
+    yDiff = Shuffleboard.getTab("Drive")
+      .add("yDiff", 0)
+      .withWidget(BuiltInWidgets.kGraph)
+      .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+      .getEntry();
+
+    rotDiff = Shuffleboard.getTab("Turn")
+      .add("rotDiff", 0)
       .withWidget(BuiltInWidgets.kGraph)
       .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
       .getEntry();
   }
 
-  public void debugPeriodic(double vYspeed) {
-    m_speed.setDouble(vYspeed);
+  public static void debugPeriodic(double x, double y, double rot) {
+
+    xDiff.setDouble(x);
+    yDiff.setDouble(y);
+    rotDiff.setDouble(rot);
+
   }
 
 }

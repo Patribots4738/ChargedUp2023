@@ -134,13 +134,13 @@ public final class Constants
     public static final double kXCorrectionI = 0;
     public static final double kXCorrectionD = 0;
 
-    public static final double kYCorrectionP = 1;
+    public static final double kYCorrectionP = 0.3;
     public static final double kYCorrectionI = 0;
     public static final double kYCorrectionD = 0;
 
     public static final double kRotationCorrectionP = -0.22;
     public static final double kRotationCorrectionI = 0;
-    public static final double kRotationCorrectionD = 0.74;
+    public static final double kRotationCorrectionD = 0;//.74;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
