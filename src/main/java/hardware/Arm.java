@@ -74,8 +74,8 @@ public class Arm {
 
 
     // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
-    _lowerArm.setIdleMode(ArmConstants.kLowerIdleMode);
-    _upperArm.setIdleMode(ArmConstants.kUpperIdleMode);
+    _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     // Save the SPARK MAX configuration. If a SPARK MAX 
     // browns out, it will retain the last configuration
