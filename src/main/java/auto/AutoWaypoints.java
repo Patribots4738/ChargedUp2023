@@ -21,7 +21,6 @@ public class AutoWaypoints implements Loggable {
 
     Swerve swerve;
 
-    private double stateStartTime;
     private double currentX;
     private double currentY;
  
