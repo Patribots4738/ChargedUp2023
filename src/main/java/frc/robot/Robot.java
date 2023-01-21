@@ -58,6 +58,7 @@ public class Robot extends TimedRobot {
     // Zero the IMU for field-oriented driving
     swerve.resetEncoders();
     swerve.zeroHeading();
+    swerve.setBrakeMode();
 
     // Setup controllers
     driver = new XboxController(OIConstants.kDriverControllerPort);
