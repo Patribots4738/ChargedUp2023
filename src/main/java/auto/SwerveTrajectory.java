@@ -54,16 +54,16 @@ public class SwerveTrajectory implements Loggable {
    * @see kMaxAngularSpeedRadiansPerSecondSquared The maximum acceleration that the robot can TURN in the trapezoidal profile
    * @return A new HolonomicDriveController with the given PID gains (xP, xI, xD, yP, yI, yD, rotP, rotI, rotD) and constraints (maxVel, maxAccel)
    */
-  // public static HolonomicDriveController HDC = new HolonomicDriveController(
-  //   new PIDController(Constants.AutoConstants.kXCorrectionP, Constants.AutoConstants.kXCorrectionI, Constants.AutoConstants.kXCorrectionD),
-  //   new PIDController(Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD),
-  //   new ProfiledPIDController(Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
-  //     new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
   public static HolonomicDriveController HDC = new HolonomicDriveController(
-    new PIDController(Debug.xP.getDouble(1), Constants.AutoConstants.kXCorrectionI, Debug.xD.getDouble(0)),
-    new PIDController(Debug.yP.getDouble(1), Constants.AutoConstants.kYCorrectionI, Debug.yD.getDouble(0)),
-    new ProfiledPIDController(Debug.rotP.getDouble(1), Constants.AutoConstants.kRotationCorrectionI, Debug.rotD.getDouble(0),
+    new PIDController(Constants.AutoConstants.kXCorrectionP, Constants.AutoConstants.kXCorrectionI, Constants.AutoConstants.kXCorrectionD),
+    new PIDController(Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD),
+    new ProfiledPIDController(Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
       new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
+  // public static HolonomicDriveController HDC = new HolonomicDriveController(
+  //   new PIDController(Debug.xP.getDouble(1), Constants.AutoConstants.kXCorrectionI, Debug.xD.getDouble(0)),
+  //   new PIDController(Debug.yP.getDouble(1), Constants.AutoConstants.kYCorrectionI, Debug.yD.getDouble(0)),
+  //   new ProfiledPIDController(Debug.rotP.getDouble(1), Constants.AutoConstants.kRotationCorrectionI, Debug.rotD.getDouble(0),
+  //     new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
   
   /**
    * This is PathPlanner.  It's awesome :) open up pathplanner.exe on the driverstation laptop.  Point the application to the locaiton of your coding project (must contain build.gradle).  Draw the path.  It will autosave. If everything is characterized correctly and your odometry reflects reality, ie. when the robot goes 1 meter it says it goes one meter--it will work like a charm.
@@ -91,7 +91,7 @@ public class SwerveTrajectory implements Loggable {
             _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getPoseMeters().getRotation().getDegrees());
           
           // If the path has not completed time wise
-          if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds+1) {
+          if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds+5) {
 
             // Use elapsedTime as a refrence for where we NEED to be
             // Then, sample the position and rotation for that time, 

@@ -158,7 +158,7 @@ public class Robot extends TimedRobot {
     {
       // Drive the robot  
       //           SpeedX SpeedY Rotation
-      swerve.drive(leftX*0.25, leftY*0.25, rightX*0.25, true);
+      swerve.drive(leftX, leftY, rightX, true);
     }
     // arm.drive(operator.getRightX(), operator.getRightY());
 

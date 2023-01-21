@@ -1,7 +1,5 @@
 package math;
 
-import math.Constants.ArmConstants;
-
 public class ArmCalcuations {
     
     /* 
@@ -29,21 +27,21 @@ public class ArmCalcuations {
         // Due to x and y being inputed as xbox contoller axis values
         // They will be only from -1 to 1
         // Thus, we multiply them by the max reach to scale them for the arm
-        x *= ArmConstants.maxReachX;
-        y *= ArmConstants.maxReachY;
+        x *= Constants.ArmConstants.maxReachX;
+        y *= Constants.ArmConstants.maxReachY;
         
         // Fail safe in case the X goes over max reach
-        if (x > ArmConstants.maxReachX)
-            x = ArmConstants.maxReachX;
+        if (x > Constants.ArmConstants.maxReachX)
+            x = Constants.ArmConstants.maxReachX;
 
         // Fail safe in case the Y goes over max reach
-        if (y > ArmConstants.maxReachY)
-            y = ArmConstants.maxReachY;
+        if (y > Constants.ArmConstants.maxReachY)
+            y = Constants.ArmConstants.maxReachY;
 
         
         double q2 = Math.acos (
-            (x * x + y * y) - (ArmConstants.a1 * ArmConstants.a1 + ArmConstants.a2 * ArmConstants.a2)
-            / (2 * ArmConstants.a1 * ArmConstants.a2));
+            (x * x + y * y) - (Constants.ArmConstants.a1 * Constants.ArmConstants.a1 + Constants.ArmConstants.a2 * Constants.ArmConstants.a2)
+            / (2 * Constants.ArmConstants.a1 * Constants.ArmConstants.a2));
         
         // Need to code
 
@@ -69,27 +67,27 @@ public class ArmCalcuations {
         // Due to x and y being inputed as xbox contoller axis values
         // They will be only from -1 to 1
         // Thus, we multiply them by the max reach to scale them for the arm
-        x *= ArmConstants.maxReachX;
-        y *= ArmConstants.maxReachY;
+        x *= Constants.ArmConstants.maxReachX;
+        y *= Constants.ArmConstants.maxReachY;
         
         // Fail safe in case the X goes over max reach
-        if (x > ArmConstants.maxReachX)
-            x = ArmConstants.maxReachX;
+        if (x > Constants.ArmConstants.maxReachX)
+            x = Constants.ArmConstants.maxReachX;
 
         // Fail safe in case the Y goes over max reach
-        if (y > ArmConstants.maxReachY)
-            y = ArmConstants.maxReachY;
+        if (y > Constants.ArmConstants.maxReachY)
+            y = Constants.ArmConstants.maxReachY;
 
 
         double q1Left = Math.atan(y / x) + 
-                        Math.atan((ArmConstants.a2 * Math.sin(q2))
-                                / (ArmConstants.a1 + ArmConstants.a2*Math.cos(q2)));
+                        Math.atan((Constants.ArmConstants.a2 * Math.sin(q2))
+                                / (Constants.ArmConstants.a1 + Constants.ArmConstants.a2*Math.cos(q2)));
         
 
         
         double q1Right = Math.atan(y / x) - 
-                        Math.atan((ArmConstants.a2 * Math.sin(q2))
-                                /(ArmConstants.a1 + ArmConstants.a2*Math.cos(q2)));
+                        Math.atan((Constants.ArmConstants.a2 * Math.sin(q2))
+                                /(Constants.ArmConstants.a1 + Constants.ArmConstants.a2*Math.cos(q2)));
         
         return q1Left;
 
