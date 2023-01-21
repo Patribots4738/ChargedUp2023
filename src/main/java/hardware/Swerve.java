@@ -176,4 +176,29 @@ public class Swerve {
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+
+  /**
+   * Sets the coast mode for the drive motors.
+   * This is useful for when the robot is disabled
+   * So we can freely move the robot around
+   */
+  public void setCoast() {
+    m_frontLeft.setCoastMode();
+    m_frontRight.setCoastMode();
+    m_rearLeft.setCoastMode();
+    m_rearRight.setCoastMode();
+  }
+
+  /**
+   * Sets the brake mode for the drive motors.
+   * This is useful for when the robot is enabled
+   * So we can stop the robot quickly
+   * 
+   * This is the default mode
+   */
+  public void setBrake() {
+    m_frontLeft.setBrakeMode();
+    m_frontRight.setBrakeMode();
+    m_rearLeft.setBrakeMode();
+    m_rearRight.setBrakeMode();
 }

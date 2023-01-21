@@ -94,8 +94,8 @@ public class MAXSwerveModule {
     _turningPIDController.setOutputRange(ModuleConstants.kTurningMinOutput,
         ModuleConstants.kTurningMaxOutput);
 
-    _drivingSparkMax.setIdleMode(ModuleConstants.kDrivingMotorIdleMode);
-    _turningSparkMax.setIdleMode(ModuleConstants.kTurningMotorIdleMode);
+    _drivingSparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    _turningSparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
     _drivingSparkMax.setSmartCurrentLimit(ModuleConstants.kDrivingMotorCurrentLimit);
     _turningSparkMax.setSmartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
 
@@ -159,5 +159,17 @@ public class MAXSwerveModule {
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     _drivingEncoder.setPosition(0);
+  }
+
+  /** Set the motor to coast mode */
+  public void setCoastMode() {
+    _drivingSparkMax.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    _turningSparkMax.setIdleMode(CANSparkMax.IdleMode.kCoast);
+  }
+
+  /** Set the motor to brake mode */
+  public void setBrakeMode() {
+    _drivingSparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    _turningSparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
   }
 }

@@ -107,9 +107,6 @@ public final class Constants
     public static final double kTurningMinOutput = -1;
     public static final double kTurningMaxOutput = 1;
 
-    public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
-    public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
-
     public static final int kDrivingMotorCurrentLimit = 50; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
@@ -153,28 +150,50 @@ public final class Constants
 
   public static final class ArmConstants {
 
+    public static final int kLowerArmMotorCanId = 9;
+    public static final int kUpperArmMotorCanId = 10;
+
     // The length of the first pivot point to the second pivot point, in inches
-    public static final double a1 = 30;
+    public static final double kLowerArmLength = 30;
 
     // The length of the second pivot point to the claw, in inches
-    public static final double a2 = 24;
+    public static final double kUpperArmLength = 24;
 
     // The max reach of the bot horizontally, in inches
-    public static final double maxReachX = 48;
+    public static final double kMaxReachX = 48;
 
     // The max reach of the bot vertically, in inches
-    public static final double maxReachY = 48;
+    public static final double kMaxReachY = 48;
 
     // The gear ratio of the lower arm is 60:1
-    public static final double lowerRatio = 60;
+    public static final double kLowerRatio = 60;
 
     // The gear ratio of the upper arm is 150:1
-    public static final double upperRatio = 150;
-
+    public static final double kUpperRatio = 150;
+    
     // The amount of degrees that the upper arm can rotate
-    public static final double upperFreedom = 200;
-
+    public static final double kLowerFreedom = 150;
+    
     // The amount of degrees that the upper arm can rotate
-    public static final double lowerFreedom = 150;
+    public static final double kUpperFreedom = 200;
+
+    // The ouputs used in the output range for the lower and upper arms
+    public static final double kLowerMinOutput = -1;
+    public static final double kLowerMaxOutput = 1;
+
+    public static final double kUpperMinOutput = -1;
+    public static final double kUpperMaxOutput = 1;
+
+    // PID values for the lower and upper arm
+    public static final double kLowerP = 0.1;
+    public static final double kLowerI = 0;
+    public static final double kLowerD = 0;
+    public static final double kLowerFF = 1;
+
+    public static final double kUpperP = 0.1;
+    public static final double kUpperI = 0;
+    public static final double kUpperD = 0;
+    public static final double kUpperFF = 1;
+
   }
 }

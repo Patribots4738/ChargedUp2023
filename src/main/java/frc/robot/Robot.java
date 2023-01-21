@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
   HolonomicDriveController autoController;
 
   Trajectory trajectory;
-  TestPath autoPath;
 
   Debug debug;
 
