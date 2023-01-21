@@ -201,4 +201,5 @@ public class Swerve {
     m_frontRight.setBrakeMode();
     m_rearLeft.setBrakeMode();
     m_rearRight.setBrakeMode();
+  }
 }
