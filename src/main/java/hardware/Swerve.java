@@ -193,8 +193,7 @@ public class Swerve {
    * Sets the brake mode for the drive motors.
    * This is useful for when the robot is enabled
    * So we can stop the robot quickly
-   * 
-   * This is the default mode
+   * (This is the default mode)
    */
   public void setBrakeMode() {
     m_frontLeft.setBrakeMode();
