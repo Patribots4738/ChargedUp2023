@@ -182,7 +182,7 @@ public class Swerve {
    * This is useful for when the robot is disabled
    * So we can freely move the robot around
    */
-  public void setCoast() {
+  public void setCoastMode() {
     m_frontLeft.setCoastMode();
     m_frontRight.setCoastMode();
     m_rearLeft.setCoastMode();
@@ -196,7 +196,7 @@ public class Swerve {
    * 
    * This is the default mode
    */
-  public void setBrake() {
+  public void setBrakeMode() {
     m_frontLeft.setBrakeMode();
     m_frontRight.setBrakeMode();
     m_rearLeft.setBrakeMode();

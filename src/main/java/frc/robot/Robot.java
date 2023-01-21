@@ -97,6 +97,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
 
     // Set the swerve drive to coast mode
+    swerve.setCoastMode();
     
   }
 
@@ -107,7 +108,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 
     autoWaypoints.init(swerve);
-
+    swerve.setCoastMode();
     SwerveTrajectory.resetTrajectoryStatus();
     
   }
@@ -127,7 +128,8 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     
     swerve.resetEncoders();
-  
+    swerve.setCoastMode();
+
   }
 
   /** This function is called periodically during operator control. */
