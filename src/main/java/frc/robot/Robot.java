@@ -30,13 +30,13 @@ public class Robot extends TimedRobot {
   XboxController driver;
   // XboxController operator;
   
-  // AutoWaypoints autoWaypoints;
+  AutoWaypoints autoWaypoints;
 
   Arm arm;
   
-  // HolonomicDriveController autoController;
+  HolonomicDriveController autoController;
 
-  // Trajectory trajectory;
+  Trajectory trajectory;
 
   Debug debug;
 
@@ -54,8 +54,8 @@ public class Robot extends TimedRobot {
     debug.debugInit();
 
     // Drivetrain instantiation
-    // swerve = new Swerve();
-    // // Zero the IMU for field-oriented driving
+    swerve = new Swerve();
+    // Zero the IMU for field-oriented driving
     swerve.resetEncoders();
     swerve.zeroHeading();
     swerve.setBrakeMode();
@@ -68,8 +68,8 @@ public class Robot extends TimedRobot {
     arm = new Arm();
     
     
-    //AutoWaypoints Instantiation
-    // autoWaypoints = new AutoWaypoints();
+    // AutoWaypoints Instantiation
+    autoWaypoints = new AutoWaypoints();
 
     // The first argument is the root container
     // The second argument is whether logging and config should be given separate tabs
@@ -109,8 +109,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    // autoWaypoints.init(swerve);
-    // swerve.setCoastMode();
+    autoWaypoints.init(swerve);
+    swerve.setCoastMode();
     SwerveTrajectory.resetTrajectoryStatus();
     
   }
@@ -119,9 +119,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    // autoWaypoints.autoPeriodic();
-    
-    // SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+    autoWaypoints.autoPeriodic();
+    SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
 
   }
@@ -129,7 +128,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     
-    // swerve.resetEncoders();
+    swerve.resetEncoders();
     swerve.setBrakeMode();
     arm.resetEncoders();
 
