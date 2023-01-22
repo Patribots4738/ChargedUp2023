@@ -261,14 +261,15 @@ public class Arm implements Loggable {
 
     feedForward = new ArmFeedforward(
       ArmConstants.kSLower, 
-      ArmConstants.kGLower, 
+      0,//ArmConstants.kGLower, 
       ArmConstants.kVLower, 
       ArmConstants.kALower);
 
     FF = feedForward.calculate(angle, 0);
+    // System.out.println(FF);
 
     _lowerArmPIDController.setFF(FF);
 
-    _lowerArmPIDController.setReference(angle, ControlType.kPosition);
+    _lowerArmPIDController.setReference(angle*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
   }
 }

@@ -187,9 +187,9 @@ public final class Constants
     public static final double kUpperMaxOutput = 1;
 
     // PID values for the lower and upper arm
-    public static final double kLowerP = 53.258;
+    public static final double kLowerP = 0.65;
     public static final double kLowerI = 0;
-    public static final double kLowerD = 21.28;
+    public static final double kLowerD = 0.2;
     public static final double kLowerFF = 0;
 
     public static final double kUpperP = 1;

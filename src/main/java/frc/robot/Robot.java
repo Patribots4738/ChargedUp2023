@@ -25,7 +25,7 @@ import io.github.oblarg.oblog.Logger;
 public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   // ExampleSubsystem exampleSubsystem; 
-  // Swerve swerve;
+  Swerve swerve;
 
   XboxController driver;
   // XboxController operator;
@@ -56,9 +56,9 @@ public class Robot extends TimedRobot {
     // Drivetrain instantiation
     // swerve = new Swerve();
     // // Zero the IMU for field-oriented driving
-    // swerve.resetEncoders();
-    // swerve.zeroHeading();
-    // swerve.setBrakeMode();
+    swerve.resetEncoders();
+    swerve.zeroHeading();
+    swerve.setBrakeMode();
 
     // Setup controllers
     driver = new XboxController(OIConstants.kDriverControllerPort);
@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     // Update the odometry for the swerve drive
-    // swerve.periodic();
+    swerve.periodic();
 
     // Update the logger for shuffleboard
     Logger.updateEntries();
@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
 
     // Set the swerve drive to coast mode
-    // swerve.setCoastMode();
+    swerve.setCoastMode();
     
   }
 
@@ -130,7 +130,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     
     // swerve.resetEncoders();
-    // swerve.setCoastMode();
+    swerve.setBrakeMode();
     arm.resetEncoders();
 
   }
@@ -164,8 +164,10 @@ public class Robot extends TimedRobot {
       //           SpeedX SpeedY Rotation
       // swerve.drive(leftX, leftY, rightX, true);
     }
-    // set lower arm position to the slider value of xPos in debug
-    arm.setLowerArmPosition(Debug.yPos.getDouble(0));
+
+
+    // set lower arm position
+    // arm.setLowerArmPositionNumber2(0.1);
 
   }
 
