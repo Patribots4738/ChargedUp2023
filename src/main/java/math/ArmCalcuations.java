@@ -76,14 +76,11 @@ public class ArmCalcuations {
                         Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
                                 / (Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2)));
         
-
-        
+        return q1Left;
+    }
+/*  ^^^ Why isnt/wasn't this needed? Maybe because the arm elbow stays on the top/botton, no matter which side.       
         double q1Right = Math.atan(y / x) - 
                         Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
-                                /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2)));
-        
-        return q1Left;
-
-    }
-    
+                                /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2))); 
+*/   
 }
