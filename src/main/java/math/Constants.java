@@ -47,7 +47,6 @@ public final class Constants
     public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
     public static final double kBackRightChassisAngularOffset = Math.toRadians(-90);
 
-    // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
     public static final int kRearLeftDrivingCanId = 5;
     public static final int kFrontRightDrivingCanId = 3;
@@ -187,7 +186,7 @@ public final class Constants
     public static final double kUpperMaxOutput = 1;
 
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.65;
+    public static final double kLowerP = 0.335;//0.65;
     public static final double kLowerI = 0;
     public static final double kLowerD = 0.2;
     public static final double kLowerFF = 0;

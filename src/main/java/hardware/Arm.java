@@ -8,7 +8,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-
+import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -250,8 +250,10 @@ public class Arm implements Loggable {
     _upperArmEncoder.setPosition(0);
 
   }
-    
+
   public void setLowerArmPositionNumber2 (double angle) {
+
+    double rotations = Units.radiansToRotations(angle);
 
     feedForward = new ArmFeedforward(
       ArmConstants.kSLower, 
@@ -259,11 +261,11 @@ public class Arm implements Loggable {
       ArmConstants.kVLower, 
       ArmConstants.kALower);
 
-    FF = feedForward.calculate(angle, 0);
+    FF = feedForward.calculate(rotations, 0);
     // System.out.println(FF);
 
     _lowerArmPIDController.setFF(FF);
 
-    _lowerArmPIDController.setReference(angle*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
+    _lowerArmPIDController.setReference(rotations*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
   }
 }

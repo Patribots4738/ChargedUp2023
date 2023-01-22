@@ -19,7 +19,7 @@ public class Debug {
     xP = Shuffleboard.getTab("Drive")
       .add("xP", 1)
       .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
+      .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
       .getEntry();
 
     xD = Shuffleboard.getTab("Drive")

@@ -30,7 +30,7 @@ public class AutoWaypoints implements Loggable {
 
     public void init(Swerve swerve) {
       this.swerve = swerve; 
-      squarePath = PathPlanner.loadPath("Heart", 3, 2.5);
+      squarePath = PathPlanner.loadPath("Square", 3, 2.5);
       chooserBuilder();
     }
 

@@ -24,7 +24,7 @@ import io.github.oblarg.oblog.Logger;
  */
 public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
-  // ExampleSubsystem exampleSubsystem; 
+  /* ExampleSubsystem exampleSubsystem; */
   Swerve swerve;
 
   XboxController driver;
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 
   Arm arm;
   
-  HolonomicDriveController autoController;
+  HolonomicDriveController autoController; 
 
   Trajectory trajectory;
 
@@ -53,9 +53,15 @@ public class Robot extends TimedRobot {
     debug = new Debug();
     debug.debugInit();
 
+
+    /** 
+     * For swerve drive, the following is the order of the motors
+     * odd CAN IDs drive the robot
+     * even CAN IDs are the turning motors
+     */
     // Drivetrain instantiation
     swerve = new Swerve();
-    // Zero the IMU for field-oriented driving
+    // Zero the IMU for field-oriented driving 
     swerve.resetEncoders();
     swerve.zeroHeading();
     swerve.setBrakeMode();
@@ -109,8 +115,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    autoWaypoints.init(swerve);
-    swerve.setCoastMode();
+    autoWaypoints.init(swerve); 
+    // swerve.setCoastMode();
     SwerveTrajectory.resetTrajectoryStatus();
     
   }
@@ -139,8 +145,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() 
   {
 
-    double leftY = driver.getLeftX();
-    double leftX = driver.getLeftY();
+    double leftX = driver.getLeftX();
+    double leftY = driver.getLeftY();
     double rightX = driver.getRightX();
     double deadZone = 0.15;
     
@@ -155,18 +161,18 @@ public class Robot extends TimedRobot {
     }
     
     if (driver.getLeftBumper()) {
-      // swerve.setX();
+      swerve.setX();
     }
     else
     {
       // Drive the robot  
       //           SpeedX SpeedY Rotation
-      // swerve.drive(leftX, leftY, rightX, true);
+      // swerve.drive(leftY*0.25, leftX*0.25, rightX*0.25, true);
     }
 
 
     // set lower arm position
-    // arm.setLowerArmPositionNumber2(0.1);
+    arm.setLowerArmPositionNumber2(leftX/2);
 
   }
 
