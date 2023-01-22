@@ -1,15 +1,27 @@
 package hardware;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
+
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import math.*;
 import math.Constants.ArmConstants;
 
-public class Arm {
+public class Arm implements Loggable {
 
   /**
    * What the arm positions look like and the index in the array
@@ -28,12 +40,31 @@ public class Arm {
   private final CANSparkMax _lowerArm;
   private final CANSparkMax _upperArm;
   
-  private final AbsoluteEncoder _lowerArmEncoder;
-  private final AbsoluteEncoder _upperArmEncoder;
+  private final RelativeEncoder _lowerArmEncoder;
+  private final RelativeEncoder _upperArmEncoder;
 
   private final SparkMaxPIDController _lowerArmPIDController;
   private final SparkMaxPIDController _upperArmPIDController;
+
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(1, 0.1);
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   
+  @Log
+  private double _lowerArmPosition;
+  @Log
+  private double rotations;
+  @Log
+  private double neoRotations;
+  @Log
+  private double currentPosition;
+  @Log
+  double currentVelocity;
+  @Log
+  ArmFeedforward feedForward;
+  @Log
+  double FF;
   /**
    * Constructs a new Arm and configures the encoders and PID controllers.
    */
@@ -47,8 +78,11 @@ public class Arm {
     _upperArm.restoreFactoryDefaults();
 
     // Setup encoders and PID controllers for the lower and upper SPARK MAX(s)
-    _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
-    _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
+    _lowerArmEncoder = _lowerArm.getEncoder();
+    _upperArmEncoder = _upperArm.getEncoder();
+    
+      // _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
+      // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
     _lowerArmPIDController = _lowerArm.getPIDController();
     _upperArmPIDController = _upperArm.getPIDController();
     _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
@@ -57,6 +91,7 @@ public class Arm {
 
     // Note that MAXSwerveModule sets the position and velocity "factors"
     // But as of 1/20/2023 I don't know what these are
+    // _lowerArmEncoder.setPositionConversionFactor(ArmConstants.kLowerArmGearRatio);
 
 
     // Set PID constants for the lower and upper SPARK MAX(s)
@@ -97,10 +132,90 @@ public class Arm {
   /**
    * Set the position of the lower arm, in radians
    * 
-   * @param angle the angle to set the lower arm to
+   * @param angle the angle to set the lower arm to (radians)
    */
   public void setLowerArmPosition(double angle) {
-    _lowerArmPIDController.setReference(angle, ControlType.kPosition);
+
+    // Limit the angle from +- pi/3
+    if (angle > (Math.PI / 3)) {
+
+      angle = (Math.PI / 3);
+
+    } else if (angle < -(Math.PI / 3)) {
+
+      angle = -(Math.PI / 3);
+
+    }
+
+    rotations = (angle) / (2 * Math.PI);
+
+    neoRotations = 2 * Math.PI;//rotations * ArmConstants.kLowerArmGearRatio;
+
+    m_goal = new TrapezoidProfile.State(neoRotations, 0);
+
+    var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+
+    m_setpoint = profile.calculate(0.02);
+    
+    feedForward = new ArmFeedforward(
+      ArmConstants.kSLower, 
+      ArmConstants.kGLower, 
+      ArmConstants.kVLower, 
+      ArmConstants.kALower);
+
+    FF = feedForward.calculate(m_setpoint.position/*- _lowerArmEncoder.getPosition()*/, m_setpoint.velocity);
+
+    // if (Math.abs(FF) < 0.4) {
+
+    //   FF = 0;
+
+    // }
+
+    //if (Math.abs(m_setpoint.position - _lowerArmEncoder.getPosition()) > 0.1) {
+
+      _lowerArmPIDController.setReference(m_setpoint.position/* / (2 * Math.PI)*/, ControlType.kPosition, 0, FF);
+
+    //} else {
+
+      //_lowerArmPIDController.setReference(0, ControlType.kVoltage);
+
+    //}
+
+   
+
+    /**
+     * Turn the angle into rotations of the arm
+     * Then, turn rotations in the arm into rotations of the motor
+     * Command the motor to rotation the amount of rotations calculated
+     */
+    /*
+    rotations = (angle) / (2 * Math.PI);
+    
+    neoRotations = rotations * ArmConstants.kLowerArmGearRatio;
+    
+    // Get the current position, in radians. This is in refrence to the 
+    // Arm, so divide by the gear ratio
+    currentPosition = (angle - (_lowerArmEncoder.getPosition() * Math.PI * 2)) / ArmConstants.kLowerArmGearRatio;
+    
+    // Get the current velocity, because getVelocity() returns RPM, turn it to radians
+    // and divide by 60s and the gear ratio
+    currentVelocity = (_lowerArmEncoder.getVelocity() * Math.PI * 2) / 60 / ArmConstants.kLowerArmGearRatio;
+    
+    feedForward = new ArmFeedforward(
+      ArmConstants.kSLower, 
+      ArmConstants.kGLower, 
+      ArmConstants.kVLower, 
+      ArmConstants.kALower);
+
+    FF = feedForward.calculate(currentPosition, currentVelocity);
+
+    _lowerArmPIDController.setFF(FF);
+
+    System.out.println(FF);
+
+    _lowerArmPIDController.setReference(neoRotations, ControlType.kPosition);
+    */
+
   }
 
   /**
@@ -125,7 +240,17 @@ public class Arm {
       double q1 = armCalculations.getQ1(armX, armY, q2);
 
       setLowerArmPosition(q1);
-      setUpperArmPosition(q2);
+      // setUpperArmPosition(q2);
+
+
+      // ((0.39694) * cos(pos)) + ((0.20953) * sgn(angularVelocity)) + ((0.27319) * (angularVelocity)) + ((0.47396) + (angularAccel))
+  }
+
+  public void resetEncoders() {
+
+    _lowerArmEncoder.setPosition(0);
+    _upperArmEncoder.setPosition(0);
+
   }
     
 }

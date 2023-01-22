@@ -148,8 +148,8 @@ public final class Constants
 
   public static final class ArmConstants {
 
-    public static final int kLowerArmMotorCanId = 9;
-    public static final int kUpperArmMotorCanId = 10;
+    public static final int kLowerArmMotorCanId = 10;
+    public static final int kUpperArmMotorCanId = 9;
 
     // The length of the first pivot point to the second pivot point, in inches
     public static final double kLowerArmLength = 30;
@@ -164,16 +164,20 @@ public final class Constants
     public static final double kMaxReachY = 48;
 
     // The gear ratio of the lower arm is 60:1
-    public static final double kLowerRatio = 60;
+    public static final double kLowerArmGearRatio = 60;
 
-    // The gear ratio of the upper arm is 150:1
-    public static final double kUpperRatio = 150;
+    // The gear ratio of the upper arm is 25:7
+    public static final double kUpperArmGearRatio = (25.0/7.0);
+
+    // The factor that the encoder is multiplied by to get the actual position
+    public static final double kLowerEncoderPositionFactor = (kLowerArmLength * Math.PI) / (kLowerArmGearRatio);
+    public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
     
     // The amount of degrees that the upper arm can rotate
-    public static final double kLowerFreedom = 150;
+    public static final double kLowerFreedom = Units.degreesToRadians(150);
     
     // The amount of degrees that the upper arm can rotate
-    public static final double kUpperFreedom = 200;
+    public static final double kUpperFreedom = Units.degreesToRadians(200);
 
     // The ouputs used in the output range for the lower and upper arms
     public static final double kLowerMinOutput = -1;
@@ -183,15 +187,20 @@ public final class Constants
     public static final double kUpperMaxOutput = 1;
 
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.1;
+    public static final double kLowerP = 8.1854E-05;
     public static final double kLowerI = 0;
-    public static final double kLowerD = 0;
-    public static final double kLowerFF = 1;
+    public static final double kLowerD = 2.4991E-05;
+    public static final double kLowerFF = 0;
 
-    public static final double kUpperP = 0.1;
+    public static final double kUpperP = 1;
     public static final double kUpperI = 0;
     public static final double kUpperD = 0;
     public static final double kUpperFF = 1;
+
+    public static final double kSLower = 0.20953;
+    public static final double kVLower = 0.27319;
+    public static final double kALower = 0.47396;
+    public static final double kGLower = 0.0;//0.39694;
 
   }
 }

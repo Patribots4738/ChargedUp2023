@@ -12,6 +12,7 @@ public class Debug {
   public static GenericEntry yP; public static GenericEntry yD; 
   public static GenericEntry rotP; public static GenericEntry rotD; 
   public static GenericEntry xDiff; public static GenericEntry yDiff; public static GenericEntry rotDiff;
+  public static GenericEntry xPos; public static GenericEntry yPos;
 
   public void debugInit() {
 
@@ -67,6 +68,18 @@ public class Debug {
       .add("rotDiff", 0)
       .withWidget(BuiltInWidgets.kGraph)
       .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+      .getEntry();
+
+    xPos = Shuffleboard.getTab("Arm")
+      .add("xPos", 0)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
+      .getEntry();
+
+    yPos = Shuffleboard.getTab("Arm")
+      .add("yPos", 0)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
       .getEntry();
   }
 

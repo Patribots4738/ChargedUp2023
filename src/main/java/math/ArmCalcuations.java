@@ -42,13 +42,6 @@ public class ArmCalcuations {
         double q2 = Math.acos (
             (x * x + y * y) - (Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength * Constants.ArmConstants.kUpperArmLength)
             / (2 * Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kUpperArmLength));
-        
-        // Need to code
-
-        /**
-         * Check if the second segment of the arm is left or right of the first arm
-         * if true, multiply q2 by -1
-         */
 
         return q2 * ((x < 0) ? 1 : -1);
     }
@@ -89,7 +82,7 @@ public class ArmCalcuations {
                         Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
                                 /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2)));
         
-        return (x < 0) ? q1Left : q1Right;
+        return q1Left;
 
     }
     

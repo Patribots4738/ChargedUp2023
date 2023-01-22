@@ -25,18 +25,18 @@ import io.github.oblarg.oblog.Logger;
 public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   // ExampleSubsystem exampleSubsystem; 
-  Swerve swerve;
+  // Swerve swerve;
 
   XboxController driver;
-  XboxController operator;
+  // XboxController operator;
   
-  AutoWaypoints autoWaypoints;
+  // AutoWaypoints autoWaypoints;
 
-  // Arm arm;
+  Arm arm;
   
-  HolonomicDriveController autoController;
+  // HolonomicDriveController autoController;
 
-  Trajectory trajectory;
+  // Trajectory trajectory;
 
   Debug debug;
 
@@ -54,21 +54,22 @@ public class Robot extends TimedRobot {
     debug.debugInit();
 
     // Drivetrain instantiation
-    swerve = new Swerve();
-    // Zero the IMU for field-oriented driving
-    swerve.resetEncoders();
-    swerve.zeroHeading();
-    swerve.setBrakeMode();
+    // swerve = new Swerve();
+    // // Zero the IMU for field-oriented driving
+    // swerve.resetEncoders();
+    // swerve.zeroHeading();
+    // swerve.setBrakeMode();
 
     // Setup controllers
     driver = new XboxController(OIConstants.kDriverControllerPort);
-    operator = new XboxController(OIConstants.kOperatorControllerPort);
+    // operator = new XboxController(OIConstants.kOperatorControllerPort);
 
     // Arm Instantiation
-    // arm = new Arm();
+    arm = new Arm();
+    
     
     //AutoWaypoints Instantiation
-    autoWaypoints = new AutoWaypoints();
+    // autoWaypoints = new AutoWaypoints();
 
     // The first argument is the root container
     // The second argument is whether logging and config should be given separate tabs
@@ -87,7 +88,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     // Update the odometry for the swerve drive
-    swerve.periodic();
+    // swerve.periodic();
 
     // Update the logger for shuffleboard
     Logger.updateEntries();
@@ -98,7 +99,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
 
     // Set the swerve drive to coast mode
-    swerve.setCoastMode();
+    // swerve.setCoastMode();
     
   }
 
@@ -108,8 +109,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    autoWaypoints.init(swerve);
-    swerve.setCoastMode();
+    // autoWaypoints.init(swerve);
+    // swerve.setCoastMode();
     SwerveTrajectory.resetTrajectoryStatus();
     
   }
@@ -118,9 +119,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    autoWaypoints.autoPeriodic();
+    // autoWaypoints.autoPeriodic();
     
-    SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+    // SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
 
   }
@@ -128,8 +129,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     
-    swerve.resetEncoders();
-    swerve.setCoastMode();
+    // swerve.resetEncoders();
+    // swerve.setCoastMode();
+    arm.resetEncoders();
 
   }
 
@@ -154,15 +156,16 @@ public class Robot extends TimedRobot {
     }
     
     if (driver.getLeftBumper()) {
-      swerve.setX();
+      // swerve.setX();
     }
     else
     {
       // Drive the robot  
       //           SpeedX SpeedY Rotation
-      swerve.drive(leftX, leftY, rightX, true);
+      // swerve.drive(leftX, leftY, rightX, true);
     }
-    // arm.drive(operator.getRightX(), operator.getRightY());
+    // set lower arm position to the slider value of xPos in debug
+    arm.setLowerArmPosition(Debug.yPos.getDouble(0));
 
   }
 
