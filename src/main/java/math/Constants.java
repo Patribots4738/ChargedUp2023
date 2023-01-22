@@ -187,9 +187,9 @@ public final class Constants
     public static final double kUpperMaxOutput = 1;
 
     // PID values for the lower and upper arm
-    public static final double kLowerP = 8.1854E-05;
+    public static final double kLowerP = 53.258;
     public static final double kLowerI = 0;
-    public static final double kLowerD = 2.4991E-05;
+    public static final double kLowerD = 21.28;
     public static final double kLowerFF = 0;
 
     public static final double kUpperP = 1;
@@ -197,10 +197,10 @@ public final class Constants
     public static final double kUpperD = 0;
     public static final double kUpperFF = 1;
 
-    public static final double kSLower = 0.20953;
-    public static final double kVLower = 0.27319;
-    public static final double kALower = 0.47396;
-    public static final double kGLower = 0.0;//0.39694;
+    public static final double kSLower = 0.15999;
+    public static final double kVLower = 0.24941;
+    public static final double kALower = 4.3455;
+    public static final double kGLower = 0.33966;
 
   }
 }

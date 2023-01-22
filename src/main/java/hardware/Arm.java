@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -47,7 +48,7 @@ public class Arm implements Loggable {
   private final SparkMaxPIDController _upperArmPIDController;
 
   private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(1, 0.1);
+      new TrapezoidProfile.Constraints(5, 5);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   
@@ -72,6 +73,9 @@ public class Arm implements Loggable {
 
     _lowerArm = new CANSparkMax(ArmConstants.kLowerArmMotorCanId, MotorType.kBrushless);
     _upperArm = new CANSparkMax(ArmConstants.kUpperArmMotorCanId, MotorType.kBrushless);
+
+    _lowerArm.setIdleMode(IdleMode.kBrake);
+    _upperArm.setIdleMode(IdleMode.kBrake);
     // Factory reset, so we get the SPARKS MAX to a known state before configuring
     // them. This is useful in case a SPARK MAX is swapped out.
     _lowerArm.restoreFactoryDefaults();
@@ -149,7 +153,7 @@ public class Arm implements Loggable {
 
     rotations = (angle) / (2 * Math.PI);
 
-    neoRotations = 2 * Math.PI;//rotations * ArmConstants.kLowerArmGearRatio;
+    neoRotations = 5;// rotations;// * ArmConstants.kLowerArmGearRatio;
 
     m_goal = new TrapezoidProfile.State(neoRotations, 0);
 
@@ -163,7 +167,7 @@ public class Arm implements Loggable {
       ArmConstants.kVLower, 
       ArmConstants.kALower);
 
-    FF = feedForward.calculate(m_setpoint.position/*- _lowerArmEncoder.getPosition()*/, m_setpoint.velocity);
+    FF = feedForward.calculate(m_setpoint.position /*- _lowerArmEncoder.getPosition()*/, m_setpoint.velocity);
 
     // if (Math.abs(FF) < 0.4) {
 
@@ -171,9 +175,9 @@ public class Arm implements Loggable {
 
     // }
 
-    //if (Math.abs(m_setpoint.position - _lowerArmEncoder.getPosition()) > 0.1) {
+    //if (Math.abs(m_setpoint.position - _lowerArmEncoder.getPosition()) > 0.25) {
 
-      _lowerArmPIDController.setReference(m_setpoint.position/* / (2 * Math.PI)*/, ControlType.kPosition, 0, FF);
+      _lowerArmPIDController.setReference(m_setpoint.position, ControlType.kPosition, 0, FF);
 
     //} else {
 
