@@ -172,7 +172,7 @@ public class Robot extends TimedRobot {
 
 
     // set lower arm position
-    arm.setLowerArmPositionNumber2(leftX/2);
+    arm.setLowerArmPositionNumber2(leftX/5);
 
   }
 

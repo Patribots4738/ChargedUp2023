@@ -185,10 +185,16 @@ public final class Constants
     public static final double kUpperMinOutput = -1;
     public static final double kUpperMaxOutput = 1;
 
+    /**
+     * SysID values:
+     * P = 0.0032326
+     * D = 0.0012612
+     * FF - modular via calculation
+     */
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.335;//0.65;
+    public static final double kLowerP = 0.1;//0.65;
     public static final double kLowerI = 0;
-    public static final double kLowerD = 0.2;
+    public static final double kLowerD = 0.025;//0.2;
     public static final double kLowerFF = 0;
 
     public static final double kUpperP = 1;

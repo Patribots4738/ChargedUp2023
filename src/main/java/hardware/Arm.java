@@ -253,7 +253,7 @@ public class Arm implements Loggable {
 
   public void setLowerArmPositionNumber2 (double angle) {
 
-    double rotations = Units.radiansToRotations(angle);
+    // double rotations = Units.radiansToRotations(angle);
 
     feedForward = new ArmFeedforward(
       ArmConstants.kSLower, 
@@ -261,11 +261,11 @@ public class Arm implements Loggable {
       ArmConstants.kVLower, 
       ArmConstants.kALower);
 
-    FF = feedForward.calculate(rotations, 0);
+    FF = feedForward.calculate(angle, 0);
     // System.out.println(FF);
 
     _lowerArmPIDController.setFF(FF);
 
-    _lowerArmPIDController.setReference(rotations*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
+    _lowerArmPIDController.setReference(angle*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
   }
 }
