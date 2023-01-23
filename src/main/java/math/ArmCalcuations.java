@@ -27,17 +27,17 @@ public class ArmCalcuations {
         // Due to x and y being inputed as xbox contoller axis values
         // They will be only from -1 to 1
         // Thus, we multiply them by the max reach to scale them for the arm
-        x *= Constants.ArmConstants.kMaxReachX;
-        y *= Constants.ArmConstants.kMaxReachY;
+        // x *= Constants.ArmConstants.kMaxReachX;
+        // y *= Constants.ArmConstants.kMaxReachY;
         
-        // Fail safe in case the X goes over max reach
-        if (x > Constants.ArmConstants.kMaxReachX){
-          x = Constants.ArmConstants.kMaxReachX;
-        }
-        // Fail safe in case the Y goes over max reach
-        if (y > Constants.ArmConstants.kMaxReachY) {
-          y = Constants.ArmConstants.kMaxReachY;
-        }
+        // // Fail safe in case the X goes over max reach
+        // if (x > Constants.ArmConstants.kMaxReachX){
+        //   x = Constants.ArmConstants.kMaxReachX;
+        // }
+        // // Fail safe in case the Y goes over max reach
+        // if (y > Constants.ArmConstants.kMaxReachY) {
+        //   y = Constants.ArmConstants.kMaxReachY;
+        // }
         
         double q2 = Math.acos (
             (x * x + y * y) - (Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength * Constants.ArmConstants.kUpperArmLength)
@@ -60,16 +60,16 @@ public class ArmCalcuations {
         // Due to x and y being inputed as xbox contoller axis values
         // They will be only from -1 to 1
         // Thus, we multiply them by the max reach to scale them for the arm
-        x *= Constants.ArmConstants.kMaxReachX;
-        y *= Constants.ArmConstants.kMaxReachY;
+        // x *= Constants.ArmConstants.kMaxReachX;
+        // y *= Constants.ArmConstants.kMaxReachY;
         
-        // Fail safe in case the X goes over max reach
-        if (x > Constants.ArmConstants.kMaxReachX)
-            x = Constants.ArmConstants.kMaxReachX;
+        // // Fail safe in case the X goes over max reach
+        // if (x > Constants.ArmConstants.kMaxReachX)
+        //     x = Constants.ArmConstants.kMaxReachX;
 
-        // Fail safe in case the Y goes over max reach
-        if (y > Constants.ArmConstants.kMaxReachY)
-            y = Constants.ArmConstants.kMaxReachY;
+        // // Fail safe in case the Y goes over max reach
+        // if (y > Constants.ArmConstants.kMaxReachY)
+        //     y = Constants.ArmConstants.kMaxReachY;
 
 
         double q1Left = Math.atan(y / x) + 

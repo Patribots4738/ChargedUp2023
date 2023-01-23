@@ -128,104 +128,6 @@ public class Arm implements Loggable {
   }
 
   /**
-   * Set the position of the lower arm, in radians
-   * 
-   * @param angle the angle to set the lower arm to (radians)
-   */
-  public void setLowerArmPosition(double angle) {
-
-    // Limit the angle from +- pi/3
-    if (angle > (Math.PI / 3)) {
-
-      angle = (Math.PI / 3);
-
-    } else if (angle < -(Math.PI / 3)) {
-
-      angle = -(Math.PI / 3);
-
-    }
-
-    rotations = (angle) / (2 * Math.PI);
-
-    neoRotations = 5;// rotations;// * ArmConstants.kLowerArmGearRatio;
-
-    m_goal = new TrapezoidProfile.State(neoRotations, 0);
-
-    var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
-
-    m_setpoint = profile.calculate(0.02);
-    
-    feedForward = new ArmFeedforward(
-      ArmConstants.kSLower, 
-      ArmConstants.kGLower, 
-      ArmConstants.kVLower, 
-      ArmConstants.kALower);
-
-    FF = feedForward.calculate(m_setpoint.position /*- _lowerArmEncoder.getPosition()*/, m_setpoint.velocity);
-
-    // if (Math.abs(FF) < 0.4) {
-
-    //   FF = 0;
-
-    // }
-
-    //if (Math.abs(m_setpoint.position - _lowerArmEncoder.getPosition()) > 0.25) {
-
-      _lowerArmPIDController.setReference(m_setpoint.position, ControlType.kPosition, 0, FF);
-
-    //} else {
-
-      //_lowerArmPIDController.setReference(0, ControlType.kVoltage);
-
-    //}
-
-   
-
-    /**
-     * Turn the angle into rotations of the arm
-     * Then, turn rotations in the arm into rotations of the motor
-     * Command the motor to rotation the amount of rotations calculated
-     */
-    /*
-    rotations = (angle) / (2 * Math.PI);
-    
-    neoRotations = rotations * ArmConstants.kLowerArmGearRatio;
-    
-    // Get the current position, in radians. This is in refrence to the 
-    // Arm, so divide by the gear ratio
-    currentPosition = (angle - (_lowerArmEncoder.getPosition() * Math.PI * 2)) / ArmConstants.kLowerArmGearRatio;
-    
-    // Get the current velocity, because getVelocity() returns RPM, turn it to radians
-    // and divide by 60s and the gear ratio
-    currentVelocity = (_lowerArmEncoder.getVelocity() * Math.PI * 2) / 60 / ArmConstants.kLowerArmGearRatio;
-    
-    feedForward = new ArmFeedforward(
-      ArmConstants.kSLower, 
-      ArmConstants.kGLower, 
-      ArmConstants.kVLower, 
-      ArmConstants.kALower);
-
-    FF = feedForward.calculate(currentPosition, currentVelocity);
-
-    _lowerArmPIDController.setFF(FF);
-
-    System.out.println(FF);
-
-    _lowerArmPIDController.setReference(neoRotations, ControlType.kPosition);
-    */
-
-  }
-
-  /**
-   * Set the position of the upper arm, in radians
-   * 
-   * @param angle the angle to set the upper arm to
-   */
-  public void setUpperArmPosition(double angle) {
-    _upperArmPIDController.setReference(angle, ControlType.kPosition);
-  }
-
-  /**
    * Calculate the position of the arm based on the joystick input
    * as an absolute position in inches, multiplied by 
    * Constants.ArmConstants.kMaxReachX,Y respectivly
@@ -234,14 +136,19 @@ public class Arm implements Loggable {
    */
   public void drive(double armX, double armY) {
 
-      double q2 = armCalculations.getQ2(armX, armY);
-      double q1 = armCalculations.getQ1(armX, armY, q2);
+    armY = (armY < 0) ? 0 : armY;
 
-      setLowerArmPosition(q1);
-      // setUpperArmPosition(q2);
+    double q2 = armCalculations.getQ2(armX, armY);
+    double q1 = armCalculations.getQ1(armX, armY, q2);
 
-
-      // ((0.39694) * cos(pos)) + ((0.20953) * sgn(angularVelocity)) + ((0.27319) * (angularVelocity)) + ((0.47396) + (angularAccel))
+    // If q2 is NaN set q1 and q2 to zero
+    if (Double.isNaN(q2)) {
+      q1 = 0;
+      q2 = 0;
+    }
+    setLowerArmPosition(Units.radiansToRotations(q1));
+    // setUpperArmPosition(q2);
+    
   }
 
   public void resetEncoders() {
@@ -251,21 +158,35 @@ public class Arm implements Loggable {
 
   }
 
-  public void setLowerArmPositionNumber2 (double angle) {
+  /**
+   * Set the position of the lower arm
+   * 
+   * @param position the position to set the lower arm to
+   * This unit is in full rotations
+   */
+  public void setLowerArmPosition (double position) {
 
-    double rotations = Units.radiansToRotations(angle);
+    // Do not let the arm go past 0.2 rotations 
+    // aka 72 degrees in both directions
+    if (position > 0.2)
+    {
+      position = 0.2;
+    }
+    else if (position < -0.2) 
+    {
+      position = -0.2;
+    }
 
     feedForward = new ArmFeedforward(
       ArmConstants.kSLower, 
-      0,//ArmConstants.kGLower, 
+      0,//ArmConstants.kGLower, // YO TURN OFF GRAVITY 
       ArmConstants.kVLower, 
       ArmConstants.kALower);
 
-    FF = feedForward.calculate(rotations, 0);
-    // System.out.println(FF);
+    FF = feedForward.calculate(position, 0);
 
     _lowerArmPIDController.setFF(FF);
 
-    _lowerArmPIDController.setReference(rotations*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
+    _lowerArmPIDController.setReference(position*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
   }
 }
