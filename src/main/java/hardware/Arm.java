@@ -234,14 +234,19 @@ public class Arm implements Loggable {
    */
   public void drive(double armX, double armY) {
 
-      double q2 = armCalculations.getQ2(armX, armY);
-      double q1 = armCalculations.getQ1(armX, armY, q2);
+    armY = (armY < 0) ? 0 : armY;
 
-      setLowerArmPosition(q1);
-      // setUpperArmPosition(q2);
+    double q2 = armCalculations.getQ2(armX, armY);
+    double q1 = armCalculations.getQ1(armX, armY, q2);
 
-
-      // ((0.39694) * cos(pos)) + ((0.20953) * sgn(angularVelocity)) + ((0.27319) * (angularVelocity)) + ((0.47396) + (angularAccel))
+    // If q2 is NaN set q1 and q2 to zero
+    if (Double.isNaN(q2)) {
+      q1 = 0;
+      q2 = 0;
+    }
+    setLowerArmPositionNumber2(Units.radiansToRotations(q1));
+    // setUpperArmPosition(q2);
+    
   }
 
   public void resetEncoders() {
@@ -254,6 +259,15 @@ public class Arm implements Loggable {
   public void setLowerArmPositionNumber2 (double angle) {
 
     // double rotations = Units.radiansToRotations(angle);
+
+    if (angle > 0.2)
+    {
+      angle = 0.2;
+    }
+    else if (angle < -0.2) 
+    {
+      angle = -0.2;
+    }
 
     feedForward = new ArmFeedforward(
       ArmConstants.kSLower, 

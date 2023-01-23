@@ -6,6 +6,7 @@ package frc.robot;
 
 import debug.*;
 import hardware.*;
+import math.ArmCalcuations;
 import math.Constants.*;
 import auto.*;
 
@@ -39,6 +40,8 @@ public class Robot extends TimedRobot {
   Trajectory trajectory;
 
   Debug debug;
+
+  ArmCalcuations armCalcuations = new ArmCalcuations();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -171,8 +174,17 @@ public class Robot extends TimedRobot {
     }
 
 
-    // set lower arm position
-    arm.setLowerArmPositionNumber2(leftX/5);
+    // Notice that the input of the lower arm pos is 
+    // revolutions / 5 becuase we want 360/5 = 72 degrees in both directions
+    // arm.setLowerArmPositionNumber2(leftX/5);
+    if (driver.getLeftBumper()) {
+      double q2 = armCalcuations.getQ2(leftX, leftY);
+      // System.out.printf("LeftX: %.3f LeftY: %.3f Q1: %.3f Q2 %.3f", leftX, leftY, armCalcuations.getQ1(leftX, leftY, q2), q2);
+      // print the above using "println" and string.format
+      System.out.println("SLeftX: " + String.format("%.3f", leftX) + " LeftY: " + String.format("%.3f", leftY) + " Q1: " + String.format("%.3f", armCalcuations.getQ1(leftX, leftY, q2)) + " Q2: " + String.format("%.3f", q2));
+
+      arm.drive(leftX, leftY);
+    }
 
   }
 

@@ -151,16 +151,16 @@ public final class Constants
     public static final int kUpperArmMotorCanId = 9;
 
     // The length of the first pivot point to the second pivot point, in inches
-    public static final double kLowerArmLength = 30;
+    public static final double kLowerArmLength = 32;
 
     // The length of the second pivot point to the claw, in inches
-    public static final double kUpperArmLength = 24;
+    public static final double kUpperArmLength = 21;
 
     // The max reach of the bot horizontally, in inches
-    public static final double kMaxReachX = 48;
+    public static final double kMaxReachX = 53;
 
     // The max reach of the bot vertically, in inches
-    public static final double kMaxReachY = 48;
+    public static final double kMaxReachY = 53;
 
     // The gear ratio of the lower arm is 60:1
     public static final double kLowerArmGearRatio = 60;
