@@ -21,24 +21,8 @@ public class ArmCalcuations {
      * Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
      * Due to an axis controlling the range, they will not go over
      */
-    public double getQ2 (double x, double y)
+    public double getLowerAngle(double x, double y)
     {
-
-        // Due to x and y being inputed as xbox contoller axis values
-        // They will be only from -1 to 1
-        // Thus, we multiply them by the max reach to scale them for the arm
-        // x *= Constants.ArmConstants.kMaxReachX;
-        // y *= Constants.ArmConstants.kMaxReachY;
-        
-        // // Fail safe in case the X goes over max reach
-        // if (x > Constants.ArmConstants.kMaxReachX){
-        //   x = Constants.ArmConstants.kMaxReachX;
-        // }
-        // // Fail safe in case the Y goes over max reach
-        // if (y > Constants.ArmConstants.kMaxReachY) {
-        //   y = Constants.ArmConstants.kMaxReachY;
-        // }
-        
         double q2 = Math.acos (
             (x * x + y * y) - (Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength * Constants.ArmConstants.kUpperArmLength)
             / (2 * Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kUpperArmLength));
@@ -54,33 +38,17 @@ public class ArmCalcuations {
      * Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
      * Due to an axis controlling the range, they will not go over
      */
-    public double getQ1 (double x, double y, double q2)
+    public double getUpperAngle(double x, double y, double q2)
     {
-
-        // Due to x and y being inputed as xbox contoller axis values
-        // They will be only from -1 to 1
-        // Thus, we multiply them by the max reach to scale them for the arm
-        // x *= Constants.ArmConstants.kMaxReachX;
-        // y *= Constants.ArmConstants.kMaxReachY;
-        
-        // // Fail safe in case the X goes over max reach
-        // if (x > Constants.ArmConstants.kMaxReachX)
-        //     x = Constants.ArmConstants.kMaxReachX;
-
-        // // Fail safe in case the Y goes over max reach
-        // if (y > Constants.ArmConstants.kMaxReachY)
-        //     y = Constants.ArmConstants.kMaxReachY;
-
-
         double q1Left = Math.atan(y / x) + 
                         Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
-                                / (Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2)));
-        
+                                / (Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength * Math.cos(q2)));
+
+        // Currently q1Right is not used, but it is here for future testing
+//        double q1Right = Math.atan(y / x) -
+//                Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
+//                        /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2)));
+
         return q1Left;
     }
-/*  ^^^ Why isnt/wasn't this needed? Maybe because the arm elbow stays on the top/botton, no matter which side.       
-        double q1Right = Math.atan(y / x) - 
-                        Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
-                                /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2))); 
-*/   
 }

@@ -7,10 +7,8 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import math.*;
@@ -41,25 +39,6 @@ public class Arm implements Loggable {
   private final SparkMaxPIDController _lowerArmPIDController;
   private final SparkMaxPIDController _upperArmPIDController;
 
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(5, 5);
-  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  
-  @Log
-  private double _lowerArmPosition;
-  @Log
-  private double rotations;
-  @Log
-  private double neoRotations;
-  @Log
-  private double currentPosition;
-  @Log
-  double currentVelocity;
-  @Log
-  ArmFeedforward feedForward;
-  @Log
-  double FF;
   /**
    * Constructs a new Arm and configures the encoders and PID controllers.
    */
@@ -70,7 +49,8 @@ public class Arm implements Loggable {
 
     _lowerArm.setIdleMode(IdleMode.kBrake);
     _upperArm.setIdleMode(IdleMode.kBrake);
-    // Factory reset, so we get the SPARKS MAX to a known state before configuring
+
+    // Factory reset, so we get the SPARK MAX to a known state before configuring
     // them. This is useful in case a SPARK MAX is swapped out.
     _lowerArm.restoreFactoryDefaults();
     _upperArm.restoreFactoryDefaults();
@@ -89,21 +69,27 @@ public class Arm implements Loggable {
 
     // Note that MAXSwerveModule sets the position and velocity "factors"
     // But as of 1/20/2023 I don't know what these are
-    // _lowerArmEncoder.setPositionConversionFactor(ArmConstants.kLowerArmGearRatio);
 
+    // as of 1/22/2023, It might be useful to touch because
+    // it could reduce the need to multiply position by gear ratio
+    // _lowerArmEncoder.setPositionConversionFactor(ArmConstants.kLowerArmGearRatio);
 
     // Set PID constants for the lower and upper SPARK MAX(s)
     _lowerArmPIDController.setP(ArmConstants.kLowerP);
     _lowerArmPIDController.setI(ArmConstants.kLowerI);
     _lowerArmPIDController.setD(ArmConstants.kLowerD);
     _lowerArmPIDController.setFF(ArmConstants.kLowerFF);
-    _lowerArmPIDController.setOutputRange(ArmConstants.kLowerMinOutput,
-        ArmConstants.kLowerMaxOutput);
+    _lowerArmPIDController.setOutputRange(
+            ArmConstants.kLowerMinOutput,
+            ArmConstants.kLowerMaxOutput);
 
     _upperArmPIDController.setP(ArmConstants.kUpperP);
     _upperArmPIDController.setI(ArmConstants.kUpperI);
     _upperArmPIDController.setD(ArmConstants.kUpperD);
     _upperArmPIDController.setFF(ArmConstants.kUpperFF);
+    _upperArmPIDController.setOutputRange(
+            ArmConstants.kUpperMinOutput,
+            ArmConstants.kUpperMaxOutput);
 
 
     // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
@@ -136,25 +122,76 @@ public class Arm implements Loggable {
    */
   public void drive(double armX, double armY) {
 
+    // Make sure armX and armY are within the range of 0 to 1
+    // We cannot reach below the ground sadge
     armY = (armY < 0) ? 0 : armY;
 
-    double q2 = armCalculations.getQ2(armX, armY);
-    double q1 = armCalculations.getQ1(armX, armY, q2);
+    // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
+    // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
+    double upperArmAngle = armCalculations.getLowerAngle(armX, armY);
+    double lowerArmAngle = armCalculations.getUpperAngle(armX, armY, upperArmAngle);
 
-    // If q2 is NaN set q1 and q2 to zero
-    if (Double.isNaN(q2)) {
-      q1 = 0;
-      q2 = 0;
+    // If upperArmAngle is NotANumber, set lowerArmAngle and upperArmAngle to zero,
+    // This is because lowerArmAngle is reliant on upperArmAngle
+    if (Double.isNaN(upperArmAngle)) {
+      lowerArmAngle = 0;
+      upperArmAngle = 0;
     }
-    setLowerArmPosition(Units.radiansToRotations(q1));
-    // setUpperArmPosition(q2);
-    
+
+    // setLowerArmPosition(Units.radiansToRotations(lowerArmAngle));
+    setUpperArmPosition(Units.radiansToRotations(upperArmAngle));
+
   }
 
-  public void resetEncoders() {
+  /**
+   * Set the position of the upper arm
+   *
+   * @param position the position to set the upper arm to
+   * This unit is in revolutions
+   */
+  public void setUpperArmPosition (double position) {
 
-    _lowerArmEncoder.setPosition(0);
-    _upperArmEncoder.setPosition(0);
+    // Do not let the arm go past the limits defined in ArmConstants
+    if (position > Units.radiansToRotations(ArmConstants.kUpperFreedom)) {
+      position = Units.radiansToRotations(ArmConstants.kUpperFreedom);
+    }
+    else if (position < -Units.radiansToRotations(ArmConstants.kUpperFreedom)) {
+      position = -Units.radiansToRotations(ArmConstants.kUpperFreedom);
+    }
+
+    /*
+      FF is a predictive formula that uses the input of where we want to be to predict the path required to get there
+      This is an open loop, and thus unable to react to the effects of disturbances / unknown disturbances.
+      Because of this, we need to give it disturbance data, which is why we use sysID
+      It then uses the data to predict the output of the motor, creating a more accurate prediction
+
+      In contrast, a closed loop is commonly used as PID, looking and reacting to the current position
+      in opposition to the desired position, taking note of any disturbance that affected the motor.
+      Since weight, and more importantly, the things connected to the arm are changing,
+      making it difficult to perfectly tune
+
+      We are using a very small combination of both, using the FF to predict the path, and PID to correct for error
+      FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
+      👌
+     */
+    ArmFeedforward feedForward = new ArmFeedforward(
+      ArmConstants.kSUpper,
+      ArmConstants.kGUpper,
+      ArmConstants.kVUpper,
+      ArmConstants.kAUpper);
+
+    // Get the feedforward value for the position,
+    // Using a predictive formula with sysID given data of the motor
+    double FF = feedForward.calculate(position, 0);
+    _upperArmPIDController.setFF(FF);
+
+    // Calculate the rotations needed to get to the position
+    // By multiplying the position by the gear ratio
+    double neoPosition = position * ArmConstants.kUpperArmGearRatio;
+
+    // Set the position of the neo controlling the upper arm to
+    // the converted position, neoPosition
+    _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
   }
 
@@ -166,27 +203,57 @@ public class Arm implements Loggable {
    */
   public void setLowerArmPosition (double position) {
 
-    // Do not let the arm go past 0.2 rotations 
-    // aka 72 degrees in both directions
-    if (position > 0.2)
-    {
-      position = 0.2;
+    // Do not let the arm go past the limits defined in ArmConstants
+    if (position > Units.radiansToRotations(ArmConstants.kLowerFreedom)) {
+      position = Units.radiansToRotations(ArmConstants.kLowerFreedom);
     }
-    else if (position < -0.2) 
-    {
-      position = -0.2;
+    else if (position < -Units.radiansToRotations(ArmConstants.kLowerFreedom)) {
+      position = -Units.radiansToRotations(ArmConstants.kLowerFreedom);
     }
 
-    feedForward = new ArmFeedforward(
+    /*
+      FF is a predictive formula that uses the input of where we want to be to predict the path required to get there
+      This is an open loop, and thus unable to react to the effects of disturbances / unknown disturbances.
+      Because of this, we need to give it disturbance data, which is why we use sysID
+      It then uses the data to predict the output of the motor, creating a more accurate prediction
+
+      In contrast, a closed loop is commonly used as PID, looking and reacting to the current position
+      in opposition to the desired position, taking note of any disturbance that affected the motor.
+      Since weight, and more importantly, the things connected to the arm are changing,
+      making it difficult to perfectly tune
+
+      We are using a very small combination of both, using the FF to predict the path, and PID to correct for error
+      FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
+      👌
+     */
+    ArmFeedforward feedForward = new ArmFeedforward(
       ArmConstants.kSLower, 
-      0,//ArmConstants.kGLower, // YO TURN OFF GRAVITY 
+      ArmConstants.kGLower,
       ArmConstants.kVLower, 
       ArmConstants.kALower);
 
-    FF = feedForward.calculate(position, 0);
-
+    // Get the feedforward value for the position,
+    // Using a predictive formula with sysID given data of the motor
+    double FF = feedForward.calculate(position, 0);
     _lowerArmPIDController.setFF(FF);
 
-    _lowerArmPIDController.setReference(position*ArmConstants.kLowerArmGearRatio, ControlType.kPosition);
+    // Calculate the rotations needed to get to the position
+    // By multiplying the position by the gear ratio
+    double neoPosition = position * ArmConstants.kUpperArmGearRatio;
+
+    // Set the position of the neo controlling the upper arm to
+    // the converted position, neoPosition
+    _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
+  }
+
+  /**
+   * Reset the encoders to zero the arm when initiating the arm
+   * Will not be needed in the future because we will have absolute encoders
+   */
+  public void resetEncoders() {
+
+    _lowerArmEncoder.setPosition(0);
+    _upperArmEncoder.setPosition(0);
+
   }
 }

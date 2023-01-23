@@ -172,13 +172,13 @@ public final class Constants
     public static final double kLowerEncoderPositionFactor = (kLowerArmLength * Math.PI) / (kLowerArmGearRatio);
     public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
     
-    // The amount of degrees that the upper arm can rotate
+    // The number of degrees that the upper arm can rotate
     public static final double kLowerFreedom = Units.degreesToRadians(150);
     
-    // The amount of degrees that the upper arm can rotate
+    // The number of degrees that the upper arm can rotate
     public static final double kUpperFreedom = Units.degreesToRadians(200);
 
-    // The ouputs used in the output range for the lower and upper arms
+    // The outputs used in the output range for the lower and upper arms
     public static final double kLowerMinOutput = -1;
     public static final double kLowerMaxOutput = 1;
 
@@ -187,16 +187,16 @@ public final class Constants
 
     /**
      * SysID values:
+     * <p>
      * Lower:
      * P = 0.0032326
      * D = 0.0012612
-     * FF - modular via calculation
-     * 
+     * <p>
      * Upper:
      * 
      */
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.1;;
+    public static final double kLowerP = 0.1;
     public static final double kLowerI = 0;
     public static final double kLowerD = 0.025;
     public static final double kLowerFF = 0;
@@ -204,12 +204,20 @@ public final class Constants
     public static final double kUpperP = 1;
     public static final double kUpperI = 0;
     public static final double kUpperD = 0;
-    public static final double kUpperFF = 1;
+    public static final double kUpperFF = 0;
 
+    // The below values are given from sysID calibration
     public static final double kSLower = 0.15999;
+    public static final double kGLower = 0;//0.33966; (We don't like gravity)
     public static final double kVLower = 0.24941;
     public static final double kALower = 4.3455;
-    public static final double kGLower = 0.33966;
+
+    public static final double kSUpper = 0;
+    public static final double kGUpper = 0;// (We don't like gravity)
+    public static final double kVUpper = 0;
+    public static final double kAUpper = 0;
+
+
 
   }
 }
