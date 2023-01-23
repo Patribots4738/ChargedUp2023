@@ -1,18 +1,5 @@
-# MAXSwerve Java Template
+# ChargedUp-2023
+![ChargedUp-2023](https://upload.wikimedia.org/wikipedia/en/thumb/b/b7/Charged_Up_Logo.svg/220px-Charged_Up_Logo.svg.png)
 
-A template project for an FRC swerve drivetrain that uses REV MAXSwerve Modules.
-
-Note that this is meant to be used with a drivetrain composed of four MAXSwerve Modules, each configured with two SPARKS MAX, a NEO as the driving motor, a NEO 550 as the turning motor, and a REV Through Bore Encoder as the absolute turning encoder.
-
-To get started, make sure you have calibrated the zero offsets for the absolute encoders in the Hardware Client using the `Absolute Encoder` tab under the associated turning SPARK MAX devices.
-
-## Prerequisites
-
-* SPARK MAX Firmware v1.6.1 - Adds features that are required for swerve
-* REVLib v2023.1.1 - Includes APIs for the new firmware features
-
-## Configuration
-
-It is possible that this project will not work for your robot right out of the box. Various things like the CAN IDs, PIDF gains, chassis configuration, etc. must be determined for your own robot!
-
-These values can be adjusted in the `Constants.java` file.
+# The Patribots (FRC 4738)
+We are a school-based _FIRST&reg; Robotics Competition_ team from Patrick Henry High School, located in San Diego, California. Visit our website at [patribots.org](https://www.patribots.org)!
