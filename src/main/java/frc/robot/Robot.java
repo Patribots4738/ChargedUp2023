@@ -13,8 +13,11 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -25,7 +28,7 @@ import io.github.oblarg.oblog.Logger;
 public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   /* ExampleSubsystem exampleSubsystem; */
-  Swerve swerve;
+  // Swerve swerve;
 
   XboxController driver;
   // XboxController operator;
@@ -40,12 +43,16 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
+  PhotonCamera camera;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
+
+    camera = new PhotonCamera("Patribots4738");
     
     // Instantiate our Robot. This acts as a dictionary for all of our subsystems
     
@@ -60,11 +67,11 @@ public class Robot extends TimedRobot {
      * even CAN IDs are the turning motors
      */
     // Drivetrain instantiation
-    swerve = new Swerve();
-    // Zero the IMU for field-oriented driving 
-    swerve.resetEncoders();
-    swerve.zeroHeading();
-    swerve.setBrakeMode();
+    // swerve = new Swerve();
+    // // Zero the IMU for field-oriented driving 
+    // swerve.resetEncoders();
+    // swerve.zeroHeading();
+    // swerve.setBrakeMode();
 
     // Setup controllers
     driver = new XboxController(OIConstants.kDriverControllerPort);
@@ -94,7 +101,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     // Update the odometry for the swerve drive
-    swerve.periodic();
+    // swerve.periodic();
 
     // Update the logger for shuffleboard
     Logger.updateEntries();
@@ -105,7 +112,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
 
     // Set the swerve drive to coast mode
-    swerve.setCoastMode();
+    // swerve.setCoastMode();
     
   }
 
@@ -115,9 +122,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    autoWaypoints.init(swerve); 
-    // swerve.setCoastMode();
-    SwerveTrajectory.resetTrajectoryStatus();
+    // autoWaypoints.init(swerve); 
+    // // swerve.setCoastMode();
+    // SwerveTrajectory.resetTrajectoryStatus();
     
   }
 
@@ -125,8 +132,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    autoWaypoints.autoPeriodic();
-    SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+    // autoWaypoints.autoPeriodic();
+    // SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
 
   }
@@ -134,9 +141,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     
-    swerve.resetEncoders();
-    swerve.setBrakeMode();
-    arm.resetEncoders();
+    // swerve.resetEncoders();
+    // swerve.setBrakeMode();
+    // arm.resetEncoders();
 
   }
 
@@ -145,34 +152,34 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() 
   {
 
-    double leftX = driver.getLeftX();
-    double leftY = driver.getLeftY();
-    double rightX = driver.getRightX();
-    double deadZone = 0.15;
+    // double leftX = driver.getLeftX();
+    // double leftY = driver.getLeftY();
+    // double rightX = driver.getRightX();
+    // double deadZone = 0.15;
     
-    if (Math.abs(leftY) < deadZone) {
-      leftY = 0;
-    }
-    if (Math.abs(leftX) < deadZone) {
-      leftX = 0;
-    }
-    if (Math.abs(rightX) < deadZone) {
-      rightX = 0;
-    }
+    // if (Math.abs(leftY) < deadZone) {
+    //   leftY = 0;
+    // }
+    // if (Math.abs(leftX) < deadZone) {
+    //   leftX = 0;
+    // }
+    // if (Math.abs(rightX) < deadZone) {
+    //   rightX = 0;
+    // }
     
-    if (driver.getLeftBumper()) {
-      swerve.setX();
-    }
-    else
-    {
+    // if (driver.getLeftBumper()) {
+    //   swerve.setX();
+    // }
+    // else
+    // {
       // Drive the robot  
       //           SpeedX SpeedY Rotation
       // swerve.drive(leftY*0.25, leftX*0.25, rightX*0.25, true);
-    }
+    // }
 
 
     // set lower arm position
-    arm.setLowerArmPositionNumber2(leftX/2);
+    // arm.setLowerArmPositionNumber2(leftX/2);
 
   }
 
@@ -181,5 +188,40 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+
+    int targetID = -1;
+    double x = -1;
+    double y = -1;
+    double pitch = -1;
+    double yaw = -1;
+
+     var result = camera.getLatestResult();
+
+     if (result.hasTargets()){
+
+        PhotonTrackedTarget bestTarget = result.getBestTarget();
+
+        if (targetID == 1){
+
+          targetID = bestTarget.getFiducialId();
+          x = bestTarget.getBestCameraToTarget().getTranslation().getX();
+          y = bestTarget.getBestCameraToTarget().getTranslation().getY();
+          pitch = bestTarget.getPitch();
+          yaw = bestTarget.getYaw();
+        
+        }
+          
+      }
+      
+      SmartDashboard.putNumber("X", x);
+      SmartDashboard.putNumber("Y", y);
+      SmartDashboard.putNumber("Pitch", pitch); 
+      SmartDashboard.putNumber("Yaw", yaw);
+
+      // if(result.hasTargets()) {
+      //   double x = result.getBestTarget().getBestCameraToTarget().getTranslation().getX();
+      //   double y = result.getBestTarget().getBestCameraToTarget().getTranslation().getY();
+      // }
+  }
 }
