@@ -25,7 +25,7 @@ public final class Main {
     System.out.println("  / /_/ / / __ `/ / __/  / ___/  / /   / __ \\ / __ \\ / __/  / ___/");
     System.out.println(" / ____/ / /_/ / / /_   / /     / /   / /_/ // /_/ // /_   (__  ) ");
     System.out.println("/_/      \\__,_/  \\__/  /_/     /_/   /_.___/ \\____/ \\__/  /____/  ");
-    System.out.println(" ");
+    System.out.println("    __ __ _____   _____   ____ ");
     System.out.println("   / // //__  /  |__  /  ( __ )");
     System.out.println("  / // /_  / /    /_ <  / __  |");
     System.out.println(" /__  __/ / /   ___/ / / /_/ /");
