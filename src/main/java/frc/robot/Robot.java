@@ -30,6 +30,7 @@ public class Robot extends TimedRobot {
 
   // The robot's subsystems and commands are defined here...
   /* ExampleSubsystem exampleSubsystem; */
+
   // Swerve swerve;
 
   XboxController driver;
@@ -64,10 +65,10 @@ public class Robot extends TimedRobot {
     debug.debugInit();
 
 
-    /** 
-     * For swerve drive, the following is the order of the motors
-     * odd CAN IDs drive the robot
-     * even CAN IDs are the turning motors
+    /*
+      For swerve drive, the following is the order of the motors
+      odd CAN IDs drive the robot
+      even CAN IDs are the turning motors
      */
     // Drivetrain instantiation
     // swerve = new Swerve();
