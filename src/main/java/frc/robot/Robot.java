@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
 
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
+// import org.photonvision.PhotonCamera;
+// import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -46,7 +46,6 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
-  PhotonCamera camera;
   ArmCalcuations armCalcuations = new ArmCalcuations();
 
   /**
@@ -56,8 +55,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
 
-    camera = new PhotonCamera("Patribots4738");
-    
     // Instantiate our Robot. This acts as a dictionary for all of our subsystems
     
     // Debug class so we can use shuffleboard
@@ -209,38 +206,38 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
 
-    int targetID = -1;
-    double x = -1;
-    double y = -1;
-    double pitch = -1;
-    double yaw = -1;
+    // int targetID = -1;
+    // double x = -1;
+    // double y = -1;
+    // double pitch = -1;
+    // double yaw = -1;
 
-     var result = camera.getLatestResult();
+    //  var result = camera.getLatestResult();
 
-     if (result.hasTargets()){
+    //  if (result.hasTargets()){
 
-        PhotonTrackedTarget bestTarget = result.getBestTarget();
+    //     PhotonTrackedTarget bestTarget = result.getBestTarget();
 
-        if (targetID == 1){
+    //     if (targetID == 1){
 
-          targetID = bestTarget.getFiducialId();
-          x = bestTarget.getBestCameraToTarget().getTranslation().getX();
-          y = bestTarget.getBestCameraToTarget().getTranslation().getY();
-          pitch = bestTarget.getPitch();
-          yaw = bestTarget.getYaw();
+    //       targetID = bestTarget.getFiducialId();
+    //       x = bestTarget.getBestCameraToTarget().getTranslation().getX();
+    //       y = bestTarget.getBestCameraToTarget().getTranslation().getY();
+    //       pitch = bestTarget.getPitch();
+    //       yaw = bestTarget.getYaw();
         
-        }
+    //     }
           
-      }
+    //   }
       
-      SmartDashboard.putNumber("X", x);
-      SmartDashboard.putNumber("Y", y);
-      SmartDashboard.putNumber("Pitch", pitch); 
-      SmartDashboard.putNumber("Yaw", yaw);
+    //   SmartDashboard.putNumber("X", x);
+    //   SmartDashboard.putNumber("Y", y);
+    //   SmartDashboard.putNumber("Pitch", pitch); 
+    //   SmartDashboard.putNumber("Yaw", yaw);
 
-      // if(result.hasTargets()) {
-      //   double x = result.getBestTarget().getBestCameraToTarget().getTranslation().getX();
-      //   double y = result.getBestTarget().getBestCameraToTarget().getTranslation().getY();
-      // }
+    //   // if(result.hasTargets()) {
+    //   //   double x = result.getBestTarget().getBestCameraToTarget().getTranslation().getX();
+    //   //   double y = result.getBestTarget().getBestCameraToTarget().getTranslation().getY();
+    //   // }
   }
 }
