@@ -29,7 +29,7 @@ public final class Main {
     System.out.println("   / // //__  /  |__  /  ( __ )");
     System.out.println("  / // /_  / /    /_ <  / __  |");
     System.out.println(" /__  __/ / /   ___/ / / /_/ /");
-    System.out.println("   /_/   /_/   /____/  \\\\____/");
+    System.out.println("   /_/   /_/   /____/  \\____/");
     RobotBase.startRobot(Robot::new);
   }
 }
