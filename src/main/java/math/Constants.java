@@ -172,11 +172,11 @@ public final class Constants
     public static final double kLowerEncoderPositionFactor = (kLowerArmLength * Math.PI) / (kLowerArmGearRatio);
     public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
     
-    // The number of degrees that the upper arm can rotate
-    public static final double kLowerFreedom = Units.degreesToRadians(150);
+    // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
+    public static final double kLowerFreedom = 75;
     
-    // The number of degrees that the upper arm can rotate
-    public static final double kUpperFreedom = Units.degreesToRadians(200);
+    // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
+    public static final double kUpperFreedom = 100;
 
     // The outputs used in the output range for the lower and upper arms
     public static final double kLowerMinOutput = -1;

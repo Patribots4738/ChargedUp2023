@@ -152,11 +152,11 @@ public class Arm implements Loggable {
   public void setUpperArmPosition (double position) {
 
     // Do not let the arm go past the limits defined in ArmConstants
-    if (position > Units.radiansToRotations(ArmConstants.kUpperFreedom)) {
-      position = Units.radiansToRotations(ArmConstants.kUpperFreedom);
+    if (position > Units.degreesToRotations(ArmConstants.kUpperFreedom)) {
+      position = Units.degreesToRotations(ArmConstants.kUpperFreedom);
     }
-    else if (position < -Units.radiansToRotations(ArmConstants.kUpperFreedom)) {
-      position = -Units.radiansToRotations(ArmConstants.kUpperFreedom);
+    else if (position < -Units.degreesToRotations(ArmConstants.kUpperFreedom)) {
+      position = -Units.degreesToRotations(ArmConstants.kUpperFreedom);
     }
 
     /*
@@ -204,11 +204,11 @@ public class Arm implements Loggable {
   public void setLowerArmPosition (double position) {
 
     // Do not let the arm go past the limits defined in ArmConstants
-    if (position > Units.radiansToRotations(ArmConstants.kLowerFreedom)) {
-      position = Units.radiansToRotations(ArmConstants.kLowerFreedom);
+    if (position > Units.degreesToRotations(ArmConstants.kLowerFreedom)) {
+      position = Units.degreesToRotations(ArmConstants.kLowerFreedom);
     }
-    else if (position < -Units.radiansToRotations(ArmConstants.kLowerFreedom)) {
-      position = -Units.radiansToRotations(ArmConstants.kLowerFreedom);
+    else if (position < -Units.degreesToRotations(ArmConstants.kLowerFreedom)) {
+      position = -Units.degreesToRotations(ArmConstants.kLowerFreedom);
     }
 
     /*
