@@ -66,8 +66,16 @@ public class SwerveTrajectory implements Loggable {
   //     new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
   
   /**
-   * This is PathPlanner.  It's awesome :) open up pathplanner.exe on the driverstation laptop.  Point the application to the locaiton of your coding project (must contain build.gradle).  Draw the path.  It will autosave. If everything is characterized correctly and your odometry reflects reality, ie. when the robot goes 1 meter it says it goes one meter--it will work like a charm.
-   * @param _pathTraj run Pathplanner.loadpath("name of file without extension") pass it here
+   * This is PathPlanner.
+   * It's awesome :)
+   * Open up pathplanner.exe on the driverstation laptop.
+   * Point the application to the location of your coding project (must contain build.gradle).
+   * Draw the path.
+   * It will autosave.
+   * If everything is characterized correctly and your odometry reflects reality,
+   * i.e. when the robot goes 1 meter, it says it went one meter--
+   * it will work like a charm.
+   * @param _pathTraj run Pathplanner.loadpath("name of file without an extension") pass it here
    * @param _odometry SwerveDrive.java's odometry
    * @param _rotation2d Pass in the current angle of the robot
    */
