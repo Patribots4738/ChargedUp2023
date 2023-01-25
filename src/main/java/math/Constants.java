@@ -150,6 +150,10 @@ public final class Constants
     public static final int kLowerArmMotorCanId = 10;
     public static final int kUpperArmMotorCanId = 9;
 
+    // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS?
+    public static final int kUpperCurrentLimit = 60;
+    public static final int kLowerCurrentLimit = 40;
+
     // The length of the first pivot point to the second pivot point, in inches
     public static final double kLowerArmLength = 32;
 
@@ -196,14 +200,14 @@ public final class Constants
      * 
      */
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.1;
+    public static final double kLowerP = 0.5;
     public static final double kLowerI = 0;
     public static final double kLowerD = 0.025;
     public static final double kLowerFF = 0;
 
-    public static final double kUpperP = 1;
+    public static final double kUpperP = 1.5;
     public static final double kUpperI = 0;
-    public static final double kUpperD = 0;
+    public static final double kUpperD = 0.75;
     public static final double kUpperFF = 0;
 
     // The below values are given from sysID calibration
@@ -212,12 +216,10 @@ public final class Constants
     public static final double kVLower = 0.24941;
     public static final double kALower = 4.3455;
 
-    public static final double kSUpper = 0;
-    public static final double kGUpper = 0;// (We don't like gravity)
-    public static final double kVUpper = 0;
-    public static final double kAUpper = 0;
-
-
+    public static final double kSUpper = 0.47727;
+    public static final double kGUpper = 0; //1.0051; // (We don't like gravity)
+    public static final double kVUpper = 0.95764;
+    public static final double kAUpper = 0.19957;
 
   }
 }

@@ -144,7 +144,7 @@ public class Robot extends TimedRobot {
     
     // swerve.resetEncoders();
     // swerve.setBrakeMode();
-    // arm.resetEncoders();
+    arm.resetEncoders();
 
   }
 
@@ -181,11 +181,12 @@ public class Robot extends TimedRobot {
 
     // Notice that the input of the lower arm pos is 
     // revolutions / 5 because we want 360/5 = 72 degrees in both directions
-    // arm.setLowerArmPosition(leftX/5);
     if (driver.getLeftBumper()) {
-
-      arm.drive(leftX, leftY);
-
+      
+      // arm.drive(leftX, leftY);
+      
+      arm.setLowerArmPosition(0);
+      arm.setUpperArmPosition(leftX/5);
       // Yummy debug makes me giddy
       double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
       System.out.println(

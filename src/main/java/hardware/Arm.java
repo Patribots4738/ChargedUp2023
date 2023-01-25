@@ -1,5 +1,7 @@
 package hardware;
 
+import java.util.ArrayList;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -9,6 +11,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import math.*;
@@ -38,6 +41,9 @@ public class Arm implements Loggable {
 
   private final SparkMaxPIDController _lowerArmPIDController;
   private final SparkMaxPIDController _upperArmPIDController;
+
+  @Log
+  private double currentPos = 0;
 
   /**
    * Constructs a new Arm and configures the encoders and PID controllers.
@@ -91,6 +97,8 @@ public class Arm implements Loggable {
             ArmConstants.kUpperMinOutput,
             ArmConstants.kUpperMaxOutput);
 
+    _lowerArm.setSmartCurrentLimit(ArmConstants.kLowerCurrentLimit);
+    _upperArm.setSmartCurrentLimit(ArmConstants.kUpperCurrentLimit);
 
     // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
     _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -138,9 +146,9 @@ public class Arm implements Loggable {
       upperArmAngle = 0;
     }
 
-    // setLowerArmPosition(Units.radiansToRotations(lowerArmAngle));
+    setLowerArmPosition(Units.radiansToRotations(lowerArmAngle));
     setUpperArmPosition(Units.radiansToRotations(upperArmAngle));
-
+    // System.out.println(Units.radiansToRotations(upperArmAngle));
   }
 
   /**
@@ -193,6 +201,7 @@ public class Arm implements Loggable {
     // the converted position, neoPosition
     _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
+    currentPos = _upperArmEncoder.getPosition() / ArmConstants.kUpperArmGearRatio;
   }
 
   /**
@@ -239,11 +248,11 @@ public class Arm implements Loggable {
 
     // Calculate the rotations needed to get to the position
     // By multiplying the position by the gear ratio
-    double neoPosition = position * ArmConstants.kUpperArmGearRatio;
+    double neoPosition = position * ArmConstants.kLowerArmGearRatio;
 
     // Set the position of the neo controlling the upper arm to
     // the converted position, neoPosition
-    _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
+    _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
   }
 
   /**
