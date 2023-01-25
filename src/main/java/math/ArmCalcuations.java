@@ -45,6 +45,10 @@ public class ArmCalcuations {
                 Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
                         /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength * Math.cos(q2)));
 
+        
+        // COMMAND FOR LATER FOR US YAY PROGRAMING
+        // mess with left and right angle and a comment of both
+
         double rightAngle = Math.atan(y / x) -
                 Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
                         /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2)));
