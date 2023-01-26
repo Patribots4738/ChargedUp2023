@@ -25,8 +25,9 @@ public class ArmCalcuations {
     public double getLowerAngle(double x, double y)
     {
         double lowerAngle = Math.acos (
-            (x * x + y * y) - (Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength * Constants.ArmConstants.kUpperArmLength)
-            / (2 * Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kUpperArmLength));
+            (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(Constants.ArmConstants.kLowerArmLength, 2)) + 
+                                (Math.pow(Constants.ArmConstants.kUpperArmLength, 2))))
+            / (2 * (Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kUpperArmLength)));
 
         return lowerAngle * ((x < 0) ? 1 : -1);
     }
@@ -43,16 +44,13 @@ public class ArmCalcuations {
     {
         double leftAngle = Math.atan(y / x) + 
                 Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
-                        /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength * Math.cos(q2)));
-
-        
-        // COMMAND FOR LATER FOR US YAY PROGRAMING
-        // mess with left and right angle and a comment of both
+                        /(Constants.ArmConstants.kLowerArmLength + (Constants.ArmConstants.kUpperArmLength * Math.cos(q2))));
 
         double rightAngle = Math.atan(y / x) -
                 Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
-                        /(Constants.ArmConstants.kLowerArmLength + Constants.ArmConstants.kUpperArmLength*Math.cos(q2)));
+                        / (Constants.ArmConstants.kLowerArmLength + (Constants.ArmConstants.kUpperArmLength*Math.cos(q2))));
 
-        return ((x < 0) ? rightAngle : leftAngle);
+        // leftAngle must correspond with a positive getLowerAngle() output.
+        return ((x < 0) ? leftAngle : rightAngle);
     }
 }
