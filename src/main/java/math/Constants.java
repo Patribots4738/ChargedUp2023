@@ -222,4 +222,10 @@ public final class Constants
     public static final double kAUpper = 0.19957;
 
   }
+
+  public static final class VisionConstants {
+    public static final double kConeOffsetMeters = 0.5;
+    
+    public static final double kDesiredVelocityMetersPerSecond = 1.5;
+  }
 }
