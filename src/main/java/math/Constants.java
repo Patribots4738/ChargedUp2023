@@ -152,7 +152,7 @@ public final class Constants
 
     // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS?
     public static final int kUpperCurrentLimit = 60;
-    public static final int kLowerCurrentLimit = 40;
+    public static final int kLowerCurrentLimit = 60;
 
     // The length of the first pivot point to the second pivot point, in inches
     public static final double kLowerArmLength = 32;
@@ -161,10 +161,10 @@ public final class Constants
     public static final double kUpperArmLength = 21;
 
     // The max reach of the bot horizontally, in inches
-    public static final double kMaxReachX = 53;
+    public static final double kMaxReachX = 40;
 
     // The max reach of the bot vertically, in inches
-    public static final double kMaxReachY = 53;
+    public static final double kMaxReachY = 40.;
 
     // The gear ratio of the lower arm is 60:1
     public static final double kLowerArmGearRatio = 60;

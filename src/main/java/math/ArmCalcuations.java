@@ -1,5 +1,7 @@
 package math;
 
+import math.Constants.*;
+
 public class ArmCalcuations {
     
     /* 
@@ -22,14 +24,25 @@ public class ArmCalcuations {
      * Due to an axis controlling the range, they will not go over
      * @return the angle to set the motor to, in radians
      */
-    public double getLowerAngle(double x, double y)
+    public double getLowerAngle(double y, double x)
     {
-        double lowerAngle = Math.acos (
-            (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(Constants.ArmConstants.kLowerArmLength, 2)) + 
-                                (Math.pow(Constants.ArmConstants.kUpperArmLength, 2))))
-            / (2 * (Constants.ArmConstants.kLowerArmLength * Constants.ArmConstants.kUpperArmLength)));
+      x *= ArmConstants.kMaxReachX;
+      y *= ArmConstants.kMaxReachY;
+      
+      if (x > ArmConstants.kMaxReachX) {
+        x = ArmConstants.kMaxReachX;
+      }
+      if (y > ArmConstants.kMaxReachY) {
+        y = ArmConstants.kMaxReachY;
+      }
 
-        return lowerAngle * ((x < 0) ? 1 : -1);
+      double lowerAngle = 
+        Math.acos(
+          (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(ArmConstants.kLowerArmLength, 2)) + 
+              (Math.pow(ArmConstants.kUpperArmLength, 2))))
+          / (2 * (ArmConstants.kLowerArmLength * ArmConstants.kUpperArmLength)));
+
+      return lowerAngle * ((x < 0) ? 1 : -1);
     }
 
 
@@ -40,17 +53,27 @@ public class ArmCalcuations {
      * Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
      * Due to an axis controlling the range, they will not go over
      */
-    public double getUpperAngle(double x, double y, double q2)
+    public double getUpperAngle(double y, double x, double q2)
     {
-        double leftAngle = Math.atan(y / x) + 
-                Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
-                        /(Constants.ArmConstants.kLowerArmLength + (Constants.ArmConstants.kUpperArmLength * Math.cos(q2))));
+      x *= ArmConstants.kMaxReachX;
+      y *= ArmConstants.kMaxReachY;
 
-        double rightAngle = Math.atan(y / x) -
-                Math.atan((Constants.ArmConstants.kUpperArmLength * Math.sin(q2))
-                        / (Constants.ArmConstants.kLowerArmLength + (Constants.ArmConstants.kUpperArmLength*Math.cos(q2))));
+      if (x > ArmConstants.kMaxReachX) {
+        x = ArmConstants.kMaxReachX;
+      }
+      if (y > ArmConstants.kMaxReachY) {
+        y = ArmConstants.kMaxReachY;
+      }
 
-        // leftAngle must correspond with a positive getLowerAngle() output.
-        return ((x < 0) ? leftAngle : rightAngle);
+      double leftAngle = Math.atan(y / x) + 
+              Math.atan((ArmConstants.kUpperArmLength * Math.sin(q2))
+                      /(ArmConstants.kLowerArmLength + (ArmConstants.kUpperArmLength * Math.cos(q2))));
+
+      double rightAngle = Math.atan(y / x) -
+              Math.atan((ArmConstants.kUpperArmLength * Math.sin(q2))
+                      / (ArmConstants.kLowerArmLength + (ArmConstants.kUpperArmLength * Math.cos(q2))));
+
+      // leftAngle must correspond with a positive getLowerAngle() output.
+      return ((x < 0) ? leftAngle : rightAngle);
     }
 }

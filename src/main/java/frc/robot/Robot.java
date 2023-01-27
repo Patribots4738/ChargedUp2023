@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -158,7 +158,7 @@ public class Robot extends TimedRobot {
   {
 
     double leftX = driver.getLeftX();
-    double leftY = driver.getLeftY();
+    double leftY = -driver.getLeftY();
     double rightX = driver.getRightX();
     double deadZone = 0.15;
     
@@ -187,18 +187,17 @@ public class Robot extends TimedRobot {
     // revolutions / 5 because we want 360/5 = 72 degrees in both directions
     if (driver.getLeftBumper()) {
       
-      // arm.drive(leftX, leftY);
+      arm.drive(leftX, leftY);
       
       // arm.setLowerArmPosition(0);
       // arm.setUpperArmPosition(leftX/5);
       // Yummy debug makes me giddy
       double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
       System.out.println(
-              "LeftX: " + String.format("%.3f", leftX) +
-                " LeftY: " + String.format("%.3f", leftY) +
-                " Q1: " + String.format("%.3f",
-                armCalcuations.getUpperAngle(leftX, leftY, lowerAngle)) +
-                " Q2: " + String.format("%.3f", lowerAngle));
+                "LeftX: "  + String.format("%.3f", leftX) +
+               " LeftY: " + String.format("%.3f", leftY) +
+               " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getUpperAngle(leftX, leftY, lowerAngle))) +
+               " Q2: "    + String.format("%.3f", Units.radiansToDegrees(lowerAngle)-90));
 
     }
 
