@@ -28,7 +28,17 @@ public class Arm implements Loggable {
    *    2  |||||  6
    */
 
-  int[][] armPos = {{0, 2}, {1, 1}, {2, 0}, {3, 1}, {4, 4}, {5, 1}, {6, 0}, {7, 2}, {8, 3}};
+  int[][] armPos =  {
+                      {0, 2}, 
+                      {1, 1}, 
+                      {2, 0}, 
+                      {3, 1}, 
+                      {4, 4}, 
+                      {5, 1}, 
+                      {6, 0}, 
+                      {7, 2}, 
+                      {8, 3}
+                    };
   int armPosIndex = 0;
   
   ArmCalcuations armCalculations = new ArmCalcuations();
@@ -122,6 +132,17 @@ public class Arm implements Loggable {
   }
 
   /**
+   * Set the position of the arm based on the array armPos
+   * @param pos the position (index) to set the arm to
+   */
+  public void setArmPosition(int direction) {
+    direction = (direction > 0) ? 1 : -1;
+    armPosIndex += direction;
+    drive(armPos[armPosIndex][0], armPos[armPosIndex][1]);
+  }
+
+
+  /**
    * Calculate the position of the arm based on the joystick input
    * as an absolute position in inches, multiplied by 
    * Constants.ArmConstants.kMaxReachX,Y respectivly
@@ -130,8 +151,8 @@ public class Arm implements Loggable {
    */
   public void drive(double armX, double armY) {
 
-    // Make sure armX and armY are within the range of 0 to 1
-    // We cannot reach below the ground sadge
+    // Make sure armX and armY are within the range of 0 to infinity
+    // We cannot reach below the ground; sadge
     armY = (armY < 0) ? 0 : armY;
 
     // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm

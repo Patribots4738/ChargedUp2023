@@ -9,7 +9,7 @@ import hardware.*;
 import math.ArmCalcuations;
 import math.Constants.*;
 import auto.*;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
@@ -154,50 +154,42 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() 
   {
 
-    double leftX = driver.getLeftX();
-    double leftY = -driver.getLeftY();
-    double rightX = driver.getRightX();
-    double deadZone = 0.15;
-    
-    if (Math.abs(leftY) < deadZone) {
-      leftY = 0;
-    }
-    if (Math.abs(leftX) < deadZone) {
-      leftX = 0;
-    }
-    if (Math.abs(rightX) < deadZone) {
-      rightX = 0;
-    }
-    
-    // if (driver.getLeftBumper()) {
+    // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
+    // This is to ensure that the up direction on the joystick is positive inputs
+    double driverLeftX  =  MathUtil.applyDeadband(driver.getLeftX(),  OIConstants.kDriverDeadband);
+    double driverLeftY  = -MathUtil.applyDeadband(driver.getLeftY(),  OIConstants.kDriverDeadband);
+    double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
+    double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
+
+    // if (driver.getRightBumper()) {
     //   swerve.setX();
     // }
     // else
     // {
-      // Drive the robot  
-      //           SpeedX SpeedY Rotation
-      // swerve.drive(leftY*0.25, leftX*0.25, rightX*0.25, true);
+    //   Drive the robot  
+    //   swerve.drive(SpeedX, SpeedY, Rotation, Field_Oriented);
+    //   swerve.drive(leftY*0.25, leftX*0.25, rightX*0.25, true);
     // }
 
-
-    // Notice that the input of the lower arm pos is 
-    // revolutions / 5 because we want 360/5 = 72 degrees in both directions
-    if (driver.getLeftBumper()) {
+    // if (driver.getLeftBumper()) {
       
-      arm.drive(leftX, leftY);
-      
-      // arm.setLowerArmPosition(0);
-      // arm.setUpperArmPosition(leftX/5);
-      // Yummy debug makes me giddy
-      double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
-      System.out.println(
-                "LeftX: "  + String.format("%.3f", leftX) +
-               " LeftY: " + String.format("%.3f", leftY) +
-               " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getUpperAngle(leftX, leftY, lowerAngle))) +
-               " Q2: "    + String.format("%.3f", Units.radiansToDegrees(lowerAngle)-90));
+    //   arm.drive(leftX, leftY);
+    //   // Yummy debug makes me giddy
+    //   double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
+    //   System.out.println(
+    //             "LeftX: "  + String.format("%.3f", leftX) +
+    //            " LeftY: " + String.format("%.3f", leftY) +
+    //            " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getUpperAngle(leftX, leftY, lowerAngle))) +
+    //            " Q2: "    + String.format("%.3f", Units.radiansToDegrees(lowerAngle)-90));
 
+    // }
+
+    if (driver.getXButtonPressed()) {
+      arm.setArmPosition(1);
     }
-
+    else if (driver.getBButtonPressed()) {
+      arm.setArmPosition(-1);
+    }
   }
 
   @Override
@@ -205,40 +197,5 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {
-
-    // int targetID = -1;
-    // double x = -1;
-    // double y = -1;
-    // double pitch = -1;
-    // double yaw = -1;
-
-    //  var result = camera.getLatestResult();
-
-    //  if (result.hasTargets()){
-
-    //     PhotonTrackedTarget bestTarget = result.getBestTarget();
-
-    //     if (targetID == 1){
-
-    //       targetID = bestTarget.getFiducialId();
-    //       x = bestTarget.getBestCameraToTarget().getTranslation().getX();
-    //       y = bestTarget.getBestCameraToTarget().getTranslation().getY();
-    //       pitch = bestTarget.getPitch();
-    //       yaw = bestTarget.getYaw();
-        
-    //     }
-          
-    //   }
-      
-    //   SmartDashboard.putNumber("X", x);
-    //   SmartDashboard.putNumber("Y", y);
-    //   SmartDashboard.putNumber("Pitch", pitch); 
-    //   SmartDashboard.putNumber("Yaw", yaw);
-
-    //   // if(result.hasTargets()) {
-    //   //   double x = result.getBestTarget().getBestCameraToTarget().getTranslation().getX();
-    //   //   double y = result.getBestTarget().getBestCameraToTarget().getTranslation().getY();
-    //   // }
-  }
+  public void testPeriodic() {}
 }
