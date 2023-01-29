@@ -20,9 +20,9 @@ import debug.*;
 public class SwerveTrajectory implements Loggable {
 
   // Create config for trajectory
-  private static double timetrajectoryStarted;
-  private static String trajectoryStatus="";
-  private static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();    
+  public static double timetrajectoryStarted;
+  public static String trajectoryStatus="";
+  public static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();    
 
   public static double elapsedTime;
 
@@ -86,7 +86,6 @@ public class SwerveTrajectory implements Loggable {
       switch (trajectoryStatus) {
 
         case "setup":
-          swerve.resetOdometry(((PathPlannerState) _pathTraj.getInitialState()).poseMeters); 
           timetrajectoryStarted = Timer.getFPGATimestamp();
           trajectoryStatus = "execute";
           break;
@@ -113,9 +112,10 @@ public class SwerveTrajectory implements Loggable {
             // It is important to note that fieldRelative is false, 
             // but calculations make it so it is true i.e. rotation is independant
             // (This is seen 6-5 lines above)
-            swerve.drive(_speeds.vxMetersPerSecond,
-            _speeds.vyMetersPerSecond, 
-            _speeds.omegaRadiansPerSecond,false);
+            swerve.drive(
+              _speeds.vxMetersPerSecond,
+              _speeds.vyMetersPerSecond, 
+              _speeds.omegaRadiansPerSecond,false);
               
           } else {
 

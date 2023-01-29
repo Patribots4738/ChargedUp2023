@@ -109,6 +109,7 @@ public final class Constants
   }
 
   public static final class OIConstants {
+
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
 
@@ -204,9 +205,9 @@ public final class Constants
      * 
      */
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.1;
+    public static final double kLowerP = 0.5;
     public static final double kLowerI = 0;
-    public static final double kLowerD = 0.0025;
+    public static final double kLowerD = 0;
     public static final double kLowerFF = 0;
 
     public static final double kUpperP = 1;//5.079;
@@ -215,10 +216,10 @@ public final class Constants
     public static final double kUpperFF = 0;
 
     // The below values are given from sysID calibration
-    public static final double kSLower = 0.15999;
+    public static final double kSLower = 0;//.15999;
     public static final double kGLower = 0;//0.33966; (We don't like gravity)
-    public static final double kVLower = 0.24941;
-    public static final double kALower = 4.3455;
+    public static final double kVLower = 0;//.24941;
+    public static final double kALower = 0;//4.3455;
 
     public static final double kSUpper = 0.47727;
     public static final double kGUpper = 0; //1.0051; // (We don't like gravity)

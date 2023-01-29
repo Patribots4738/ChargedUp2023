@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
 
 // import org.photonvision.PhotonCamera;
 // import org.photonvision.targeting.PhotonTrackedTarget;
@@ -50,6 +51,7 @@ public class Robot extends TimedRobot {
   Debug debug;
 
   ArmCalcuations armCalcuations = new ArmCalcuations();
+  
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -176,18 +178,22 @@ public class Robot extends TimedRobot {
     // }
 
     if (driver.getLeftBumper()) {
-      
       // arm.drive(armInputs.getX(), armInputs.getY());
-      arm.setUpperArmPosition(driverLeftX/5);
-      arm.setLowerArmPosition(0);
+      // arm.setUpperArmPosition(driverLeftX/5);
+      System.out.println(" ");
+      arm.setLowerArmPosition(0.15);
       // Yummy debug makes me giddy
       double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
-      System.out.println(
-                "LeftX: "  + String.format("%.3f", armInputs.getX()) +
-               " LeftY: " + String.format("%.3f", armInputs.getY()) +
-               " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
-               " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
-
+      double lowerAngle = armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle);
+      // System.out.println(
+      //           "LeftX: "  + String.format("%.3f", armInputs.getX()) +
+      //          " LeftY: " + String.format("%.3f", armInputs.getY()) +
+      //          " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
+      //          " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
+      /*
+       * p from 0.05 +- 1 to ~0.25 and then go back until not oscilating
+       * d from 0.05 +_ 1 to ~0.25 and then go back until not oscilating
+       */
     }
     
 
