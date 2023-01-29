@@ -50,8 +50,10 @@ public class Arm implements Loggable {
   private final SparkMaxPIDController _lowerArmPIDController;
   private final SparkMaxPIDController _upperArmPIDController;
 
-  @Log
-  private double currentPos = 0;
+  // @Log
+  private double upperPos = 0;
+  // @Log 
+  private double lowerPos = 0;
 
   /**
    * Constructs a new Arm and configures the encoders and PID controllers.
@@ -230,7 +232,7 @@ public class Arm implements Loggable {
     // the converted position, neoPosition
     _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
-    currentPos = _upperArmEncoder.getPosition() / ArmConstants.kUpperArmGearRatio;
+    upperPos = _upperArmEncoder.getPosition() / ArmConstants.kUpperArmGearRatio;
   }
 
   /**
@@ -282,6 +284,9 @@ public class Arm implements Loggable {
     // Set the position of the neo controlling the upper arm to
     // the converted position, neoPosition
     _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
+
+    lowerPos = _lowerArmEncoder.getPosition() / ArmConstants.kLowerArmGearRatio;
+    System.out.print(lowerPos + ", ");
   }
 
   /**
