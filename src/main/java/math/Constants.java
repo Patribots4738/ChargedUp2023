@@ -115,6 +115,10 @@ public final class Constants
     public static final double kDriverDeadband = 0.15;
     public static final double kOperatorDeadband = 0.15;
 
+    // See https://www.desmos.com/calculator/uvjyezftlq
+    // And https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
+    public static final double kControllerCornerSlope1 = 1/0.7;
+    public static final double kControllerCornerSlope2 = 0.7;
   }
 
   public static final class AutoConstants {
@@ -154,8 +158,8 @@ public final class Constants
     public static final int kUpperArmMotorCanId = 9;
 
     // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS?
-    public static final int kUpperCurrentLimit = 60;
-    public static final int kLowerCurrentLimit = 60;
+    public static final int kUpperCurrentLimit = 80;
+    public static final int kLowerCurrentLimit = 80;
 
     // The length of the first pivot point to the second pivot point, in inches
     public static final double kLowerArmLength = 32;
@@ -164,10 +168,7 @@ public final class Constants
     public static final double kUpperArmLength = 21;
 
     // The max reach of the bot horizontally, in inches
-    public static final double kMaxReachX = 40;
-
-    // The max reach of the bot vertically, in inches
-    public static final double kMaxReachY = 40.;
+    public static final double kMaxReach = kLowerArmLength + kUpperArmLength;
 
     // The gear ratio of the lower arm is 60:1
     public static final double kLowerArmGearRatio = 60;
@@ -203,14 +204,14 @@ public final class Constants
      * 
      */
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.5;
+    public static final double kLowerP = 0.1;
     public static final double kLowerI = 0;
-    public static final double kLowerD = 0.025;
+    public static final double kLowerD = 0.0025;
     public static final double kLowerFF = 0;
 
-    public static final double kUpperP = 1.5;
+    public static final double kUpperP = 1;//5.079;
     public static final double kUpperI = 0;
-    public static final double kUpperD = 0.75;
+    public static final double kUpperD = 0;//1.006;
     public static final double kUpperFF = 0;
 
     // The below values are given from sysID calibration

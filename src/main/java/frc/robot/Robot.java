@@ -7,10 +7,12 @@ package frc.robot;
 import debug.*;
 import hardware.*;
 import math.ArmCalcuations;
+import math.OICalc;
 import math.Constants.*;
 import auto.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -161,6 +163,8 @@ public class Robot extends TimedRobot {
     double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
     double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
 
+    Translation2d armInputs = OICalc.toCircle(driverLeftX, 0.75);
+
     // if (driver.getRightBumper()) {
     //   swerve.setX();
     // }
@@ -171,25 +175,28 @@ public class Robot extends TimedRobot {
     //   swerve.drive(leftY*0.25, leftX*0.25, rightX*0.25, true);
     // }
 
-    // if (driver.getLeftBumper()) {
+    if (driver.getLeftBumper()) {
       
-    //   arm.drive(leftX, leftY);
-    //   // Yummy debug makes me giddy
-    //   double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
-    //   System.out.println(
-    //             "LeftX: "  + String.format("%.3f", leftX) +
-    //            " LeftY: " + String.format("%.3f", leftY) +
-    //            " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getUpperAngle(leftX, leftY, lowerAngle))) +
-    //            " Q2: "    + String.format("%.3f", Units.radiansToDegrees(lowerAngle)-90));
+      // arm.drive(armInputs.getX(), armInputs.getY());
+      arm.setUpperArmPosition(driverLeftX/5);
+      arm.setLowerArmPosition(0);
+      // Yummy debug makes me giddy
+      double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
+      System.out.println(
+                "LeftX: "  + String.format("%.3f", armInputs.getX()) +
+               " LeftY: " + String.format("%.3f", armInputs.getY()) +
+               " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
+               " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
 
+    }
+    
+
+    // else if (driver.getBButtonPressed()) {
+    //   arm.setArmPosition(1);
     // }
-
-    if (driver.getXButtonPressed()) {
-      arm.setArmPosition(1);
-    }
-    else if (driver.getBButtonPressed()) {
-      arm.setArmPosition(-1);
-    }
+    // else if (driver.getXButtonPressed()) {
+    //   arm.setArmPosition(-1);
+    // }
   }
 
   @Override

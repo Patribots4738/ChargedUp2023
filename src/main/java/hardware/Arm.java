@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -28,16 +29,13 @@ public class Arm implements Loggable {
    *    2  |||||  6
    */
 
-  int[][] armPos =  {
-                      {0, 2}, 
-                      {1, 1}, 
-                      {2, 0}, 
-                      {3, 1}, 
-                      {4, 4}, 
-                      {5, 1}, 
-                      {6, 0}, 
-                      {7, 2}, 
-                      {8, 3}
+
+  // All armPos values are in inches
+  Translation2d[] armPos =  {
+                      new Translation2d(0, ArmConstants.kMaxReach),
+                      new Translation2d(33, 22.6),
+                      new Translation2d(37.47, 37.47),
+                      new Translation2d(46, 3),
                     };
   int armPosIndex = 0;
   
@@ -121,24 +119,24 @@ public class Arm implements Loggable {
   }
 
   /**
-   * Return the current position of both segments
-   * 
-   * @return the current position of both segments
-   */
-  public double[] getArmPosition() {
-    return new double[] {
-      _lowerArmEncoder.getPosition(), _upperArmEncoder.getPosition()
-    };
-  }
-
-  /**
    * Set the position of the arm based on the array armPos
    * @param pos the position (index) to set the arm to
    */
   public void setArmPosition(int direction) {
+
     direction = (direction > 0) ? 1 : -1;
+
     armPosIndex += direction;
-    drive(armPos[armPosIndex][0], armPos[armPosIndex][1]);
+
+    // Make sure armPosIndex is within the range of 0 to armPos.length - 1
+    // To prevent out of bounds errors
+    armPosIndex = (armPosIndex < 0) ? 0 : (armPosIndex > armPos.length - 1) ? armPos.length - 1 : armPosIndex;
+
+    System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
+    
+    drive(
+      armPos[armPosIndex].getX() / ArmConstants.kMaxReach, 
+      armPos[armPosIndex].getY() / ArmConstants.kMaxReach);
   }
 
 
@@ -157,8 +155,8 @@ public class Arm implements Loggable {
 
     // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
     // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-    double upperArmAngle = armCalculations.getLowerAngle(armX, armY);
-    double lowerArmAngle = armCalculations.getUpperAngle(armX, armY, upperArmAngle);
+    double upperArmAngle = armCalculations.getUpperAngle(armX, armY);
+    double lowerArmAngle = armCalculations.getLowerAngle(armX, armY, upperArmAngle);
 
     // If upperArmAngle is NotANumber, set lowerArmAngle and upperArmAngle to zero,
     // This is because lowerArmAngle is reliant on upperArmAngle
@@ -169,7 +167,7 @@ public class Arm implements Loggable {
 
     setLowerArmPosition(Units.radiansToRotations(lowerArmAngle));
     setUpperArmPosition(Units.radiansToRotations(upperArmAngle));
-    // System.out.println(Units.radiansToRotations(upperArmAngle));
+    System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) + " Lower: " + Units.radiansToDegrees(lowerArmAngle));
   }
 
   /**
