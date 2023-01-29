@@ -113,9 +113,10 @@ public class SwerveTrajectory implements Loggable {
             // It is important to note that fieldRelative is false, 
             // but calculations make it so it is true i.e. rotation is independant
             // (This is seen 6-5 lines above)
-            swerve.drive(_speeds.vxMetersPerSecond,
-            _speeds.vyMetersPerSecond, 
-            _speeds.omegaRadiansPerSecond,false);
+            swerve.drive(
+              _speeds.vxMetersPerSecond,
+              _speeds.vyMetersPerSecond, 
+              _speeds.omegaRadiansPerSecond,false);
               
           } else {
 
