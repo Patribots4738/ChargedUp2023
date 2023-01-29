@@ -119,10 +119,21 @@ public class Arm implements Loggable {
   }
 
   /**
+   * Reset the encoders to zero the arm when initiating the arm
+   * Will not be needed in the future because we will have absolute encoders
+   */
+  public void resetEncoders() {
+
+    _lowerArmEncoder.setPosition(0);
+    _upperArmEncoder.setPosition(0);
+
+  }
+
+  /**
    * Set the position of the arm based on the array armPos
    * @param pos the position (index) to set the arm to
    */
-  public void setArmPosition(int direction) {
+  public void setArmIndex(int direction) {
 
     direction = (direction > 0) ? 1 : -1;
 
@@ -138,7 +149,6 @@ public class Arm implements Loggable {
       armPos[armPosIndex].getX() / ArmConstants.kMaxReach, 
       armPos[armPosIndex].getY() / ArmConstants.kMaxReach);
   }
-
 
   /**
    * Calculate the position of the arm based on the joystick input
@@ -275,13 +285,22 @@ public class Arm implements Loggable {
   }
 
   /**
-   * Reset the encoders to zero the arm when initiating the arm
-   * Will not be needed in the future because we will have absolute encoders
+   * Get the current position of the upper arm
+   * 
+   * @return the current position of the upper arm
+   * This unit is in revolutions
    */
-  public void resetEncoders() {
+  public double getUpperArmPosition () {
+    return _upperArmEncoder.getPosition() / ArmConstants.kUpperArmGearRatio;
+  }
 
-    _lowerArmEncoder.setPosition(0);
-    _upperArmEncoder.setPosition(0);
-
+  /**
+   * Get the current position of the lower arm
+   * 
+   * @return the current position of the lower arm
+   * This unit is in revolutions
+   */
+  public double getLowerArmPosition () {
+    return _lowerArmEncoder.getPosition() / ArmConstants.kLowerArmGearRatio;
   }
 }

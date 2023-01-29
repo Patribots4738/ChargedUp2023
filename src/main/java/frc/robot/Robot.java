@@ -33,12 +33,12 @@ public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   /* ExampleSubsystem exampleSubsystem; */
 
-  // Swerve swerve;
+  Swerve swerve;
 
   XboxController driver;
   // XboxController operator;
   
-  AutoWaypoints autoWaypoints;
+  AutoSegmentedWaypoints autoSegmentedWaypoints;
 
   Arm arm;
   
@@ -70,11 +70,11 @@ public class Robot extends TimedRobot {
       even CAN IDs are the turning motors
      */
     // Drivetrain instantiation
-    // swerve = new Swerve();
+    swerve = new Swerve();
     // // Zero the IMU for field-oriented driving 
-    // swerve.resetEncoders();
-    // swerve.zeroHeading();
-    // swerve.setBrakeMode();
+    swerve.resetEncoders();
+    swerve.zeroHeading();
+    swerve.setBrakeMode();
 
     // Setup controllers
     driver = new XboxController(OIConstants.kDriverControllerPort);
@@ -84,8 +84,9 @@ public class Robot extends TimedRobot {
     arm = new Arm();
     
     
-    // AutoWaypoints Instantiation
-    autoWaypoints = new AutoWaypoints();
+    // AutoSegmentedWaypoints Instantiation
+    autoSegmentedWaypoints = new AutoSegmentedWaypoints();
+    autoSegmentedWaypoints.loadAutoPaths();
 
     // The first argument is the root container
     // The second argument is whether logging and config should be given separate tabs
@@ -104,7 +105,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     // Update the odometry for the swerve drive
-    // swerve.periodic();
+    swerve.periodic();
 
     // Update the logger for shuffleboard
     Logger.updateEntries();
@@ -125,9 +126,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    // autoWaypoints.init(swerve); 
-    // // swerve.setCoastMode();
-    // SwerveTrajectory.resetTrajectoryStatus();
+    autoSegmentedWaypoints.init(swerve, arm); 
+    // swerve.setCoastMode();
+    SwerveTrajectory.resetTrajectoryStatus();
     
   }
 
@@ -135,8 +136,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    // autoWaypoints.autoPeriodic();
-    // SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+    autoSegmentedWaypoints.autoPeriodic();
+    // SwerveTrajectory.PathPlannerRunner(autoSegmentedWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
 
   }
@@ -145,8 +146,9 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     
     // swerve.resetEncoders();
-    // swerve.setBrakeMode();
-    arm.resetEncoders();
+    // arm.resetEncoders();
+
+    swerve.setBrakeMode();
 
   }
 
@@ -174,7 +176,7 @@ public class Robot extends TimedRobot {
     //   swerve.drive(leftY*0.25, leftX*0.25, rightX*0.25, true);
     // }
 
-    if (driver.getLeftBumper()) {
+    if (driver.getLeftBumper()) { 
       
       // arm.drive(armInputs.getX(), armInputs.getY());
       arm.setUpperArmPosition(driverLeftX/5);
@@ -187,15 +189,16 @@ public class Robot extends TimedRobot {
                " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
                " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
 
+    
+    
+    }
+    else if (driver.getBButtonPressed()) {
+      arm.setArmIndex(1);
+    }
+    else if (driver.getXButtonPressed()) {
+      arm.setArmIndex(-1);
     }
     
-
-    // else if (driver.getBButtonPressed()) {
-    //   arm.setArmPosition(1);
-    // }
-    // else if (driver.getXButtonPressed()) {
-    //   arm.setArmPosition(-1);
-    // }
   }
 
   @Override
