@@ -13,8 +13,12 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Logger;
 import hardware.*;
+
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
+
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
@@ -22,6 +26,8 @@ import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+
+import auto.SwerveTrajectory;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -62,17 +68,34 @@ public class AutoAllignment {
   }
 
   public void moveToTag(int tagID, HolonomicDriveController HDC, double time){
-    targetPose = getTagPos(tagID);
-    State targetState = new State(time, 0, 0, targetPose, 0);
-    ChassisSpeeds speeds = HDC.calculate(
-              swerve.getOdometry().getPoseMeters(), 
-              (targetState),
-              (targetPose.getRotation()));
+    
+    // PathPlannerTrajectory tagPos = PathPlanner.generatePath(
+    //   new PathConstraints(0.5, 0.5),
+    //   new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(), swerve.getOdometry().getPoseMeters().getRotation(), swerve.getOdometry().getPoseMeters().getRotation()),
+    //   new PathPoint()
+
+    // );
+
+    PathPlannerTrajectory traj1 = PathPlanner.generatePath(
+      new PathConstraints(4, 3),
+      new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(), swerve.getOdometry().getPoseMeters().getRotation()),
+      new PathPoint(new Translation2d(3.0, 3.0), Rotation2d.fromDegrees(45))
+    );
+
+    SwerveTrajectory.PathPlannerRunner(traj1, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+        
+    // targetPose = getTagPos(tagID);
+    // State targetState = new State(1, 0, 0, targetPose, 0);
+    // ChassisSpeeds speeds = HDC.calculate(
+    //           swerve.getOdometry().getPoseMeters(), 
+    //           (targetState),
+    //           (targetPose.getRotation()));
             
-            System.out.println(speeds.vxMetersPerSecond + " " + speeds.vyMetersPerSecond + " " + targetState);
-            swerve.drive(speeds.vxMetersPerSecond*0.25,
-            speeds.vyMetersPerSecond*0.25, 
-            speeds.omegaRadiansPerSecond,false);
+            
+    //         swerve.drive(speeds.vxMetersPerSecond*0.25,
+    //         speeds.vyMetersPerSecond*0.25, 
+    //         speeds.omegaRadiansPerSecond,false);
+    // return targetState;
   }
 
   public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {
@@ -147,6 +170,6 @@ public class AutoAllignment {
         rotation = Constants.AllignmentConstants.kTag_8_pos.getRotation();
         break;
     }
-    return new Pose2d(tagX, tagY, rotation);
+    return new Pose2d(1000.0, tagY, rotation);
   }
 }

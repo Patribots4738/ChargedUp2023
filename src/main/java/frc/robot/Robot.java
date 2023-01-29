@@ -131,12 +131,14 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
   
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    autoWaypoints.init(swerve);
+  }
   @Override
   public void autonomousPeriodic() {
 
     autoWaypoints.autoPeriodic();
-    SwerveTrajectory.PathPlannerRunner(autoWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+    SwerveTrajectory.PathPlannerRunner(autoWaypoints.testTraj, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
   }
 
@@ -209,33 +211,33 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     swerve.periodic();
 
-    // double leftX = driver.getLeftX();
-    // double leftY = driver.getLeftY();
-    // double rightX = driver.getRightX();
-    // double deadZone = 0.15;
+    double leftX = driver.getLeftX();
+    double leftY = driver.getLeftY();
+    double rightX = driver.getRightX();
+    double deadZone = 0.15;
 
-    // swerve.periodic();
+    swerve.periodic();
     
-    // if (Math.abs(leftY) < deadZone) {
-    //   leftY = 0;
-    // }
-    // if (Math.abs(leftX) < deadZone) {
-    //   leftX = 0;
-    // }
-    // if (Math.abs(rightX) < deadZone) {
-    //   rightX = 0;
-    // }
+    if (Math.abs(leftY) < deadZone) {
+      leftY = 0;
+    }
+    if (Math.abs(leftX) < deadZone) {
+      leftX = 0;
+    }
+    if (Math.abs(rightX) < deadZone) {
+      rightX = 0;
+    }
     
-    // if (driver.getLeftBumper()) {
-    //   swerve.setX();
-    // }
-    // else
-    // {
-    // // Drive the robot  
-    // //           SpeedX SpeedY Rotation
-    //   swerve.drive(-leftX*0.25, - leftY*0.25, rightX*0.25, true);
-    // }
-      
+    if (driver.getLeftBumper()) {
+      swerve.setX();
+    }
+    else
+    {
+    // Drive the robot  
+    //           SpeedX SpeedY Rotation
+      swerve.drive(-leftX*0.25, - leftY*0.25, rightX*0.25, true);
+    }
+    
 
         /**
          * The operator has two buttons they can press, 
@@ -261,46 +263,8 @@ public class Robot extends TimedRobot {
          *  \ --------------------------------------------- /
          */
         
-    // System.out.println(driver.getAButton());
-    if (driver.getAButton()){
-      vision.pereodic();
-      
-      if (vision.hasTargets()){
-        if (driver.getLeftBumperPressed()){
-          System.out.println("asdlkjas");
-          autoAllignment.callibrateOdometry(vision.getPose(), vision.getTagID());
-        } else if (driver.getRightBumper()){
-          // System.out.println("ADSDASDASLJDASDL");
-          autoAllignment.moveToTag(vision.getTagID(), HDC, 5.0);
-        } else {
-          swerve.drive(0, 0, 0, false);
-        }
-      }
-    }
-    else {
-      swerve.drive(0, 0, 0, false);
-    }
-
-    if (autoAllignment.isAlligned()){
-      driver.setRumble(RumbleType.kLeftRumble, 0.5);
-    } else {
-      driver.setRumble(RumbleType.kBothRumble, 0.5);
-    }
-
-    if (autoAllignment.isAlligned()){
-      if (driver.getLeftBumperPressed()){
-        driver.setRumble(RumbleType.kBothRumble, 0);
-        autoAllignment.moveRelative(0, 0.5, 0, HDC);
-      } else if (driver.getRightBumperPressed()){
-        driver.setRumble(RumbleType.kBothRumble, 0);
-        autoAllignment.moveRelative(0, 0.5, 0, HDC);
-      } else {
-        driver.setRumble(RumbleType.kLeftRumble, 0.5);
-        swerve.drive(0, 0, 0, false);
-      }
-    } else {
-      driver.setRumble(RumbleType.kBothRumble, 0);
-      swerve.drive(0, 0, 0, false);
-    }
+    
+    
+    
   }
 }

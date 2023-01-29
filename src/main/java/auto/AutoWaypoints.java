@@ -3,9 +3,13 @@ package auto;
 
 import hardware.*;
 
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
@@ -19,6 +23,8 @@ public class AutoWaypoints implements Loggable {
 
     public PathPlannerTrajectory squarePath;
 
+    public PathPlannerTrajectory testTraj;
+
     Swerve swerve;
 
     private double currentX;
@@ -31,6 +37,11 @@ public class AutoWaypoints implements Loggable {
     public void init(Swerve swerve) {
       this.swerve = swerve; 
       squarePath = PathPlanner.loadPath("Square", 3, 2.5);
+      testTraj = PathPlanner.generatePath(
+        new PathConstraints(4, 3),
+        new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(), swerve.getOdometry().getPoseMeters().getRotation()),
+        new PathPoint(new Translation2d(3.0, 3.0), Rotation2d.fromDegrees(45))
+      );
       chooserBuilder();
     }
 
