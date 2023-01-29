@@ -1,4 +1,4 @@
-package hardware;
+package subsystems;
 
 import java.util.HashMap;
 
@@ -19,11 +19,15 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Vision {
 
-    public static final double rotDeadzone = 10;
+    public static final double rotDeadzone = 5;
 
-    public static final double xDeadZone = 0.1;
+    public static final double yDeadZone = 0.03;
 
-    public static final double allignmentSpeed = 0.5;
+    public static final double xDistance = 1.5;
+
+    public static final double xDeadZone = 0.05;
+
+    public static final double allignmentSpeed = 0.005;
     
     public static final double allignmentRotSpeed = 0.05;
 

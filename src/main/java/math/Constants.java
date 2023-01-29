@@ -4,6 +4,8 @@
 
 package math;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -227,5 +229,20 @@ public final class Constants
     public static final double kConeOffsetMeters = 0.5;
     
     public static final double kDesiredVelocityMetersPerSecond = 1.5;
+  }
+
+  public static final class AllignmentConstants {
+
+    public static final Pose2d kTag_1_pos = new Pose2d(14.5, 1.065, new Rotation2d(0));
+
+    public static final Pose2d kTag_2_pos = new Pose2d(14.5, 2.745, new Rotation2d(0));
+
+    public static final Pose2d kTag_3_pos = new Pose2d(14.5, 4.425, new Rotation2d(0));
+
+    public static final Pose2d kTag_6_pos = new Pose2d(2, 4.425, new Rotation2d(Units.degreesToRadians(180)));
+
+    public static final Pose2d kTag_7_pos = new Pose2d(2, 2.745, new Rotation2d(Units.degreesToRadians(180)));
+
+    public static final Pose2d kTag_8_pos = new Pose2d(2, 1.065, new Rotation2d(Units.degreesToRadians(180)));
   }
 }
