@@ -7,7 +7,7 @@ import math.Constants.OIConstants;
 public class OICalc {
 
 
-  // All calculations can be refrenced here https://www.desmos.com/calculator/7e69t0ieaf
+  // All calculations can be refrenced here https://www.desmos.com/calculator/e07raajzh5
   public static Translation2d toCircle(double x, double y) {
     
      Translation2d intercept = new Translation2d();
