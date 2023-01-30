@@ -57,6 +57,8 @@ public class OICalc {
 
      double distance = getDistance(x, y, intercept.getX(), intercept.getY());
 
+     distance = (distance > 1) ? 1 : distance;
+
      output = new Translation2d(Math.signum(x) * distance, new Rotation2d(Math.atan(y/x)));
 
      return output;
