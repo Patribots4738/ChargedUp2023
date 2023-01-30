@@ -233,7 +233,7 @@ public final class Constants
 
   public static final class AllignmentConstants {
 
-    public static final Pose2d kTag_1_pos = new Pose2d(14.5, 1.065, new Rotation2d(0));
+    public static final Pose2d kTag_1_pos = new Pose2d(0, 0, new Rotation2d(0));
 
     public static final Pose2d kTag_2_pos = new Pose2d(14.5, 2.745, new Rotation2d(0));
 

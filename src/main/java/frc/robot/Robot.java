@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   
   AutoWaypoints autoWaypoints;
 
-  Arm arm;
+  // Arm arm;
   
   HolonomicDriveController autoController; 
 
@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
-  ArmCalcuations armCalcuations = new ArmCalcuations();
+  // ArmCalcuations armCalcuations = new ArmCalcuations();
 
   Vision vision = new Vision();
 
@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
   Boolean isHorizontallyAlligned = false;
 
-  HolonomicDriveController HDC = SwerveTrajectory.getHDC();
+  HolonomicDriveController HDC;
 
   Pose2d aprilPos;
 
@@ -106,6 +106,9 @@ public class Robot extends TimedRobot {
     // The second argument is whether logging and config should be given separate tabs
     Logger.configureLoggingAndConfig(this, false);
 
+    SwerveTrajectory.resetTrajectoryStatus();
+    autoWaypoints.init(swerve);
+
   }
 
   @Override
@@ -147,7 +150,8 @@ public class Robot extends TimedRobot {
     
     swerve.resetEncoders();
     swerve.setBrakeMode();
-    arm.resetEncoders();
+    // arm.resetEncoders();
+    HDC = SwerveTrajectory.getHDC();
 
   }
 
@@ -183,21 +187,21 @@ public class Robot extends TimedRobot {
 
     // Notice that the input of the lower arm pos is 
     // revolutions / 5 because we want 360/5 = 72 degrees in both directions
-    if (driver.getLeftBumper()) {
+    // if (driver.getLeftBumper()) {
       
-      arm.drive(leftX, leftY);
+    //   // arm.drive(leftX, leftY);
       
-      // arm.setLowerArmPosition(0);
-      // arm.setUpperArmPosition(leftX/5);
-      // Yummy debug makes me giddy
-      double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
-      System.out.println(
-                "LeftX: "  + String.format("%.3f", leftX) +
-               " LeftY: " + String.format("%.3f", leftY) +
-               " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getUpperAngle(leftX, leftY, lowerAngle))) +
-               " Q2: "    + String.format("%.3f", Units.radiansToDegrees(lowerAngle)-90));
+    //   // arm.setLowerArmPosition(0);
+    //   // arm.setUpperArmPosition(leftX/5);
+    //   // Yummy debug makes me giddy
+    //   double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
+    //   System.out.println(
+    //             "LeftX: "  + String.format("%.3f", leftX) +
+    //            " LeftY: " + String.format("%.3f", leftY) +
+    //            " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getUpperAngle(leftX, leftY, lowerAngle))) +
+    //            " Q2: "    + String.format("%.3f", Units.radiansToDegrees(lowerAngle)-90));
 
-    }
+    // }
 
   }
 
@@ -205,11 +209,13 @@ public class Robot extends TimedRobot {
   public void testInit() {
     swerve.resetEncoders();
     swerve.setBrakeMode();
+    HDC = SwerveTrajectory.getHDC();
   }
 
   @Override
   public void testPeriodic() {
     swerve.periodic();
+    vision.pereodic();
 
     double leftX = driver.getLeftX();
     double leftY = driver.getLeftY();
@@ -218,51 +224,41 @@ public class Robot extends TimedRobot {
 
     swerve.periodic();
     
-    if (Math.abs(leftY) < deadZone) {
-      leftY = 0;
+    if (!driver.getAButton()){
+      if (Math.abs(leftY) < deadZone) {
+        leftY = 0;
+      }
+      if (Math.abs(leftX) < deadZone) {
+        leftX = 0;
+      }
+      if (Math.abs(rightX) < deadZone) {
+        rightX = 0;
+      }
+      
+      if (driver.getLeftBumper()) {
+        swerve.setX();
+      }
+      else
+      {
+      // Drive the robot  
+      //           SpeedX SpeedY Rotation
+        swerve.drive(-leftX*0.25, - leftY*0.25, rightX*0.25, true);
+      }
     }
-    if (Math.abs(leftX) < deadZone) {
-      leftX = 0;
-    }
-    if (Math.abs(rightX) < deadZone) {
-      rightX = 0;
-    }
-    
-    if (driver.getLeftBumper()) {
-      swerve.setX();
-    }
-    else
-    {
-    // Drive the robot  
-    //           SpeedX SpeedY Rotation
-      swerve.drive(-leftX*0.25, - leftY*0.25, rightX*0.25, true);
-    }
-    
+    else {
 
-        /**
-         * The operator has two buttons they can press, 
-         * one moves the robot to the left if there's a valid position to the left,
-         * and the other does the same for the right.
-         * 
-         * The distances for these positions are set as an array tagPositions,
-         * which follows format:
-         * {1:[leftDist, rightDist], 2:[leftDist, rightDist], ...}
-        */
+      if (driver.getAButton()){
+        if (driver.getLeftBumperPressed()){
+          System.out.println("Callibrate");
+          autoAllignment.callibrateOdometry(vision.getPose(), vision.getTagID());
+        }
 
-        /**
-         *  A visual representation of the apriltag positions
-         *  / --------------------------------------------- \ 
-         *  5                      |                        4
-         *  |                      |                        |
-         *  |                      |                        |
-         *  6                      |                        3
-         *  |                      |                        |
-         *  7                      |                        2
-         *  |                      |                        |
-         *  8                      |                        1
-         *  \ --------------------------------------------- /
-         */
-        
+        else if (driver.getRightBumper()){
+          System.out.println("Move to tag");
+          autoAllignment.moveToTag(vision.getTagID(), HDC, autoWaypoints);
+        }
+      }        
+    }
     
     
     
