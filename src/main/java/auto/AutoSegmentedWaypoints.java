@@ -78,10 +78,10 @@ public class AutoSegmentedWaypoints implements Loggable {
       // new Waypoint(new AutoSegmentedWaypoints()::moveLowerArm, 5.23, 1.97, seg2),
       // new Waypoint(new AutoSegmentedWaypoints()::moveBothArms, 0.74, 1.02, seg3)
 
-      new Waypoint(new AutoSegmentedWaypoints()::moveUpperArm, seg1.getEndState().poseMeters.getX(), seg1.getEndState().poseMeters.getY(), seg1),
-      new Waypoint(new AutoSegmentedWaypoints()::moveLowerArm, seg2.getEndState().poseMeters.getX(), seg2.getEndState().poseMeters.getY(), seg2),
-      new Waypoint(new AutoSegmentedWaypoints()::moveBothArms, seg3.getEndState().poseMeters.getX(), seg3.getEndState().poseMeters.getY(), seg3),
-      new Waypoint(new AutoSegmentedWaypoints()::moveUpperArm, seg4.getEndState().poseMeters.getX(), seg4.getEndState().poseMeters.getY(), seg4)
+      new Waypoint(this::moveUpperArm, seg1.getEndState().poseMeters.getX(), seg1.getEndState().poseMeters.getY(), seg1),
+      new Waypoint(this::moveLowerArm, seg2.getEndState().poseMeters.getX(), seg2.getEndState().poseMeters.getY(), seg2),
+      new Waypoint(this::moveBothArms, seg3.getEndState().poseMeters.getX(), seg3.getEndState().poseMeters.getY(), seg3),
+      new Waypoint(this::moveUpperArm, seg4.getEndState().poseMeters.getX(), seg4.getEndState().poseMeters.getY(), seg4)
 
     };
 
@@ -112,7 +112,6 @@ public class AutoSegmentedWaypoints implements Loggable {
     else if (!SwerveTrajectory.trajectoryStatus.equals("done")) {
 
       autoDelay = Timer.getFPGATimestamp();
-
     }
   }
 
@@ -141,7 +140,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     
       }
     }
-  }
+  }waypointRunnerwaypointRunner
 
   private void moveBothArms() {
       
