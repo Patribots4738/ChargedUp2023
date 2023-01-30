@@ -95,12 +95,14 @@ public class Robot extends TimedRobot {
     operator = new XboxController(OIConstants.kOperatorControllerPort);
 
     // Arm Instantiation
-    // arm = new Arm();
+     arm = new Arm();
+     arm.resetEncoders();
     
     
     // AutoSegmentedWaypoints Instantiation
     autoSegmentedWaypoints = new AutoSegmentedWaypoints();
     autoSegmentedWaypoints.loadAutoPaths();
+    autoSegmentedWaypoints.init(swerve, arm);
 
     // The first argument is the root container
     // The second argument is whether logging and config should be given separate tabs
@@ -118,7 +120,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    // Update the odometry for the swerve drive
+    // Update the odometer for the swerve drive
     swerve.periodic();
 
     // Update the logger for shuffleboard
@@ -140,7 +142,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    autoSegmentedWaypoints.init(swerve, arm); 
     // swerve.setCoastMode();
     SwerveTrajectory.resetTrajectoryStatus();
     
@@ -180,29 +181,29 @@ public class Robot extends TimedRobot {
 
     Translation2d armInputs = OICalc.toCircle(driverLeftX, 0.75);
 
-    // if (driver.getRightBumper()) {
-    //   swerve.setX();
-    // }
-    // else
-    // {
-    //   Drive the robot  
-    //   swerve.drive(SpeedX, SpeedY, Rotation, Field_Oriented);
-    //   swerve.drive(leftY*0.25, leftX*0.25, rightX*0.25, true);
-    // }
+     if (driver.getRightBumper()) {
+       swerve.setX();
+     }
+     else
+     {
+//       Drive the robot
+//       swerve.drive(SpeedX, SpeedY, Rotation, Field_Oriented);
+       swerve.drive(driverLeftY * 0.25, driverLeftX * 0.25, driverRightX * 0.25, true);
+     }
 
     if (driver.getLeftBumper()) { 
       
-      // arm.drive(leftX, leftsY);
+      arm.drive(driverLeftX, 0.75);
       
       // arm.setLowerArmPosition(0);
       // arm.setUpperArmPosition(leftX/5);
-      // Yummy debug makes me giddy
-      double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
-      System.out.println(
-                "LeftX: "  + String.format("%.3f", armInputs.getX()) +
-               " LeftY: " + String.format("%.3f", armInputs.getY()) +
-               " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
-               " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
+//       Yummy debug makes me giddy
+//      double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
+//      System.out.println(
+//                "LeftX: "  + String.format("%.3f", armInputs.getX()) +
+//               " LeftY: " + String.format("%.3f", armInputs.getY()) +
+//               " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
+//               " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
 
     
     
