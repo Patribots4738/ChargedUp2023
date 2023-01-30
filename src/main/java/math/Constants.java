@@ -116,7 +116,7 @@ public final class Constants
     public static final double kDriverDeadband = 0.15;
     public static final double kOperatorDeadband = 0.15;
 
-    // See https://www.desmos.com/calculator/uvjyezftlq
+    // See https://www.desmos.com/calculator/7e69t0ieaf
     // And https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
     public static final double kControllerCornerSlope1 = 1/0.7;
     public static final double kControllerCornerSlope2 = 0.7;
