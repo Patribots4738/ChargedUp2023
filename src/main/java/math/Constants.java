@@ -182,7 +182,7 @@ public final class Constants
     public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
     
     // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-    public static final double kLowerFreedom = 75;
+    public static final double kLowerFreedom = 60;
     
     // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
     public static final double kUpperFreedom = 100;
@@ -207,14 +207,15 @@ public final class Constants
     // PID values for the lower and upper arm
     public static final double kLowerP = 0.5;
     public static final double kLowerI = 0;
-    public static final double kLowerD = 0;
+    public static final double kLowerD = 0.025;
     public static final double kLowerFF = 0;
 
-    public static final double kUpperP = 1;//5.079;
-    public static final double kUpperI = 0;
-    public static final double kUpperD = 0;//1.006;
-    public static final double kUpperFF = 0;
-
+    
+    public static final double kUpperP = 46.6;
+    public static final double kUpperD = 34.2;
+    public static final double kUpperI = 0.035;
+    public static final double kUpperFF = 1;
+    
     // The below values are given from sysID calibration
     public static final double kSLower = 0;//.15999;
     public static final double kGLower = 0;//0.33966; (We don't like gravity)

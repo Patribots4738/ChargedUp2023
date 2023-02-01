@@ -1,4 +1,4 @@
-// Refrenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
+// Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
 package auto;
 
 import com.pathplanner.lib.PathPlanner;
@@ -96,7 +96,9 @@ public class AutoSegmentedWaypoints implements Loggable {
   private void moveUpperArm() {
 
     // Set the upper arm to go 45 degrees
-    arm.setUpperArmPosition(0.25);
+    arm.setUpperArmReference(0.25);
+    arm.setLowerArmReference(0);
+
 
     if (SwerveTrajectory.trajectoryStatus.equals("done") &&
       ((0.23 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= 0.27) ||
@@ -119,7 +121,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     // Robot.SWERVEDRIVE.autoLimeLightAim = true;
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {
 
-      arm.setLowerArmPosition(0.25);
+      arm.setLowerArmReference(0.1);
       
     } else {
         
@@ -132,7 +134,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       (Timer.getFPGATimestamp() - autoDelay > 1.0))
     {
           
-    arm.setLowerArmPosition(0);
+    arm.setLowerArmReference(0);
         
     if (chosenWaypoints.length != currentWaypointNumber + 1) {
   
@@ -140,15 +142,15 @@ public class AutoSegmentedWaypoints implements Loggable {
     
       }
     }
-  }waypointRunnerwaypointRunner
+  }
 
   private void moveBothArms() {
       
-    arm.setUpperArmPosition(-0.25);
+    arm.setUpperArmReference(-0.25);
 
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {
 
-      arm.setLowerArmPosition(-0.25);
+      arm.setLowerArmReference(-0.1);
       
     } else {
         
@@ -161,8 +163,8 @@ public class AutoSegmentedWaypoints implements Loggable {
         (-0.23 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= -0.27) &&
         (Timer.getFPGATimestamp() - autoDelay > 1.5)) {
           
-      arm.setLowerArmPosition(0);
-      arm.setUpperArmPosition(0);
+      arm.setLowerArmReference(0);
+      arm.setUpperArmReference(0);
         
       if (chosenWaypoints.length != currentWaypointNumber + 1){
         StateHasFinished = true;    
@@ -172,11 +174,11 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   private void moveBothArmsNoTimer() {
         
-    arm.setUpperArmPosition(-0.25);
+    arm.setUpperArmReference(-0.25);
 
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {
 
-      arm.setLowerArmPosition(-0.25);
+      arm.setLowerArmReference(-0.1);
       
     } else {
         
@@ -190,8 +192,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     {
       System.out.println("done");
           
-      arm.setLowerArmPosition(0);
-      arm.setUpperArmPosition(0);
+      arm.setLowerArmReference(0);
+      arm.setUpperArmReference(0);
         
       if (chosenWaypoints.length != currentWaypointNumber + 1) {
 

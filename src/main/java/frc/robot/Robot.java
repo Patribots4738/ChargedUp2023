@@ -95,8 +95,8 @@ public class Robot extends TimedRobot {
     operator = new XboxController(OIConstants.kOperatorControllerPort);
 
     // Arm Instantiation
-     arm = new Arm();
-     arm.resetEncoders();
+    arm = new Arm();
+    arm.resetEncoders();
     
     
     // AutoSegmentedWaypoints Instantiation
@@ -133,7 +133,7 @@ public class Robot extends TimedRobot {
 
     // Set the swerve drive to coast mode
     // swerve.setCoastMode();
-    
+    arm.printList();
   }
 
   @Override
@@ -152,6 +152,9 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
 
     autoSegmentedWaypoints.autoPeriodic();
+    arm.armPeriodic();
+    // arm.setUpperArmPosition(0);
+    // arm.setLowerArmPosition(0);
     // SwerveTrajectory.PathPlannerRunner(autoSegmentedWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
 
@@ -162,7 +165,7 @@ public class Robot extends TimedRobot {
     
     // swerve.resetEncoders();
     // arm.resetEncoders();
-
+    arm.setLowerArmReference(-0.1);
     swerve.setBrakeMode();
 
   }
@@ -171,6 +174,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
+    arm.armPeriodic();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
@@ -179,7 +183,7 @@ public class Robot extends TimedRobot {
     double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
     double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
 
-    Translation2d armInputs = OICalc.toCircle(driverLeftX, 0.75);
+    Translation2d armInputs = OICalc.toCircle(driverLeftX, driverLeftY);
 
      if (driver.getRightBumper()) {
        swerve.setX();
@@ -191,12 +195,13 @@ public class Robot extends TimedRobot {
        swerve.drive(driverLeftY * 0.25, driverLeftX * 0.25, driverRightX * 0.25, true);
      }
 
+    //  arm.setUpperArmRotation(0);
+
     if (driver.getLeftBumper()) { 
       
-      arm.drive(driverLeftX, 0.75);
+      // arm.drive(armInputs.getX(), armInputs.getY());
       
-      // arm.setLowerArmPosition(0);
-      // arm.setUpperArmPosition(leftX/5);
+
 //       Yummy debug makes me giddy
 //      double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
 //      System.out.println(
