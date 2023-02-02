@@ -214,8 +214,8 @@ public final class Constants
     public static final double kLowerFF = 1;
 
     
-    public static final double kUpperP = 14.8508919;	//46.6;
-    public static final double kUpperD = 27.19084616; //34.2;
+    public static final double kUpperP = 5;	//46.6;
+    public static final double kUpperD = 1; //34.2;
     public static final double kUpperI = 0;//.035;
     public static final double kUpperFF = 1;
     
@@ -225,10 +225,10 @@ public final class Constants
     public static final double kVLower = 0;//.24941;
     public static final double kALower = 0;//4.3455;
 
-    public static final double kSUpper = 0;//0.47727;
+    public static final double kSUpper = 0.47727;
     public static final double kGUpper = 0; //1.0051; // (We don't like gravity)
-    public static final double kVUpper = 0;//0.95764;
-    public static final double kAUpper = 0;//0.19957;
+    public static final double kVUpper = 0.95764;
+    public static final double kAUpper = 0.19957;
 
   }
 

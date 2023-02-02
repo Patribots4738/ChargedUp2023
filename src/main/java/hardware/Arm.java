@@ -32,16 +32,18 @@ public class Arm implements Loggable {
 
   // All armPos values are in inches
   Translation2d[] armPos =  {
-                      new Translation2d(0, ArmConstants.kMaxReach),
-                      new Translation2d(33, 22.6),
-                      new Translation2d(37.47, 37.47),
-                      new Translation2d(46, 3),
-                    };
-  int armPosIndex = 0;
-
+    // new Translation2d(-40, 28),
+    new Translation2d(-36, 36),
+    new Translation2d(-10, 13),
+    new Translation2d(0, ArmConstants.kMaxReach),
+    new Translation2d(10, 13),
+    new Translation2d(36, 36),
+    // new Translation2d(40, 28),
+  };
+  int armPosIndex = (int) Math.ceil(armPos.length/2);
+  
   private double lowerReference = 0;
   private double upperReference = 0;
-  
   
   ArmCalcuations armCalculations = new ArmCalcuations();
 
@@ -56,9 +58,12 @@ public class Arm implements Loggable {
 
   @Log
   private double upperPos = 0;
+
   private ArrayList<Double> upperPosList = new ArrayList<Double>();
+
   @Log 
   private double lowerPos = 0;
+
   private ArrayList<Double> lowerPosList = new ArrayList<Double>();
 
   /**
@@ -117,8 +122,8 @@ public class Arm implements Loggable {
     _upperArm.setSmartCurrentLimit(ArmConstants.kUpperCurrentLimit);
 
     // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
-    // _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    // _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     // Save the SPARK MAX configuration. If a SPARK MAX 
     // browns out, it will retain the last configuration
@@ -159,18 +164,23 @@ public class Arm implements Loggable {
   public void setArmIndex(int direction) {
 
     direction = (direction > 0) ? 1 : -1;
-
-    armPosIndex += direction;
-
+    
     // Make sure armPosIndex is within the range of 0 to armPos.length - 1
     // To prevent out of bounds errors
-    armPosIndex = (armPosIndex < 0) ? 0 : (armPosIndex > armPos.length - 1) ? armPos.length - 1 : armPosIndex;
+    if (armPosIndex == 0 && direction == -1) {
+      direction = 0;
+    }
+    if (armPosIndex >= armPos.length-1 && direction == 1) {
+      direction = 0;
+    }
+    
+    armPosIndex += direction;
 
     System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
     
     drive(
-      armPos[armPosIndex].getX() / ArmConstants.kMaxReach, 
-      armPos[armPosIndex].getY() / ArmConstants.kMaxReach);
+          armPos[armPosIndex].getX() / ArmConstants.kMaxReach, 
+          armPos[armPosIndex].getY() / ArmConstants.kMaxReach);
   }
 
   /**
