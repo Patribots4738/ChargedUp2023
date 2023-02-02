@@ -42,6 +42,7 @@ public class Arm implements Loggable {
   private double lowerReference = 0;
   private double upperReference = 0;
   
+  
   ArmCalcuations armCalculations = new ArmCalcuations();
 
   private final CANSparkMax _lowerArm;
@@ -116,8 +117,8 @@ public class Arm implements Loggable {
     _upperArm.setSmartCurrentLimit(ArmConstants.kUpperCurrentLimit);
 
     // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
-    _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    // _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    // _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     // Save the SPARK MAX configuration. If a SPARK MAX 
     // browns out, it will retain the last configuration
@@ -137,8 +138,10 @@ public class Arm implements Loggable {
   }
 
   public void armPeriodic() {
+      
     setLowerArmPosition(this.lowerReference);
     setUpperArmPosition(this.upperReference);
+    
   }
 
   public void setLowerArmReference(double reference) {
@@ -240,7 +243,7 @@ public class Arm implements Loggable {
     // Get the feedforward value for the position,
     // Using a predictive formula with sysID given data of the motor
     double FF = feedForward.calculate(position, 0);
-    // _upperArmPIDController.setFF(FF);
+    _upperArmPIDController.setFF(FF);
 
     // Calculate the rotations needed to get to the position
     // By multiplying the position by the gear ratio
@@ -332,5 +335,16 @@ public class Arm implements Loggable {
     System.out.println(upperPosList);
   }
 
+  /** Set the motor to coast mode */
+  public void setCoastMode() {
+    _lowerArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+  }
+
+  /** Set the motor to brake mode */
+  public void setBrakeMode() {
+    _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+  }
   
 }

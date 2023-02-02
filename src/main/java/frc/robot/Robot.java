@@ -165,8 +165,10 @@ public class Robot extends TimedRobot {
     
     // swerve.resetEncoders();
     // arm.resetEncoders();
-    arm.setLowerArmReference(-0.1);
+    // arm.setLowerArmReference(-0.1);
+    // arm.setUpperArmReference(-0.1);
     swerve.setBrakeMode();
+    arm.setBrakeMode();
 
   }
 
@@ -186,7 +188,7 @@ public class Robot extends TimedRobot {
     Translation2d armInputs = OICalc.toCircle(driverLeftX, driverLeftY);
 
      if (driver.getRightBumper()) {
-       swerve.setX();
+      swerve.setX();
      }
      else
      {
@@ -195,10 +197,9 @@ public class Robot extends TimedRobot {
        swerve.drive(driverLeftY * 0.25, driverLeftX * 0.25, driverRightX * 0.25, true);
      }
 
-    //  arm.setUpperArmRotation(0);
 
     if (driver.getLeftBumper()) { 
-      
+      arm.setUpperArmReference(driverLeftX/5);
       // arm.drive(armInputs.getX(), armInputs.getY());
       
 
@@ -220,6 +221,7 @@ public class Robot extends TimedRobot {
   public void testInit() {
     swerve.resetEncoders();
     swerve.setBrakeMode();
+    arm.setCoastMode();
   }
 
   

@@ -158,7 +158,7 @@ public final class Constants
     public static final int kLowerArmMotorCanId = 10;
     public static final int kUpperArmMotorCanId = 9;
 
-    // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS?
+    // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
     public static final int kUpperCurrentLimit = 80;
     public static final int kLowerCurrentLimit = 80;
 
@@ -187,6 +187,12 @@ public final class Constants
     // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
     public static final double kUpperFreedom = 100;
 
+    // The amount of error allowed for the arm's position, in FULL ROTATIONS
+    // this is found via https://www.omnicalculator.com/math/arc-length.
+    // Currently, 0.0012 for lower and 0.0019 for upper is for a one inch deadband
+    public static final double kLowerDeadband = 0.0001263292;
+    public static final double kUpperDeadband = 0.0001925017;
+
     // The outputs used in the output range for the lower and upper arms
     public static final double kLowerMinOutput = -1;
     public static final double kLowerMaxOutput = 1;
@@ -201,19 +207,17 @@ public final class Constants
      * P = 0.0032326
      * D = 0.0012612
      * <p>
-     * Upper:
-     * 
      */
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.5;
+    public static final double kLowerP = 0.1;
     public static final double kLowerI = 0;
     public static final double kLowerD = 0.025;
-    public static final double kLowerFF = 0;
+    public static final double kLowerFF = 1;
 
     
-    public static final double kUpperP = 46.6;
-    public static final double kUpperD = 34.2;
-    public static final double kUpperI = 0.035;
+    public static final double kUpperP = 14.8508919;	//46.6;
+    public static final double kUpperD = 27.19084616; //34.2;
+    public static final double kUpperI = 0;//.035;
     public static final double kUpperFF = 1;
     
     // The below values are given from sysID calibration
@@ -222,10 +226,10 @@ public final class Constants
     public static final double kVLower = 0;//.24941;
     public static final double kALower = 0;//4.3455;
 
-    public static final double kSUpper = 0.47727;
+    public static final double kSUpper = 0;//0.47727;
     public static final double kGUpper = 0; //1.0051; // (We don't like gravity)
-    public static final double kVUpper = 0.95764;
-    public static final double kAUpper = 0.19957;
+    public static final double kVUpper = 0;//0.95764;
+    public static final double kAUpper = 0;//0.19957;
 
   }
 

@@ -14,12 +14,12 @@
     "###FMS": {
       "Collapsed": "0",
       "Pos": "5,562",
-      "Size": "283,146"
+      "Size": "600,254"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "250,465",
-      "Size": "1876,468"
+      "Pos": "340,613",
+      "Size": "1876,127"
     },
     "###NetworkTables": {
       "Collapsed": "0",
@@ -29,7 +29,7 @@
     "###Other Devices": {
       "Collapsed": "0",
       "Pos": "1025,20",
-      "Size": "250,695"
+      "Size": "590,695"
     },
     "###System Joysticks": {
       "Collapsed": "0",

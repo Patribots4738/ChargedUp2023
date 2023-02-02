@@ -62,7 +62,6 @@ public class AutoSegmentedWaypoints implements Loggable {
   }
     
   public void autoPeriodic() {
-    //System.out.println(currentWaypointNumber);
     waypointRunner(chosenWaypoints);
   }
 
@@ -146,7 +145,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   private void moveBothArms() {
       
-    arm.setUpperArmReference(-0.25);
+    arm.setUpperArmReference(0);
 
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {
 
@@ -158,9 +157,11 @@ public class AutoSegmentedWaypoints implements Loggable {
       
     }
 
+    System.out.println();
+
     if (SwerveTrajectory.trajectoryStatus.equals("done") && 
-        (-0.23 <= arm.getLowerArmPosition() && arm.getLowerArmPosition() <= -0.27) &&
-        (-0.23 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= -0.27) &&
+        (-0.13 <= arm.getLowerArmPosition() && arm.getLowerArmPosition() <= -0.07) &&
+        (-0.02 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= 0.02) &&
         (Timer.getFPGATimestamp() - autoDelay > 1.5)) {
           
       arm.setLowerArmReference(0);
