@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
+import math.Constants.ArmConstants;
 import hardware.*;
 
 public class AutoSegmentedWaypoints implements Loggable {
@@ -21,10 +21,13 @@ public class AutoSegmentedWaypoints implements Loggable {
   public Waypoint[] HighFiveBallAutoWPs;
   public Waypoint[] SquareAutoWPs;
   public Waypoint[] chosenWaypoints;
+
   // @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
   public int currentWaypointNumber = 0;
+
   public AutoPose chosenPath;
   public AutoPose[] myAutoContainer;
+
   public PathPlannerTrajectory seg1;
   public PathPlannerTrajectory seg2;
   public PathPlannerTrajectory seg3;
@@ -33,12 +36,13 @@ public class AutoSegmentedWaypoints implements Loggable {
     
   @Log
   public double autoDelay;
-  // public static final float ; =0.00000;
     
   public boolean StateHasFinished = false;
   public Boolean StateHasInitialized = false;
+  
   @Log(tabName = "CompetitionLogger", rowIndex = 1, columnIndex = 4)
   public double distance = 0;
+
   @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
   public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
 
@@ -47,11 +51,12 @@ public class AutoSegmentedWaypoints implements Loggable {
     this.arm = arm;
     this.swerve = swerve;
       
-    if (m_autoChooser.getSelected()==null) {
+    if (m_autoChooser.getSelected() == null) {
       chosenPath = myAutoContainer[0];
     } else {
       chosenPath = m_autoChooser.getSelected();
     }
+
     chosenWaypoints = chosenPath.thisWPset;
         
     currentWaypointNumber = 0;
@@ -59,6 +64,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     PathPlannerState initalPathPose =((PathPlannerState)chosenWaypoints[0].pathPlannerSegment.getInitialState());
         
     this.swerve.resetOdometry(initalPathPose.poseMeters); 
+
   }
     
   public void autoPeriodic() {
@@ -87,40 +93,53 @@ public class AutoSegmentedWaypoints implements Loggable {
     myAutoContainer = new AutoPose[] {
       new AutoPose("SquareAuto", 7.57, 1.84, -91.17, SquareAutoWPs),
     };
-    for (AutoPose myAutoPose : myAutoContainer ){
+    for (AutoPose myAutoPose : myAutoContainer ) {
       m_autoChooser.addOption(myAutoPose.name, myAutoPose);
     }
   }
 
   private void moveUpperArm() {
 
+    double upperReference = 0.25;
+
     // Set the upper arm to go 45 degrees
-    arm.setUpperArmReference(0.25);
+    arm.setUpperArmReference(upperReference);
     arm.setLowerArmReference(0);
 
 
-    if (SwerveTrajectory.trajectoryStatus.equals("done") &&
-      ((0.23 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= 0.27) ||
-      (Timer.getFPGATimestamp() - autoDelay > 1.0))) 
+    if ( SwerveTrajectory.trajectoryStatus.equals("done") &&
+
+        (((upperReference + ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() && 
+          arm.getUpperArmPosition() <= (upperReference + ArmConstants.kUpperArmDeadband)) ||
+
+        (Timer.getFPGATimestamp() - autoDelay > 1.0)))
+
     {
 
-      // Robot.INTAKE.intakeNow = false;
+      // Task to do when task is finished here:
+      // arm.setUpperArmReference(0);
+      
       if (chosenWaypoints.length != currentWaypointNumber + 1) {
+
         StateHasFinished = true;
+      
       }
 
     } 
     else if (!SwerveTrajectory.trajectoryStatus.equals("done")) {
 
       autoDelay = Timer.getFPGATimestamp();
+
     }
   }
 
   private void moveLowerArm() {
-    // Robot.SWERVEDRIVE.autoLimeLightAim = true;
+
+    double lowerReference = 0.1;
+
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {
 
-      arm.setLowerArmReference(0.1);
+      arm.setLowerArmReference(lowerReference);
       
     } else {
         
@@ -128,28 +147,37 @@ public class AutoSegmentedWaypoints implements Loggable {
       
     }
 
-    if (SwerveTrajectory.trajectoryStatus.equals("done") && 
-      (0.23 <= arm.getLowerArmPosition() && arm.getLowerArmPosition() <= 0.27) &&
-      (Timer.getFPGATimestamp() - autoDelay > 1.0))
+    if ( SwerveTrajectory.trajectoryStatus.equals("done") && 
+        
+        ((lowerReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() && 
+          arm.getLowerArmPosition() <= (lowerReference + ArmConstants.kLowerArmDeadband)) || 
+        
+        (Timer.getFPGATimestamp() - autoDelay > 1.0))
+
     {
           
-    arm.setLowerArmReference(0);
-        
-    if (chosenWaypoints.length != currentWaypointNumber + 1) {
-  
-      StateHasFinished = true;
-    
+      arm.setLowerArmReference(0);
+      
+      if (chosenWaypoints.length != currentWaypointNumber + 1) {
+
+        StateHasFinished = true;
+
       }
     }
   }
 
   private void moveBothArms() {
-      
-    arm.setUpperArmReference(0);
+    
+    // Where we want to put the arm
+    // this is in revolutions
+    double lowerArmReference = -0.1;
+    double upperArmReference = 0;
+
+    arm.setUpperArmReference(upperArmReference);
 
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {
 
-      arm.setLowerArmReference(-0.1);
+      arm.setLowerArmReference(lowerArmReference);
       
     } else {
         
@@ -157,17 +185,28 @@ public class AutoSegmentedWaypoints implements Loggable {
       
     }
 
-    System.out.println();
+    // The if statement, in english:
 
-    if (SwerveTrajectory.trajectoryStatus.equals("done") && 
-        (-0.13 <= arm.getLowerArmPosition() && arm.getLowerArmPosition() <= -0.07) &&
-        (-0.02 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= 0.02) &&
-        (Timer.getFPGATimestamp() - autoDelay > 1.5)) {
-          
+    // If the trajectory is done, 
+    // and the lower and upper arms are near the desired positions (within the deadband)
+    // and the task has started 1.5 seconds ago,
+    // then set the arm references back to 0
+    if ( SwerveTrajectory.trajectoryStatus.equals("done") && 
+
+        ((lowerArmReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() && 
+          arm.getLowerArmPosition() <= (lowerArmReference + ArmConstants.kLowerArmDeadband)) &&
+
+        ((upperArmReference - ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() && 
+          arm.getUpperArmPosition() <= (upperArmReference + ArmConstants.kUpperArmDeadband)) &&
+
+        (Timer.getFPGATimestamp() - autoDelay > 1.5)) 
+
+    {
+      
       arm.setLowerArmReference(0);
       arm.setUpperArmReference(0);
         
-      if (chosenWaypoints.length != currentWaypointNumber + 1){
+      if (chosenWaypoints.length != currentWaypointNumber + 1) {
         StateHasFinished = true;    
       }
     }

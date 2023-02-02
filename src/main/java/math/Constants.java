@@ -188,10 +188,9 @@ public final class Constants
     public static final double kUpperFreedom = 100;
 
     // The amount of error allowed for the arm's position, in FULL ROTATIONS
-    // this is found via https://www.omnicalculator.com/math/arc-length.
-    // Currently, 0.0012 for lower and 0.0019 for upper is for a one inch deadband
-    public static final double kLowerDeadband = 0.0001263292;
-    public static final double kUpperDeadband = 0.0001925017;
+    // This is primarily used in autonomous
+    public static final double kLowerArmDeadband = 0.01;
+    public static final double kUpperArmDeadband = 0.01;
 
     // The outputs used in the output range for the lower and upper arms
     public static final double kLowerMinOutput = -1;
