@@ -27,198 +27,186 @@ import io.github.oblarg.oblog.Logger;
  */
 public class Robot extends TimedRobot {
 
-  // The robot's subsystems and commands are defined here...
+    // The robot's subsystems and commands are defined here...
 
-  Swerve swerve;
+    Swerve swerve;
 
-  XboxController driver;
-  XboxController operator;
-  
-  AutoSegmentedWaypoints autoSegmentedWaypoints;
+    XboxController driver;
+    XboxController operator;
 
-  Arm arm;
-  
-  HolonomicDriveController autoController; 
+    AutoSegmentedWaypoints autoSegmentedWaypoints;
 
-  Trajectory trajectory;
+    Arm arm;
 
-  Debug debug;
+    HolonomicDriveController autoController;
 
-  ArmCalcuations armCalcuations = new ArmCalcuations();
-  
+    Trajectory trajectory;
 
-  Vision vision = new Vision();
+    Debug debug;
 
-  Boolean isHorizontallyAlligned = false;
-
-  HolonomicDriveController HDC = SwerveTrajectory.getHDC();
-
-  Pose2d aprilPos;
+    ArmCalcuations armCalcuations = new ArmCalcuations();
 
 
-  @Override
-  public void robotInit() {
+    Vision vision = new Vision();
 
-    // Instantiate our Robot. This acts as a dictionary for all of our subsystems
-    
-    // Debug class for ShuffleBoard
-    debug = new Debug();
-    debug.debugInit();
+    Boolean isHorizontallyAlligned = false;
+
+    HolonomicDriveController HDC = SwerveTrajectory.getHDC();
+
+    Pose2d aprilPos;
 
 
-    /*
-      For swerve drive, the following is the order of the motors
-      odd CAN IDs drive the robot
-      even CAN IDs are the turning motors
+    @Override
+    public void robotInit() {
+        // Instantiate our Robot. This acts as a dictionary for all of our subsystems
+
+        // Debug class for ShuffleBoard
+        debug = new Debug();
+        debug.debugInit();
+
+        // Drivetrain instantiation
+        swerve = new Swerve();
+        // Zero the IMU for field-oriented driving
+        swerve.resetEncoders();
+        swerve.zeroHeading();
+
+        swerve.setBrakeMode();
+
+        driver = new XboxController(OIConstants.kDriverControllerPort);
+        operator = new XboxController(OIConstants.kOperatorControllerPort);
+
+        arm = new Arm();
+        arm.resetEncoders();
+
+        autoSegmentedWaypoints = new AutoSegmentedWaypoints();
+        autoSegmentedWaypoints.loadAutoPaths();
+
+        // Configure the logger for shuffleboard
+        Logger.configureLoggingAndConfig(this, false);
+    }
+
+    /**
+     * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
+     * that you want ran during disabled, autonomous, teleoperated and test.
+     * <p>
+     * This runs after the mode specific periodic functions, but before LiveWindow and
+     * SmartDashboard integrated updating.
      */
-    // Drivetrain instantiation
-    swerve = new Swerve();
-    // // Zero the IMU for field-oriented driving 
-    swerve.resetEncoders();
-    swerve.zeroHeading();
-    swerve.setBrakeMode();
+    @Override
+    public void robotPeriodic() {
 
-    // Setup controllers
-    driver = new XboxController(OIConstants.kDriverControllerPort);
-    operator = new XboxController(OIConstants.kOperatorControllerPort);
+        swerve.periodic();
 
-    // Arm Instantiation
-    arm = new Arm();
-    arm.resetEncoders();
-    
-    
-    // AutoSegmentedWaypoints Instantiation
-    autoSegmentedWaypoints = new AutoSegmentedWaypoints();
-    autoSegmentedWaypoints.loadAutoPaths();
+        Logger.updateEntries();
 
-    // The first argument is the root container
-    // The second argument is whether logging and config should be given separate tabs
-    Logger.configureLoggingAndConfig(this, false);
-
-  }
-
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-
-    // Update the odometer for the swerve drive
-    swerve.periodic();
-
-    // Update the logger for shuffleboard
-    Logger.updateEntries();
-
-  }
-  
-  @Override
-  public void disabledInit() {
-
-    // Set the swerve drive to coast mode
-    // swerve.setCoastMode();
-    arm.printList();
-  }
-
-  @Override
-  public void disabledPeriodic() {}
-  
-  @Override
-  public void autonomousInit() {
-
-    // swerve.setCoastMode();
-    autoSegmentedWaypoints.init(swerve, arm);
-    SwerveTrajectory.resetTrajectoryStatus();
-
-    
-  }
-
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-
-    autoSegmentedWaypoints.autoPeriodic();
-    arm.armPeriodic();
-    // arm.setUpperArmPosition(0);
-    // arm.setLowerArmPosition(0);
-    // SwerveTrajectory.PathPlannerRunner(autoSegmentedWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
-
-
-  }
-
-  @Override
-  public void teleopInit() {
-    
-    // swerve.resetEncoders();
-    // arm.resetEncoders();
-    // arm.setLowerArmReference(-0.1);
-    // arm.setUpperArmReference(-0.1);
-    swerve.setBrakeMode();
-    // arm.setBrakeMode();
-
-  }
-
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() 
-  {
-    arm.armPeriodic();
-
-    // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
-    // This is to ensure that the up direction on the joystick is positive inputs
-    double driverLeftX  =  MathUtil.applyDeadband(driver.getLeftX(),  OIConstants.kDriverDeadband);
-    double driverLeftY  = -MathUtil.applyDeadband(driver.getLeftY(),  OIConstants.kDriverDeadband);
-    double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
-    double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
-
-    Translation2d armInputs = OICalc.toCircle(driverLeftX, driverLeftY);
-
-    //  if (driver.getRightBumper()) {
-    //   swerve.setX();
-    //  }
-    //  else
-    //  {
-    //   // Drive the robot
-    //   // swerve.drive(SpeedX, SpeedY, Rotation, Field_Oriented);
-    //    swerve.drive(driverLeftY, driverLeftX, driverRightX, true);
-    //  }
-
-
-    if (driver.getLeftBumper()) { 
-      
-      // arm.drive(armInputs.getX(), armInputs.getY());
-      
-
-    //   Yummy debug makes me giddy
-    //  double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
-    //  System.out.println(
-    //            "LeftX: "  + String.format("%.3f", armInputs.getX()) +
-    //           " LeftY: " + String.format("%.3f", armInputs.getY()) +
-    //           " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
-    //           " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
     }
-    if (driver.getRightBumperPressed()) {
-      arm.setArmIndex(1);
+
+    @Override
+    public void disabledInit() {
+
+        arm.printList();
+
     }
-    else if (driver.getLeftBumperPressed()) {
-      arm.setArmIndex(-1);
+
+    @Override
+    public void disabledPeriodic() {
     }
-    
-  }
 
-  @Override
-  public void testInit() {
+    @Override
+    public void autonomousInit() {
 
-    swerve.resetEncoders();
-    swerve.setBrakeMode();
-  
-  }
+        // swerve.setCoastMode();
+        autoSegmentedWaypoints.init(swerve, arm);
+        SwerveTrajectory.resetTrajectoryStatus();
 
-  
-  @Override
-  public void testPeriodic() {
-  }
+
+    }
+
+    /**
+     * This function is called periodically during autonomous.
+     */
+    @Override
+    public void autonomousPeriodic() {
+
+        autoSegmentedWaypoints.autoPeriodic();
+        arm.armPeriodic();
+        // arm.setUpperArmPosition(0);
+        // arm.setLowerArmPosition(0);
+        // SwerveTrajectory.PathPlannerRunner(autoSegmentedWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+
+
+    }
+
+    @Override
+    public void teleopInit() {
+
+        // swerve.resetEncoders();
+        // arm.resetEncoders();
+        // arm.setLowerArmReference(-0.1);
+        // arm.setUpperArmReference(-0.1);
+        swerve.setBrakeMode();
+        // arm.setBrakeMode();
+
+    }
+
+    /**
+     * This function is called periodically during operator control.
+     */
+    @Override
+    public void teleopPeriodic() {
+        arm.armPeriodic();
+
+        // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
+        // This is to ensure that the up direction on the joystick is positive inputs
+        double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
+        double driverLeftY = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
+        double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
+        double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
+
+        Translation2d armInputs = OICalc.toCircle(driverLeftX, driverLeftY);
+
+        //  if (driver.getRightBumper()) {
+        //   swerve.setX();
+        //  }
+        //  else
+        //  {
+        //   // Drive the robot
+        //   // swerve.drive(SpeedX, SpeedY, Rotation, Field_Oriented);
+        //    swerve.drive(driverLeftY, driverLeftX, driverRightX, true);
+        //  }
+
+
+        if (driver.getLeftBumper()) {
+
+            // arm.drive(armInputs.getX(), armInputs.getY());
+
+
+            //   Yummy debug makes me giddy
+            //  double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
+            //  System.out.println(
+            //            "LeftX: "  + String.format("%.3f", armInputs.getX()) +
+            //           " LeftY: " + String.format("%.3f", armInputs.getY()) +
+            //           " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
+            //           " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
+        }
+        if (driver.getRightBumperPressed()) {
+            arm.setArmIndex(1);
+        } else if (driver.getLeftBumperPressed()) {
+            arm.setArmIndex(-1);
+        }
+
+    }
+
+    @Override
+    public void testInit() {
+
+        swerve.resetEncoders();
+        swerve.setBrakeMode();
+
+    }
+
+
+    @Override
+    public void testPeriodic() {
+    }
 }

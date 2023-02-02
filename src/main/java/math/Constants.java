@@ -47,11 +47,14 @@ public final class Constants
     public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
     public static final double kBackRightChassisAngularOffset = Math.toRadians(-90);
 
+
+    // Driving motors CAN IDs (EVEN)
     public static final int kFrontLeftDrivingCanId = 1;
     public static final int kRearLeftDrivingCanId = 5;
     public static final int kFrontRightDrivingCanId = 3;
     public static final int kRearRightDrivingCanId = 7;
 
+    // Turning motors CAN IDs (ODD)
     public static final int kFrontLeftTurningCanId = 2;
     public static final int kRearLeftTurningCanId = 6;
     public static final int kFrontRightTurningCanId = 4;
