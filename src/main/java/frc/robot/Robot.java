@@ -46,11 +46,6 @@ public class Robot extends TimedRobot {
 
     ArmCalcuations armCalcuations = new ArmCalcuations();
 
-
-    Vision vision = new Vision();
-
-    Boolean isHorizontallyAlligned = false;
-
     HolonomicDriveController HDC = SwerveTrajectory.getHDC();
 
     Pose2d aprilPos;

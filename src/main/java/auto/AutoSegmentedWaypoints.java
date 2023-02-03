@@ -129,6 +129,13 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
     }
 
+
+    /**
+     * This method moves the lower arm to a position
+     * <p>
+     *  If the lower arm is at the set position
+     *  it will stop the auto path and move on to the next waypoint
+     */
     private void moveLowerArm() {
 
         double lowerReference = 0.1;
@@ -160,6 +167,12 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
     }
 
+    /**
+     * This method moves both arms to a position
+     * <p>
+     * If both arms are at the set position then
+     * stop the auto path and move on to the next waypoint
+     */
     private void moveBothArms() {
 
         // Where we want to put the arm
