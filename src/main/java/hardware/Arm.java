@@ -227,7 +227,7 @@ public class Arm implements Loggable {
 
 
     /**
-     * Set the position of the upper arm
+     * Set the position of an arm
      *
      * @param position the position to set the upper arm to
      *                 This unit is in revolutions
