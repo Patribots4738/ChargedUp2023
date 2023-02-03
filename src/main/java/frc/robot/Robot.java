@@ -136,7 +136,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
 
     autoWaypoints.autoPeriodic();
-    SwerveTrajectory.PathPlannerRunner(autoWaypoints.testTraj, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+    // SwerveTrajectory.PathPlannerRunner(autoWaypoints.testTraj, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
 
   }
 

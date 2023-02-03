@@ -69,7 +69,7 @@ public class AutoAlignment {
     
     double x = visionPose.getX();
 
-    // flip the sign of y to correlate with pathplanner
+    // flip the sign of y to correlate with pathplanner's Y axis
     double y = -visionPose.getY();
 
     if (0 < tagID && tagID < 4) {
@@ -81,10 +81,11 @@ public class AutoAlignment {
     Pose2d generatedPose = new Pose2d(
         targetPosition.getX() + x, 
         targetPosition.getY() + y, 
-        visionPose.getRotation().plus(targetPosition.getRotation())
+        targetPosition.getRotation().plus(visionPose.getRotation())
     );
     
     swerve.resetOdometry(generatedPose);
+
     SwerveTrajectory.resetTrajectoryStatus();
 
   }

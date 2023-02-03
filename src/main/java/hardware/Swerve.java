@@ -85,6 +85,7 @@ public class Swerve {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
+
     m_odometry.resetPosition(
         Rotation2d.fromDegrees(m_gyro.getAngle()),
         new SwerveModulePosition[] {
@@ -94,6 +95,7 @@ public class Swerve {
             m_rearRight.getPosition()
         },
         pose);
+
   }
 
   /**
@@ -113,10 +115,12 @@ public class Swerve {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(m_gyro.getAngle()))
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, m_odometry.getPoseMeters().getRotation())
             : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
+
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -168,6 +172,7 @@ public class Swerve {
   public double getHeading() {
     return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
   }
+
 
   /**
    * Returns the turn rate of the robot.
