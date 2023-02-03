@@ -214,6 +214,7 @@ public class Arm implements Loggable {
                 " Lower: " + Units.radiansToDegrees(lowerArmAngle));
     }
 
+
     /**
      * Set the position of the upper arm
      *
@@ -224,21 +225,7 @@ public class Arm implements Loggable {
 
         position = setLimits(position, ArmConstants.kUpperFreedom);
 
-    /*
-      FF is a predictive formula that uses the input of where we want to be to predict the path required to get there
-      This is an open loop, and thus unable to react to the effects of disturbances / unknown disturbances.
-      Because of this, we need to give it disturbance data, which is why we use sysID
-      It then uses the data to predict the output of the motor, creating a more accurate prediction
-
-      In contrast, a closed loop is commonly used as PID, looking and reacting to the current position
-      in opposition to the desired position, taking note of any disturbance that affected the motor.
-      Since weight, and more importantly, the things connected to the arm are changing,
-      making it difficult to perfectly tune
-
-      We are using a very small combination of both, using the FF to predict the path, and PID to correct for error
-      FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
-      👌
-     */
+        // Description of FF in Constants :D
         ArmFeedforward feedForward = new ArmFeedforward(
                 ArmConstants.kSUpper,
                 ArmConstants.kGUpper,
@@ -271,29 +258,8 @@ public class Arm implements Loggable {
      *                 This unit is in full rotations
      */
     private void setLowerArmPosition(double position) {
+        position = setLimits(position, ArmConstants.kLowerFreedom);
 
-        // Do not let the arm go past the limits defined in ArmConstants
-        if (position > Units.degreesToRotations(ArmConstants.kLowerFreedom)) {
-            position = Units.degreesToRotations(ArmConstants.kLowerFreedom);
-        } else if (position < -Units.degreesToRotations(ArmConstants.kLowerFreedom)) {
-            position = -Units.degreesToRotations(ArmConstants.kLowerFreedom);
-        }
-
-    /**
-     * FF is a predictive formula that uses the input of where we want to be to predict the path required to get there
-     * This is an open loop, and thus unable to react to the effects of disturbances / unknown disturbances.
-     * Because of this, we need to give it disturbance data, which is why we use sysID
-     * It then uses the data to predict the output of the motor, creating a more accurate prediction
-     * <p>
-     * In contrast, a closed loop is commonly used as PID, looking and reacting to the current position
-     * in opposition to the desired position, taking note of any disturbance that affected the motor.
-     * Since weight, and more importantly, the things connected to the arm are changing,
-     * making it difficult to perfectly tune
-
-     * We are using a very small combination of both, using the FF to predict the path, and PID to correct for error
-     * FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
-     * 👌
-     */
         ArmFeedforward feedForward = new ArmFeedforward(
                 ArmConstants.kSLower,
                 ArmConstants.kGLower,
@@ -324,7 +290,7 @@ public class Arm implements Loggable {
      * Set the limits of the upper arm
      *
      * @param position the position to set the upper arm to
-     * @param freedom the freedom of the upper/lower arm
+     * @param freedom  the freedom of the upper/lower arm in degrees
      * @return the position, but limited
      */
     private double setLimits(double position, double freedom) {
@@ -346,6 +312,7 @@ public class Arm implements Loggable {
     public double getUpperArmPosition() {
         return _upperArmEncoder.getPosition() / ArmConstants.kUpperArmGearRatio;
     }
+
 
     /**
      * Get the current position of the lower arm

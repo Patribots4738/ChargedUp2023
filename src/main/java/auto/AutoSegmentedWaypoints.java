@@ -15,284 +15,277 @@ import hardware.*;
 
 public class AutoSegmentedWaypoints implements Loggable {
 
-  Arm arm;
-  Swerve swerve;
+    Arm arm;
+    Swerve swerve;
 
-  public Waypoint[] HighFiveBallAutoWPs;
-  public Waypoint[] SquareAutoWPs;
-  public Waypoint[] chosenWaypoints;
+    public Waypoint[] HighFiveBallAutoWPs;
+    public Waypoint[] SquareAutoWPs;
+    public Waypoint[] chosenWaypoints;
 
-  // @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
-  public int currentWaypointNumber = 0;
+    // @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
+    public int currentWaypointNumber = 0;
 
-  public AutoPose chosenPath;
-  public AutoPose[] myAutoContainer;
+    public AutoPose chosenPath;
+    public AutoPose[] myAutoContainer;
 
-  public PathPlannerTrajectory seg1;
-  public PathPlannerTrajectory seg2;
-  public PathPlannerTrajectory seg3;
-  public PathPlannerTrajectory seg4;
-    
-    
-  @Log
-  public double autoDelay;
-    
-  public boolean StateHasFinished = false;
-  public Boolean StateHasInitialized = false;
-  
-  @Log(tabName = "CompetitionLogger", rowIndex = 1, columnIndex = 4)
-  public double distance = 0;
-
-  @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
-  public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
-
-  public void init(Swerve swerve, Arm arm) {
-
-    this.arm = arm;
-    this.swerve = swerve;
-      
-    if (m_autoChooser.getSelected() == null) {
-      chosenPath = myAutoContainer[0];
-    } else {
-      chosenPath = m_autoChooser.getSelected();
-    }
-
-    chosenWaypoints = chosenPath.thisWPset;
-        
-    currentWaypointNumber = 0;
-        
-    PathPlannerState initalPathPose =((PathPlannerState)chosenWaypoints[0].pathPlannerSegment.getInitialState());
-    
-    this.swerve.resetOdometry(initalPathPose.poseMeters); 
-
-  }
-    
-  public void autoPeriodic() {
-    waypointRunner(chosenWaypoints);
-  }
-
-  public void loadAutoPaths() {
-        
-    seg1 = PathPlanner.loadPath("4", 2.0, 1.5);
-    seg2 = PathPlanner.loadPath("5", 2.0, 1.5);
-    seg3 = PathPlanner.loadPath("6", 2.0, 1.5);
-    seg4 = PathPlanner.loadPath("7", 2.0, 1.5);
-
-    SquareAutoWPs = new Waypoint[] {
-      // new Waypoint(new AutoSegmentedWaypoints()::moveUpperArm, 7.62, 0.75, seg1),
-      // new Waypoint(new AutoSegmentedWaypoints()::moveLowerArm, 5.23, 1.97, seg2),
-      // new Waypoint(new AutoSegmentedWaypoints()::moveBothArms, 0.74, 1.02, seg3)
-
-      new Waypoint(this::moveUpperArm, seg1.getEndState().poseMeters.getX(), seg1.getEndState().poseMeters.getY(), seg1),
-      new Waypoint(this::moveLowerArm, seg2.getEndState().poseMeters.getX(), seg2.getEndState().poseMeters.getY(), seg2),
-      new Waypoint(this::moveBothArms, seg3.getEndState().poseMeters.getX(), seg3.getEndState().poseMeters.getY(), seg3),
-      new Waypoint(this::moveUpperArm, seg4.getEndState().poseMeters.getX(), seg4.getEndState().poseMeters.getY(), seg4)
-
-    };
-
-    myAutoContainer = new AutoPose[] {
-      new AutoPose("SquareAuto", 7.57, 1.84, -91.17, SquareAutoWPs),
-    };
-    for (AutoPose myAutoPose : myAutoContainer ) {
-      m_autoChooser.addOption(myAutoPose.name, myAutoPose);
-    }
-  }
-
-  private void moveUpperArm() {
-
-    double upperReference = 0.25;
-
-    // Set the upper arm to go 45 degrees
-    arm.setUpperArmReference(upperReference);
-    arm.setLowerArmReference(0);
+    public PathPlannerTrajectory seg1;
+    public PathPlannerTrajectory seg2;
+    public PathPlannerTrajectory seg3;
+    public PathPlannerTrajectory seg4;
 
 
-    if ( SwerveTrajectory.trajectoryStatus.equals("done") &&
+    @Log
+    public double autoDelay;
 
-        (((upperReference + ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() && 
-          arm.getUpperArmPosition() <= (upperReference + ArmConstants.kUpperArmDeadband)) ||
+    public boolean StateHasFinished = false;
+    public Boolean StateHasInitialized = false;
 
-        (Timer.getFPGATimestamp() - autoDelay > 1.0)))
+    @Log(tabName = "CompetitionLogger", rowIndex = 1, columnIndex = 4)
+    public double distance = 0;
 
-    {
+    @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
+    public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
 
-      // Task to do when task is finished here:
-      // arm.setUpperArmReference(0);
-      
-      if (chosenWaypoints.length != currentWaypointNumber + 1) {
+    public void init(Swerve swerve, Arm arm) {
 
-        StateHasFinished = true;
-      
-      }
+        this.arm = arm;
+        this.swerve = swerve;
 
-    } 
-    else if (!SwerveTrajectory.trajectoryStatus.equals("done")) {
+        if (m_autoChooser.getSelected() == null) {
+            chosenPath = myAutoContainer[0];
+        } else {
+            chosenPath = m_autoChooser.getSelected();
+        }
 
-      autoDelay = Timer.getFPGATimestamp();
+        chosenWaypoints = chosenPath.thisWPset;
+
+        currentWaypointNumber = 0;
+
+        PathPlannerState initalPathPose = ((PathPlannerState) chosenWaypoints[0].pathPlannerSegment.getInitialState());
+
+        this.swerve.resetOdometry(initalPathPose.poseMeters);
 
     }
-  }
 
-  private void moveLowerArm() {
-
-    double lowerReference = 0.1;
-
-    if (SwerveTrajectory.trajectoryStatus.equals("done")) {
-
-      arm.setLowerArmReference(lowerReference);
-      
-    } else {
-        
-      autoDelay = Timer.getFPGATimestamp();
-      
+    public void autoPeriodic() {
+        waypointRunner(chosenWaypoints);
     }
 
-    if ( SwerveTrajectory.trajectoryStatus.equals("done") && 
-        
-        ((lowerReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() && 
-          arm.getLowerArmPosition() <= (lowerReference + ArmConstants.kLowerArmDeadband)) || 
-        
-        (Timer.getFPGATimestamp() - autoDelay > 1.0))
+    public void loadAutoPaths() {
 
-    {
-          
-      arm.setLowerArmReference(0);
-      
-      if (chosenWaypoints.length != currentWaypointNumber + 1) {
+        seg1 = PathPlanner.loadPath("4", 2.0, 1.5);
+        seg2 = PathPlanner.loadPath("5", 2.0, 1.5);
+        seg3 = PathPlanner.loadPath("6", 2.0, 1.5);
+        seg4 = PathPlanner.loadPath("7", 2.0, 1.5);
 
-        StateHasFinished = true;
+        SquareAutoWPs = new Waypoint[]{
+                // new Waypoint(new AutoSegmentedWaypoints()::moveUpperArm, 7.62, 0.75, seg1),
+                // new Waypoint(new AutoSegmentedWaypoints()::moveLowerArm, 5.23, 1.97, seg2),
+                // new Waypoint(new AutoSegmentedWaypoints()::moveBothArms, 0.74, 1.02, seg3)
 
-      }
-    }
-  }
+                new Waypoint(this::moveUpperArm, seg1.getEndState().poseMeters.getX(), seg1.getEndState().poseMeters.getY(), seg1),
+                new Waypoint(this::moveLowerArm, seg2.getEndState().poseMeters.getX(), seg2.getEndState().poseMeters.getY(), seg2),
+                new Waypoint(this::moveBothArms, seg3.getEndState().poseMeters.getX(), seg3.getEndState().poseMeters.getY(), seg3),
+                new Waypoint(this::moveUpperArm, seg4.getEndState().poseMeters.getX(), seg4.getEndState().poseMeters.getY(), seg4)
 
-  private void moveBothArms() {
-    
-    // Where we want to put the arm
-    // this is in revolutions
-    double lowerArmReference = -0.1;
-    double upperArmReference = 0;
+        };
 
-    arm.setUpperArmReference(upperArmReference);
-
-    if (SwerveTrajectory.trajectoryStatus.equals("done")) {
-
-      arm.setLowerArmReference(lowerArmReference);
-      
-    } else {
-        
-      autoDelay = Timer.getFPGATimestamp();
-      
+        myAutoContainer = new AutoPose[]{
+                new AutoPose("SquareAuto", 7.57, 1.84, -91.17, SquareAutoWPs),
+        };
+        for (AutoPose myAutoPose : myAutoContainer) {
+            m_autoChooser.addOption(myAutoPose.name, myAutoPose);
+        }
     }
 
-    // The if statement, in english:
+    private void moveUpperArm() {
 
-    // If the trajectory is done, 
-    // and the lower and upper arms are near the desired positions (within the deadband)
-    // and the task has started 1.5 seconds ago,
-    // then set the arm references back to 0
-    if ( SwerveTrajectory.trajectoryStatus.equals("done") && 
+        double upperReference = 0.25;
 
-        ((lowerArmReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() && 
-          arm.getLowerArmPosition() <= (lowerArmReference + ArmConstants.kLowerArmDeadband)) &&
+        // Set the upper arm to go 45 degrees
+        arm.setUpperArmReference(upperReference);
+        arm.setLowerArmReference(0);
 
-        ((upperArmReference - ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() && 
-          arm.getUpperArmPosition() <= (upperArmReference + ArmConstants.kUpperArmDeadband)) &&
 
-        (Timer.getFPGATimestamp() - autoDelay > 1.5)) 
+        if (SwerveTrajectory.trajectoryStatus.equals("done") &&
 
-    {
-      
-      arm.setLowerArmReference(0);
-      arm.setUpperArmReference(0);
-        
-      if (chosenWaypoints.length != currentWaypointNumber + 1) {
-        StateHasFinished = true;    
-      }
-    }
-  }
+                (((upperReference + ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() &&
+                        arm.getUpperArmPosition() <= (upperReference + ArmConstants.kUpperArmDeadband)) ||
 
-  private void moveBothArmsNoTimer() {
-        
-    arm.setUpperArmReference(-0.25);
+                        (Timer.getFPGATimestamp() - autoDelay > 1.0))) {
 
-    if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+            // Task to do when task is finished here:
+            // arm.setUpperArmReference(0);
 
-      arm.setLowerArmReference(-0.1);
-      
-    } else {
-        
-      autoDelay = Timer.getFPGATimestamp();
-      
+            if (chosenWaypoints.length != currentWaypointNumber + 1) {
+
+                StateHasFinished = true;
+
+            }
+
+        } else if (!SwerveTrajectory.trajectoryStatus.equals("done")) {
+
+            autoDelay = Timer.getFPGATimestamp();
+
+        }
     }
 
-    if (SwerveTrajectory.trajectoryStatus.equals("done") && 
-        (-0.23 <= arm.getLowerArmPosition() && arm.getLowerArmPosition() <= -0.27) &&
-        (-0.23 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= -0.27))
-    {
-      System.out.println("done");
-          
-      arm.setLowerArmReference(0);
-      arm.setUpperArmReference(0);
-        
-      if (chosenWaypoints.length != currentWaypointNumber + 1) {
+    private void moveLowerArm() {
 
-        StateHasFinished = true;
-          
-      }
+        double lowerReference = 0.1;
+
+        if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+
+            arm.setLowerArmReference(lowerReference);
+
+        } else {
+
+            autoDelay = Timer.getFPGATimestamp();
+
+        }
+
+        if (SwerveTrajectory.trajectoryStatus.equals("done") &&
+
+                ((lowerReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() &&
+                        arm.getLowerArmPosition() <= (lowerReference + ArmConstants.kLowerArmDeadband)) ||
+
+                (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
+
+            arm.setLowerArmReference(0);
+
+            if (chosenWaypoints.length != currentWaypointNumber + 1) {
+
+                StateHasFinished = true;
+
+            }
+        }
     }
-  }
 
-  public void done() {}
+    private void moveBothArms() {
 
-  public class Waypoint {
-    public Runnable action;
-    public double posX ;
-    public double posY;
-    public PathPlannerTrajectory pathPlannerSegment;
+        // Where we want to put the arm
+        // this is in revolutions
+        double lowerArmReference = -0.1;
+        double upperArmReference = 0;
 
-    public Waypoint(Runnable _action, double _x, double _y, PathPlannerTrajectory _PPS) {
-      action = _action;
-      posX=_x;
-      posY=_y;
-      pathPlannerSegment = _PPS;
+        arm.setUpperArmReference(upperArmReference);
+
+        if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+
+            arm.setLowerArmReference(lowerArmReference);
+
+        } else {
+
+            autoDelay = Timer.getFPGATimestamp();
+
+        }
+
+        // The if statement, in english:
+
+        // If the trajectory is done,
+        // and the lower and upper arms are near the desired positions (within the deadband)
+        // and the task has started 1.5 seconds ago,
+        // then set the arm references back to 0
+        if (SwerveTrajectory.trajectoryStatus.equals("done") &&
+
+                ((lowerArmReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() &&
+                        arm.getLowerArmPosition() <= (lowerArmReference + ArmConstants.kLowerArmDeadband)) &&
+
+                ((upperArmReference - ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() &&
+                        arm.getUpperArmPosition() <= (upperArmReference + ArmConstants.kUpperArmDeadband)) &&
+
+                (Timer.getFPGATimestamp() - autoDelay > 1.5)) {
+
+            arm.setLowerArmReference(0);
+            arm.setUpperArmReference(0);
+
+            if (chosenWaypoints.length != currentWaypointNumber + 1) {
+                StateHasFinished = true;
+            }
+        }
     }
-  }
-    
 
-  public class AutoPose {
+    private void moveBothArmsNoTimer() {
 
-    public double thisX;
-    public double thisY;
-    public double thisRot;
-    public Waypoint[] thisWPset;
-    public String name;
+        arm.setUpperArmReference(-0.25);
 
-    AutoPose(String _S, double _x, double _y, double _rot, Waypoint[] _WP) {
-      thisX = _x;
-      thisY = _y;
-      thisRot = _rot;
-      thisWPset = _WP;
-      name = _S;
+        if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+
+            arm.setLowerArmReference(-0.1);
+
+        } else {
+
+            autoDelay = Timer.getFPGATimestamp();
+
+        }
+
+        if (SwerveTrajectory.trajectoryStatus.equals("done") &&
+                (-0.23 <= arm.getLowerArmPosition() && arm.getLowerArmPosition() <= -0.27) &&
+                (-0.23 <= arm.getUpperArmPosition() && arm.getUpperArmPosition() <= -0.27)) {
+            System.out.println("done");
+
+            arm.setLowerArmReference(0);
+            arm.setUpperArmReference(0);
+
+            if (chosenWaypoints.length != currentWaypointNumber + 1) {
+
+                StateHasFinished = true;
+
+            }
+        }
     }
-  }
 
-  public void waypointRunner(Waypoint[] thisWaypointSet) {
-    // If we made one round with the state, we have successfully initialized
-    if (!StateHasInitialized) {
-      SwerveTrajectory.resetTrajectoryStatus();
-      StateHasInitialized = true;
+    public void done() {
     }
-      
-    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
-      
-    thisWaypointSet[currentWaypointNumber].action.run();
-      
-    if (StateHasFinished) {
-      currentWaypointNumber ++;
-          
-      StateHasFinished = false; 
-      StateHasInitialized = false;
+
+    public class Waypoint {
+        public Runnable action;
+        public double posX;
+        public double posY;
+        public PathPlannerTrajectory pathPlannerSegment;
+
+        public Waypoint(Runnable _action, double _x, double _y, PathPlannerTrajectory _PPS) {
+            action = _action;
+            posX = _x;
+            posY = _y;
+            pathPlannerSegment = _PPS;
+        }
     }
-  }
+
+
+    public class AutoPose {
+
+        public double thisX;
+        public double thisY;
+        public double thisRot;
+        public Waypoint[] thisWPset;
+        public String name;
+
+        AutoPose(String _S, double _x, double _y, double _rot, Waypoint[] _WP) {
+            thisX = _x;
+            thisY = _y;
+            thisRot = _rot;
+            thisWPset = _WP;
+            name = _S;
+        }
+    }
+
+    public void waypointRunner(Waypoint[] thisWaypointSet) {
+        // If we made one round with the state, we have successfully initialized
+        if (!StateHasInitialized) {
+            SwerveTrajectory.resetTrajectoryStatus();
+            StateHasInitialized = true;
+        }
+
+        SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
+
+        thisWaypointSet[currentWaypointNumber].action.run();
+
+        if (StateHasFinished) {
+            currentWaypointNumber++;
+
+            StateHasFinished = false;
+            StateHasInitialized = false;
+        }
+    }
 }

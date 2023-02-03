@@ -77,6 +77,7 @@ public class Robot extends TimedRobot {
 
         arm = new Arm();
         arm.resetEncoders();
+        arm.setBrakeMode();
 
         autoSegmentedWaypoints = new AutoSegmentedWaypoints();
         autoSegmentedWaypoints.loadAutoPaths();
@@ -86,8 +87,8 @@ public class Robot extends TimedRobot {
     }
 
     /**
-     * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-     * that you want ran during disabled, autonomous, teleoperated and test.
+     * This function is called every 20 ms, no matter the mode. Used for items like diagnostics
+     * ran during disabled, autonomous, teleoperated and test. :D
      * <p>
      * This runs after the mode specific periodic functions, but before LiveWindow and
      * SmartDashboard integrated updating.
@@ -115,43 +116,23 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
 
-        // swerve.setCoastMode();
         autoSegmentedWaypoints.init(swerve, arm);
         SwerveTrajectory.resetTrajectoryStatus();
 
-
     }
 
-    /**
-     * This function is called periodically during autonomous.
-     */
     @Override
     public void autonomousPeriodic() {
 
         autoSegmentedWaypoints.autoPeriodic();
         arm.armPeriodic();
-        // arm.setUpperArmPosition(0);
-        // arm.setLowerArmPosition(0);
-        // SwerveTrajectory.PathPlannerRunner(autoSegmentedWaypoints.squarePath, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
-
 
     }
 
     @Override
     public void teleopInit() {
-
-        // swerve.resetEncoders();
-        // arm.resetEncoders();
-        // arm.setLowerArmReference(-0.1);
-        // arm.setUpperArmReference(-0.1);
-        swerve.setBrakeMode();
-        // arm.setBrakeMode();
-
     }
 
-    /**
-     * This function is called periodically during operator control.
-     */
     @Override
     public void teleopPeriodic() {
         arm.armPeriodic();
@@ -165,29 +146,22 @@ public class Robot extends TimedRobot {
 
         Translation2d armInputs = OICalc.toCircle(driverLeftX, driverLeftY);
 
-        //  if (driver.getRightBumper()) {
-        //   swerve.setX();
-        //  }
-        //  else
-        //  {
-        //   // Drive the robot
-        //   // swerve.drive(SpeedX, SpeedY, Rotation, Field_Oriented);
-        //    swerve.drive(driverLeftY, driverLeftX, driverRightX, true);
-        //  }
+        if (driver.getRightBumper()) {
+            swerve.setX();
+        } else {
+            //              SpeedX,       SpeedY,     Rotation,    Field_Oriented
+            swerve.drive(driverLeftY, driverLeftX, driverRightX, true); //Why is this swapped?
+        }
 
 
         if (driver.getLeftBumper()) {
 
-            // arm.drive(armInputs.getX(), armInputs.getY());
-
+            arm.drive(armInputs.getX(), armInputs.getY());
 
             //   Yummy debug makes me giddy
-            //  double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
-            //  System.out.println(
-            //            "LeftX: "  + String.format("%.3f", armInputs.getX()) +
-            //           " LeftY: " + String.format("%.3f", armInputs.getY()) +
-            //           " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle))) +
-            //           " Q2: "    + String.format("%.3f", Units.radiansToDegrees(upperAngle)-90));
+            double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
+            double lowerAngle = armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle);
+            Debug.printArmAngles(armInputs, upperAngle, lowerAngle);
         }
         if (driver.getRightBumperPressed()) {
             arm.setArmIndex(1);
