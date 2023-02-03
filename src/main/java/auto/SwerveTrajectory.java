@@ -41,6 +41,18 @@ public class SwerveTrajectory implements Loggable {
      * The ProfiledPIDController for the rotation of the robot,
      * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
      *
+     * @see kXCorrectionP The x-axis' P gain for the PID controller
+     * @see kXCorrectionI The x-axis' I gain for the PID controller
+     * @see kXCorrectionD The x-axis' D gain for the PID controller
+     * @see kYCorrectionP The y-axis' P gain for the PID controller
+     * @see kYCorrectionI The y-axis' I gain for the PID controller
+     * @see kYCorrectionD The y-axis' D gain for the PID controller
+     * @see kRotationCorrectionP The rotational-axis' P gain for the PID controller
+     * @see kRotationCorrectionI The rotational-axis' I gain for the PID controller
+     * @see kRotationCorrectionD The rotational-axis' D gain for the PID controller
+     * @see kMaxAngularSpeedRadiansPerSecond The maximum velocity that the robot can TURN in the trapezoidal profile
+     * @see kMaxAngularSpeedRadiansPerSecondSquared The maximum acceleration that the robot can TURN in the trapezoidal profile
+     *
      * @return A new HolonomicDriveController with the given PID gains (xP, xI, xD, yP, yI, yD, rotP, rotI, rotD) and constraints (maxVel, maxAccel)
      */
     public static HolonomicDriveController HDC = new HolonomicDriveController(
@@ -83,7 +95,9 @@ public class SwerveTrajectory implements Loggable {
                         _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getPoseMeters().getRotation().getDegrees());
 
                 // If the path has not completed time wise
-                if (elapsedTime < ((PathPlannerState) _pathTraj.getEndState()).timeSeconds + 5) {
+                // The extra second at the end is added in case the robot overshoots, and needs to correct
+                // This should be removed in the final version
+                if (elapsedTime < ((PathPlannerState) _pathTraj.getEndState()).timeSeconds + 1) {
 
                     // Use elapsedTime as a refrence for where we NEED to be
                     // Then, sample the position and rotation for that time,
