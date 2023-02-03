@@ -163,9 +163,11 @@ public class Robot extends TimedRobot {
             double lowerAngle = armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle);
             Debug.printArmAngles(armInputs, upperAngle, lowerAngle);
         }
-        if (driver.getRightBumperPressed()) {
+        if (driver.getRightBumperPressed())
+        {
             arm.setArmIndex(1);
-        } else if (driver.getLeftBumperPressed()) {
+        } else if (driver.getLeftBumperPressed())
+        {
             arm.setArmIndex(-1);
         }
 

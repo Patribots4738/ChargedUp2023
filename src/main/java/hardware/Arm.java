@@ -22,11 +22,11 @@ public class Arm implements Loggable {
 
     /**
      * What the arm positions look like and the index in the array
-     * 4
+     *          4
      * O        __     8
-     * 1      |      7
-     * 3 | 5
-     * 2  |||||  6
+     *  1      |      7
+ *          3 | 5
+     *   2  |||||  6
      */
 
 
@@ -169,14 +169,22 @@ public class Arm implements Loggable {
 
         // Make sure armPosIndex is within the range of 0 to armPos.length - 1
         // To prevent out of bounds errors
-        if ((armPosIndex == 0 && armIndex == -1) ||
-                (armPosIndex >= armPos.length - 1 && armIndex == 1)) {
+        if (armPosIndex == 0 && armIndex == -1){
+            armIndex = 0;
+        }
+        if (armPosIndex >= armPos.length - 1 && armIndex == 1) {
+            armIndex = 0;
+        }
+
+        if (Math.abs(_lowerArmEncoder.getPosition() - lowerReference) > ArmConstants.kLowerArmDeadband ||
+                Math.abs(_upperArmEncoder.getPosition() - upperReference) > ArmConstants.kUpperArmDeadband)
+        {
             armIndex = 0;
         }
 
         armPosIndex += armIndex;
 
-        System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
+//        System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
 
         drive(
                 armPos[armPosIndex].getX() / ArmConstants.kMaxReach,
