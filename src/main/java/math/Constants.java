@@ -4,8 +4,6 @@
 
 package math;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -49,11 +47,14 @@ public final class Constants
     public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
     public static final double kBackRightChassisAngularOffset = Math.toRadians(-90);
 
+
+    // Driving motors CAN IDs (EVEN)
     public static final int kFrontLeftDrivingCanId = 1;
     public static final int kRearLeftDrivingCanId = 5;
     public static final int kFrontRightDrivingCanId = 3;
     public static final int kRearRightDrivingCanId = 7;
 
+    // Turning motors CAN IDs (ODD)
     public static final int kFrontLeftTurningCanId = 2;
     public static final int kRearLeftTurningCanId = 6;
     public static final int kFrontRightTurningCanId = 4;
@@ -111,9 +112,17 @@ public final class Constants
   }
 
   public static final class OIConstants {
+
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
 
+    public static final double kDriverDeadband = 0.15;
+    public static final double kOperatorDeadband = 0.15;
+
+    // See https://www.desmos.com/calculator/e07raajzh5
+    // And https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
+    public static final double kControllerCornerSlope1 = 1/0.7;
+    public static final double kControllerCornerSlope2 = 0.7;
   }
 
   public static final class AutoConstants {
@@ -152,9 +161,9 @@ public final class Constants
     public static final int kLowerArmMotorCanId = 10;
     public static final int kUpperArmMotorCanId = 9;
 
-    // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS?
-    public static final int kUpperCurrentLimit = 60;
-    public static final int kLowerCurrentLimit = 60;
+    // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
+    public static final int kUpperCurrentLimit = 80;
+    public static final int kLowerCurrentLimit = 80;
 
     // The length of the first pivot point to the second pivot point, in inches
     public static final double kLowerArmLength = 32;
@@ -163,10 +172,7 @@ public final class Constants
     public static final double kUpperArmLength = 21;
 
     // The max reach of the bot horizontally, in inches
-    public static final double kMaxReachX = 40;
-
-    // The max reach of the bot vertically, in inches
-    public static final double kMaxReachY = 40.;
+    public static final double kMaxReach = kLowerArmLength + kUpperArmLength;
 
     // The gear ratio of the lower arm is 60:1
     public static final double kLowerArmGearRatio = 60;
@@ -179,10 +185,15 @@ public final class Constants
     public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
     
     // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-    public static final double kLowerFreedom = 75;
+    public static final double kLowerFreedom = 60;
     
     // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
     public static final double kUpperFreedom = 100;
+
+    // The amount of error allowed for the arm's position, in FULL ROTATIONS
+    // This is primarily used in autonomous
+    public static final double kLowerArmDeadband = 0.01;
+    public static final double kUpperArmDeadband = 0.01;
 
     // The outputs used in the output range for the lower and upper arms
     public static final double kLowerMinOutput = -1;
@@ -198,25 +209,24 @@ public final class Constants
      * P = 0.0032326
      * D = 0.0012612
      * <p>
-     * Upper:
-     * 
      */
     // PID values for the lower and upper arm
-    public static final double kLowerP = 0.5;
+    public static final double kLowerP = 0.1;
     public static final double kLowerI = 0;
     public static final double kLowerD = 0.025;
-    public static final double kLowerFF = 0;
+    public static final double kLowerFF = 1;
 
-    public static final double kUpperP = 1.5;
-    public static final double kUpperI = 0;
-    public static final double kUpperD = 0.75;
-    public static final double kUpperFF = 0;
-
+    
+    public static final double kUpperP = 5;	//46.6;
+    public static final double kUpperD = 1; //34.2;
+    public static final double kUpperI = 0;//.035;
+    public static final double kUpperFF = 1;
+    
     // The below values are given from sysID calibration
-    public static final double kSLower = 0.15999;
+    public static final double kSLower = 0;//.15999;
     public static final double kGLower = 0;//0.33966; (We don't like gravity)
-    public static final double kVLower = 0.24941;
-    public static final double kALower = 4.3455;
+    public static final double kVLower = 0;//.24941;
+    public static final double kALower = 0;//4.3455;
 
     public static final double kSUpper = 0.47727;
     public static final double kGUpper = 0; //1.0051; // (We don't like gravity)
@@ -229,20 +239,5 @@ public final class Constants
     public static final double kConeOffsetMeters = 0.5;
     
     public static final double kDesiredVelocityMetersPerSecond = 1.5;
-  }
-
-  public static final class AllignmentConstants {
-
-    public static final Pose2d kTag_1_pos = new Pose2d(0, 0, new Rotation2d(0));
-
-    public static final Pose2d kTag_2_pos = new Pose2d(14.5, 2.745, new Rotation2d(0));
-
-    public static final Pose2d kTag_3_pos = new Pose2d(14.5, 4.425, new Rotation2d(0));
-
-    public static final Pose2d kTag_6_pos = new Pose2d(2, 4.425, new Rotation2d(Units.degreesToRadians(180)));
-
-    public static final Pose2d kTag_7_pos = new Pose2d(2, 2.745, new Rotation2d(Units.degreesToRadians(180)));
-
-    public static final Pose2d kTag_8_pos = new Pose2d(2, 1.065, new Rotation2d(Units.degreesToRadians(180)));
   }
 }

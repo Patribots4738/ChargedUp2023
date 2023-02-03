@@ -11,7 +11,7 @@ import math.Constants;
 import math.Constants.*;
 import auto.*;
 import subsystems.*;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -168,10 +168,12 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
 
+    double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
+    double driverLeftY = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
+    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
+    double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
     
     if (driver.getLeftBumper()) {
-      swerve.setX();
-    } else {
       swerve.drive(driverLeftX * 0.25, driverLeftY * 0.25, driverRightX * 0.25, true);
     }
 
