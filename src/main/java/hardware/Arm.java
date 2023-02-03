@@ -8,6 +8,7 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -176,7 +177,8 @@ public class Arm implements Loggable {
         if (armPosIndex >= armPos.length - 1 && armIndex == 1) {
             armIndex = 0;
         }
-
+        // If the arm is not at the reference
+        // position (accounting for deadband), don't let the arm index change
         if (Math.abs(_lowerArmEncoder.getPosition() - lowerReference) > ArmConstants.kLowerArmDeadband ||
                 Math.abs(_upperArmEncoder.getPosition() - upperReference) > ArmConstants.kUpperArmDeadband)
         {
@@ -303,12 +305,7 @@ public class Arm implements Loggable {
      * @return the position, but limited
      */
     private double clampPos(double position, double freedom) {
-        if (position > Units.degreesToRotations(freedom)) {
-            position = Units.degreesToRotations(freedom);
-        } else if (position < -Units.degreesToRotations(freedom)) {
-            position = -Units.degreesToRotations(freedom);
-        }
-        return position;
+        return MathUtil.clamp(position, -Units.degreesToRotations(freedom), Units.degreesToRotations(freedom));
     }
 
 
