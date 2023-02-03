@@ -4,6 +4,8 @@
 
 package math;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -47,14 +49,11 @@ public final class Constants
     public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
     public static final double kBackRightChassisAngularOffset = Math.toRadians(-90);
 
-
-    // Driving motors CAN IDs (EVEN)
     public static final int kFrontLeftDrivingCanId = 1;
     public static final int kRearLeftDrivingCanId = 5;
     public static final int kFrontRightDrivingCanId = 3;
     public static final int kRearRightDrivingCanId = 7;
 
-    // Turning motors CAN IDs (ODD)
     public static final int kFrontLeftTurningCanId = 2;
     public static final int kRearLeftTurningCanId = 6;
     public static final int kFrontRightTurningCanId = 4;
@@ -236,8 +235,25 @@ public final class Constants
   }
 
   public static final class VisionConstants {
+
     public static final double kConeOffsetMeters = 0.5;
     
     public static final double kDesiredVelocityMetersPerSecond = 1.5;
+
   }
+  
+  public static final class AlignmentConstants {
+    
+    // Distance from the camera to the front of the bot
+    public static final double kCameraPosition = Units.inchesToMeters(9.5);
+
+    public static final Pose2d kTag_1_pos = new Pose2d(0, 0, new Rotation2d(0));
+    public static final Pose2d kTag_2_pos = new Pose2d(14.5, 2.745, new Rotation2d(0));
+    public static final Pose2d kTag_3_pos = new Pose2d(14.5, 4.425, new Rotation2d(0));
+    public static final Pose2d kTag_6_pos = new Pose2d(2, 4.425, new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d kTag_7_pos = new Pose2d(2, 2.745, new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d kTag_8_pos = new Pose2d(2, 1.065, new Rotation2d(Units.degreesToRadians(180)));
+
+  }
+
 }

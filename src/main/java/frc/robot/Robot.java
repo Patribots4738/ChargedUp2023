@@ -58,15 +58,15 @@ public class Robot extends TimedRobot {
 
   Vision vision = new Vision();
 
-  Boolean isAlligned = false;
-
-  Boolean isHorizontallyAlligned = false;
+  boolean isAligned;
 
   HolonomicDriveController HDC;
 
   Pose2d aprilPos;
 
-  AutoAllignment autoAllignment;
+  AutoAlignment autoAlignment;
+
+  boolean isAlligning;
 
   @Override
   public void robotInit() {
@@ -85,7 +85,7 @@ public class Robot extends TimedRobot {
      */
     // Drivetrain instantiation
     swerve = new Swerve();
-    autoAllignment = new AutoAllignment(swerve);
+    autoAlignment = new AutoAlignment(swerve);
     // // Zero the IMU for field-oriented driving 
     swerve.resetEncoders();
     swerve.zeroHeading();
@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     // Update the odometry for the swerve drive
-    // swerve.periodic();
+    swerve.periodic();
 
     // Update the logger for shuffleboard
     Logger.updateEntries();
@@ -127,6 +127,7 @@ public class Robot extends TimedRobot {
 
     // Set the swerve drive to coast mode
     // swerve.setCoastMode();
+    isAligned = false;
     
   }
 
@@ -137,6 +138,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     autoWaypoints.init(swerve);
   }
+
   @Override
   public void autonomousPeriodic() {
 
@@ -163,38 +165,73 @@ public class Robot extends TimedRobot {
     swerve.resetEncoders();
     swerve.setBrakeMode();
     HDC = SwerveTrajectory.getHDC();
+
   }
 
   @Override
   public void testPeriodic() {
 
-    double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
-    double driverLeftY = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
-    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
-    double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
-    
-    if (driver.getLeftBumper()) {
-      swerve.drive(driverLeftX * 0.25, driverLeftY * 0.25, driverRightX * 0.25, true);
-    }
+    int tagID = autoAlignment.getTagID();
 
-    // Use the A button to activate the allignment process
-    if (operator.getAButton()) {
+    double driverLeftX  =  MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
+    double driverLeftY  = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
+    double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
+    double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
+
+    // Use the A button to activate the alignment process
+    if (driver.getAButton()) {
 
       // Run the vision calculations and get the most visible tag
       vision.pereodic();
-
+      
       // Make sure that the camera has tags in view
       if (vision.hasTargets()) {
+        
+        
+        autoAlignment.setTagID(vision.getTagID());
+        
+        if (driver.getLeftBumperPressed()) {
+          
+          System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
+          System.out.println("Distance from april to bot: " + vision.getPose() + "\n\n");
 
-        int tagID = vision.getTagID();
-        autoAllignment.moveToTag(tagID, HDC, autoWaypoints);
+          autoAlignment.calibrateOdometry(vision.getPose(), tagID);
+
+          System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+          
+          isAligned = true;
+
+        }
+      }
+      
+      if (isAligned && driver.getRightBumper()) {
+
+        autoAlignment.moveToTag(tagID, HDC, autoWaypoints);
 
       }
+
       // Make the controller buzz if there are no targets in view
       else {
-        operator.setRumble(RumbleType.kLeftRumble, 0.);
-        isHorizontallyAlligned = false;
+
+        driver.setRumble(RumbleType.kLeftRumble, 0.0);
+
       }
+
+      // if (vision.hasTargets()) {
+      //   if (operator.getLeftBumperPressed()) {
+      //     autoAlignment.calibrateOdometry(vision.getPose(), vision.getTagID());
+      //   }
+
+      //   else if (operator.getRightBumper()) {
+      //     if (!isAlligning) {
+      //       aprilPos
+      //     }
+      //   }
+      // }
+    } else {
+
+      swerve.drive(driverLeftY * 0.25, driverLeftX * 0.25, driverRightX * 0.25, true);
+
     }
   }
 }

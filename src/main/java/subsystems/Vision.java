@@ -19,18 +19,17 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Vision {
 
-    public static final double rotDeadzone = 5;
+    public static final double rotDeadzone = 0.03;
 
     public static final double yDeadZone = 0.03;
 
+    public static final double xDeadZone = 0.05;
+    
     public static final double xDistance = 1.5;
 
-    public static final double xDeadZone = 0.05;
-
-    public static final double allignmentSpeed = 0.005;
+    public static final double alignmentSpeed = 0.005;
     
-    public static final double allignmentRotSpeed = 0.05;
-
+    public static final double alignmentRotSpeed = 0.05;
 
     private PhotonCamera camera = new PhotonCamera("Patribots4738");
 
@@ -39,21 +38,20 @@ public class Vision {
     private boolean hasTargets;
 
 
-    public Vision(){}
-
+    public Vision() {}
 
     /**
      * Converts the PhotonPipelineResult to an easier to use format
      * @return A HashMap<String, Double> representing the most visible AprilTag, null if no tag is visible
      */
-    public HashMap<String, Double> pereodic(){
+    public HashMap<String, Double> pereodic() {
 
         // Get the most recent image from the camera and run the calculations
         // necessary to get AprilTag data
         PhotonPipelineResult result = camera.getLatestResult();
 
         // Make sure that the camera can see an AprilTag
-        if (!result.hasTargets()){
+        if (!result.hasTargets()) {
             hasTargets = false;
             return null;
         }
@@ -86,35 +84,35 @@ public class Vision {
         return tagInfo;
     }
 
-    public boolean hasTargets(){
+    public boolean hasTargets() {
         return true ? this.hasTargets : false;
     }
 
-    public Double getX(){
+    public Double getX() {
         return tagInfo.get("x");
     }
 
-    public Double getY(){
+    public Double getY() {
         return tagInfo.get("y");
     }
 
-    public Double getZ(){
+    public Double getZ() {
         return tagInfo.get("z");
     }
 
-    public Double getYaw(){
+    public Double getYaw() {
         return tagInfo.get("yaw");
     }
 
-    public Double getPitch(){
+    public Double getPitch() {
         return tagInfo.get("pitch");
     }
 
-    public int getTagID(){
+    public int getTagID() {
         return tagInfo.get("tagID").intValue();
     }
 
-    public Pose2d getPose(){
-        return new Pose2d(getX(), getY(), new Rotation2d(getYaw()));
+    public Pose2d getPose() {
+        return new Pose2d(getX(), getY(), new Rotation2d(Units.degreesToRadians(getYaw())));
     }
 }

@@ -136,8 +136,8 @@ public class Arm implements Loggable {
 
     // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
     // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-    double upperArmAngle = armCalculations.getLowerAngle(armX, armY);
-    double lowerArmAngle = armCalculations.getUpperAngle(armX, armY, upperArmAngle);
+    double upperArmAngle = armCalculations.getUpperAngle(armX, armY);
+    double lowerArmAngle = armCalculations.getLowerAngle(armX, armY, upperArmAngle);
 
     // If upperArmAngle is NotANumber, set lowerArmAngle and upperArmAngle to zero,
     // This is because lowerArmAngle is reliant on upperArmAngle

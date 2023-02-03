@@ -32,7 +32,7 @@ import hardware.Swerve;
 import math.Constants;
 
 
-public class AutoAllignment {
+public class AutoAlignment {
 
   /**
    *  A visual representation of the apriltag positions
@@ -54,30 +54,63 @@ public class AutoAllignment {
 
   Pose2d targetPose;
 
-  public AutoAllignment(Swerve swerve){
+  int tagID;
+
+  public AutoAlignment(Swerve swerve) {
     this.swerve = swerve;
   }
 
-  public void callibrateOdometry(Pose2d aprilPose, int aprilTagID){
-    double x = aprilPose.getX();
-    double y = aprilPose.getY();
-    int tagID = aprilTagID;
+  /**
+   * Calibrate the odometry for the swerve
+   * @param visionPose the position of the aprilTag relative to the bot
+   * @param aprilTagID the ID of the tag being watched
+   */
+  public void calibrateOdometry(Pose2d visionPose, int aprilTagID) {
+    
+    double x = visionPose.getX();
 
-    Pose2d targetPosition = getTagPos(tagID);
+    // flip the sign of y to correlate with pathplanner
+    double y = -visionPose.getY();
 
-    Pose2d generatedPos = new Pose2d(targetPosition.getX() + x, targetPosition.getY() + y, new Rotation2d(targetPosition.getRotation().getDegrees()));
-    System.out.println(generatedPos);
-    swerve.resetOdometry(generatedPos);
+    if (0 < tagID && tagID < 4) {
+      x *= -1;
+    }
+
+    Pose2d targetPosition = getTagPos(aprilTagID);
+
+    Pose2d generatedPose = new Pose2d(
+        targetPosition.getX() + x, 
+        targetPosition.getY() + y, 
+        visionPose.getRotation().plus(targetPosition.getRotation())
+    );
+    
+    swerve.resetOdometry(generatedPose);
+    SwerveTrajectory.resetTrajectoryStatus();
 
   }
 
-  public void moveToTag(int tagID, HolonomicDriveController HDC, AutoWaypoints autoWaypoints){
+  public void moveToTag(int tagID, HolonomicDriveController HDC, AutoWaypoints autoWaypoints) {
 
     autoWaypoints.autoPeriodic();
 
     Pose2d targetPose = getTagPos(tagID);
 
-    targetPose = targetPose.plus(new Transform2d(new Translation2d(1, 0), new Rotation2d(0)));
+    
+    // if (0 < tagID && tagID < 4) {
+      //   targetPose = targetPose.plus(new Transform2d(new Translation2d(-Units.inchesToMeters(15), 0), new Rotation2d(0)));
+      // } else {
+        //   targetPose = targetPose.plus(new Transform2d(new Translation2d(Units.inchesToMeters(15), 0), new Rotation2d(0)));
+        // }
+        
+    int direction = (0 < tagID && tagID < 5) ? -1 : 1;
+
+    targetPose = new Pose2d(
+      new Translation2d(
+        targetPose.getX() + ((Units.inchesToMeters(15) + (Constants.AlignmentConstants.kCameraPosition)) * direction), 
+        targetPose.getY()
+      ),
+      targetPose.getRotation()
+    );
 
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
       new PathConstraints(0.1, 0.1),
@@ -87,8 +120,9 @@ public class AutoAllignment {
     
     SwerveTrajectory.PathPlannerRunner(tagPos, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
     
-    System.out.println("Target Pose: " + targetPose);
-    System.out.println(swerve.getOdometry().getPoseMeters());
+    System.out.println("Direction: " + direction);
+    System.out.println("Modified Target Pose: " + targetPose);
+    System.out.println("Current Pose: " + swerve.getOdometry().getPoseMeters() + "\n\n");
   }
 
   public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {
@@ -108,61 +142,69 @@ public class AutoAllignment {
       targetPose.getRotation());
 
     swerve.drive(speeds.vxMetersPerSecond*0.25,
-    speeds.vyMetersPerSecond*0.25, 
-    speeds.omegaRadiansPerSecond,false);
+      speeds.vyMetersPerSecond*0.25, 
+      speeds.omegaRadiansPerSecond,false);
 
   }
 
-  public boolean isAlligned(){
-    if (swerve.getOdometry().getPoseMeters() == targetPose){
+  public boolean isAligned() {
+    if (swerve.getOdometry().getPoseMeters() == targetPose) {
       return true;
     }
     return false;
   }
 
-  
-  private Pose2d getTagPos(int tagID){
+  private Pose2d getTagPos(int tagID) {
     double tagX = 0.0;
     double tagY = 0.0;
     Rotation2d rotation = new Rotation2d(0);
 
-    switch (tagID){
+    switch (tagID) {
       case 1:
-        tagX = Constants.AllignmentConstants.kTag_1_pos.getX();
-        tagY = Constants.AllignmentConstants.kTag_1_pos.getY();
-        rotation = Constants.AllignmentConstants.kTag_1_pos.getRotation();
+        tagX = Constants.AlignmentConstants.kTag_1_pos.getX();
+        tagY = Constants.AlignmentConstants.kTag_1_pos.getY();
+        rotation = Constants.AlignmentConstants.kTag_1_pos.getRotation();
         break;
 
       case 2:
-        tagX = Constants.AllignmentConstants.kTag_2_pos.getX();
-        tagY = Constants.AllignmentConstants.kTag_2_pos.getY();
-        rotation = Constants.AllignmentConstants.kTag_2_pos.getRotation();
+        tagX = Constants.AlignmentConstants.kTag_2_pos.getX();
+        tagY = Constants.AlignmentConstants.kTag_2_pos.getY();
+        rotation = Constants.AlignmentConstants.kTag_2_pos.getRotation();
         break;
 
       case 3:
-        tagX = Constants.AllignmentConstants.kTag_3_pos.getX();
-        tagY = Constants.AllignmentConstants.kTag_3_pos.getY();
-        rotation = Constants.AllignmentConstants.kTag_3_pos.getRotation();
+        tagX = Constants.AlignmentConstants.kTag_3_pos.getX();
+        tagY = Constants.AlignmentConstants.kTag_3_pos.getY();
+        rotation = Constants.AlignmentConstants.kTag_3_pos.getRotation();
         break;
 
       case 6:
-        tagX = Constants.AllignmentConstants.kTag_6_pos.getX();
-        tagY = Constants.AllignmentConstants.kTag_6_pos.getY();
-        rotation = Constants.AllignmentConstants.kTag_6_pos.getRotation();
+        tagX = Constants.AlignmentConstants.kTag_6_pos.getX();
+        tagY = Constants.AlignmentConstants.kTag_6_pos.getY();
+        rotation = Constants.AlignmentConstants.kTag_6_pos.getRotation();
         break;
 
       case 7:
-        tagX = Constants.AllignmentConstants.kTag_7_pos.getX();
-        tagY = Constants.AllignmentConstants.kTag_7_pos.getY();
-        rotation = Constants.AllignmentConstants.kTag_7_pos.getRotation();
+        tagX = Constants.AlignmentConstants.kTag_7_pos.getX();
+        tagY = Constants.AlignmentConstants.kTag_7_pos.getY();
+        rotation = Constants.AlignmentConstants.kTag_7_pos.getRotation();
         break;
 
       case 8: 
-        tagX = Constants.AllignmentConstants.kTag_8_pos.getX();
-        tagY = Constants.AllignmentConstants.kTag_8_pos.getY();
-        rotation = Constants.AllignmentConstants.kTag_8_pos.getRotation();
+        tagX = Constants.AlignmentConstants.kTag_8_pos.getX();
+        tagY = Constants.AlignmentConstants.kTag_8_pos.getY();
+        rotation = Constants.AlignmentConstants.kTag_8_pos.getRotation();
         break;
     }
     return new Pose2d(tagX, tagY, rotation);
   }
+
+  public void setTagID(int tagID) {
+    this.tagID = tagID;
+  }
+
+  public int getTagID() {
+    return tagID;
+  }
+
 }

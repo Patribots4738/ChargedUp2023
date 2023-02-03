@@ -140,7 +140,7 @@ public class SwerveTrajectory implements Loggable {
   
   }
 
-  public static HolonomicDriveController getHDC(){
+  public static HolonomicDriveController getHDC() {
 
     return HDC;
 
