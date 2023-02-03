@@ -150,6 +150,9 @@ public final class Constants {
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
+    public static final class ClawConstants {
+        double kClawCANID = 11;
+    }
     public static final class NeoMotorConstants {
         public static final double kFreeSpeedRpm = 5676;
     }
