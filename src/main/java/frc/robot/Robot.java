@@ -156,54 +156,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() 
-  {
-
-    double leftX = driver.getLeftX();
-    double leftY = -driver.getLeftY();
-    double rightX = driver.getRightX();
-    double deadZone = 0.15;
-    
-    if (Math.abs(leftY) < deadZone) {
-      leftY = 0;
-    }
-    if (Math.abs(leftX) < deadZone) {
-      leftX = 0;
-    }
-    if (Math.abs(rightX) < deadZone) {
-      rightX = 0;
-    }
-    
-    // if (driver.getLeftBumper()) {
-    //   swerve.setX();
-    // }
-    // else
-    // {
-      // Drive the robot  
-      //           SpeedX SpeedY Rotation
-      swerve.drive(leftX*0.25, leftY*0.25, rightX*0.25, true);
-    // }
-
-
-    // Notice that the input of the lower arm pos is 
-    // revolutions / 5 because we want 360/5 = 72 degrees in both directions
-    // if (driver.getLeftBumper()) {
-      
-    //   // arm.drive(leftX, leftY);
-      
-    //   // arm.setLowerArmPosition(0);
-    //   // arm.setUpperArmPosition(leftX/5);
-    //   // Yummy debug makes me giddy
-    //   double lowerAngle = armCalcuations.getLowerAngle(leftX, leftY);
-    //   System.out.println(
-    //             "LeftX: "  + String.format("%.3f", leftX) +
-    //            " LeftY: " + String.format("%.3f", leftY) +
-    //            " Q1: "    + String.format("%.3f", Units.radiansToDegrees(armCalcuations.getUpperAngle(leftX, leftY, lowerAngle))) +
-    //            " Q2: "    + String.format("%.3f", Units.radiansToDegrees(lowerAngle)-90));
-
-    // }
-
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {
@@ -216,151 +169,30 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
 
     
-    double leftX = driver.getLeftX();
-    double leftY = driver.getLeftY();
-    double rightX = driver.getRightX();
-    double deadZone = 0.15;
-    
-    if (Math.abs(leftY) < deadZone) {
-      leftY = 0;
-    }
-    if (Math.abs(leftX) < deadZone) {
-      leftX = 0;
-    }
-    if (Math.abs(rightX) < deadZone) {
-      rightX = 0;
-    }
-    
     if (driver.getLeftBumper()) {
       swerve.setX();
-    }
-    else
-    {
-    // Drive the robot  
-    //           SpeedX SpeedY Rotation
-      swerve.drive(leftX*0.25, leftY*0.25, rightX*0.25, true);
+    } else {
+      swerve.drive(driverLeftX * 0.25, driverLeftY * 0.25, driverRightX * 0.25, true);
     }
 
-     // Use the A button to activate the allignment process
-     if (operator.getAButton()){
-          
+    // Use the A button to activate the allignment process
+    if (operator.getAButton()) {
+
       // Run the vision calculations and get the most visible tag
       vision.pereodic();
 
       // Make sure that the camera has tags in view
-      if (vision.hasTargets()){
+      if (vision.hasTargets()) {
 
-        aprilPos = vision.getPose();
-
-        // Get all the data we need for allignment
-        double yaw = vision.getYaw();
-        double x = vision.getX();
         int tagID = vision.getTagID();
-
-        // Direction is Left: -1, Right: 1, Default: 0
-        int direction = 0;
-
-        if (yaw > vision.rotDeadzone){
-          // Rotate the robot in the negative yaw direction
-          swerve.drive(0, 0, vision.allignmentRotSpeed, true);
-        }
-        
-        else if (yaw < -vision.rotDeadzone){
-          // Rotate the robot in the positive yaw direction
-          swerve.drive(0, 0, -vision.allignmentRotSpeed, true);
-        }
-
-        /**
-         * The operator has two buttons they can press, 
-         * one moves the robot to the left if there's a valid position to the left,
-         * and the other does the same for the right.
-         * 
-         * The distances for these positions are set as an array tagPositions,
-         * which follows format:
-         * {1:[leftDist, rightDist], 2:[leftDist, rightDist], ...}
-        */
-
-        /**
-         *  A visual representation of the apriltag positions
-         *  / --------------------------------------------- \ 
-         *  5                      |                        4
-         *  |                      |                        |
-         *  |                      |                        |
-         *  6                      |                        3
-         *  |                      |                        |
-         *  7                      |                        2
-         *  |                      |                        |
-         *  8                      |                        1
-         *  \ --------------------------------------------- /
-         */
-        
-        
-        else {
-        
-          // Check the horizontal allignment of the robot relative to the tag
-          // "Horizontal", "left", and "right" are all relative to the robot in this circumstance
-          if (x > vision.xDeadZone){
-            // Move the robot left at x speed
-            swerve.drive(0, vision.allignmentSpeed, 0, true);
-          }
-          else if (x < -vision.xDeadZone){
-            // Move the robot right at x speed
-            swerve.drive(0, -vision.allignmentSpeed, 0, true);
-          }
-          else {
-            // Stop the robot
-            swerve.drive(0, 0, 0, true);
-            isHorizontallyAlligned = true;
-            
-          }
-        }
-
-        // Make the controller buzz if the robot is alligned horizontally
-        if (isHorizontallyAlligned){
-          operator.setRumble(RumbleType.kRightRumble, 0.5);
-        }
-        else {
-          operator.setRumble(RumbleType.kRightRumble, 0);
-
-          // ChassisSpeeds _speeds = HDC.calculate(
-          //   // Current pose
-          //   (swerve.getOdometry().getPoseMeters()), 
-          //   // Desired pose, which is the 
-          //   // our pose on the X since we don't care about how far we are from it,
-          //   // and the april pose + the offset of the cone on the Y
-          //   // and the rotation of the april tag, to align us with the field
-          //   (new Pose2d(swerve.getOdometry().getPoseMeters().getX(), 
-          //   vision.getY() + Constants.VisionConstants.kConeOffsetMeters, 
-          //   vision.getPose().getRotation())),
-          //   // Desired velocity
-          //   Constants.VisionConstants.kDesiredVelocityMetersPerSecond,
-          //   // Desired rotation (the field)
-          //   (aprilPos.getRotation()));
-
-          // // if (Math.abs(_speeds.vyMetersPerSecond) < 0.01){
-          // //   isHorizontallyAlligned = true;
-          // // }
-
-          // swerve.drive(leftX*0.25,
-          // _speeds.vyMetersPerSecond*.25, 
-          // _speeds.omegaRadiansPerSecond*.25,false);
-          
-        }
-
+        autoAllignment.moveToTag(tagID, HDC, autoWaypoints);
 
       }
-
       // Make the controller buzz if there are no targets in view
       else {
         operator.setRumble(RumbleType.kLeftRumble, 0.);
         isHorizontallyAlligned = false;
       }
     }
-
-    // Set isAlligned to false if the A button is not pressed
-    else {
-      isHorizontallyAlligned = false;
-      operator.setRumble(RumbleType.kBothRumble, 0);
-    }    
   }
 }

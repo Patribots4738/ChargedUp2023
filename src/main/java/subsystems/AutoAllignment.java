@@ -31,7 +31,22 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import hardware.Swerve;
 import math.Constants;
 
+
 public class AutoAllignment {
+
+  /**
+   *  A visual representation of the apriltag positions
+   *  / --------------------------------------------- \ 
+   *  5                      |                        4
+   *  |                      |                        |
+   *  |                      |                        |
+   *  6                      |                        3
+   *  |                      |                        |
+   *  7                      |                        2
+   *  |                      |                        |
+   *  8                      |                        1
+   *  \ --------------------------------------------- /
+   */
   
   Swerve swerve;
 
@@ -59,42 +74,43 @@ public class AutoAllignment {
   public void moveToTag(int tagID, HolonomicDriveController HDC, AutoWaypoints autoWaypoints){
 
     autoWaypoints.autoPeriodic();
-    
-    Pose2d targetPose = getTagPos(tagID);
-    targetPose = targetPose.plus(new Transform2d(new Translation2d(1, 0), new Rotation2d(0)));
 
-    System.out.println("Target Pose: " + targetPose);
+    Pose2d targetPose = getTagPos(tagID);
+
+    targetPose = targetPose.plus(new Transform2d(new Translation2d(1, 0), new Rotation2d(0)));
 
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
       new PathConstraints(0.1, 0.1),
-      new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(), swerve.getOdometry().getPoseMeters().getRotation()),
-      new PathPoint(targetPose.getTranslation(), targetPose.getRotation())
-    );
-    System.out.println(swerve.getOdometry().getPoseMeters());
+      new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(),
+        swerve.getOdometry().getPoseMeters().getRotation()),
+      new PathPoint(targetPose.getTranslation(), targetPose.getRotation()));
+    
     SwerveTrajectory.PathPlannerRunner(tagPos, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
-        
+    
+    System.out.println("Target Pose: " + targetPose);
+    System.out.println(swerve.getOdometry().getPoseMeters());
   }
 
   public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {
+
     Pose2d currentPose = swerve.getOdometry().getPoseMeters();
     
     Pose2d targetPose = new Pose2d(
-                                    currentPose.getX() + x,
-                                    currentPose.getY() + y,
-                                    new Rotation2d(currentPose.getY() + rotation)
-                                  );
+      currentPose.getX() + x,
+      currentPose.getY() + y,
+      new Rotation2d(currentPose.getY() + rotation));
 
     State targetState = new State(0, 0, 0, targetPose, 0);
 
     ChassisSpeeds speeds = HDC.calculate(
-                                          currentPose,
-                                          targetState,
-                                          targetPose.getRotation()
-                                        );
+      currentPose,
+      targetState,
+      targetPose.getRotation());
 
     swerve.drive(speeds.vxMetersPerSecond*0.25,
     speeds.vyMetersPerSecond*0.25, 
     speeds.omegaRadiansPerSecond,false);
+
   }
 
   public boolean isAlligned(){
