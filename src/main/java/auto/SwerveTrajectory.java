@@ -19,131 +19,116 @@ import debug.*;
 
 public class SwerveTrajectory implements Loggable {
 
-  // Create config for trajectory
-  public static double timetrajectoryStarted;
-  public static String trajectoryStatus="";
-  public static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();    
+    // Create config for trajectory
+    public static double timetrajectoryStarted;
+    public static String trajectoryStatus = "";
+    public static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();
 
-  public static double elapsedTime;
+    public static double elapsedTime;
 
-  public static SwerveTrajectory getInstance() {
-      return SINGLE_INSTANCE;
-  }
+    public static SwerveTrajectory getInstance() {
+        return SINGLE_INSTANCE;
+    }
 
-  /**
-   * Returns a new HolonomicDriveController with constant PID gains.
-   * 
-   * The 2 PID controllers are controllers that should correct 
-   * for error in the field-relative x and y directions respectively.
-   * i.e. kXCorrectionP,I,D is PID for X correction
-   *  and kYCorrectionP,I,D is PID for Y correction
-   * 
-   * The ProfiledPIDController for the rotation of the robot, 
-   * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
-   * 
-   * @see kXCorrectionP The x-axis' P gain for the PID controller
-   * @see kXCorrectionI The x-axis' I gain for the PID controller
-   * @see kXCorrectionD The x-axis' D gain for the PID controller
-   * @see kYCorrectionP The y-axis' P gain for the PID controller
-   * @see kYCorrectionI The y-axis' I gain for the PID controller
-   * @see kYCorrectionD The y-axis' D gain for the PID controller
-   * @see kRotationCorrectionP The rotational-axis' P gain for the PID controller
-   * @see kRotationCorrectionI The rotational-axis' I gain for the PID controller
-   * @see kRotationCorrectionD The rotational-axis' D gain for the PID controller
-   * @see kMaxAngularSpeedRadiansPerSecond The maximum velocity that the robot can TURN in the trapezoidal profile
-   * @see kMaxAngularSpeedRadiansPerSecondSquared The maximum acceleration that the robot can TURN in the trapezoidal profile
-   * @return A new HolonomicDriveController with the given PID gains (xP, xI, xD, yP, yI, yD, rotP, rotI, rotD) and constraints (maxVel, maxAccel)
-   */
-  public static HolonomicDriveController HDC = new HolonomicDriveController(
-    new PIDController(Constants.AutoConstants.kXCorrectionP, Constants.AutoConstants.kXCorrectionI, Constants.AutoConstants.kXCorrectionD),
-    new PIDController(Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD),
-    new ProfiledPIDController(Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
-      new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
-  // public static HolonomicDriveController HDC = new HolonomicDriveController(
-  //   new PIDController(Debug.xP.getDouble(1), Constants.AutoConstants.kXCorrectionI, Debug.xD.getDouble(0)),
-  //   new PIDController(Debug.yP.getDouble(1), Constants.AutoConstants.kYCorrectionI, Debug.yD.getDouble(0)),
-  //   new ProfiledPIDController(Debug.rotP.getDouble(1), Constants.AutoConstants.kRotationCorrectionI, Debug.rotD.getDouble(0),
-  //     new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
-  
-  /**
-   * This is PathPlanner.
-   * It's awesome :)
-   * Open up pathplanner.exe on the driverstation laptop.
-   * Point the application to the location of your coding project (must contain build.gradle).
-   * Draw the path.
-   * It will autosave.
-   * If everything is characterized correctly and your odometry reflects reality,
-   * i.e. when the robot goes 1 meter, it says it went one meter--
-   * it will work like a charm.
-   * @param _pathTraj run Pathplanner.loadpath("name of file without an extension") pass it here
-   * @param _odometry SwerveDrive.java's odometry
-   * @param _rotation2d Pass in the current angle of the robot
-   */
-  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, SwerveDriveOdometry _odometry, Rotation2d _rotation2d) {
+    /**
+     * Returns a new HolonomicDriveController with constant PID gains.
+     * <p>
+     * The 2 PID controllers are controllers that should correct
+     * for error in the field-relative x and y directions respectively.
+     * i.e. kXCorrectionP,I,D is PID for X correction
+     * and kYCorrectionP,I,D is PID for Y correction
+     * <p>
+     * The ProfiledPIDController for the rotation of the robot,
+     * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
+     *
+     * @return A new HolonomicDriveController with the given PID gains (xP, xI, xD, yP, yI, yD, rotP, rotI, rotD) and constraints (maxVel, maxAccel)
+     */
+    public static HolonomicDriveController HDC = new HolonomicDriveController(
+            new PIDController(Constants.AutoConstants.kXCorrectionP, Constants.AutoConstants.kXCorrectionI, Constants.AutoConstants.kXCorrectionD),
+            new PIDController(Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD),
+            new ProfiledPIDController(Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
+                    new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
 
-      elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
+    /**
+     * This is PathPlanner.
+     * It's awesome :)
+     * Open up pathplanner.exe on the driverstation laptop.
+     * Point the application to the location of your coding project (must contain build.gradle).
+     * Draw the path.
+     * It will autosave.
+     * If everything is characterized correctly and your odometry reflects reality,
+     * i.e. when the robot goes 1 meter, it says it went one meter--
+     * it will work like a charm.
+     *
+     * @param _pathTraj   run Pathplanner.loadpath("name of file without an extension") pass it here
+     * @param _odometry   SwerveDrive.java's odometry
+     * @param _rotation2d Pass in the current angle of the robot
+     */
+    public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, SwerveDriveOdometry _odometry, Rotation2d _rotation2d) {
 
-      switch (trajectoryStatus) {
+        elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
 
-        case "setup":
-          timetrajectoryStarted = Timer.getFPGATimestamp();
-          trajectoryStatus = "execute";
-          break;
+        switch (trajectoryStatus) {
 
-        case "execute":
-          
-          Debug.debugPeriodic(
-            _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getPoseMeters().getX(),
-            _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getPoseMeters().getY(),
-            _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getPoseMeters().getRotation().getDegrees());
-          
-          // If the path has not completed time wise
-          if (elapsedTime <  ((PathPlannerState) _pathTraj.getEndState()).timeSeconds+5) {
+            case "setup":
+                timetrajectoryStarted = Timer.getFPGATimestamp();
+                trajectoryStatus = "execute";
+                break;
 
-            // Use elapsedTime as a refrence for where we NEED to be
-            // Then, sample the position and rotation for that time, 
-            // And calculate the ChassisSpeeds required to get there
-            ChassisSpeeds _speeds = HDC.calculate(
-              _odometry.getPoseMeters(), 
-              ((PathPlannerState) _pathTraj.sample(elapsedTime)),
-              ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
-            
-            // Set the states for the motor using calculated values above
-            // It is important to note that fieldRelative is false, 
-            // but calculations make it so it is true i.e. rotation is independant
-            // (This is seen 6-5 lines above)
-            swerve.drive(
-              _speeds.vxMetersPerSecond,
-              _speeds.vyMetersPerSecond, 
-              _speeds.omegaRadiansPerSecond,false);
-              
-          } else {
+            case "execute":
 
-            swerve.drive(0,0,0,false);
-            trajectoryStatus = "done";
+                Debug.debugPeriodic(
+                        _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getPoseMeters().getX(),
+                        _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getPoseMeters().getY(),
+                        _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getPoseMeters().getRotation().getDegrees());
 
-          }
+                // If the path has not completed time wise
+                if (elapsedTime < ((PathPlannerState) _pathTraj.getEndState()).timeSeconds + 5) {
 
-          break;
+                    // Use elapsedTime as a refrence for where we NEED to be
+                    // Then, sample the position and rotation for that time,
+                    // And calculate the ChassisSpeeds required to get there
+                    ChassisSpeeds _speeds = HDC.calculate(
+                            _odometry.getPoseMeters(),
+                            ((PathPlannerState) _pathTraj.sample(elapsedTime)),
+                            ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
 
-        default:
+                    // Set the states for the motor using calculated values above
+                    // It is important to note that fieldRelative is false,
+                    // but calculations make it so it is true i.e. rotation is independant
+                    // (This is seen 6-5 lines above)
+                    swerve.drive(
+                            _speeds.vxMetersPerSecond,
+                            _speeds.vyMetersPerSecond,
+                            _speeds.omegaRadiansPerSecond, false);
 
-            swerve.drive(0,0,0,false);
-            break;
+                } else {
 
-      }
-  }
+                    swerve.drive(0, 0, 0, false);
+                    trajectoryStatus = "done";
 
-  public static void resetTrajectoryStatus() {
+                }
 
-      trajectoryStatus = "setup";
-  
-  }
+                break;
 
-  public static HolonomicDriveController getHDC() {
+            default:
 
-    return HDC;
+                swerve.drive(0, 0, 0, false);
+                break;
 
-  }
-    
+        }
+    }
+
+    public static void resetTrajectoryStatus() {
+
+        trajectoryStatus = "setup";
+
+    }
+
+    public static HolonomicDriveController getHDC() {
+
+        return HDC;
+
+    }
+
 }
