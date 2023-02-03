@@ -22,7 +22,6 @@ public class AutoSegmentedWaypoints implements Loggable {
     public Waypoint[] SquareAutoWPs;
     public Waypoint[] chosenWaypoints;
 
-    // @Log(tabName = "CompetitionLogger", rowIndex = 2, columnIndex = 4)
     public int currentWaypointNumber = 0;
 
     public AutoPose chosenPath;

@@ -48,11 +48,6 @@ public class SwerveTrajectory implements Loggable {
             new PIDController(Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD),
             new ProfiledPIDController(Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
                     new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
-    // public static HolonomicDriveController HDC = new HolonomicDriveController(
-    //   new PIDController(Debug.xP.getDouble(1), Constants.AutoConstants.kXCorrectionI, Debug.xD.getDouble(0)),
-    //   new PIDController(Debug.yP.getDouble(1), Constants.AutoConstants.kYCorrectionI, Debug.yD.getDouble(0)),
-    //   new ProfiledPIDController(Debug.rotP.getDouble(1), Constants.AutoConstants.kRotationCorrectionI, Debug.rotD.getDouble(0),
-    //     new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
 
     /**
      * This is PathPlanner.
