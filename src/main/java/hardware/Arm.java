@@ -40,6 +40,7 @@ public class Arm implements Loggable {
             new Translation2d(36, 36),
             // new Translation2d(40, 28),
     };
+    // ceil -- force round up
     int armPosIndex = (int) Math.ceil(armPos.length / 2);
 
     private double lowerReference = 0;
@@ -231,7 +232,7 @@ public class Arm implements Loggable {
      */
     private void setUpperArmPosition(double position) {
 
-        position = setLimits(position, ArmConstants.kUpperFreedom);
+        position = clampPos(position, ArmConstants.kUpperFreedom);
 
         // Description of FF in Constants :D
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -266,7 +267,7 @@ public class Arm implements Loggable {
      *                 This unit is in full rotations
      */
     private void setLowerArmPosition(double position) {
-        position = setLimits(position, ArmConstants.kLowerFreedom);
+        position = clampPos(position, ArmConstants.kLowerFreedom);
 
         ArmFeedforward feedForward = new ArmFeedforward(
                 ArmConstants.kSLower,
@@ -297,11 +298,11 @@ public class Arm implements Loggable {
     /**
      * Set the limits of the upper arm
      *
-     * @param position the position to set the upper arm to
+     * @param position the position to set an arm to
      * @param freedom  the freedom of the upper/lower arm in degrees
      * @return the position, but limited
      */
-    private double setLimits(double position, double freedom) {
+    private double clampPos(double position, double freedom) {
         if (position > Units.degreesToRotations(freedom)) {
             position = Units.degreesToRotations(freedom);
         } else if (position < -Units.degreesToRotations(freedom)) {
