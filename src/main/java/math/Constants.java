@@ -179,7 +179,7 @@ public final class Constants {
         public static final double kLowerArmGearRatio = 60;
 
         // The gear ratio of the upper arm is 25:7
-        public static final double kUpperArmGearRatio = (25.0 / 7.0);
+        public static final double kUpperArmGearRatio = (85 / 9);
 
         // The factor that the encoder is multiplied by to get the actual position
         public static final double kLowerEncoderPositionFactor = (kLowerArmLength * Math.PI) / (kLowerArmGearRatio);
