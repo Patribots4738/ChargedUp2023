@@ -110,7 +110,7 @@ public class AutoAlignment {
         targetPose.getX() + ((Units.inchesToMeters(15) + (Constants.AlignmentConstants.kCameraPosition.getX())) * direction), 
         targetPose.getY() + (Constants.AlignmentConstants.kCameraPosition.getY())
       ),
-      targetPose.getRotation()
+      targetPose.getRotation().minus(visionPose.getRotation()
     );
 
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
