@@ -134,7 +134,7 @@ public class Robot extends TimedRobot {
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
-        double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
+        double driverLeftX = -MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
         double driverLeftY = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
         double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
         double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
