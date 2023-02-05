@@ -245,7 +245,7 @@ public final class Constants
   public static final class AlignmentConstants {
     
     // Distance from the camera to the front of the bot
-    public static final double kCameraPosition = Units.inchesToMeters(9.5);
+    public static final Translation2d kCameraPosition = new Translation2d(Units.inchesToMeters(9.5), Units.inchesToMeters(8));
 
     public static final Pose2d kTag_1_pos = new Pose2d(0, 0, new Rotation2d(0));
     public static final Pose2d kTag_2_pos = new Pose2d(14.5, 2.745, new Rotation2d(0));

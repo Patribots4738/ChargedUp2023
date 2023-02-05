@@ -107,8 +107,8 @@ public class AutoAlignment {
 
     targetPose = new Pose2d(
       new Translation2d(
-        targetPose.getX() + ((Units.inchesToMeters(15) + (Constants.AlignmentConstants.kCameraPosition)) * direction), 
-        targetPose.getY()
+        targetPose.getX() + ((Units.inchesToMeters(15) + (Constants.AlignmentConstants.kCameraPosition.getX())) * direction), 
+        targetPose.getY() + (Constants.AlignmentConstants.kCameraPosition.getY())
       ),
       targetPose.getRotation()
     );
