@@ -166,7 +166,7 @@ public class Robot extends TimedRobot {
 
     int tagID = autoAlignment.getTagID();
 
-    double driverLeftX  =  MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
+    double driverLeftX  = -MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
     double driverLeftY  = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
     double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
     double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
