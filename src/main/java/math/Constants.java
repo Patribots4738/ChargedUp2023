@@ -179,7 +179,7 @@ public final class Constants {
         public static final double kLowerArmGearRatio = 60;
 
         // The gear ratio of the upper arm is 25:7
-        public static final double kUpperArmGearRatio = (85 / 9);
+        public static final double kUpperArmGearRatio = (85.0 / 9.0);
 
         // The factor that the encoder is multiplied by to get the actual position
         public static final double kLowerEncoderPositionFactor = (kLowerArmLength * Math.PI) / (kLowerArmGearRatio);
@@ -218,8 +218,8 @@ public final class Constants {
         public static final double kLowerFF = 1;
 
 
-        public static final double kUpperP = 5;    //46.6;
-        public static final double kUpperD = 1; //34.2;
+        public static final double kUpperP = 1;    //46.6;
+        public static final double kUpperD = 0; //34.2;
         public static final double kUpperI = 0;//.035;
         public static final double kUpperFF = 1;
 
@@ -248,7 +248,6 @@ public final class Constants {
         public static final double kGUpper = 0; //1.0051; // (We don't like gravity)
         public static final double kVUpper = 0.95764;
         public static final double kAUpper = 0.19957;
-
     }
 
     public static final class VisionConstants {
