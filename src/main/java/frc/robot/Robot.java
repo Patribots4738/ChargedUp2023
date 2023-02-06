@@ -81,21 +81,17 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
 
         swerve.periodic();
+        // arm.periodic();
 
         Logger.updateEntries();
 
     }
 
     @Override
-    public void disabledInit() {
-
-        arm.printList();
-
-    }
+    public void disabledInit() {}
 
     @Override
-    public void disabledPeriodic() {
-    }
+    public void disabledPeriodic() {}
 
     @Override
     public void autonomousInit() {
@@ -157,15 +153,9 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void testInit() {
-
-        swerve.resetEncoders();
-        swerve.setBrakeMode();
-
-    }
+    public void testInit() {}
 
 
     @Override
-    public void testPeriodic() {
-    }
+    public void testPeriodic() {}
 }
