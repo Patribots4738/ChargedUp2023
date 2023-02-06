@@ -5,7 +5,10 @@
 package math;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -115,7 +118,7 @@ public final class Constants
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
 
-    public static final double kDriverDeadband = 0.15;
+    public static final double kDriverDeadband = 0.13;
     public static final double kOperatorDeadband = 0.15;
 
     // See https://www.desmos.com/calculator/e07raajzh5
@@ -244,8 +247,14 @@ public final class Constants
   
   public static final class AlignmentConstants {
     
-    // Distance from the camera to the front of the bot
-    public static final Translation2d kCameraPosition = new Translation2d(Units.inchesToMeters(9.5), Units.inchesToMeters(8));
+    // Distance from the camera to the IMU
+    // First is the direction of the arm, 
+    // then perpendicular to the arm, 
+    // then rotation
+    public static final Transform2d kCameraPosition = 
+        new Transform2d( new Translation2d(Units.inchesToMeters(7.75), 
+                    Units.inchesToMeters(5.5)), 
+                    Rotation2d.fromDegrees(0));
 
     public static final Pose2d kTag_1_pos = new Pose2d(0, 0, new Rotation2d(0));
     public static final Pose2d kTag_2_pos = new Pose2d(14.5, 2.745, new Rotation2d(0));

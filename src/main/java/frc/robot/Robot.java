@@ -170,16 +170,16 @@ public class Robot extends TimedRobot {
     double driverLeftY  = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
     double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
     double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
-
     // Use the A button to activate the alignment process
     if (driver.getAButton()) {
 
       // Run the vision calculations and get the most visible tag
-      vision.pereodic();
+      vision.periodic();
       
       // Make sure that the camera has tags in view
       if (vision.hasTargets()) {
         
+        System.out.println("Vision Pose: " + vision.getPose() + "\n\n");
         
         autoAlignment.setTagID(vision.getTagID());
         
@@ -199,7 +199,7 @@ public class Robot extends TimedRobot {
       
       if (isAligned && driver.getRightBumper()) {
 
-        autoAlignment.moveToTag(tagID, HDC, autoWaypoints);
+        autoAlignment.moveToTag(tagID, HDC, autoWaypoints, vision.getPose());
 
       }
 
