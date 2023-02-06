@@ -139,24 +139,24 @@ public class Robot extends TimedRobot {
         double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
         double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
 
-        Translation2d armInputs = OICalc.toCircle(driverLeftX, driverLeftY);
+        Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
 
         if (driver.getRightBumper()) {
             swerve.setX();
         } else {
             //              SpeedX,       SpeedY,     Rotation,    Field_Oriented
-            swerve.drive(driverLeftY, driverLeftX, driverRightX, true); //Why is this swapped?
+            swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX, true); //Why is this swapped?
         }
 
 
         if (driver.getLeftBumper()) {
 
-            arm.drive(armInputs.getX(), armInputs.getY());
+            arm.drive(driverLeftAxis.getX(), driverLeftAxis.getY());
 
             //   Yummy debug makes me giddy
-            double upperAngle = armCalcuations.getUpperAngle(armInputs.getX(), armInputs.getY());
-            double lowerAngle = armCalcuations.getLowerAngle(armInputs.getX(), armInputs.getY(), upperAngle);
-            Debug.printArmAngles(armInputs, upperAngle, lowerAngle);
+            double upperAngle = armCalcuations.getUpperAngle(driverLeftAxis.getX(), driverLeftAxis.getY());
+            double lowerAngle = armCalcuations.getLowerAngle(driverLeftAxis.getX(), driverLeftAxis.getY(), upperAngle);
+            Debug.printArmAngles(driverLeftAxis, upperAngle, lowerAngle);
         }
         if (driver.getRightBumperPressed())
         {
