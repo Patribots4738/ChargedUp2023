@@ -61,12 +61,12 @@ public class Arm implements Loggable {
     @Log
     private double upperPos = 0;
 
-    private ArrayList<Double> upperPosList = new ArrayList<Double>();
+    private final ArrayList<Double> upperPosList = new ArrayList<Double>();
 
     @Log
     private double lowerPos = 0;
 
-    private ArrayList<Double> lowerPosList = new ArrayList<Double>();
+    private final ArrayList<Double> lowerPosList = new ArrayList<Double>();
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
