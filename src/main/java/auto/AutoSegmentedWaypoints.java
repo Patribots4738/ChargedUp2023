@@ -60,13 +60,13 @@ public class AutoSegmentedWaypoints implements Loggable {
 
         currentWaypointNumber = 0;
 
-        PathPlannerState initalPathPose = ((PathPlannerState) chosenWaypoints[0].pathPlannerSegment.getInitialState());
+        PathPlannerState initalPathPose = chosenWaypoints[0].pathPlannerSegment.getInitialState();
 
         this.swerve.resetOdometry(initalPathPose.poseMeters);
 
     }
 
-    public void autoPeriodic() {
+    public void periodic() {
         waypointRunner(chosenWaypoints);
     }
 

@@ -83,14 +83,14 @@ public class SwerveTrajectory implements Loggable {
                         _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getPoseMeters().getRotation().getDegrees());
 
                 // If the path has not completed time wise
-                if (elapsedTime < ((PathPlannerState) _pathTraj.getEndState()).timeSeconds + 5) {
+                if (elapsedTime < _pathTraj.getEndState().timeSeconds + 5) {
 
                     // Use elapsedTime as a refrence for where we NEED to be
                     // Then, sample the position and rotation for that time,
                     // And calculate the ChassisSpeeds required to get there
                     ChassisSpeeds _speeds = HDC.calculate(
                             _odometry.getPoseMeters(),
-                            ((PathPlannerState) _pathTraj.sample(elapsedTime)),
+                            _pathTraj.sample(elapsedTime),
                             ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
 
                     // Set the states for the motor using calculated values above

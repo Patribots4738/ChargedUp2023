@@ -61,12 +61,12 @@ public class Arm implements Loggable {
     @Log
     private double upperPos = 0;
 
-    private ArrayList<Double> upperPosList = new ArrayList<Double>();
+    private final ArrayList<Double> upperPosList = new ArrayList<Double>();
 
     @Log
     private double lowerPos = 0;
 
-    private ArrayList<Double> lowerPosList = new ArrayList<Double>();
+    private final ArrayList<Double> lowerPosList = new ArrayList<Double>();
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -101,7 +101,8 @@ public class Arm implements Loggable {
 
         // as of 1/22/2023, It might be useful to touch because
         // it could reduce the need to multiply position by gear ratio
-        // _lowerArmEncoder.setPositionConversionFactor(ArmConstants.kLowerArmGearRatio);
+        _lowerArmEncoder.setPositionConversionFactor(ArmConstants.kLowerEncoderPositionFactor);
+        _upperArmEncoder.setPositionConversionFactor(ArmConstants.kUpperEncoderPositionFactor);
 
         // Set PID constants for the lower and upper SPARK MAX(s)
         _lowerArmPIDController.setP(ArmConstants.kLowerP);
@@ -121,7 +122,7 @@ public class Arm implements Loggable {
                 ArmConstants.kUpperMaxOutput);
 
         _lowerArm.setSmartCurrentLimit(ArmConstants.kLowerCurrentLimit);
-        _upperArm.setSmartCurrentLimit(ArmConstants.kUpperCurrentLimit);
+        // _upperArm.setSmartCurrentLimit(ArmConstants.kUpperCurrentLimit);
 
         // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
         _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -140,14 +141,14 @@ public class Arm implements Loggable {
     public void resetEncoders() {
 
         _lowerArmEncoder.setPosition(0);
-        _upperArmEncoder.setPosition(0);
+        _upperArmEncoder.setPosition(0);//-0.5687823825412326);
 
     }
 
-    public void armPeriodic() {
+    public void periodic() {
 
         setLowerArmPosition(this.lowerReference);
-        setUpperArmPosition(this.upperReference);
+       //setUpperArmPosition(this.upperReference);
 
     }
 
@@ -249,14 +250,14 @@ public class Arm implements Loggable {
         _upperArmPIDController.setFF(FF);
 
         // Calculate the rotations needed to get to the position
-        double neoPosition = position * ArmConstants.kUpperArmGearRatio;
+        double neoPosition = position;
 
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
         _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
         double upperArmEncoderPos = _upperArmEncoder.getPosition();
-        upperPos = upperArmEncoderPos / ArmConstants.kUpperArmGearRatio;
+        upperPos = upperArmEncoderPos;
 
         upperPosList.add(upperPos);
     }
@@ -284,14 +285,14 @@ public class Arm implements Loggable {
 
         // Calculate the rotations needed to get to the position
         // By multiplying the position by the gear ratio
-        double neoPosition = position * ArmConstants.kLowerArmGearRatio;
+        double neoPosition = position;
 
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
         _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
         double lowerArmEncoderPosition = _lowerArmEncoder.getPosition();
-        lowerPos = lowerArmEncoderPosition / ArmConstants.kLowerArmGearRatio;
+        lowerPos = lowerArmEncoderPosition;
 
         lowerPosList.add(lowerPos);
     }
@@ -316,7 +317,7 @@ public class Arm implements Loggable {
      * This unit is in revolutions
      */
     public double getUpperArmPosition() {
-        return _upperArmEncoder.getPosition() / ArmConstants.kUpperArmGearRatio;
+        return _upperArmEncoder.getPosition();
     }
 
 
@@ -327,7 +328,7 @@ public class Arm implements Loggable {
      * This unit is in revolutions
      */
     public double getLowerArmPosition() {
-        return _lowerArmEncoder.getPosition() / ArmConstants.kLowerArmGearRatio;
+        return _lowerArmEncoder.getPosition();
     }
 
     public void printList() {
@@ -348,6 +349,12 @@ public class Arm implements Loggable {
     public void setBrakeMode() {
         _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
         _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    }
+
+    public void setUpperArmSpeed(double speed) {
+
+      _upperArm.set(speed);
+
     }
 
 }
