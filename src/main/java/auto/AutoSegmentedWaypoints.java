@@ -66,7 +66,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     }
 
-    public void autoPeriodic() {
+    public void periodic() {
         waypointRunner(chosenWaypoints);
     }
 

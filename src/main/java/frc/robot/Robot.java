@@ -11,10 +11,7 @@ import math.OICalc;
 import math.Constants.*;
 import auto.*;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import io.github.oblarg.oblog.Logger;
@@ -38,17 +35,9 @@ public class Robot extends TimedRobot {
 
     Arm arm;
 
-    HolonomicDriveController autoController;
-
-    Trajectory trajectory;
-
     Debug debug;
 
     ArmCalcuations armCalcuations = new ArmCalcuations();
-
-    HolonomicDriveController HDC = SwerveTrajectory.getHDC();
-
-    Pose2d aprilPos;
 
 
     @Override
@@ -119,18 +108,17 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
 
-        autoSegmentedWaypoints.autoPeriodic();
-        arm.armPeriodic();
+        autoSegmentedWaypoints.periodic();
+        arm.periodic();
 
     }
 
     @Override
-    public void teleopInit() {
-    }
+    public void teleopInit() {}
 
     @Override
     public void teleopPeriodic() {
-        arm.armPeriodic();
+        arm.periodic();
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs

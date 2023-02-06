@@ -145,7 +145,7 @@ public class Arm implements Loggable {
 
     }
 
-    public void armPeriodic() {
+    public void periodic() {
 
         setLowerArmPosition(this.lowerReference);
        //setUpperArmPosition(this.upperReference);
