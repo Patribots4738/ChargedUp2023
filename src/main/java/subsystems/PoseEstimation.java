@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import math.Constants.PoseEstimationConstants;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 
@@ -43,16 +44,15 @@ public class PoseEstimation {
         // TODO - once 2023 happens, replace this with just loading the 2023 field arrangement
         AprilTagFieldLayout aprilTagFieldLayout = null;
         try {
-            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
+                    AprilTagFields.k2023ChargedUp.m_resourceFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         // Forward Camera
         photonCamera =
-                new PhotonCamera(
-                        VisionConstants
-                                .cameraName); // Change the name of your camera here to whatever it is in the
+                new PhotonCamera(PoseEstimationConstants.CAMERA_NAME); // Change the name of your camera here to whatever it is in the
         // PhotonVision UI.
 
         // Create pose estimator
@@ -60,6 +60,7 @@ public class PoseEstimation {
                 new PhotonPoseEstimator(
                         aprilTagFieldLayout,
                         PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
-                        photonCamera, VisionConstants.robotToCam);
+                        photonCamera,
+                        VisionConstants.robotToCam);
     }
 }

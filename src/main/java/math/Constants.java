@@ -244,6 +244,10 @@ public final class Constants
     public static final double kDesiredVelocityMetersPerSecond = 1.5;
 
   }
+
+  public static final class PoseEstimationConstants {
+    public static final String CAMERA_NAME = "Patribots4738";
+  }
   
   public static final class AlignmentConstants {
     
