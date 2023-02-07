@@ -316,5 +316,14 @@ imgui.ini
 
 # # VS Code Specific Java Settings
 .cl
+.classpath
+.project
+.settings/
+bin/
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
+
+# Simulation GUI and other tools window save file
+*-window.json
+simgui-ds.json
+simgui.json
