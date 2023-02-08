@@ -54,7 +54,7 @@ public class NewSwerve extends SubsystemBase {
             Constants.DriveConstants.kBackRightChassisAngularOffset);
 
     public NewSwerve() {
-        zeroGyro();
+        zeroHeading();
 
         mSwerveMods = new MAXSwerveModule[]{
                 m_frontLeft,
@@ -185,7 +185,7 @@ public class NewSwerve extends SubsystemBase {
     /**
      * Resets the gyro to a heading of 0
      */
-    public void zeroGyro() {
+    public void zeroHeading() {
         gyro.reset();
     }
 
@@ -195,7 +195,6 @@ public class NewSwerve extends SubsystemBase {
                 Rotation2d.fromDegrees(gyro.getAngle());
     }
 
-    @Override
     public void periodic() {
 
         updateOdometry();
