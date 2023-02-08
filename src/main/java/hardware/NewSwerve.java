@@ -161,6 +161,7 @@ public class NewSwerve extends SubsystemBase {
 
         field.getObject("Actual Pos").setPose(getPose());
         field.setRobotPose(poseEstimator.getEstimatedPosition());
+        resetOdometry(poseEstimator.getEstimatedPosition());
 
     }
 
