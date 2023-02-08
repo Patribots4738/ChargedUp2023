@@ -5,8 +5,11 @@
 package math;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -236,26 +239,36 @@ public final class Constants
 
   public static final class VisionConstants {
 
+    public static final String CAMERA_NAME = "Patribots4738";
+
+    // Distance from the camera to the front of the bot
+    public static final Pose3d kCameraPosition = new Pose3d(
+        new Translation3d(
+          Units.inchesToMeters(9.5), 
+          Units.inchesToMeters(8),
+          Units.inchesToMeters(8)),
+        new Rotation3d(0,0,0));
+
     public static final double kConeOffsetMeters = 0.5;
     
     public static final double kDesiredVelocityMetersPerSecond = 1.5;
+    
 
   }
 
   public static final class AlignmentConstants {
     
-    public static final String CAMERA_NAME = "Patribots4738";
-      
-      // Distance from the camera to the front of the bot
-    public static final Translation2d kCameraPosition = new Translation2d(Units.inchesToMeters(9.5), Units.inchesToMeters(8));
+    private static final double GRID_TAG_HEIGHT  = Units.inchesToMeters(18.22);
+    private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
 
-    public static final Pose2d kTag_1_pos = new Pose2d(0, 0, new Rotation2d(0));
-    public static final Pose2d kTag_2_pos = new Pose2d(14.5, 2.745, new Rotation2d(0));
-    public static final Pose2d kTag_3_pos = new Pose2d(14.5, 4.425, new Rotation2d(0));
-    public static final Pose2d kTag_6_pos = new Pose2d(2, 4.425, new Rotation2d(Units.degreesToRadians(180)));
-    public static final Pose2d kTag_7_pos = new Pose2d(2, 2.745, new Rotation2d(Units.degreesToRadians(180)));
-    public static final Pose2d kTag_8_pos = new Pose2d(2, 1.065, new Rotation2d(Units.degreesToRadians(180)));
-
+    public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
+    public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
+    public static final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
+    public static final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+    public static final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25),  Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    public static final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(174.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(108.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
   }
 
 }
