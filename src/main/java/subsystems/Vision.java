@@ -3,7 +3,6 @@ package subsystems;
 import java.util.HashMap;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -11,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
-import math.Constants.AlignmentConstants;
 
 public class Vision {
 
@@ -38,9 +36,9 @@ public class Vision {
 
     /**
      * Converts the PhotonPipelineResult to an easier to use format
-     * @return A HashMap<String, double> representing the most visible AprilTag, null if no tag is visible
+     * @return A HashMap<String, Double> representing the most visible AprilTag, null if no tag is visible
      */
-    public HashMap<String, Double> periodic() {
+    public HashMap<String, Double> pereodic() {
 
         // Get the most recent image from the camera and run the calculations
         // necessary to get AprilTag data
@@ -51,14 +49,17 @@ public class Vision {
             hasTargets = false;
             return null;
         }
+
         hasTargets = true;
+        
+        // Create the HashMap that represents the most visible tag
+        
         
         // Get the best tag visible
         PhotonTrackedTarget target = result.getBestTarget();
 
         // Extract the position of the best tag
         Transform3d position = target.getBestCameraToTarget();
-        
         
         // Add all the required info to the HashMap
         tagInfo.put("tagID", Double.valueOf(target.getFiducialId()));
@@ -73,39 +74,32 @@ public class Vision {
 
         tagInfo.put("pitch", target.getPitch());
 
-        tagInfo.put("zAngle", position.getRotation().getZ());
-
         // Returns the HashMap
         return tagInfo;
-
     }
 
     public boolean hasTargets() {
         return true ? this.hasTargets : false;
     }
 
-    public double getX() {
+    public Double getX() {
         return tagInfo.get("x");
     }
 
-    public double getY() {
+    public Double getY() {
         return tagInfo.get("y");
     }
 
-    public double getZ() {
+    public Double getZ() {
         return tagInfo.get("z");
     }
 
-    public double getYaw() {
+    public Double getYaw() {
         return tagInfo.get("yaw");
     }
 
-    public double getPitch() {
+    public Double getPitch() {
         return tagInfo.get("pitch");
-    }
-    
-    public double getZAngle() {
-      return tagInfo.get("zAngle");
     }
 
     public int getTagID() {
@@ -113,6 +107,6 @@ public class Vision {
     }
 
     public Pose2d getPose() {
-      return new Pose2d(getX(), getY(), new Rotation2d(getZAngle()));
+        return new Pose2d(getX(), getY(), new Rotation2d(Units.degreesToRadians(getYaw())));
     }
 }

@@ -169,8 +169,8 @@ public class Swerve {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle());
+  public double getHeading() {
+    return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
   }
 
 
