@@ -10,13 +10,12 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Optional;
 
 public class PhotonCameraPose {
     public PhotonCamera photonCamera;
     public PhotonPoseEstimator photonPoseEstimator;
-    private AprilTagFieldLayout aprilTagFieldLayout;
+    public AprilTagFieldLayout aprilTagFieldLayout;
     public PhotonCameraPose() {
 
         try {
