@@ -4,12 +4,7 @@
 
 package math;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -243,6 +238,20 @@ public final class Constants
     
     public static final double kDesiredVelocityMetersPerSecond = 1.5;
 
+  }
+
+  public static final class PoseEstimationConstants {
+    public static final String CAMERA_NAME = "Patribots4738";
+
+    public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(
+            new Translation3d(
+                    Units.inchesToMeters(7.75),
+                    Units.inchesToMeters(5.5),
+                    0),
+            new Rotation3d(
+                    0,
+                    0,
+                    0));
   }
   
   public static final class AlignmentConstants {
