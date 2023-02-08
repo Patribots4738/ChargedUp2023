@@ -169,13 +169,13 @@ public class Robot extends TimedRobot {
     double driverLeftX  = -MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
     double driverLeftY  = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
     double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
-    double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
+    //double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
 
     // Use the A button to activate the alignment process
     if (driver.getAButton()) {
 
       // Run the vision calculations and get the most visible tag
-      vision.pereodic();
+      vision.periodic();
       
       // Make sure that the camera has tags in view
       if (vision.hasTargets()) {
@@ -188,7 +188,7 @@ public class Robot extends TimedRobot {
           System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
           System.out.println("Distance from april to bot: " + vision.getPose() + "\n\n");
 
-          autoAlignment.calibrateOdometry(vision.getPose(), tagID);
+          autoAlignment.calibrateOdometry(tagID, vision.getPitch(), vision.getYaw(), vision.getPose());
 
           System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
           

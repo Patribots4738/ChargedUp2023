@@ -8,7 +8,9 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 public class Vision {
@@ -38,7 +40,7 @@ public class Vision {
      * Converts the PhotonPipelineResult to an easier to use format
      * @return A HashMap<String, Double> representing the most visible AprilTag, null if no tag is visible
      */
-    public HashMap<String, Double> pereodic() {
+    public HashMap<String, Double> periodic() {
 
         // Get the most recent image from the camera and run the calculations
         // necessary to get AprilTag data
@@ -82,23 +84,23 @@ public class Vision {
         return true ? this.hasTargets : false;
     }
 
-    public Double getX() {
+    public double getX() {
         return tagInfo.get("x");
     }
 
-    public Double getY() {
+    public double getY() {
         return tagInfo.get("y");
     }
 
-    public Double getZ() {
+    public double getZ() {
         return tagInfo.get("z");
     }
 
-    public Double getYaw() {
+    public double getYaw() {
         return tagInfo.get("yaw");
     }
 
-    public Double getPitch() {
+    public double getPitch() {
         return tagInfo.get("pitch");
     }
 
@@ -108,5 +110,9 @@ public class Vision {
 
     public Pose2d getPose() {
         return new Pose2d(getX(), getY(), new Rotation2d(Units.degreesToRadians(getYaw())));
+    }
+
+    public Transform3d getTransform() {
+        return new Transform3d(new Translation3d(getX(), getY(), getZ()), new Rotation3d(Units.degreesToRadians(getYaw()), Units.degreesToRadians(getPitch()), 0));
     }
 }

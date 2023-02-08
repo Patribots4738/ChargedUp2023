@@ -4,10 +4,9 @@
 
 package math;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -242,7 +241,7 @@ public final class Constants
     public static final String CAMERA_NAME = "Patribots4738";
 
     // Distance from the camera to the front of the bot
-    public static final Pose3d kCameraPosition = new Pose3d(
+    public static final Transform3d kCameraPosition = new Transform3d(
         new Translation3d(
           Units.inchesToMeters(9.5), 
           Units.inchesToMeters(8),
