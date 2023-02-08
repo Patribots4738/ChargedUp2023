@@ -31,7 +31,7 @@ public class AutoAlignment {
   /**
    *  A visual representation of the apriltag positions
    *  / --------------------------------------------- \ 
-   *  5                      |                        4
+   *   5                     |                       4
    *  |                      |                        |
    *  |                      |                        |
    *  6                      |                        3
@@ -59,25 +59,29 @@ public class AutoAlignment {
    * @param visionPitch the position of the aprilTag relative to the bot
    * @param aprilTagID the ID of the tag being watched
    */
-  public void calibrateOdometry(int aprilTagID, double visionPitch, double visionYaw, Transform3d visionPose) {
+  public void calibrateOdometry(int aprilTagID, Transform3d visionTransform3d) {
     
+    // divide by -100 to convert negative centimeters to meters
     double rangeMeters =
-                  PhotonUtils.calculateDistanceToTargetMeters(
+                  (PhotonUtils.calculateDistanceToTargetMeters(
                           VisionConstants.kCameraPosition.getZ(),
                           getTagPos(aprilTagID).getZ(),
                           VisionConstants.kCameraPosition.getRotation().getY(),
-                          Units.degreesToRadians(visionPitch));
+                          (visionTransform3d.getRotation().getY())));
 
     Translation2d targetPosition = getTagPos(aprilTagID).toPose2d().getTranslation();
 
     Pose2d generatedPose = new Pose2d(
-      PhotonUtils.estimateCameraToTargetTranslation(rangeMeters, Rotation2d.fromDegrees(-visionYaw)).plus(targetPosition),
-      Rotation2d.fromDegrees(visionYaw)
+      PhotonUtils.estimateCameraToTargetTranslation(rangeMeters, Rotation2d.fromDegrees(-visionTransform3d.getRotation().getZ())).minus(new Translation2d(targetPosition.getX(),0)),
+      Rotation2d.fromDegrees(visionTransform3d.getRotation().getZ())
     );
 
-    // Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(visionPose, getTagPos(aprilTagID), VisionConstants.kCameraPosition);
+    // NEED TO FIND A WAY TO FLIP THE X ON VISIONTRANSFORM3D
+    Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(visionTransform3d, getTagPos(aprilTagID), VisionConstants.kCameraPosition);
+
+    System.out.println("\nRangeMeters" + rangeMeters + "\nTargetPosition" + targetPosition + "\nGenerated Pose: " + generatedPose + "\nRobot Pose: " + robotPose + "\n");
     
-    swerve.resetOdometry(generatedPose);
+    swerve.resetOdometry(robotPose.toPose2d());
 
     SwerveTrajectory.resetTrajectoryStatus();
 
@@ -88,7 +92,6 @@ public class AutoAlignment {
     autoWaypoints.autoPeriodic();
 
     Pose2d targetPose = getTagPos(tagID).toPose2d();
-
     
     // if (0 < tagID && tagID < 4) {
       //   targetPose = targetPose.plus(new Transform2d(new Translation2d(-Units.inchesToMeters(15), 0), new Rotation2d(0)));
@@ -113,6 +116,11 @@ public class AutoAlignment {
       new PathPoint(targetPose.getTranslation(), targetPose.getRotation()));
     
     SwerveTrajectory.PathPlannerRunner(tagPos, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+    
+    System.out.println("Direction: " + direction);
+    System.out.println("April Pose: " + getTagPos(tagID));
+    System.out.println("Modified Target Pose: " + targetPose);
+    System.out.println("Current Pose: " + swerve.getOdometry().getPoseMeters() + "\n\n");
   }
 
   public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {

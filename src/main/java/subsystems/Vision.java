@@ -72,9 +72,9 @@ public class Vision {
 
         tagInfo.put("z", position.getZ());
 
-        tagInfo.put("yaw", target.getYaw());
+        tagInfo.put("yaw", position.getRotation().getZ());
 
-        tagInfo.put("pitch", target.getPitch());
+        tagInfo.put("pitch", position.getRotation().getY());
 
         // Returns the HashMap
         return tagInfo;
@@ -109,10 +109,10 @@ public class Vision {
     }
 
     public Pose2d getPose() {
-        return new Pose2d(getX(), getY(), new Rotation2d(Units.degreesToRadians(getYaw())));
+        return new Pose2d(getX(), getY(), new Rotation2d(getYaw()));
     }
 
     public Transform3d getTransform() {
-        return new Transform3d(new Translation3d(getX(), getY(), getZ()), new Rotation3d(Units.degreesToRadians(getYaw()), Units.degreesToRadians(getPitch()), 0));
+        return new Transform3d(new Translation3d(getX(), getY(), getZ()), new Rotation3d(0, getPitch(), getYaw()));
     }
 }

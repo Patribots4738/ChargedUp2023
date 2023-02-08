@@ -188,7 +188,7 @@ public class Robot extends TimedRobot {
           System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
           System.out.println("Distance from april to bot: " + vision.getPose() + "\n\n");
 
-          autoAlignment.calibrateOdometry(tagID, vision.getPitch(), vision.getYaw(), vision.getPose());
+          autoAlignment.calibrateOdometry(tagID, vision.getTransform());
 
           System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
           
