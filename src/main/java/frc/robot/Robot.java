@@ -33,7 +33,9 @@ public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   /* ExampleSubsystem exampleSubsystem; */
 
-  Swerve swerve;
+  NewSwerve swerve;
+
+  Swerve oldSwerve;
 
   XboxController driver;
   XboxController operator;
