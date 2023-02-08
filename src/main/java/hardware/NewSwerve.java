@@ -83,14 +83,15 @@ public class NewSwerve extends SubsystemBase {
         SmartDashboard.putData("Field", field);
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+    public void drive(Translation2d translation, Translation2d rotation, boolean fieldRelative) {
+
         double xSpeed = translation.getX();
         xSpeed *= Constants.DriveConstants.kMaxSpeedMetersPerSecond;
 
         double ySpeed = translation.getY();
         ySpeed *= Constants.DriveConstants.kMaxSpeedMetersPerSecond;
 
-        double rotSpeed = rotation;
+        double rotSpeed = rotation.getX();
         rotSpeed *= Constants.DriveConstants.kMaxAngularSpeed;
 
         var swerveModuleStates =
