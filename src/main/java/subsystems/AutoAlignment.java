@@ -144,7 +144,7 @@ public class AutoAlignment {
     System.out.println("Direction: " + direction);
     System.out.println("April Pose: " + aprilPose);
     System.out.println("Modified Target Pose: " + targetPose);
-    System.out.println("Current Pose: " + swerve.getOdometry().getPoseMeters() + "\n\n");
+    System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
   }
 
   public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {
@@ -181,7 +181,7 @@ public class AutoAlignment {
   }
 
   public boolean isAligned() {
-    if (swerve.getOdometry().getPoseMeters() == targetPose) {
+    if (swerve.getPose() == targetPose) {
       return true;
     }
     return false;

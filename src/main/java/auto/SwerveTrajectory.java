@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
@@ -41,17 +42,17 @@ public class SwerveTrajectory implements Loggable {
      * The ProfiledPIDController for the rotation of the robot,
      * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
      *
-     * @see kXCorrectionP The x-axis' P gain for the PID controller
-     * @see kXCorrectionI The x-axis' I gain for the PID controller
-     * @see kXCorrectionD The x-axis' D gain for the PID controller
-     * @see kYCorrectionP The y-axis' P gain for the PID controller
-     * @see kYCorrectionI The y-axis' I gain for the PID controller
-     * @see kYCorrectionD The y-axis' D gain for the PID controller
-     * @see kRotationCorrectionP The rotational-axis' P gain for the PID controller
-     * @see kRotationCorrectionI The rotational-axis' I gain for the PID controller
-     * @see kRotationCorrectionD The rotational-axis' D gain for the PID controller
-     * @see kMaxAngularSpeedRadiansPerSecond The maximum velocity that the robot can TURN in the trapezoidal profile
-     * @see kMaxAngularSpeedRadiansPerSecondSquared The maximum acceleration that the robot can TURN in the trapezoidal profile
+     * @see double kXCorrectionP The x-axis' P gain for the PID controller
+     * @see double kXCorrectionI The x-axis' I gain for the PID controller
+     * @see double kXCorrectionD The x-axis' D gain for the PID controller
+     * @see double kYCorrectionP The y-axis' P gain for the PID controller
+     * @see double kYCorrectionI The y-axis' I gain for the PID controller
+     * @see double kYCorrectionD The y-axis' D gain for the PID controller
+     * @see double kRotationCorrectionP The rotational-axis' P gain for the PID controller
+     * @see double kRotationCorrectionI The rotational-axis' I gain for the PID controller
+     * @see double kRotationCorrectionD The rotational-axis' D gain for the PID controller
+     * @see double kMaxAngularSpeedRadiansPerSecond The maximum velocity that the robot can TURN in the trapezoidal profile
+     * @see double kMaxAngularSpeedRadiansPerSecondSquared The maximum acceleration that the robot can TURN in the trapezoidal profile
      *
      * @return A new HolonomicDriveController with the given PID gains (xP, xI, xD, yP, yI, yD, rotP, rotI, rotD) and constraints (maxVel, maxAccel)
      */
@@ -90,9 +91,9 @@ public class SwerveTrajectory implements Loggable {
             case "execute":
 
                 Debug.debugPeriodic(
-                        _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getPoseMeters().getX(),
-                        _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getPoseMeters().getY(),
-                        _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getPoseMeters().getRotation().getDegrees());
+                        _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getEstimatedPosition().getX(),
+                        _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getEstimatedPosition().getY(),
+                        _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getEstimatedPosition().getRotation().getDegrees());
 
                 // If the path has not completed time wise
                 // The extra second at the end is added in case the robot overshoots, and needs to correct
@@ -103,22 +104,37 @@ public class SwerveTrajectory implements Loggable {
                     // Then, sample the position and rotation for that time,
                     // And calculate the ChassisSpeeds required to get there
                     ChassisSpeeds _speeds = HDC.calculate(
-                            _odometry.getPoseMeters(),
+                            _odometry.getEstimatedPosition(),
                             ((PathPlannerState) _pathTraj.sample(elapsedTime)),
                             ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
 
+                    Translation2d _translation2d = new Translation2d(
+                            _speeds.vxMetersPerSecond,
+                            _speeds.vyMetersPerSecond);
                     // Set the states for the motor using calculated values above
                     // It is important to note that fieldRelative is false,
                     // but calculations make it so it is true i.e. rotation is independant
                     // (This is seen 6-5 lines above)
                     swerve.drive(
-                            _speeds.vxMetersPerSecond,
-                            _speeds.vyMetersPerSecond,
-                            _speeds.omegaRadiansPerSecond, false);
+                            _translation2d,
+                            new Translation2d(
+                                    _speeds.omegaRadiansPerSecond,
+                                    0
+                            ),
+                            false);
 
                 } else {
 
-                    swerve.drive(0, 0, 0, false);
+                    swerve.drive(
+                            new Translation2d(
+                                    0,
+                                    0
+                            ),
+                            new Translation2d(
+                                    0,
+                                    0
+                            ),
+                            false);
                     trajectoryStatus = "done";
 
                 }
@@ -127,7 +143,16 @@ public class SwerveTrajectory implements Loggable {
 
             default:
 
-                swerve.drive(0, 0, 0, false);
+                swerve.drive(
+                        new Translation2d(
+                                0,
+                                0
+                        ),
+                        new Translation2d(
+                                0,
+                                0
+                        ),
+                        false);
                 break;
 
         }
