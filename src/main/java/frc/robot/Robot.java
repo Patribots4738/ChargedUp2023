@@ -34,20 +34,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    if(driver.getAButton()) {
-      // align to target using swerve vision periodic
-      swerve.visionPeriodic();
-    } else {
-      swerve.drive(
-              new Translation2d(
-                      driver.getLeftX(),
-                      driver.getLeftY()),
-              new Translation2d(
-                      driver.getRightX(),
-                      driver.getRightY()
-              ),
-              true);
-    }
+    swerve.periodic();
   }
   
   @Override
@@ -72,5 +59,19 @@ public class Robot extends TimedRobot {
   public void testInit() {}
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+
+    if(!driver.getAButton())
+    {
+      swerve.drive(
+              new Translation2d(
+                      driver.getLeftX(),
+                      driver.getLeftY()),
+              new Translation2d(
+                      driver.getRightX(),
+                      driver.getRightY()
+              ),
+              true);
+    }
+  }
 }
