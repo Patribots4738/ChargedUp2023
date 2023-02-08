@@ -129,7 +129,7 @@ public class NewSwerve extends SubsystemBase {
 //
 //    }
 
-    public Pose2d getOdometry() {
+    public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
@@ -154,7 +154,7 @@ public class NewSwerve extends SubsystemBase {
             field.getObject("Estimated Vision Position").setPose(new Pose2d(-100, -100, new Rotation2d()));
         }
 
-        field.getObject("Actual Pos").setPose(getOdometry());
+        field.getObject("Actual Pos").setPose(getPose());
         field.setRobotPose(poseEstimator.getEstimatedPosition());
 
     }
