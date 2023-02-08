@@ -206,4 +206,16 @@ public class NewSwerve extends SubsystemBase {
         }
         SmartDashboard.putNumber("Heading", getYaw().getDegrees());
     }
+
+    public void setBrakeMode() {
+        for (MAXSwerveModule mSwerveMod : mSwerveMods) {
+            mSwerveMod.setBrakeMode();
+        }
+    }
+
+    public void resetEncoders() {
+        for (MAXSwerveModule mSwerveMod : mSwerveMods) {
+            mSwerveMod.resetEncoders();
+        }
+    }
 }
