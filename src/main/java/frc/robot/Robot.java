@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    swerve.periodic();
+    swerve.periodic(driver.getAButton());
   }
   
   @Override
@@ -60,7 +60,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-
     if(!driver.getAButton())
     {
       swerve.drive(

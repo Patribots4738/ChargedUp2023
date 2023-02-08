@@ -145,13 +145,13 @@ public class NewSwerve extends SubsystemBase {
                 pose);
     }
 
-    public void updateOdometry() {
+    public void updateOdometry(boolean alignment) {
 
         poseEstimator.update(getYaw(), getModulePositions());
 
         Optional<EstimatedRobotPose> result = photonPose.getEstimatedRobotPose(poseEstimator.getEstimatedPosition());
 
-        if (result.isPresent()) {
+        if (result.isPresent() && alignment) {
             EstimatedRobotPose camPose = result.get();
             poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
             field.getObject("Estimated Vision Position").setPose(camPose.estimatedPose.toPose2d());
@@ -201,9 +201,9 @@ public class NewSwerve extends SubsystemBase {
                 Rotation2d.fromDegrees(gyro.getAngle());
     }
 
-    public void periodic() {
+    public void periodic(boolean alignment) {
 
-        updateOdometry();
+        updateOdometry(alignment);
 
         for (int modNum = 0; modNum < mSwerveMods.length; modNum++) {
             SmartDashboard.putNumber("Mod " + modNum + " Angle", mSwerveMods[modNum].getPosition().angle.getDegrees());
