@@ -48,8 +48,6 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
-  // ArmCalcuations armCalcuations = new ArmCalcuations();
-
   Vision vision = new Vision();
 
   boolean isAligned;

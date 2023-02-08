@@ -127,9 +127,9 @@ public class AutoAlignment {
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
       new PathConstraints(0.1, 0.1),
       new PathPoint(
-              swerve.getOdometry().getPoseMeters().getTranslation(),
-              swerve.getHeading(),
-              swerve.getOdometry().getPoseMeters().getRotation()),
+              swerve.getPose().getTranslation(),
+              swerve.getYaw(),
+              swerve.getPose().getRotation()),
             new PathPoint(
                     targetPose.getTranslation(),
                     Rotation2d.fromDegrees(0),
@@ -138,8 +138,8 @@ public class AutoAlignment {
     SwerveTrajectory.PathPlannerRunner(
             tagPos,
             swerve,
-            swerve.getOdometry(),
-            swerve.getOdometry().getPoseMeters().getRotation());
+            swerve.getPoseEstimator(),
+            swerve.getPose().getRotation());
     
     System.out.println("Direction: " + direction);
     System.out.println("April Pose: " + aprilPose);
@@ -149,23 +149,34 @@ public class AutoAlignment {
 
   public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {
 
-    Pose2d currentPose = swerve.getOdometry().getPoseMeters();
+    Pose2d currentPose = swerve.getPose();
     
     Pose2d targetPose = new Pose2d(
       currentPose.getX() + x,
       currentPose.getY() - y,
       new Rotation2d(currentPose.getY() + rotation));
 
-    State targetState = new State(0, 0, 0, targetPose, 0);
+    State targetState = new State(
+            0,
+            0,
+            0,
+            targetPose,
+            0);
 
     ChassisSpeeds speeds = HDC.calculate(
       currentPose,
       targetState,
       targetPose.getRotation());
 
-    swerve.drive(speeds.vxMetersPerSecond*0.25,
-      speeds.vyMetersPerSecond*0.25, 
-      speeds.omegaRadiansPerSecond,false);
+    Translation2d speedsTranslation = new Translation2d(
+      speeds.vxMetersPerSecond,
+      speeds.vyMetersPerSecond);
+    swerve.drive(
+            speedsTranslation,
+            new Translation2d(
+                    speeds.omegaRadiansPerSecond,
+                    0),
+            false);
 
   }
 

@@ -7,11 +7,12 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
+import hardware.NewSwerve;
 import io.github.oblarg.oblog.Loggable;
 import math.Constants;
 import debug.*;
@@ -75,7 +76,7 @@ public class SwerveTrajectory implements Loggable {
      * @param _odometry   SwerveDrive.java's odometry
      * @param _rotation2d Pass in the current angle of the robot
      */
-    public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, SwerveDriveOdometry _odometry, Rotation2d _rotation2d) {
+    public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, NewSwerve swerve, SwerveDrivePoseEstimator _odometry, Rotation2d _rotation2d) {
 
         elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
 
