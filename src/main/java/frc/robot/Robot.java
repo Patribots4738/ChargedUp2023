@@ -5,6 +5,7 @@
 package frc.robot;
 
 import debug.*;
+import edu.wpi.first.math.geometry.Translation2d;
 import hardware.*;
 import math.Constants.*;
 import auto.*;
@@ -77,7 +78,9 @@ public class Robot extends TimedRobot {
       even CAN IDs are the turning motors
      */
     // Drivetrain instantiation
-    swerve = new Swerve();
+    oldSwerve = new Swerve();
+    swerve = new NewSwerve();
+
     autoAlignment = new AutoAlignment(swerve);
     // // Zero the IMU for field-oriented driving 
     swerve.resetEncoders();
@@ -170,6 +173,14 @@ public class Robot extends TimedRobot {
     double driverLeftY  = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
     double driverRightX =  MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
     double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
+
+    Translation2d driverLeft = new Translation2d(
+            driverLeftX,
+            driverLeftY);
+    Translation2d driverRight = new Translation2d(
+            driverRightX,
+            driverRightY);
+
     // Use the A button to activate the alignment process
     if (driver.getAButton()) {
 
@@ -223,7 +234,7 @@ public class Robot extends TimedRobot {
       // }
     } else {
 
-      swerve.drive(driverLeftY * 0.25, driverLeftX * 0.25, driverRightX * 0.25, true);
+      swerve.drive(driverLeft, driverRight, true);
 
     }
   }
