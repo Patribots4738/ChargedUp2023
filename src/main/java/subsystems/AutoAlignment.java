@@ -6,14 +6,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
+import hardware.NewSwerve;
 import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.TargetCorner;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -21,13 +17,9 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import auto.AutoWaypoints;
 import auto.SwerveTrajectory;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import hardware.Swerve;
 import math.Constants.AlignmentConstants;
@@ -49,7 +41,7 @@ public class AutoAlignment {
    *  \ --------------------------------------------- /
    */
   
-  Swerve swerve;
+  NewSwerve swerve;
 
   SwerveDriveOdometry odometry;
 
@@ -57,7 +49,7 @@ public class AutoAlignment {
 
   int tagID;
 
-  public AutoAlignment(Swerve swerve) {
+  public AutoAlignment(NewSwerve swerve) {
     this.swerve = swerve;
   }
 
@@ -135,11 +127,20 @@ public class AutoAlignment {
 
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
       new PathConstraints(0.1, 0.1),
-      new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(),
-        swerve.getHeading(), swerve.getOdometry().getPoseMeters().getRotation()),
-      new PathPoint(targetPose.getTranslation(), Rotation2d.fromDegrees(0), targetPose.getRotation()));
+      new PathPoint(
+              swerve.getOdometry().getPoseMeters().getTranslation(),
+              swerve.getHeading(),
+              swerve.getOdometry().getPoseMeters().getRotation()),
+            new PathPoint(
+                    targetPose.getTranslation(),
+                    Rotation2d.fromDegrees(0),
+                    targetPose.getRotation()));
     
-    SwerveTrajectory.PathPlannerRunner(tagPos, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
+    SwerveTrajectory.PathPlannerRunner(
+            tagPos,
+            swerve,
+            swerve.getOdometry(),
+            swerve.getOdometry().getPoseMeters().getRotation());
     
     System.out.println("Direction: " + direction);
     System.out.println("April Pose: " + aprilPose);
