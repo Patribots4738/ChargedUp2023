@@ -28,10 +28,10 @@ import java.util.Optional;
 public class NewSwerve extends SubsystemBase {
     private SwerveDrivePoseEstimator poseEstimator;
     private MAXSwerveModule[] mSwerveMods;
-    private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+    private final ADIS16470_IMU gyro = new ADIS16470_IMU();
     private PhotonCameraPose photonPose = new PhotonCameraPose();
     ;
-    private Field2d field = new Field2d();
+    private final Field2d field = new Field2d();
 
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
             Constants.DriveConstants.kFrontLeftDrivingCanId,
@@ -71,13 +71,13 @@ public class NewSwerve extends SubsystemBase {
                 new MatBuilder<N3, N1>(
                         Nat.N3(),
                         Nat.N1()).fill(0.1, 0.1, 0.1),// State measurement
-                // standard deviations.
-                // X, Y, theta.
+                                                            // standard deviations.
+                                                            // X, Y, theta.
                 new MatBuilder<N3, N1>(
                         Nat.N3(),
                         Nat.N1()).fill(1.25, 1.25, 1.25));// Vision measurement
-        // standard deviations.
-        // X, Y, theta.);
+                                                                // standard deviations.
+                                                                // X, Y, theta.);
 
 
         SmartDashboard.putData("Field", field);
@@ -186,13 +186,13 @@ public class NewSwerve extends SubsystemBase {
      * Resets the gyro to a heading of 0
      */
     public void zeroGyro() {
-        m_gyro.reset();
+        gyro.reset();
     }
 
     public Rotation2d getYaw() {
         return (Constants.DriveConstants.kGyroReversed) ?
-                Rotation2d.fromDegrees(360 - m_gyro.getAngle()) :
-                Rotation2d.fromDegrees(m_gyro.getAngle());
+                Rotation2d.fromDegrees(360 - gyro.getAngle()) :
+                Rotation2d.fromDegrees(gyro.getAngle());
     }
 
     @Override
@@ -200,7 +200,7 @@ public class NewSwerve extends SubsystemBase {
 
         updateOdometry();
 
-        for(int modNum = 0; modNum < mSwerveMods.length; modNum++) {
+        for (int modNum = 0; modNum < mSwerveMods.length; modNum++) {
             SmartDashboard.putNumber("Mod " + modNum + " Angle", mSwerveMods[modNum].getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + modNum + " Velocity", mSwerveMods[modNum].getState().speedMetersPerSecond);
         }
