@@ -12,7 +12,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
-import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import math.Constants;
 import debug.*;

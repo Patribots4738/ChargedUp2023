@@ -21,7 +21,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import auto.AutoWaypoints;
 import auto.SwerveTrajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
-import hardware.Swerve;
 import math.Constants.AlignmentConstants;
 
 

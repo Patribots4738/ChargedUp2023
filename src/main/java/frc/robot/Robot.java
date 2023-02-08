@@ -35,8 +35,6 @@ public class Robot extends TimedRobot {
 
   NewSwerve swerve;
 
-  Swerve oldSwerve;
-
   XboxController driver;
   XboxController operator;
   
@@ -80,7 +78,6 @@ public class Robot extends TimedRobot {
       even CAN IDs are the turning motors
      */
     // Drivetrain instantiation
-    oldSwerve = new Swerve();
     swerve = new NewSwerve();
 
     autoAlignment = new AutoAlignment(swerve);
