@@ -134,6 +134,10 @@ public class NewSwerve extends SubsystemBase {
         return poseEstimator.getEstimatedPosition();
     }
 
+    public SwerveDrivePoseEstimator getPoseEstimator() {
+        return poseEstimator;
+    }
+
     public void resetOdometry(Pose2d pose) {
         poseEstimator.resetPosition(
                 getYaw(),
