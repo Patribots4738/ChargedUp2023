@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
@@ -68,12 +69,12 @@ public class NewSwerve extends SubsystemBase {
                 getYaw(),
                 getModulePositions(),
                 new Pose2d(),
-                new MatBuilder<N3, N1>(
+                new MatBuilder<>(
                         Nat.N3(),
                         Nat.N1()).fill(0.1, 0.1, 0.1),// State measurement
                                                             // standard deviations.
                                                             // X, Y, theta.
-                new MatBuilder<N3, N1>(
+                new MatBuilder<>(
                         Nat.N3(),
                         Nat.N1()).fill(1.25, 1.25, 1.25));// Vision measurement
                                                                 // standard deviations.
@@ -111,24 +112,19 @@ public class NewSwerve extends SubsystemBase {
                 swerveModuleStates,
                 Constants.DriveConstants.kMaxSpeedMetersPerSecond);
 
-        for (int modNum = 0; modNum < mSwerveMods.length; modNum++) {
-            mSwerveMods[modNum].setDesiredState(swerveModuleStates[modNum]);
-        }
+        setModuleStates(swerveModuleStates);
     }
 
-    // LOOK AT IF WE NEED THIS
-//    public void setModuleStates(SwerveModuleState[] desiredStates) {
-//
-//        SwerveDriveKinematics.desaturateWheelSpeeds(
-//                desiredStates,
-//                Constants.DriveConstants.kMaxSpeedMetersPerSecond);
-//
-//        m_frontLeft.setDesiredState(desiredStates[0]);
-//        m_frontRight.setDesiredState(desiredStates[1]);
-//        m_rearLeft.setDesiredState(desiredStates[2]);
-//        m_rearRight.setDesiredState(desiredStates[3]);
-//
-//    }
+    public void setModuleStates(SwerveModuleState[] desiredStates) {
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(
+                desiredStates,
+                Constants.DriveConstants.kMaxSpeedMetersPerSecond);
+
+        for (int modNum = 0; modNum < mSwerveMods.length; modNum++) {
+            mSwerveMods[modNum].setDesiredState(desiredStates[modNum]);
+        }
+    }
 
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
@@ -161,18 +157,14 @@ public class NewSwerve extends SubsystemBase {
 
         field.getObject("Actual Pos").setPose(getPose());
         field.setRobotPose(poseEstimator.getEstimatedPosition());
-        resetOdometry(poseEstimator.getEstimatedPosition());
-
     }
 
-    // LOOK AT IF WE NEED THIS
 //    public SwerveModuleState[] getModuleStates() {
 //
 //        SwerveModuleState[] states = new SwerveModuleState[4];
-//        states[0] = m_frontLeft.getState();
-//        states[1] = m_frontRight.getState();
-//        states[2] = m_rearLeft.getState();
-//        states[3] = m_rearRight.getState();
+//        for (int modNum = 0; modNum < mSwerveMods.length; modNum++) {
+//            states[modNum] = mSwerveMods[modNum].getState();
+//        }
 //        return states;
 //
 //    }
