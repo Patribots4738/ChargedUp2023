@@ -60,8 +60,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    if(!driver.getAButton())
-    {
       swerve.drive(
               new Translation2d(
                       driver.getLeftX(),
@@ -70,7 +68,6 @@ public class Robot extends TimedRobot {
                       driver.getRightX(),
                       driver.getRightY()
               ),
-              true);
-    }
+              !driver.getAButton());
   }
 }
