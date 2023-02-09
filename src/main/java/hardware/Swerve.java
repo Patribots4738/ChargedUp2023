@@ -14,7 +14,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import math.Constants.DriveConstants;
 
-public class Swerve {
+public class Swerve { 
+    private double speedMultiplier = 1;
+  
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
             DriveConstants.kFrontLeftDrivingCanId,
             DriveConstants.kFrontLeftTurningCanId,
@@ -109,9 +111,9 @@ public class Swerve {
      */
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
         // Adjust input based on max speed
-        xSpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
-        ySpeed *= DriveConstants.kMaxSpeedMetersPerSecond;
-        rotSpeed *= DriveConstants.kMaxAngularSpeed;
+        xSpeed *= DriveConstants.kMaxSpeedMetersPerSecond * speedMultiplier;
+        ySpeed *= DriveConstants.kMaxSpeedMetersPerSecond * speedMultiplier;
+        rotSpeed *= DriveConstants.kMaxAngularSpeed       * speedMultiplier;
 
         var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
                 fieldRelative
@@ -182,6 +184,10 @@ public class Swerve {
      */
     public double getTurnRate() {
         return m_gyro.getRate();
+    }
+
+    public void toggleSpeed() {
+      this.speedMultiplier = (this.speedMultiplier == 1) ? 0.1 : 1;
     }
 
     /**
