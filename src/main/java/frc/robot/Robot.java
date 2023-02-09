@@ -11,10 +11,7 @@ import math.OICalc;
 import math.Constants.*;
 import auto.*;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import io.github.oblarg.oblog.Logger;
@@ -38,17 +35,9 @@ public class Robot extends TimedRobot {
 
     Arm arm;
 
-    HolonomicDriveController autoController;
-
-    Trajectory trajectory;
-
     Debug debug;
 
     ArmCalcuations armCalcuations = new ArmCalcuations();
-
-    HolonomicDriveController HDC = SwerveTrajectory.getHDC();
-
-    Pose2d aprilPos;
 
 
     @Override
@@ -92,21 +81,17 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
 
         swerve.periodic();
+        // arm.periodic();
 
         Logger.updateEntries();
 
     }
 
     @Override
-    public void disabledInit() {
-
-        arm.printList();
-
-    }
+    public void disabledInit() {}
 
     @Override
-    public void disabledPeriodic() {
-    }
+    public void disabledPeriodic() {}
 
     @Override
     public void autonomousInit() {
@@ -119,18 +104,17 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
 
-        autoSegmentedWaypoints.autoPeriodic();
-        arm.armPeriodic();
+        autoSegmentedWaypoints.periodic();
+        arm.periodic();
 
     }
 
     @Override
-    public void teleopInit() {
-    }
+    public void teleopInit() {}
 
     @Override
     public void teleopPeriodic() {
-        arm.armPeriodic();
+        arm.periodic();
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
@@ -138,11 +122,11 @@ public class Robot extends TimedRobot {
         double driverLeftY = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
         double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
         double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
-
-        double operatorLeftX = -MathUtil.applyDeadband(operator.getLeftX(), OIConstants.kDriverDeadband);
-        double operatorLeftY = -MathUtil.applyDeadband(operator.getLeftY(), OIConstants.kDriverDeadband);
+        
+        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.kDriverDeadband);
+        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.kDriverDeadband);
         double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.kDriverDeadband);
-        double operatorRightY = -MathUtil.applyDeadband(operator.getRightY(), OIConstants.kDriverDeadband);
+        double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.kDriverDeadband);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
@@ -151,7 +135,7 @@ public class Robot extends TimedRobot {
             swerve.setX();
         } else {
             //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-            swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true); //Why is this swapped?
+            swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
         }
 
         if (driver.getRightBumperPressed())
@@ -180,15 +164,9 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void testInit() {
-
-        swerve.resetEncoders();
-        swerve.setBrakeMode();
-
-    }
+    public void testInit() {}
 
 
     @Override
-    public void testPeriodic() {
-    }
+    public void testPeriodic() {}
 }

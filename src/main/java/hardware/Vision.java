@@ -28,9 +28,9 @@ public class Vision {
     public static final double allignmentRotSpeed = 0.05;
 
 
-    private PhotonCamera camera = new PhotonCamera("Patribots4738");
+    private final PhotonCamera camera = new PhotonCamera("Patribots4738");
 
-    private HashMap<String, Double> tagInfo = new HashMap<String, Double>();
+    private final HashMap<String, Double> tagInfo = new HashMap<String, Double>();
 
     private boolean hasTargets;
 
@@ -83,7 +83,7 @@ public class Vision {
     }
 
     public boolean hasTargets(){
-        return true ? this.hasTargets : false;
+        return this.hasTargets;
     }
 
     public Double getX(){

@@ -183,7 +183,7 @@ public class Swerve {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+        return m_gyro.getRate();
     }
 
     public void toggleSpeed() {
