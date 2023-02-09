@@ -228,6 +228,8 @@ public class Arm implements Loggable {
 
         Translation2d armPos = new Translation2d(armXPos, armYPos);
 
+        // proof: https://www.desmos.com/calculator/ppsa3db9fa
+        // If the distance from zero is greater than the max reach, cap it at the max reach
         if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.kMaxReach) {
             armPos = armPos.times(ArmConstants.kMaxReach / armPos.getDistance(new Translation2d(0,0)));
         }
