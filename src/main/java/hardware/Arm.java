@@ -30,7 +30,6 @@ public class Arm implements Loggable {
      *   2  |||||  6
      */
 
-
     // All armPos values are in inches
     Translation2d[] armPos = {
             // new Translation2d(-40, 28),
@@ -41,8 +40,13 @@ public class Arm implements Loggable {
             new Translation2d(36, 36),
             // new Translation2d(40, 28),
     };
+    
+    private boolean operatorOverride = false;
+    private double armXPos = 0;
+    private double armYPos = 0;
+    
     // ceil -- force round up
-    int armPosIndex = (int) Math.ceil(armPos.length / 2);
+    private int armPosIndex = (int) Math.ceil(armPos.length / 2);
 
     private double lowerReference = 0;
     private double upperReference = 0;
@@ -133,6 +137,10 @@ public class Arm implements Loggable {
         _upperArm.burnFlash();
     }
 
+    public void toggleOperatorOverride() {
+      this.operatorOverride = !operatorOverride;
+    }
+
     /**
      * Reset the encoders to zero the arm when initiating the arm
      * Will not be needed in the future because we will have absolute encoders
@@ -146,9 +154,13 @@ public class Arm implements Loggable {
 
     public void armPeriodic() {
 
-        setLowerArmPosition(this.lowerReference);
-        setUpperArmPosition(this.upperReference);
+      setLowerArmPosition(this.lowerReference);
+      setUpperArmPosition(this.upperReference);
 
+    }
+
+    public boolean getOperatorOverride() {
+      return this.operatorOverride;
     }
 
     public void setLowerArmReference(double reference) {
@@ -158,7 +170,6 @@ public class Arm implements Loggable {
     public void setUpperArmReference(double reference) {
         this.upperReference = reference;
     }
-
 
     /**
      * Sets arm index from the armPos array
@@ -202,16 +213,33 @@ public class Arm implements Loggable {
      * @param armX the x position of the joystick
      * @param armY the y position of the joystick
      */
-    public void drive(double armX, double armY) {
+    public void drive(Translation2d position) {
+
+        // If operatorOverride is true, add the joystick input to the current position
+        // recall that this value is in inches
+        if (operatorOverride) {
+            armXPos += position.getX();
+            armYPos += position.getY();
+        }
+        else {
+            this.armXPos = position.getX();
+            this.armYPos = position.getY();
+        }
+
+        Translation2d armPos = new Translation2d(armXPos, armYPos);
+
+        if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.kMaxReach) {
+            armPos = armPos.times(ArmConstants.kMaxReach / armPos.getDistance(new Translation2d(0,0)));
+        }
 
         // Make sure armX and armY are within the range of 0 to infinity
         // So we cannot reach below the ground
-        armY = (armY < 0) ? 0 : armY;
+        armYPos = (position.getY() < 0) ? 0 : armYPos;
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-        double upperArmAngle = armCalculations.getUpperAngle(armX, armY);
-        double lowerArmAngle = armCalculations.getLowerAngle(armX, armY, upperArmAngle);
+        double upperArmAngle = armCalculations.getUpperAngle(armXPos, armYPos);
+        double lowerArmAngle = armCalculations.getLowerAngle(armXPos, armYPos, upperArmAngle);
 
         // We do this because lowerArmAngle is reliant on upperArmAngle
         if (Double.isNaN(upperArmAngle)) {
@@ -221,10 +249,10 @@ public class Arm implements Loggable {
 
         setLowerArmReference(Units.radiansToRotations(lowerArmAngle));
         setUpperArmReference(Units.radiansToRotations(upperArmAngle));
+
         System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
                 " Lower: " + Units.radiansToDegrees(lowerArmAngle));
     }
-
 
     /**
      * Set the position of an arm
@@ -234,7 +262,11 @@ public class Arm implements Loggable {
      */
     private void setUpperArmPosition(double position) {
 
-        position = clampPos(position, ArmConstants.kUpperFreedom);
+        position = MathUtil.clamp(
+            position, 
+            ArmConstants.UPPER_ARM_FREEDOM_DEGREES, 
+            -ArmConstants.UPPER_ARM_FREEDOM_DEGREES
+        );
 
         // Description of FF in Constants :D
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -261,7 +293,6 @@ public class Arm implements Loggable {
         upperPosList.add(upperPos);
     }
 
-
     /**
      * Set the position of the lower arm
      *
@@ -269,7 +300,12 @@ public class Arm implements Loggable {
      *                 This unit is in full rotations
      */
     private void setLowerArmPosition(double position) {
-        position = clampPos(position, ArmConstants.kLowerFreedom);
+        
+        position = MathUtil.clamp(
+            position, 
+            ArmConstants.LOWER_ARM_FREEDOM_DEGREES, 
+            -ArmConstants.LOWER_ARM_FREEDOM_DEGREES
+        );
 
         ArmFeedforward feedForward = new ArmFeedforward(
                 ArmConstants.kSLower,
@@ -296,19 +332,6 @@ public class Arm implements Loggable {
         lowerPosList.add(lowerPos);
     }
 
-
-    /**
-     * Set the limits of the upper arm
-     *
-     * @param position the position to set an arm to
-     * @param freedom  the freedom of the upper/lower arm in degrees
-     * @return the position, but limited
-     */
-    private double clampPos(double position, double freedom) {
-        return MathUtil.clamp(position, -Units.degreesToRotations(freedom), Units.degreesToRotations(freedom));
-    }
-
-
     /**
      * Get the current position of the upper arm
      *
@@ -319,7 +342,6 @@ public class Arm implements Loggable {
         return _upperArmEncoder.getPosition() / ArmConstants.kUpperArmGearRatio;
     }
 
-
     /**
      * Get the current position of the lower arm
      *
@@ -328,10 +350,6 @@ public class Arm implements Loggable {
      */
     public double getLowerArmPosition() {
         return _lowerArmEncoder.getPosition() / ArmConstants.kLowerArmGearRatio;
-    }
-
-    public void printList() {
-        System.out.println(upperPosList);
     }
 
     /**
@@ -350,4 +368,7 @@ public class Arm implements Loggable {
         _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
+    public void printList() {
+      System.out.println(upperPosList);
+  }
 }

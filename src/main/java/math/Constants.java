@@ -186,10 +186,10 @@ public final class Constants {
         public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
 
         // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-        public static final double kLowerFreedom = 60;
+        public static final double LOWER_ARM_FREEDOM_DEGREES = 60;
 
         // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-        public static final double kUpperFreedom = 100;
+        public static final double UPPER_ARM_FREEDOM_DEGREES = 100;
 
         // The amount of error allowed for the arm's position, in FULL ROTATIONS
         // This is primarily used in autonomous
