@@ -32,17 +32,28 @@ public class Arm implements Loggable {
 
 
     // All armPos values are in inches
-    Translation2d[] armPos = {
-            // new Translation2d(-40, 28),
-            new Translation2d(-36, 36),
-            new Translation2d(-10, 13),
-            new Translation2d(0, ArmConstants.kMaxReach),
-            new Translation2d(10, 13),
-            new Translation2d(36, 36),
-            // new Translation2d(40, 28),
+    Translation2d[][] armPos = {
+            {
+                new Translation2d(
+                        -20,
+                        30),
+                new Translation2d(
+                        -36,
+                        23)
+            },
+            { new Translation2d(0, ArmConstants.kMaxReach) },
+            {
+                new Translation2d(
+                        -12,
+                        19),
+                new Translation2d(
+                        -28,
+                        13)
+            }
     };
     // ceil -- force round up
     int armPosIndex = (int) Math.ceil(armPos.length / 2);
+    int armOffsetIndex = 0;
 
     private double lowerReference = 0;
     private double upperReference = 0;
@@ -159,17 +170,25 @@ public class Arm implements Loggable {
      *
      * @param armIndex the arm index
      */
-    public void setArmIndex(int armIndex) {
+    public void setArmIndex(int armIndex, int offsetIndex) {
 
         armIndex = (armIndex > 0) ? 1 : -1;
 
         // Make sure armPosIndex is within the range of 0 to armPos.length - 1
         // To prevent out of bounds errors
-        if (armPosIndex == 0 && armIndex == -1){
+        if (armPosIndex == 0 &&
+                armIndex == -1 &&
+                offsetIndex == -1)
+        {
             armIndex = 0;
+            offsetIndex = 0;
         }
-        if (armPosIndex >= armPos.length - 1 && armIndex == 1) {
+        if (armPosIndex >= armPos.length - 1 &&
+                armIndex == 1 &&
+                offsetIndex == 1)
+        {
             armIndex = 0;
+            offsetIndex = 0;
         }
         // If the arm is not at the reference
         // position (accounting for deadband), don't let the arm index change
@@ -177,15 +196,17 @@ public class Arm implements Loggable {
                 Math.abs(_upperArmEncoder.getPosition() - upperReference) > ArmConstants.kUpperArmDeadband)
         {
             armIndex = 0;
+            offsetIndex = 0;
         }
 
         armPosIndex += armIndex;
+        armOffsetIndex += offsetIndex;
 
 //        System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
 
         drive(
-                armPos[armPosIndex].getX() / ArmConstants.kMaxReach,
-                armPos[armPosIndex].getY() / ArmConstants.kMaxReach);
+                armPos[armOffsetIndex][armPosIndex].getX() / ArmConstants.kMaxReach,
+                armPos[armOffsetIndex][armPosIndex].getY() / ArmConstants.kMaxReach);
     }
 
     /**
