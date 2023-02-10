@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 
 import javax.sql.rowset.spi.TransactionalWriter;
 
+import org.ejml.dense.row.misc.TransposeAlgs_DDRM;
 import org.photonvision.PhotonUtils;
 
 import com.pathplanner.lib.PathConstraints;
@@ -93,21 +95,25 @@ public class AutoAlignment {
 
     Pose2d targetPose = getTagPos(tagID).toPose2d();
     
-    // if (0 < tagID && tagID < 4) {
-      //   targetPose = targetPose.plus(new Transform2d(new Translation2d(-Units.inchesToMeters(15), 0), new Rotation2d(0)));
-      // } else {
-        //   targetPose = targetPose.plus(new Transform2d(new Translation2d(Units.inchesToMeters(15), 0), new Rotation2d(0)));
-        // }
-        
+    if (0 < tagID && tagID < 5) {
+        targetPose = targetPose.plus(new Transform2d(new Translation2d(-Units.inchesToMeters(15), 0), new Rotation2d(0)));
+    } else {
+          targetPose = targetPose.plus(new Transform2d(new Translation2d(Units.inchesToMeters(15), 0), new Rotation2d(0)));
+    }
+    
     int direction = (0 < tagID && tagID < 5) ? -1 : 1;
 
-    targetPose = new Pose2d(
-      new Translation2d(
-        targetPose.getX() + ((Units.inchesToMeters(15) + (VisionConstants.kCameraPosition.getX())) * direction), 
-        targetPose.getY() + (VisionConstants.kCameraPosition.getY())
-      ),
-      targetPose.getRotation()
-    );
+    // targetPose = new Pose2d(
+    //   new Translation2d(
+    //     targetPose.getX() + ((Units.inchesToMeters(15) + (VisionConstants.kCameraPosition.getX())) * direction), 
+    //     targetPose.getY() + (VisionConstants.kCameraPosition.getY())
+    //   ),
+    //   targetPose.getRotation()
+    // );
+
+    if (swerve.getOdometry().getPoseMeters().getTranslation().getX() - targetPose.getTranslation().getX() < 0.1) {
+      // we are close enough to the target
+    }
 
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
       new PathConstraints(0.1, 0.1),
