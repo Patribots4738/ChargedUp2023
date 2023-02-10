@@ -5,7 +5,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import math.Constants;
+import math.Constants.ClawConstants;
 
 public class Claw {
     private final CANSparkMax _claw;
