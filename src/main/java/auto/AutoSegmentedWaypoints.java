@@ -39,9 +39,6 @@ public class AutoSegmentedWaypoints implements Loggable {
     public boolean StateHasFinished = false;
     public Boolean StateHasInitialized = false;
 
-    @Log(tabName = "CompetitionLogger", rowIndex = 1, columnIndex = 4)
-    public double distance = 0;
-
     @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
     public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
 
@@ -247,10 +244,9 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
     }
 
-    public void done() {
-    }
+    public void done() {}
 
-    public class Waypoint {
+    public static class Waypoint {
         public Runnable action;
         public double posX;
         public double posY;
@@ -265,7 +261,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
 
-    public class AutoPose {
+    public static class AutoPose {
 
         public double thisX;
         public double thisY;
