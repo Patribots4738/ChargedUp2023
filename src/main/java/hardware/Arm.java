@@ -62,6 +62,9 @@ public class Arm implements Loggable {
     private final CANSparkMax _lowerArm;
     private final CANSparkMax _upperArm;
 
+    private boolean armAtReference = false;
+    private boolean hasBeenRan = false;
+
     private final RelativeEncoder _lowerArmEncoder;
     private final RelativeEncoder _upperArmEncoder;
 
@@ -191,20 +194,25 @@ public class Arm implements Loggable {
                 Math.abs(_upperArmEncoder.getPosition() - upperReference) > ArmConstants.kUpperArmDeadband)
         {
             armIndex = 0;
-            boolean armAtReference = Math.abs(_lowerArmEncoder.getPosition() - lowerReference) < ArmConstants.kLowerArmDeadband;
+            armAtReference = false;
+        }
+        else if (!armAtReference)
+        {
+            armAtReference = true;
         }
 
         armPosIndex += armIndex;
 
-//        System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
+        if (!hasBeenRan && armAtReference){
+            drive(  armPos[armPosIndex][0].getX() / ArmConstants.kMaxReach,
+                    armPos[armPosIndex][0].getY() / ArmConstants.kMaxReach);
+            hasBeenRan = true;
+        } else if (hasBeenRan && armAtReference){
+            drive(  armPos[armPosIndex][1].getX() / ArmConstants.kMaxReach,
+                    armPos[armPosIndex][1].getY() / ArmConstants.kMaxReach);
+        }
 
-        drive(
-                armPos[armPosIndex][0].getX() / ArmConstants.kMaxReach,
-                armPos[armPosIndex][0].getY() / ArmConstants.kMaxReach);
 
-        drive(
-                armPos[armPosIndex][1].getX() / ArmConstants.kMaxReach,
-                armPos[armPosIndex][1].getY() / ArmConstants.kMaxReach);
     }
 
     /**
