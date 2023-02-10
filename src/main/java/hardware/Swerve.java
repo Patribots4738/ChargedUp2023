@@ -119,12 +119,8 @@ public class Swerve {
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(m_gyro.getAngle()))
                         : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-                swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
-        m_frontLeft.setDesiredState(swerveModuleStates[0]);
-        m_frontRight.setDesiredState(swerveModuleStates[1]);
-        m_rearLeft.setDesiredState(swerveModuleStates[2]);
-        m_rearRight.setDesiredState(swerveModuleStates[3]);
+
+        setModuleStates(swerveModuleStates);
     }
 
     /**
