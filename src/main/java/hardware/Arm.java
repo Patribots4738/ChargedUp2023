@@ -42,35 +42,37 @@ public class Arm implements Loggable {
     };
     
     private boolean operatorOverride = false;
+
     private double armXPos = 0;
     private double armYPos = 0;
     
-    // ceil -- force round up
+    // The current rotation of the upper arm
+    @Log
+    private double upperRotation = 0;
+    private final ArrayList<Double> upperRotationList = new ArrayList<Double>();
+
+    // The current rotation of the lower arm
+    @Log
+    private double lowerRotation = 0;
+    private final ArrayList<Double> lowerRotationList = new ArrayList<Double>();
+    
+    // Math.ceil -- force round up
     private int armPosIndex = (int) Math.ceil(armPos.length / 2);
 
-    private double lowerReference = 0;
+    // The DESIRED rotation of the upper and lower arm(s)
     private double upperReference = 0;
-
-    ArmCalcuations armCalculations = new ArmCalcuations();
-
+    private double lowerReference = 0;
+    
     private final CANSparkMax _lowerArm;
     private final CANSparkMax _upperArm;
-
+    
     private final RelativeEncoder _lowerArmEncoder;
     private final RelativeEncoder _upperArmEncoder;
-
+    
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
-
-    @Log
-    private double upperPos = 0;
-
-    private final ArrayList<Double> upperPosList = new ArrayList<Double>();
-
-    @Log
-    private double lowerPos = 0;
-
-    private final ArrayList<Double> lowerPosList = new ArrayList<Double>();
+    
+    ArmCalcuations armCalculations = new ArmCalcuations();
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -194,9 +196,8 @@ public class Arm implements Loggable {
 
 //        System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
 
-        drive(
-                armPos[armPosIndex].getX() / ArmConstants.kMaxReach,
-                armPos[armPosIndex].getY() / ArmConstants.kMaxReach);
+        drive(new Translation2d(armPos[armPosIndex].getX(), armPos[armPosIndex].getY()));
+
     }
 
     /**
@@ -222,10 +223,15 @@ public class Arm implements Loggable {
 
         Translation2d armPos = new Translation2d(armXPos, armYPos);
 
-        // proof: https://www.desmos.com/calculator/ppsa3db9fa
+        // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
+        // Give it a one inch cushon
         if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.kMaxReach) {
-            armPos = armPos.times(ArmConstants.kMaxReach / armPos.getDistance(new Translation2d(0,0)));
+            armPos = armPos.times((ArmConstants.kMaxReach) / armPos.getDistance(new Translation2d(0, 0)));
+        }
+
+        if (armPos.getY() > ArmConstants.kMaxReachY) {
+            armPos = new Translation2d(armPos.getX(), ArmConstants.kMaxReachY);
         }
 
         // Make sure armX and armY are within the range of 0 to infinity
@@ -239,8 +245,8 @@ public class Arm implements Loggable {
 
         // We do this because lowerArmAngle is reliant on upperArmAngle
         if (Double.isNaN(upperArmAngle)) {
-            lowerArmAngle = 0;
-            upperArmAngle = 0;
+            lowerArmAngle = lowerRotation;
+            upperArmAngle = upperRotation;
         }
 
         setLowerArmReference(Units.radiansToRotations(lowerArmAngle));
@@ -284,9 +290,9 @@ public class Arm implements Loggable {
         _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
         double upperArmEncoderPos = _upperArmEncoder.getPosition();
-        upperPos = upperArmEncoderPos;
+        upperRotation = upperArmEncoderPos;
 
-        upperPosList.add(upperPos);
+        upperRotationList.add(upperRotation);
     }
 
     /**
@@ -323,9 +329,9 @@ public class Arm implements Loggable {
         _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
         double lowerArmEncoderPosition = _lowerArmEncoder.getPosition();
-        lowerPos = lowerArmEncoderPosition;
+        lowerRotation = lowerArmEncoderPosition;
 
-        lowerPosList.add(lowerPos);
+        lowerRotationList.add(lowerRotation);
     }
 
     /**
@@ -365,6 +371,6 @@ public class Arm implements Loggable {
     }
 
     public void printList() {
-      System.out.println(upperPosList);
+      System.out.println(upperRotationList);
   }
 }
