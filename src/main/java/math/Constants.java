@@ -155,7 +155,7 @@ public final class Constants {
 
         // from the edge of the upper arm, straight out,
         // and stop at the end of the 3d-printed "grabber"
-        public static final double kClawLengthXInches = 12;
+        public static final double kClawLengthXInches = 13;
     }
 
     public static final class NeoMotorConstants {
