@@ -25,9 +25,18 @@ public class ArmCalcuations {
      *          Due to an axis controlling the range, they will not go over
      * @return the angle to set the motor to, in radians
      */
-    public double getUpperAngle(double y, double x) {
-        x *= ArmConstants.kMaxReach;
-        y *= ArmConstants.kMaxReach;
+    public double getUpperAngle(double y, double x)
+    {
+      
+        // Make sure the values are not over the max reach (-1)
+        // The -1 is applied as a bufffer to prevent the math from going over
+        // (just in case)
+        if (x >= ArmConstants.kMaxReach - 1) {
+          x = ArmConstants.kMaxReach - 1;
+        }
+        if (y >= ArmConstants.kMaxReach - 1) {
+          y = ArmConstants.kMaxReach - 1;
+        }
 
         if (x >= ArmConstants.kMaxReach) {
             x = ArmConstants.kMaxReach - 1;
@@ -54,16 +63,17 @@ public class ArmCalcuations {
      *          Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
      *          Due to an axis controlling the range, they will not go over
      */
-    public double getLowerAngle(double y, double x, double q2) {
+    public double getLowerAngle(double y, double x, double q2)
+    {
 
-        x *= ArmConstants.kMaxReach;
-        y *= ArmConstants.kMaxReach;
-
-        if (x >= ArmConstants.kMaxReach) {
-            x = ArmConstants.kMaxReach - 1;
+        // Make sure the values are not over the max reach (-1)
+        // The -1 is applied as a bufffer to prevent the math from going over
+        // (just in case)
+        if (x >= ArmConstants.kMaxReach - 1) {
+          x = ArmConstants.kMaxReach - 1;
         }
-        if (y >= ArmConstants.kMaxReach) {
-            y = ArmConstants.kMaxReach - 1;
+        if (y >= ArmConstants.kMaxReach - 1) {
+          y = ArmConstants.kMaxReach - 1;
         }
 
         double leftAngle = Math.atan(y / x) +

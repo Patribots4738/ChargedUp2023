@@ -153,7 +153,11 @@ public final class Constants {
     public static final class ClawConstants {
         public static final double kClawCANID = 11;
 
+        // from the edge of the upper arm, straight out,
+        // and stop at the end of the 3d-printed "grabber"
+        public static final double kClawLengthXInches = 13;
     }
+
     public static final class NeoMotorConstants {
         public static final double kFreeSpeedRpm = 5676;
     }
@@ -176,6 +180,10 @@ public final class Constants {
         // The max reach of the bot horizontally, in inches
         public static final double kMaxReach = kLowerArmLength + kUpperArmLength;
 
+        // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
+        // 78 inches is the rule, 11 inches is the base of the arm to the ground
+        public static final double kMaxReachY = 78 - 11 - ClawConstants.kClawLengthXInches;
+
         // The gear ratio of the lower arm is 60:1
         public static final double kLowerArmGearRatio = 60;
 
@@ -187,10 +195,10 @@ public final class Constants {
         public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
 
         // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-        public static final double kLowerFreedom = 60;
+        public static final double LOWER_ARM_FREEDOM_DEGREES = 60;
 
         // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-        public static final double kUpperFreedom = 100;
+        public static final double UPPER_ARM_FREEDOM_DEGREES = 100;
 
         // The amount of error allowed for the arm's position, in FULL ROTATIONS
         // This is primarily used in autonomous
@@ -256,4 +264,5 @@ public final class Constants {
 
         public static final double kDesiredVelocityMetersPerSecond = 1.5;
     }
-}
+
+  }
