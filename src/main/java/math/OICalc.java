@@ -10,8 +10,8 @@ public class OICalc {
     // All calculations can be refrenced here https://www.desmos.com/calculator/e07raajzh5
     public static Translation2d toCircle(double x, double y) {
 
-        Translation2d intercept = new Translation2d();
-        Translation2d output = new Translation2d();
+        Translation2d intercept;
+        Translation2d output;
 
         double slope = y / x;
 
