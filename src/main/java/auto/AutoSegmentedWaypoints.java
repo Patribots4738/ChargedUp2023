@@ -108,8 +108,8 @@ public class AutoSegmentedWaypoints implements Loggable {
 
         if (SwerveTrajectory.trajectoryStatus.equals("done") &&
 
-                (((upperReference + ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() &&
-                        arm.getUpperArmPosition() <= (upperReference + ArmConstants.kUpperArmDeadband)) ||
+                (((upperReference + ArmConstants.UPPER_ARM_DEADBAND) <= arm.getUpperArmPosition() &&
+                        arm.getUpperArmPosition() <= (upperReference + ArmConstants.UPPER_ARM_DEADBAND)) ||
 
                         (Timer.getFPGATimestamp() - autoDelay > 1.0))) {
 
@@ -152,8 +152,8 @@ public class AutoSegmentedWaypoints implements Loggable {
 
         if (SwerveTrajectory.trajectoryStatus.equals("done") &&
 
-                ((lowerReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() &&
-                        arm.getLowerArmPosition() <= (lowerReference + ArmConstants.kLowerArmDeadband)) ||
+                ((lowerReference - ArmConstants.LOWER_ARM_DEADBAND) <= arm.getLowerArmPosition() &&
+                        arm.getLowerArmPosition() <= (lowerReference + ArmConstants.LOWER_ARM_DEADBAND)) ||
 
                 (Timer.getFPGATimestamp() - autoDelay > 1.0)) {
 
@@ -200,11 +200,11 @@ public class AutoSegmentedWaypoints implements Loggable {
         // then set the arm references back to 0
         if (SwerveTrajectory.trajectoryStatus.equals("done") &&
 
-                ((lowerArmReference - ArmConstants.kLowerArmDeadband) <= arm.getLowerArmPosition() &&
-                        arm.getLowerArmPosition() <= (lowerArmReference + ArmConstants.kLowerArmDeadband)) &&
+                ((lowerArmReference - ArmConstants.LOWER_ARM_DEADBAND) <= arm.getLowerArmPosition() &&
+                        arm.getLowerArmPosition() <= (lowerArmReference + ArmConstants.LOWER_ARM_DEADBAND)) &&
 
-                ((upperArmReference - ArmConstants.kUpperArmDeadband) <= arm.getUpperArmPosition() &&
-                        arm.getUpperArmPosition() <= (upperArmReference + ArmConstants.kUpperArmDeadband)) &&
+                ((upperArmReference - ArmConstants.UPPER_ARM_DEADBAND) <= arm.getUpperArmPosition() &&
+                        arm.getUpperArmPosition() <= (upperArmReference + ArmConstants.UPPER_ARM_DEADBAND)) &&
 
                 (Timer.getFPGATimestamp() - autoDelay > 1.5)) {
 

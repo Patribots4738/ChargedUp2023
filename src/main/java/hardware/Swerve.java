@@ -18,31 +18,31 @@ public class Swerve {
     private double speedMultiplier = 1;
   
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
-            DriveConstants.kFrontLeftDrivingCanId,
-            DriveConstants.kFrontLeftTurningCanId,
-            DriveConstants.kFrontLeftChassisAngularOffset);
+            DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
+            DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
+            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
     private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
-            DriveConstants.kFrontRightDrivingCanId,
-            DriveConstants.kFrontRightTurningCanId,
-            DriveConstants.kFrontRightChassisAngularOffset);
+            DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
+            DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
+            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
-            DriveConstants.kRearLeftDrivingCanId,
-            DriveConstants.kRearLeftTurningCanId,
-            DriveConstants.kBackLeftChassisAngularOffset);
+            DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
+            DriveConstants.REAR_LEFT_TURNING_CAN_ID,
+            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
     private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
-            DriveConstants.kRearRightDrivingCanId,
-            DriveConstants.kRearRightTurningCanId,
-            DriveConstants.kBackRightChassisAngularOffset);
+            DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
+            DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
+            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     // The gyro sensor
     private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-            DriveConstants.kDriveKinematics,
+            DriveConstants.DRIVE_KINEMATICS,
             Rotation2d.fromDegrees(m_gyro.getAngle()),
             new SwerveModulePosition[]{
                     m_frontLeft.getPosition(),
@@ -111,16 +111,16 @@ public class Swerve {
      */
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
         // Adjust input based on max speed
-        xSpeed *= DriveConstants.kMaxSpeedMetersPerSecond * speedMultiplier;
-        ySpeed *= DriveConstants.kMaxSpeedMetersPerSecond * speedMultiplier;
-        rotSpeed *= DriveConstants.kMaxAngularSpeed       * speedMultiplier;
+        xSpeed *= DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
+        ySpeed *= DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
+        rotSpeed *= DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier;
 
-        var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+        var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(m_gyro.getAngle()))
                         : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
         SwerveDriveKinematics.desaturateWheelSpeeds(
-                swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+                swerveModuleStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
         m_frontLeft.setDesiredState(swerveModuleStates[0]);
         m_frontRight.setDesiredState(swerveModuleStates[1]);
         m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -144,7 +144,7 @@ public class Swerve {
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
-                desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+                desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
         m_frontLeft.setDesiredState(desiredStates[0]);
         m_frontRight.setDesiredState(desiredStates[1]);
         m_rearLeft.setDesiredState(desiredStates[2]);

@@ -37,7 +37,7 @@ public class Arm implements Loggable {
           new Translation2d(-36, 23),
       },
       { 
-          new Translation2d(0, ArmConstants.kMaxReach) 
+          new Translation2d(0, ArmConstants.MAX_REACH)
       },
       {
           new Translation2d(-12, 19),
@@ -88,8 +88,8 @@ public class Arm implements Loggable {
      */
     public Arm() {
 
-        _lowerArm = new CANSparkMax(ArmConstants.kLowerArmMotorCanId, MotorType.kBrushless);
-        _upperArm = new CANSparkMax(ArmConstants.kUpperArmMotorCanId, MotorType.kBrushless);
+        _lowerArm = new CANSparkMax(ArmConstants.LOWER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+        _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
         _lowerArm.setIdleMode(IdleMode.kBrake);
         _upperArm.setIdleMode(IdleMode.kBrake);
@@ -102,8 +102,8 @@ public class Arm implements Loggable {
         // Setup encoders and PID controllers for the lower and upper SPARK MAX(s)
         _lowerArmEncoder = _lowerArm.getEncoder();
         _upperArmEncoder = _upperArm.getEncoder();
-        _lowerArmEncoder.setPositionConversionFactor(ArmConstants.kLowerEncoderPositionFactor);
-        _upperArmEncoder.setPositionConversionFactor(ArmConstants.kUpperEncoderPositionFactor);
+        _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
+        _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
 
         // _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
         // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
@@ -113,24 +113,24 @@ public class Arm implements Loggable {
         _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
 
         // Set PID constants for the lower and upper SPARK MAX(s)
-        _lowerArmPIDController.setP(ArmConstants.kLowerP);
-        _lowerArmPIDController.setI(ArmConstants.kLowerI);
-        _lowerArmPIDController.setD(ArmConstants.kLowerD);
-        _lowerArmPIDController.setFF(ArmConstants.kLowerFF);
+        _lowerArmPIDController.setP(ArmConstants.LOWER_P);
+        _lowerArmPIDController.setI(ArmConstants.LOWER_I);
+        _lowerArmPIDController.setD(ArmConstants.LOWER_D);
+        _lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
         _lowerArmPIDController.setOutputRange(
-                ArmConstants.kLowerMinOutput,
-                ArmConstants.kLowerMaxOutput);
+                ArmConstants.LOWER_MIN_OUTPUT,
+                ArmConstants.LOWER_MAX_OUTPUT);
 
-        _upperArmPIDController.setP(ArmConstants.kUpperP);
-        _upperArmPIDController.setI(ArmConstants.kUpperI);
-        _upperArmPIDController.setD(ArmConstants.kUpperD);
-        _upperArmPIDController.setFF(ArmConstants.kUpperFF);
+        _upperArmPIDController.setP(ArmConstants.UPPER_P);
+        _upperArmPIDController.setI(ArmConstants.UPPER_I);
+        _upperArmPIDController.setD(ArmConstants.UPPER_D);
+        _upperArmPIDController.setFF(ArmConstants.UPPER_FF);
         _upperArmPIDController.setOutputRange(
-                ArmConstants.kUpperMinOutput,
-                ArmConstants.kUpperMaxOutput);
+                ArmConstants.UPPER_MIN_OUTPUT,
+                ArmConstants.UPPER_MAX_OUTPUT);
 
-        _lowerArm.setSmartCurrentLimit(ArmConstants.kLowerCurrentLimit);
-        // _upperArm.setSmartCurrentLimit(ArmConstants.kUpperCurrentLimit);
+        _lowerArm.setSmartCurrentLimit(ArmConstants.LOWER_CURRENT_LIMIT);
+        // _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_CURRENT_LIMIT);
 
         // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
         _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -170,8 +170,8 @@ public class Arm implements Loggable {
             return;
         }
 
-        if (Math.abs(getLowerArmPosition() - lowerReference) > ArmConstants.kLowerArmDeadband ||
-            Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.kUpperArmDeadband) 
+        if (Math.abs(getLowerArmPosition() - lowerReference) > ArmConstants.LOWER_ARM_DEADBAND ||
+            Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.UPPER_ARM_DEADBAND)
         {
             armPosDimention2++;
             drive(armPos[armPosDimention1][armPosDimention2]);
@@ -234,12 +234,12 @@ public class Arm implements Loggable {
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
         // Give it a one inch cushon
-        if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.kMaxReach) {
-            armPos = armPos.times((ArmConstants.kMaxReach) / armPos.getDistance(new Translation2d(0, 0)));
+        if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.MAX_REACH) {
+            armPos = armPos.times((ArmConstants.MAX_REACH) / armPos.getDistance(new Translation2d(0, 0)));
         }
 
-        if (armPos.getY() > ArmConstants.kMaxReachY) {
-            armPos = new Translation2d(armPos.getX(), ArmConstants.kMaxReachY);
+        if (armPos.getY() > ArmConstants.MAX_REACH_Y) {
+            armPos = new Translation2d(armPos.getX(), ArmConstants.MAX_REACH_Y);
         }
 
         // Make sure armX and armY are within the range of 0 to infinity
@@ -280,10 +280,10 @@ public class Arm implements Loggable {
 
         // Description of FF in Constants :D
         ArmFeedforward feedForward = new ArmFeedforward(
-                ArmConstants.kSUpper,
-                ArmConstants.kGUpper,
-                ArmConstants.kVUpper,
-                ArmConstants.kAUpper);
+                ArmConstants.S_UPPER,
+                ArmConstants.G_UPPER,
+                ArmConstants.V_UPPER,
+                ArmConstants.A_UPPER);
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
@@ -318,10 +318,10 @@ public class Arm implements Loggable {
         );
 
         ArmFeedforward feedForward = new ArmFeedforward(
-                ArmConstants.kSLower,
-                ArmConstants.kGLower,
-                ArmConstants.kVLower,
-                ArmConstants.kALower);
+                ArmConstants.S_LOWER,
+                ArmConstants.G_LOWER,
+                ArmConstants.V_LOWER,
+                ArmConstants.A_LOWER);
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor

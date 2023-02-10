@@ -20,29 +20,29 @@ public class OICalc {
             output = new Translation2d(x, y);
             return output;
 
-        } else if (0 > slope && slope >= -OIConstants.kControllerCornerSlope2) {
+        } else if (0 > slope && slope >= -OIConstants.CONTROLLER_CORNER_SLOPE_2) {
 
             intercept = new Translation2d(-1, -slope);
 
-        } else if (-OIConstants.kControllerCornerSlope1 < slope && slope < -OIConstants.kControllerCornerSlope2) {
+        } else if (-OIConstants.CONTROLLER_CORNER_SLOPE_1 < slope && slope < -OIConstants.CONTROLLER_CORNER_SLOPE_2) {
 
             double intersectionX = (1.7) / (slope - 1);
             double intersectionY = (intersectionX + 1.7);
 
             intercept = new Translation2d(intersectionX, intersectionY);
 
-        } else if (slope < -OIConstants.kControllerCornerSlope1 || slope > OIConstants.kControllerCornerSlope1) {
+        } else if (slope < -OIConstants.CONTROLLER_CORNER_SLOPE_1 || slope > OIConstants.CONTROLLER_CORNER_SLOPE_1) {
 
             intercept = new Translation2d(1 / slope, 1);
 
-        } else if (OIConstants.kControllerCornerSlope1 > slope && slope > OIConstants.kControllerCornerSlope2) {
+        } else if (OIConstants.CONTROLLER_CORNER_SLOPE_1 > slope && slope > OIConstants.CONTROLLER_CORNER_SLOPE_2) {
 
             double intersectionX = (1.7) / (slope + 1);
             double intersectionY = -intersectionX + 1.7;
 
             intercept = new Translation2d(intersectionX, intersectionY);
 
-        } else if (0 < slope && slope <= OIConstants.kControllerCornerSlope2) {
+        } else if (0 < slope && slope <= OIConstants.CONTROLLER_CORNER_SLOPE_2) {
 
             intercept = new Translation2d(1, slope);
 

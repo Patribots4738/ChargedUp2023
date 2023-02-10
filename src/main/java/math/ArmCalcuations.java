@@ -31,25 +31,25 @@ public class ArmCalcuations {
         // Make sure the values are not over the max reach (-1)
         // The -1 is applied as a bufffer to prevent the math from going over
         // (just in case)
-        if (x >= ArmConstants.kMaxReach - 1) {
-          x = ArmConstants.kMaxReach - 1;
+        if (x >= ArmConstants.MAX_REACH - 1) {
+          x = ArmConstants.MAX_REACH - 1;
         }
-        if (y >= ArmConstants.kMaxReach - 1) {
-          y = ArmConstants.kMaxReach - 1;
+        if (y >= ArmConstants.MAX_REACH - 1) {
+          y = ArmConstants.MAX_REACH - 1;
         }
 
-        if (x >= ArmConstants.kMaxReach) {
-            x = ArmConstants.kMaxReach - 1;
+        if (x >= ArmConstants.MAX_REACH) {
+            x = ArmConstants.MAX_REACH - 1;
         }
-        if (y >= ArmConstants.kMaxReach) {
-            y = ArmConstants.kMaxReach - 1;
+        if (y >= ArmConstants.MAX_REACH) {
+            y = ArmConstants.MAX_REACH - 1;
         }
 
         double upperAngle =
                 (Math.acos(
-                        (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(ArmConstants.kLowerArmLength, 2)) +
-                                (Math.pow(ArmConstants.kUpperArmLength, 2))))
-                                / (2 * (ArmConstants.kLowerArmLength * ArmConstants.kUpperArmLength))));
+                        (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(ArmConstants.LOWER_ARM_LENGTH, 2)) +
+                                (Math.pow(ArmConstants.UPPER_ARM_LENGTH, 2))))
+                                / (2 * (ArmConstants.LOWER_ARM_LENGTH * ArmConstants.UPPER_ARM_LENGTH))));
 
         return upperAngle * ((x > 0) ? 1 : -1);
     }
@@ -69,20 +69,20 @@ public class ArmCalcuations {
         // Make sure the values are not over the max reach (-1)
         // The -1 is applied as a bufffer to prevent the math from going over
         // (just in case)
-        if (x >= ArmConstants.kMaxReach - 1) {
-          x = ArmConstants.kMaxReach - 1;
+        if (x >= ArmConstants.MAX_REACH - 1) {
+          x = ArmConstants.MAX_REACH - 1;
         }
-        if (y >= ArmConstants.kMaxReach - 1) {
-          y = ArmConstants.kMaxReach - 1;
+        if (y >= ArmConstants.MAX_REACH - 1) {
+          y = ArmConstants.MAX_REACH - 1;
         }
 
         double leftAngle = Math.atan(y / x) +
-                Math.atan((ArmConstants.kUpperArmLength * Math.sin(q2))
-                        / (ArmConstants.kLowerArmLength + (ArmConstants.kUpperArmLength * Math.cos(q2))));
+                Math.atan((ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2))
+                        / (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));
 
         double rightAngle = Math.atan(y / x) -
-                Math.atan((ArmConstants.kUpperArmLength * Math.sin(q2))
-                        / (ArmConstants.kLowerArmLength + (ArmConstants.kUpperArmLength * Math.cos(q2))));
+                Math.atan((ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2))
+                        / (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));
 
         return rightAngle; // ((x < 0) ? leftAngle : rightAngle);
     }

@@ -57,8 +57,8 @@ public class Robot extends TimedRobot {
 
         swerve.setBrakeMode();
 
-        driver = new XboxController(OIConstants.kDriverControllerPort);
-        operator = new XboxController(OIConstants.kOperatorControllerPort);
+        driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
+        operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
         arm = new Arm();
         arm.resetEncoders();
@@ -119,18 +119,18 @@ public class Robot extends TimedRobot {
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
-        double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
-        double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
-        double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
-        double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
+        double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+        double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+        double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+        double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
-        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.kDriverDeadband);
-        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.kDriverDeadband);
-        double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.kDriverDeadband);
-        double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.kDriverDeadband);
+        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.DRIVER_DEADBAND);
+        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.DRIVER_DEADBAND);
+        double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
+        double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
-        // if we are on blue alliance, flip the driverLeftAxis
+        // If we are on blue alliance, flip the driverLeftAxis
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
             driverLeftAxis.unaryMinus();
         }
@@ -148,7 +148,7 @@ public class Robot extends TimedRobot {
         if (driver.getLeftStickButtonPressed()) {
             swerve.toggleSpeed();
         }
-        
+
         // Toggle the operator override when the operator's left stick is pressed
         if (operator.getLeftStickButtonPressed()) {
             arm.toggleOperatorOverride();

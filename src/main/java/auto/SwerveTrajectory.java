@@ -35,8 +35,8 @@ public class SwerveTrajectory implements Loggable {
      * <p>
      * The 2 PID controllers are controllers that should correct
      * for error in the field-relative x and y directions respectively.
-     * i.e. kXCorrectionP,I,D is PID for X correction
-     * and kYCorrectionP,I,D is PID for Y correction
+     * i.e. X_CORRECTION_P,I,D is PID for X correction
+     * and Y_CORRECTION_P,I,D is PID for Y correction
      * <p>
      * The ProfiledPIDController for the rotation of the robot,
      * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
@@ -44,10 +44,10 @@ public class SwerveTrajectory implements Loggable {
      * @return A new HolonomicDriveController with the given PID gains (xP, xI, xD, yP, yI, yD, rotP, rotI, rotD) and constraints (maxVel, maxAccel)
      */
     public static HolonomicDriveController HDC = new HolonomicDriveController(
-            new PIDController(Constants.AutoConstants.kXCorrectionP, Constants.AutoConstants.kXCorrectionI, Constants.AutoConstants.kXCorrectionD),
-            new PIDController(Constants.AutoConstants.kYCorrectionP, Constants.AutoConstants.kYCorrectionI, Constants.AutoConstants.kYCorrectionD),
-            new ProfiledPIDController(Constants.AutoConstants.kRotationCorrectionP, Constants.AutoConstants.kRotationCorrectionI, Constants.AutoConstants.kRotationCorrectionD,
-                    new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond, Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
+            new PIDController(Constants.AutoConstants.X_CORRECTION_P, Constants.AutoConstants.X_CORRECTION_I, Constants.AutoConstants.X_CORRECTION_D),
+            new PIDController(Constants.AutoConstants.Y_CORRECTION_P, Constants.AutoConstants.Y_CORRECTION_I, Constants.AutoConstants.Y_CORRECTION_D),
+            new ProfiledPIDController(Constants.AutoConstants.ROTATION_CORRECTION_P, Constants.AutoConstants.ROTATION_CORRECTION_I, Constants.AutoConstants.ROTATION_CORRECTION_D,
+                    new TrapezoidProfile.Constraints(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
 
     /**
      * This is PathPlanner.

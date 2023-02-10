@@ -25,174 +25,174 @@ public final class Constants {
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
-        public static final double kMaxSpeedMetersPerSecond = 2;
-        public static final double kMaxAngularSpeed = 6 * Math.PI; // radians per second
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2;
+        public static final double MAX_ANGULAR_SPEED = 6 * Math.PI; // radians per second
 
         // Chassis configuration
-        public static final double kTrackWidth = Units.inchesToMeters(21.5);
+        public static final double TRACK_WIDTH = Units.inchesToMeters(21.5);
         // Distance between centers of right and left wheels on robot
-        public static final double kWheelBase = Units.inchesToMeters(21.5);
+        public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
         // Distance between front and back wheels on robot
-        public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-                new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-                new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+        public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
+                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
         // Angular offsets of the modules relative to the chassis in radians
-        public static final double kFrontLeftChassisAngularOffset = Math.toRadians(90);
-        public static final double kFrontRightChassisAngularOffset = Math.toRadians(-180);
-        public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
-        public static final double kBackRightChassisAngularOffset = Math.toRadians(-90);
+        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90);
+        public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-180);
+        public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0);
+        public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90);
 
 
         // Driving motors CAN IDs (EVEN)
-        public static final int kFrontLeftDrivingCanId = 1;
-        public static final int kRearLeftDrivingCanId = 5;
-        public static final int kFrontRightDrivingCanId = 3;
-        public static final int kRearRightDrivingCanId = 7;
+        public static final int FRONT_LEFT_DRIVING_CAN_ID = 1;
+        public static final int REAR_LEFT_DRIVING_CAN_ID = 5;
+        public static final int FRONT_RIGHT_DRIVING_CAN_ID = 3;
+        public static final int REAR_RIGHT_DRIVING_CAN_ID = 7;
 
         // Turning motors CAN IDs (ODD)
-        public static final int kFrontLeftTurningCanId = 2;
-        public static final int kRearLeftTurningCanId = 6;
-        public static final int kFrontRightTurningCanId = 4;
-        public static final int kRearRightTurningCanId = 8;
+        public static final int FRONT_LEFT_TURNING_CAN_ID = 2;
+        public static final int REAR_LEFT_TURNING_CAN_ID = 6;
+        public static final int FRONT_RIGHT_TURNING_CAN_ID = 4;
+        public static final int REAR_RIGHT_TURNING_CAN_ID = 8;
 
-        public static final boolean kGyroReversed = false;
+        public static final boolean GYRO_REVERSED = false;
     }
 
     public static final class ModuleConstants {
         // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
         // This changes the drive speed of the module (a pinion gear with more teeth will result in a
         // robot that drives faster).
-        public static final int kDrivingMotorPinionTeeth = 12;
+        public static final int DRIVING_MOTOR_PINION_TEETH = 12;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite direction of
         // the steering motor in the MAXSwerve Module.
-        public static final boolean kTurningEncoderInverted = true;
+        public static final boolean TURNING_ENCODER_INVERTED = true;
 
         // Calculations required for driving motor conversion factors and feed forward
-        public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-        public static final double kWheelDiameterMeters = 0.0762;
-        public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
+        public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.FREE_SPEED_RPM / 60;
+        public static final double WHEEL_DIAMETER_METERS = 0.0762;
+        public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
-        public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
-        public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
-                / kDrivingMotorReduction;
+        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (DRIVING_MOTOR_PINION_TEETH * 15);
+        public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS)
+                / DRIVING_MOTOR_REDUCTION;
 
-        public static final double kDrivingEncoderPositionFactor = (kWheelDiameterMeters * Math.PI)
-                / kDrivingMotorReduction; // meters
-        public static final double kDrivingEncoderVelocityFactor = ((kWheelDiameterMeters * Math.PI)
-                / kDrivingMotorReduction) / 60.0; // meters per second
+        public static final double DRIVING_ENCODER_POSITION_FACTOR = (WHEEL_DIAMETER_METERS * Math.PI)
+                / DRIVING_MOTOR_REDUCTION; // meters
+        public static final double DRIVING_ENCODER_VELOCITY_FACTOR = ((WHEEL_DIAMETER_METERS * Math.PI)
+                / DRIVING_MOTOR_REDUCTION) / 60.0; // meters per second
 
-        public static final double kTurningEncoderPositionFactor = (2 * Math.PI); // radians
-        public static final double kTurningEncoderVelocityFactor = (2 * Math.PI) / 60.0; // radians per second
+        public static final double TURNING_ENCODER_POSITION_FACTOR = (2 * Math.PI); // radians
+        public static final double TURNING_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // radians per second
 
-        public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
-        public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
+        public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
+        public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT = TURNING_ENCODER_POSITION_FACTOR; // radians
 
-        public static final double kDrivingP = 0.04;
-        public static final double kDrivingI = 0;
-        public static final double kDrivingD = 0;
-        public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
-        public static final double kDrivingMinOutput = -1;
-        public static final double kDrivingMaxOutput = 1;
+        public static final double DRIVING_P = 0.04;
+        public static final double DRIVING_I = 0;
+        public static final double DRIVING_D = 0;
+        public static final double DRIVING_FF = 1 / DRIVE_WHEEL_FREE_SPEED_RPS;
+        public static final double DRIVING_MIN_OUTPUT = -1;
+        public static final double DRIVING_MAX_OUTPUT = 1;
 
-        public static final double kTurningP = 1;
-        public static final double kTurningI = 0;
-        public static final double kTurningD = 0;
-        public static final double kTurningFF = 0;
-        public static final double kTurningMinOutput = -1;
-        public static final double kTurningMaxOutput = 1;
+        public static final double TURNING_P = 1;
+        public static final double TURNING_I = 0;
+        public static final double TURNING_D = 0;
+        public static final double TURNING_FF = 0;
+        public static final double TURNING_MIN_OUTPUT = -1;
+        public static final double TURNING_MAX_OUTPUT = 1;
 
-        public static final int kDrivingMotorCurrentLimit = 50; // amps
-        public static final int kTurningMotorCurrentLimit = 20; // amps
+        public static final int DRIVING_MOTOR_CURRENT_LIMIT = 50; // amps
+        public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
     }
 
     public static final class OIConstants {
 
-        public static final int kDriverControllerPort = 0;
-        public static final int kOperatorControllerPort = 1;
+        public static final int DRIVER_CONTROLLER_PORT = 0;
+        public static final int OPERATOR_CONTROLLER_PORT = 1;
 
-        public static final double kDriverDeadband = 0.15;
-        public static final double kOperatorDeadband = 0.15;
+        public static final double DRIVER_DEADBAND = 0.15;
+        public static final double OPERATOR_DEADBAND = 0.15;
 
         // See https://www.desmos.com/calculator/e07raajzh5
         // And https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
-        public static final double kControllerCornerSlope1 = 1 / 0.7;
-        public static final double kControllerCornerSlope2 = 0.7;
+        public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
+        public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-        public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-        public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
-        public static final double kPXController = 1;
-        public static final double kPYController = 1;
-        public static final double kPThetaController = 1;
+        public static final double PX_CONTROLLER = 1;
+        public static final double PY_CONTROLLER = 1;
+        public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double kXCorrectionP = 1;
-        public static final double kXCorrectionI = 0;
-        public static final double kXCorrectionD = 0;
+        public static final double X_CORRECTION_P = 1;
+        public static final double X_CORRECTION_I = 0;
+        public static final double X_CORRECTION_D = 0;
 
-        public static final double kYCorrectionP = 0.3;
-        public static final double kYCorrectionI = 0;
-        public static final double kYCorrectionD = 0;
+        public static final double Y_CORRECTION_P = 0.3;
+        public static final double Y_CORRECTION_I = 0;
+        public static final double Y_CORRECTION_D = 0;
 
-        public static final double kRotationCorrectionP = -0.22;
-        public static final double kRotationCorrectionI = 0;
-        public static final double kRotationCorrectionD = 0;//.74;
+        public static final double ROTATION_CORRECTION_P = -0.22;
+        public static final double ROTATION_CORRECTION_I = 0;
+        public static final double ROTATION_CORRECTION_D = 0;//.74;
 
-        // Constraint for the motion profiled robot angle controller
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-                kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+        // Constraint for the motion-profiled robot angle controller
+        public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
+                MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
     }
 
     public static final class ClawConstants {
-        public static final double kClawCANID = 11;
+        public static final double CLAW_CAN_ID = 11;
 
         // from the edge of the upper arm, straight out,
         // and stop at the end of the 3d-printed "grabber"
-        public static final double kClawLengthXInches = 13;
+        public static final double CLAW_LENGTH_X_INCHES = 13;
     }
 
     public static final class NeoMotorConstants {
-        public static final double kFreeSpeedRpm = 5676;
+        public static final double FREE_SPEED_RPM = 5676;
     }
 
     public static final class ArmConstants {
 
-        public static final int kLowerArmMotorCanId = 10;
-        public static final int kUpperArmMotorCanId = 9;
+        public static final int LOWER_ARM_MOTOR_CAN_ID = 10;
+        public static final int UPPER_ARM_MOTOR_CAN_ID = 9;
 
         // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
-        public static final int kUpperCurrentLimit = 80;
-        public static final int kLowerCurrentLimit = 80;
+        public static final int UPPER_CURRENT_LIMIT = 80;
+        public static final int LOWER_CURRENT_LIMIT = 80;
 
         // The length of the first pivot point to the second pivot point, in inches
-        public static final double kLowerArmLength = 32;
+        public static final double LOWER_ARM_LENGTH = 32;
 
         // The length of the second pivot point to the claw, in inches
-        public static final double kUpperArmLength = 21;
+        public static final double UPPER_ARM_LENGTH = 21;
 
         // The max reach of the bot horizontally, in inches
-        public static final double kMaxReach = kLowerArmLength + kUpperArmLength;
+        public static final double MAX_REACH = LOWER_ARM_LENGTH + UPPER_ARM_LENGTH;
 
         // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
         // 78 inches is the rule, 11 inches is the base of the arm to the ground
-        public static final double kMaxReachY = 78 - 11 - ClawConstants.kClawLengthXInches;
+        public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
 
         // The gear ratio of the lower arm is 60:1
-        public static final double kLowerArmGearRatio = 60;
+        public static final double LOWER_ARM_GEAR_RATIO = 60;
 
         // The gear ratio of the upper arm is 25:7
-        public static final double kUpperArmGearRatio = (85.0 / 9.0);
+        public static final double UPPER_ARM_GEAR_RATIO = (85.0 / 9.0);
 
         // The factor that the encoder is multiplied by to get the actual position
-        public static final double kLowerEncoderPositionFactor = (kLowerArmLength * Math.PI) / (kLowerArmGearRatio);
-        public static final double kUpperEncoderPositionFactor = (kUpperArmLength * Math.PI) / (kUpperArmGearRatio);
+        public static final double LOWER_ENCODER_POSITION_FACTOR = (LOWER_ARM_LENGTH * Math.PI) / (LOWER_ARM_GEAR_RATIO);
+        public static final double UPPER_ENCODER_POSITION_FACTOR = (UPPER_ARM_LENGTH * Math.PI) / (UPPER_ARM_GEAR_RATIO);
 
         // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
         public static final double LOWER_ARM_FREEDOM_DEGREES = 60;
@@ -202,15 +202,15 @@ public final class Constants {
 
         // The amount of error allowed for the arm's position, in FULL ROTATIONS
         // This is primarily used in autonomous
-        public static final double kLowerArmDeadband = 0.01;
-        public static final double kUpperArmDeadband = 0.01;
+        public static final double LOWER_ARM_DEADBAND = 0.01;
+        public static final double UPPER_ARM_DEADBAND = 0.01;
 
         // The outputs used in the output range for the lower and upper arms
-        public static final double kLowerMinOutput = -1;
-        public static final double kLowerMaxOutput = 1;
+        public static final double LOWER_MIN_OUTPUT = -1;
+        public static final double LOWER_MAX_OUTPUT = 1;
 
-        public static final double kUpperMinOutput = -1;
-        public static final double kUpperMaxOutput = 1;
+        public static final double UPPER_MIN_OUTPUT = -1;
+        public static final double UPPER_MAX_OUTPUT = 1;
 
         /**
          * SysID values:
@@ -221,16 +221,16 @@ public final class Constants {
          * <p>
          */
         // PID values for the lower and upper arm
-        public static final double kLowerP = 0.1;
-        public static final double kLowerI = 0;
-        public static final double kLowerD = 0.025;
-        public static final double kLowerFF = 1;
+        public static final double LOWER_P = 0.1;
+        public static final double LOWER_I = 0;
+        public static final double LOWER_D = 0.025;
+        public static final double LOWER_FF = 1;
 
 
-        public static final double kUpperP = 1;    //46.6;
-        public static final double kUpperD = 0; //34.2;
-        public static final double kUpperI = 0;//.035;
-        public static final double kUpperFF = 1;
+        public static final double UPPER_P = 1;    //46.6;
+        public static final double UPPER_D = 0; //34.2;
+        public static final double UPPER_I = 0;//.035;
+        public static final double UPPER_FF = 1;
 
 
         /**
@@ -248,21 +248,21 @@ public final class Constants {
          * FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
          * 👌
          */
-        public static final double kSLower = 0;//.15999;
-        public static final double kGLower = 0;//0.33966; (We don't like gravity)
-        public static final double kVLower = 0;//.24941;
-        public static final double kALower = 0;//4.3455;
+        public static final double S_LOWER = 0;//.15999;
+        public static final double G_LOWER = 0;//0.33966; (We don't like gravity)
+        public static final double V_LOWER = 0;//.24941;
+        public static final double A_LOWER = 0;//4.3455;
 
-        public static final double kSUpper = 0.47727;
-        public static final double kGUpper = 0; //1.0051; // (We don't like gravity)
-        public static final double kVUpper = 0.95764;
-        public static final double kAUpper = 0.19957;
+        public static final double S_UPPER = 0.47727;
+        public static final double G_UPPER = 0; //1.0051; // (We don't like gravity)
+        public static final double V_UPPER = 0.95764;
+        public static final double A_UPPER = 0.19957;
     }
 
     public static final class VisionConstants {
-        public static final double kConeOffsetMeters = 0.5;
+        public static final double CONE_OFFSET_METERS = 0.5;
 
-        public static final double kDesiredVelocityMetersPerSecond = 1.5;
+        public static final double DESIRED_VELOCITY_METERS_PER_SECOND = 1.5;
     }
 
   }
