@@ -5,6 +5,7 @@
 package frc.robot;
 
 import debug.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import hardware.*;
 import math.ArmCalcuations;
 import math.OICalc;
@@ -118,17 +119,22 @@ public class Robot extends TimedRobot {
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
-        double driverLeftX = -MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
-        double driverLeftY = -MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
+        double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.kDriverDeadband);
+        double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.kDriverDeadband);
         double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.kDriverDeadband);
-        double driverRightY = -MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
-        
+        double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.kDriverDeadband);
+
         double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.kDriverDeadband);
         double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.kDriverDeadband);
         double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.kDriverDeadband);
         double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.kDriverDeadband);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+        // if we are on blue alliance, flip the driverLeftAxis
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+            driverLeftAxis.unaryMinus();
+        }
+
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         if (driver.getRightBumper()) {
@@ -140,7 +146,7 @@ public class Robot extends TimedRobot {
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
         if (driver.getLeftStickButtonPressed()) {
-          swerve.toggleSpeed();
+            swerve.toggleSpeed();
         }
 
         if (driver.getRightBumperPressed()) {
