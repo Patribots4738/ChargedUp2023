@@ -58,15 +58,12 @@ public class Arm implements Loggable {
     // The current rotation of the upper arm
     @Log
     private double upperRotation = 0;
-    private final ArrayList<Double> upperRotationList = new ArrayList<Double>();
+    private final ArrayList<Double> upperRotationList = new ArrayList<>();
 
     // The current rotation of the lower arm
     @Log
     private double lowerRotation = 0;
-    private final ArrayList<Double> lowerRotationList = new ArrayList<Double>();
-    
-    // Math.ceil -- force round up
-    private int armPosIndex = (int) Math.ceil(armPos.length / 2);
+    private final ArrayList<Double> lowerRotationList = new ArrayList<>();
 
     // The DESIRED rotation of the upper and lower arm(s)
     private double upperReference = 0;
@@ -197,7 +194,7 @@ public class Arm implements Loggable {
      */
     public void setArmIndex(int index) {
 
-        MathUtil.clamp(index, 0, armPos.length-1);
+        index = MathUtil.clamp(index, 0, armPos.length-1);
         
         armPosDimention1 += index;
         armPosDimention2 = 0;
@@ -213,27 +210,33 @@ public class Arm implements Loggable {
      * as an absolute position in inches, multiplied by
      * Constants.ArmConstants.kMaxReachX,Y respectively
      *
-     * @param armX the x position of the joystick
-     * @param armY the y position of the joystick
+     * @param position either the joystick input or the desired absolute position
+     *                 this case is handled under OperatorOverride
      */
     public void drive(Translation2d position) {
 
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-            armXPos += position.getX();
-            armYPos += position.getY();
+            this.armXPos += position.getX();
+            this.armYPos += position.getY();
         }
         else {
             this.armXPos = position.getX();
             this.armYPos = position.getY();
         }
 
+        // Make sure armX and armY are within the range of 0 to infinity
+        // Because we cannot reach below the ground.
+        // Even though our arm starts 11 inches above the ground,
+        // the claw will be 11 inches from the arm end
+        armYPos = (position.getY() < 0) ? 0 : armYPos;
+
         Translation2d armPos = new Translation2d(armXPos, armYPos);
 
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
-        // Give it a one inch cushon
+        // Give it a one-inch cushion
         if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.MAX_REACH) {
             armPos = armPos.times((ArmConstants.MAX_REACH) / armPos.getDistance(new Translation2d(0, 0)));
         }
@@ -242,19 +245,15 @@ public class Arm implements Loggable {
             armPos = new Translation2d(armPos.getX(), ArmConstants.MAX_REACH_Y);
         }
 
-        // Make sure armX and armY are within the range of 0 to infinity
-        // So we cannot reach below the ground
-        armYPos = (position.getY() < 0) ? 0 : armYPos;
-
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-        double upperArmAngle = armCalculations.getUpperAngle(armXPos, armYPos);
-        double lowerArmAngle = armCalculations.getLowerAngle(armXPos, armYPos, upperArmAngle);
+        double upperArmAngle = armCalculations.getUpperAngle(armPos.getX(), armPos.getY());
+        double lowerArmAngle = armCalculations.getLowerAngle(armPos.getX(), armPos.getY(), upperArmAngle);
 
-        // We do this because lowerArmAngle is reliant on upperArmAngle
+        // If upperArmAngle is NaN, then tell the arm not to change position
+        // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
         if (Double.isNaN(upperArmAngle)) {
-            lowerArmAngle = lowerRotation;
-            upperArmAngle = upperRotation;
+            return;
         }
 
         setLowerArmReference(Units.radiansToRotations(lowerArmAngle));
@@ -336,8 +335,7 @@ public class Arm implements Loggable {
         // the converted position, neoPosition
         _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
-        double lowerArmEncoderPosition = _lowerArmEncoder.getPosition();
-        lowerRotation = lowerArmEncoderPosition;
+        lowerRotation = _lowerArmEncoder.getPosition();;
 
         lowerRotationList.add(lowerRotation);
     }
