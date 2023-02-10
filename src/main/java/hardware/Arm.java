@@ -23,11 +23,11 @@ public class Arm implements Loggable {
 
     /**
      * What the arm positions look like and the index in the array
-     *          4
-     * O        __     8
-     *  1      |      7
-  *          3 | 5
-     *   2  |||||  6
+     *               4
+     *      O        __     8
+     *       1      |      7
+     *           3 | 5
+     *        2  |||||  6
      */
 
     // All armPos values are in inches
@@ -296,7 +296,7 @@ public class Arm implements Loggable {
         // the converted position, neoPosition
         _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
-        upperRotation = _upperArmEncoder.getPosition();;
+        upperRotation = _upperArmEncoder.getPosition();
 
         upperRotationList.add(upperRotation);
     }
