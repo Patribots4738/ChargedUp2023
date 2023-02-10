@@ -32,18 +32,18 @@ public class Arm implements Loggable {
 
     // All armPos values are in inches
     Translation2d[][] armPos = {
-      {
-          new Translation2d(-20, 30),
-          new Translation2d(-36, 23),
-      },
-      { 
-          new Translation2d(0, ArmConstants.MAX_REACH)
-      },
-      {
-          new Translation2d(-12, 19),
-          new Translation2d(-28, 13),
-          new Translation2d(-32, 10)
-      }
+    {
+        new Translation2d(-20, 30),
+        new Translation2d(-36, 23),
+    },
+    {
+        new Translation2d(0, ArmConstants.MAX_REACH)
+    },
+    {
+        new Translation2d(-12, 19),
+        new Translation2d(-28, 13),
+        new Translation2d(-32, 10)
+    }
     };
     
     // ceil -- force round up
@@ -54,7 +54,7 @@ public class Arm implements Loggable {
 
     private double armXPos = 0;
     private double armYPos = 0;
-    
+
     // The current rotation of the upper arm
     @Log
     private double upperRotation = 0;
@@ -296,8 +296,7 @@ public class Arm implements Loggable {
         // the converted position, neoPosition
         _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
-        double upperArmEncoderPos = _upperArmEncoder.getPosition();
-        upperRotation = upperArmEncoderPos;
+        upperRotation = _upperArmEncoder.getPosition();;
 
         upperRotationList.add(upperRotation);
     }
@@ -335,7 +334,7 @@ public class Arm implements Loggable {
         // the converted position, neoPosition
         _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
 
-        lowerRotation = _lowerArmEncoder.getPosition();;
+        lowerRotation = _lowerArmEncoder.getPosition();
 
         lowerRotationList.add(lowerRotation);
     }
