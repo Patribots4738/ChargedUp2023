@@ -137,11 +137,12 @@ public class Robot extends TimedRobot {
         if (driver.getLeftBumper()) {
             arm.drive(driverLeftAxis.getX(), driverLeftAxis.getY());
         }
+
         if (driver.getRightBumperPressed()) {
-            arm.setArmIndex(1);
+            arm.setArmIndex(arm.getArmIndex() + 1);
         }
         else if (driver.getLeftBumperPressed()) {
-            arm.setArmIndex(-1);
+            arm.setArmIndex(arm.getArmIndex() - 1);
         }
 
     }
