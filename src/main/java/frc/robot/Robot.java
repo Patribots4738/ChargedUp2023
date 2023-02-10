@@ -138,18 +138,16 @@ public class Robot extends TimedRobot {
             swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
         }
 
-        if (driver.getRightBumperPressed())
-        {
-            arm.setArmIndex(1);
-        } 
-        else if (driver.getLeftBumperPressed())
-        {
-            arm.setArmIndex(-1);
-        }
-
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
         if (driver.getLeftStickButtonPressed()) {
           swerve.toggleSpeed();
+        }
+
+        if (driver.getRightBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() + 1);
+        }
+        else if (driver.getLeftBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() - 1);
         }
         
         // Toggle the operator override when the operator's left stick is pressed
@@ -158,6 +156,12 @@ public class Robot extends TimedRobot {
         }
         if (arm.getOperatorOverride()) {
           arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
+        }
+        else if (driver.getRightBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() + 1);
+        }
+        else if (driver.getLeftBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() - 1);
         }
 
 

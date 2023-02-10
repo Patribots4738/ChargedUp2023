@@ -26,20 +26,29 @@ public class Arm implements Loggable {
      *          4
      * O        __     8
      *  1      |      7
- *          3 | 5
+  *          3 | 5
      *   2  |||||  6
      */
 
     // All armPos values are in inches
-    Translation2d[] armPos = {
-            // new Translation2d(-40, 28),
-            new Translation2d(-36, 36),
-            new Translation2d(-10, 13),
-            new Translation2d(0, ArmConstants.kMaxReach),
-            new Translation2d(10, 13),
-            new Translation2d(36, 36),
-            // new Translation2d(40, 28),
+    Translation2d[][] armPos = {
+      {
+          new Translation2d(-20, 30),
+          new Translation2d(-36, 23),
+      },
+      { 
+          new Translation2d(0, ArmConstants.kMaxReach) 
+      },
+      {
+          new Translation2d(-12, 19),
+          new Translation2d(-28, 13),
+          new Translation2d(-32, 10)
+      }
     };
+    
+    // ceil -- force round up
+    int armPosDimention1 = (int) Math.ceil(armPos.length / 2);
+    int armPosDimention2 = 0;
     
     private boolean operatorOverride = false;
 
@@ -149,10 +158,24 @@ public class Arm implements Loggable {
     }
 
     public void periodic() {
-    
-      setLowerArmPosition(this.lowerReference);
-      setUpperArmPosition(this.upperReference);
+        indexPeriodic();
+    }
 
+    public void indexPeriodic() {
+
+        // armPos[armPosDimention1][armPosDimention2]
+        if (armPosDimention1 == armPos.length ||
+            armPosDimention2 == armPos[armPosDimention1].length) 
+        {
+            return;
+        }
+
+        if (Math.abs(getLowerArmPosition() - lowerReference) > ArmConstants.kLowerArmDeadband ||
+            Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.kUpperArmDeadband) 
+        {
+            armPosDimention2++;
+            drive(armPos[armPosDimention1][armPosDimention2]);
+        }
     }
 
     public boolean getOperatorOverride() {
@@ -170,34 +193,19 @@ public class Arm implements Loggable {
     /**
      * Sets arm index from the armPos array
      *
-     * @param armIndex the arm index
+     * @param index the direction to change the arm index by
      */
-    public void setArmIndex(int armIndex) {
+    public void setArmIndex(int index) {
 
-        armIndex = (armIndex > 0) ? 1 : -1;
+        MathUtil.clamp(index, 0, armPos.length-1);
+        
+        armPosDimention1 += index;
+        armPosDimention2 = 0;
 
-        // Make sure armPosIndex is within the range of 0 to armPos.length - 1
-        // To prevent out of bounds errors
-        if (armPosIndex == 0 && armIndex == -1){
-            armIndex = 0;
-        }
-        if (armPosIndex >= armPos.length - 1 && armIndex == 1) {
-            armIndex = 0;
-        }
-        // If the arm is not at the reference
-        // position (accounting for deadband), don't let the arm index change
-        if (Math.abs(_lowerArmEncoder.getPosition() - lowerReference) > ArmConstants.kLowerArmDeadband ||
-                Math.abs(_upperArmEncoder.getPosition() - upperReference) > ArmConstants.kUpperArmDeadband)
-        {
-            armIndex = 0;
-        }
+    }
 
-        armPosIndex += armIndex;
-
-//        System.out.println("Index: " + armPosIndex + ", X: " + armPos[armPosIndex].getX() + ", Y: " + armPos[armPosIndex].getY());
-
-        drive(new Translation2d(armPos[armPosIndex].getX(), armPos[armPosIndex].getY()));
-
+    public int getArmIndex() {
+        return armPosDimention1;
     }
 
     /**
