@@ -15,25 +15,25 @@ public class Claw {
 
     public Claw() {
 
-        _claw = new CANSparkMax(ClawConstants.kClawMotorCanID, MotorType.kBrushless);
+        _claw = new CANSparkMax(ClawConstants.CLAW_CAN_ID, MotorType.kBrushless);
         _claw.setIdleMode(CANSparkMax.IdleMode.kBrake);
         _claw.restoreFactoryDefaults();
 
         _clawEncoder = _claw.getEncoder();
-        _clawEncoder.setPositionConversionFactor(ClawConstants.kClawPositionConversionFactor);
+        _clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
         _clawPIDController = _claw.getPIDController();
         _clawPIDController.setFeedbackDevice(_clawEncoder);
 
-        _clawPIDController.setP(ClawConstants.kClawP);
-        _clawPIDController.setI(ClawConstants.kClawI);
-        _clawPIDController.setD(ClawConstants.kClawD);
-        _clawPIDController.setFF(ClawConstants.kClawFF);
+        _clawPIDController.setP(ClawConstants.CLAW_P);
+        _clawPIDController.setI(ClawConstants.CLAW_I);
+        _clawPIDController.setD(ClawConstants.CLAW_D);
+        _clawPIDController.setFF(ClawConstants.CLAW_FF);
         _clawPIDController.setOutputRange(
-                ClawConstants.kClawMinOutput,
-                ClawConstants.kClawMaxOutput);
+                ClawConstants.CLAW_MIN_OUTPUT,
+                ClawConstants.CLAW_MAX_OUTPUT);
 
-        _claw.setSmartCurrentLimit(ClawConstants.kClawStallLimit, ClawConstants.kClawFreeLimit);
+        _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
         _claw.burnFlash();
 
     }

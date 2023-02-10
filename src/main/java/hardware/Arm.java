@@ -376,6 +376,6 @@ public class Arm implements Loggable {
     }
 
     public void printList() {
-      System.out.println(upperRotationList);
-  }
+        System.out.println(upperRotationList);
+    }
 }

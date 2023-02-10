@@ -151,7 +151,21 @@ public final class Constants {
     }
 
     public static final class ClawConstants {
-        public static final double CLAW_CAN_ID = 11;
+        public static final int CLAW_CAN_ID = 11;
+
+        public static final double CLAW_POSITION_CONVERSION_FACTOR = 50;
+
+        public static final double CLAW_P = 1;
+        public static final double CLAW_I = 0;
+        public static final double CLAW_D = 0;
+        public static final double CLAW_FF = 1;
+
+        public static final double CLAW_MIN_OUTPUT = -1;
+        public static final double CLAW_MAX_OUTPUT = 1;
+
+        public static final int CLAW_STALL_LIMIT = 20;
+        public static final int CLAW_FREE_LIMIT = 20;
+
 
         // from the edge of the upper arm, straight out,
         // and stop at the end of the 3d-printed "grabber"
