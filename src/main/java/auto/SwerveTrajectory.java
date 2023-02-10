@@ -22,13 +22,8 @@ public class SwerveTrajectory implements Loggable {
     // Create config for trajectory
     public static double timetrajectoryStarted;
     public static String trajectoryStatus = "";
-    public static SwerveTrajectory SINGLE_INSTANCE = new SwerveTrajectory();
 
     public static double elapsedTime;
-
-    public static SwerveTrajectory getInstance() {
-        return SINGLE_INSTANCE;
-    }
 
     /**
      * Returns a new HolonomicDriveController with constant PID gains.
@@ -40,8 +35,6 @@ public class SwerveTrajectory implements Loggable {
      * <p>
      * The ProfiledPIDController for the rotation of the robot,
      * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
-     *
-     * @return A new HolonomicDriveController with the given PID gains (xP, xI, xD, yP, yI, yD, rotP, rotI, rotD) and constraints (maxVel, maxAccel)
      */
     public static HolonomicDriveController HDC = new HolonomicDriveController(
             new PIDController(Constants.AutoConstants.X_CORRECTION_P, Constants.AutoConstants.X_CORRECTION_I, Constants.AutoConstants.X_CORRECTION_D),
