@@ -118,7 +118,7 @@ public final class Constants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final int OPERATOR_CONTROLLER_PORT = 1;
 
-        public static final double DRIVER_DEADBAND = 0.15;
+        public static final double DRIVER_DEADBAND = 0.09;
         public static final double OPERATOR_DEADBAND = 0.15;
 
         // See https://www.desmos.com/calculator/e07raajzh5
@@ -281,7 +281,7 @@ public final class Constants {
         public static final String CAMERA_NAME = "Patribots4738";
 
         // Distance from the camera to the front of the bot
-        public static final Transform3d kCameraPosition = new Transform3d(
+        public static final Transform3d CAMERA_POSITION = new Transform3d(
             new Translation3d(
               Units.inchesToMeters(9.5),
               Units.inchesToMeters(8),

@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 
 import javax.sql.rowset.spi.TransactionalWriter;
+import javax.xml.crypto.dsig.Transform;
 
 import org.ejml.dense.row.misc.TransposeAlgs_DDRM;
 import org.photonvision.PhotonUtils;
@@ -66,9 +67,9 @@ public class AutoAlignment {
     // divide by -100 to convert negative centimeters to meters
     double rangeMeters =
                   (PhotonUtils.calculateDistanceToTargetMeters(
-                          VisionConstants.kCameraPosition.getZ(),
+                          VisionConstants.CAMERA_POSITION.getZ(),
                           getTagPos(aprilTagID).getZ(),
-                          VisionConstants.kCameraPosition.getRotation().getY(),
+                          VisionConstants.CAMERA_POSITION.getRotation().getY(),
                           (visionTransform3d.getRotation().getY())));
 
     Translation2d targetPosition = getTagPos(aprilTagID).toPose2d().getTranslation();
@@ -79,9 +80,10 @@ public class AutoAlignment {
     );
 
     // NEED TO FIND A WAY TO FLIP THE X ON VISIONTRANSFORM3D
-    Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(visionTransform3d, getTagPos(aprilTagID), VisionConstants.kCameraPosition);
+    Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(visionTransform3d, getTagPos(aprilTagID), VisionConstants.CAMERA_POSITION);
+    Translation2d noCameraOffset = targetPosition.plus(visionTransform3d.getTranslation().toTranslation2d().unaryMinus());
 
-    System.out.println("\nRangeMeters" + rangeMeters + "\nTargetPosition" + targetPosition + "\nGenerated Pose: " + generatedPose + "\nRobot Pose: " + robotPose + "\n");
+    System.out.println("\nRangeMeters" + rangeMeters + "\nTargetPosition" + targetPosition + "\nGenerated Pose: " + generatedPose + "\nRobot Pose: " + robotPose + "\nnoCameraOffset" + noCameraOffset + "\n");
     
     swerve.resetOdometry(robotPose.toPose2d());
 
@@ -91,7 +93,7 @@ public class AutoAlignment {
 
   public void moveToTag(int tagID, HolonomicDriveController HDC, AutoSegmentedWaypoints autoSegmentedWaypoints) {
 
-    autoSegmentedWaypoints.periodic();
+    // autoSegmentedWaypoints.periodic();
 
     Pose2d targetPose = getTagPos(tagID).toPose2d();
     

@@ -48,8 +48,8 @@ public class ArmCalcuations {
     public double getLowerAngle(double y, double x, double q2)
     {
         double aTanFraction =
-                (Constants.ArmConstants.kUpperArmLength * Math.sin(q2)) /
-                (Constants.ArmConstants.kLowerArmLength + (Constants.ArmConstants.kUpperArmLength * Math.cos(q2)));
+                (Constants.ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) /
+                (Constants.ArmConstants.LOWER_ARM_LENGTH + (Constants.ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2)));
 
         double leftAngle = Math.atan(y / x) +
                 Math.atan(aTanFraction);

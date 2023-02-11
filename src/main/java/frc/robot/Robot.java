@@ -83,7 +83,7 @@ public class Robot extends TimedRobot {
         arm.setBrakeMode();
 
         autoSegmentedWaypoints = new AutoSegmentedWaypoints();
-        autoSegmentedWaypoints.init(swerve, arm);
+        // autoSegmentedWaypoints.init(swerve, arm);
         autoSegmentedWaypoints.loadAutoPaths();
         SwerveTrajectory.resetTrajectoryStatus();
 
@@ -221,14 +221,14 @@ public class Robot extends TimedRobot {
       // Make sure that the camera has tags in view
       if (vision.hasTargets()) {
 
-
+        
         autoAlignment.setTagID(vision.getTagID());
-
+        
         if (driver.getLeftBumperPressed()) {
-
+          
           System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
-          System.out.println("Distance from april to bot: " + vision.getPose() + "\n\n");
-
+          System.out.println("Distance from april to bot: " + vision.getTransform() + "\n\n");
+          
           autoAlignment.calibrateOdometry(tagID, vision.getTransform());
 
           System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
@@ -264,8 +264,8 @@ public class Robot extends TimedRobot {
       // }
     } else {
 
-      swerve.drive(driverLeftY * 0.25, driverLeftX * 0.25, driverRightX * 0.25, true);
-
+      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX, true);
+      
     }
   }
 }
