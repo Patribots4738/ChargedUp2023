@@ -14,9 +14,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import math.Constants.DriveConstants;
 
-public class Swerve { 
+public class Swerve {
     private double speedMultiplier = 1;
-  
+
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
             DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
@@ -179,7 +179,7 @@ public class Swerve {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return m_gyro.getRate();
+        return m_gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public void toggleSpeed() {

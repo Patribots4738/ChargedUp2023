@@ -5,18 +5,20 @@
 package frc.robot;
 
 import debug.*;
-import edu.wpi.first.wpilibj.DriverStation;
 import hardware.*;
-import math.ArmCalcuations;
-import math.OICalc;
 import math.Constants.*;
 import auto.*;
+import subsystems.*;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
-
+import edu.wpi.first.wpilibj.DriverStation;
+import math.OICalc;
+import edu.wpi.first.math.geometry.Translation2d;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -27,34 +29,50 @@ public class Robot extends TimedRobot {
 
     // The robot's subsystems and commands are defined here...
 
-    Swerve swerve;
+  Swerve swerve;
 
-    XboxController driver;
-    XboxController operator;
+  XboxController driver;
+  XboxController operator;
 
-    AutoSegmentedWaypoints autoSegmentedWaypoints;
+  AutoSegmentedWaypoints autoSegmentedWaypoints;
 
-    Arm arm;
+  Arm arm;
 
-    Debug debug;
+  Debug debug;
 
-    ArmCalcuations armCalcuations = new ArmCalcuations();
+  Vision vision = new Vision();
 
+  boolean isAligned;
 
-    @Override
-    public void robotInit() {
+  HolonomicDriveController HDC;
+
+  Pose2d aprilPos;
+
+  AutoAlignment autoAlignment;
+
+  boolean isAlligning;
+
+  @Override
+  public void robotInit() {
+
         // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
-        // Debug class for ShuffleBoard
+        // Debug class for Shuffleboard
         debug = new Debug();
         debug.debugInit();
 
+
+        /*
+          For swerve drive, the following is the order of the motors
+          odd CAN IDs drive the robot
+          even CAN IDs are the turning motors
+         */
         // Drivetrain instantiation
         swerve = new Swerve();
-        // Zero the IMU for field-oriented driving
+        autoAlignment = new AutoAlignment(swerve);
+        // // Zero the IMU for field-oriented driving
         swerve.resetEncoders();
         swerve.zeroHeading();
-
         swerve.setBrakeMode();
 
         driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
@@ -65,7 +83,9 @@ public class Robot extends TimedRobot {
         arm.setBrakeMode();
 
         autoSegmentedWaypoints = new AutoSegmentedWaypoints();
+        autoSegmentedWaypoints.init(swerve, arm);
         autoSegmentedWaypoints.loadAutoPaths();
+        SwerveTrajectory.resetTrajectoryStatus();
 
         // Configure the logger for shuffleboard
         Logger.configureLoggingAndConfig(this, false);
@@ -86,10 +106,14 @@ public class Robot extends TimedRobot {
 
         Logger.updateEntries();
 
-    }
+  }
 
-    @Override
-    public void disabledInit() {}
+  @Override
+  public void disabledInit() {
+
+      isAligned = false;
+
+  }
 
     @Override
     public void disabledPeriodic() {}
@@ -165,10 +189,83 @@ public class Robot extends TimedRobot {
 
     }
 
-    @Override
-    public void testInit() {}
+  @Override
+  public void testInit() {
+    swerve.resetEncoders();
+    swerve.setBrakeMode();
+    HDC = SwerveTrajectory.getHDC();
+
+  }
+
+  @Override
+  public void testPeriodic() {
+
+    int tagID = autoAlignment.getTagID();
+
+    double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+    double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+
+    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+    // If we are on blue alliance, flip the driverLeftAxis
+
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+      driverLeftAxis.unaryMinus();
+    }
+    // Use the A button to activate the alignment process
+    if (driver.getAButton()) {
+
+      // Run the vision calculations and get the most visible tag
+      vision.periodic();
+
+      // Make sure that the camera has tags in view
+      if (vision.hasTargets()) {
 
 
-    @Override
-    public void testPeriodic() {}
+        autoAlignment.setTagID(vision.getTagID());
+
+        if (driver.getLeftBumperPressed()) {
+
+          System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
+          System.out.println("Distance from april to bot: " + vision.getPose() + "\n\n");
+
+          autoAlignment.calibrateOdometry(tagID, vision.getTransform());
+
+          System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+
+          isAligned = true;
+
+        }
+      }
+
+      if (isAligned && driver.getRightBumper()) {
+
+        autoAlignment.moveToTag(tagID, HDC, autoSegmentedWaypoints);
+
+      }
+
+      // Make the controller buzz if there are no targets in view
+      else {
+
+        driver.setRumble(RumbleType.kLeftRumble, 0.0);
+
+      }
+
+      // if (vision.hasTargets()) {
+      //   if (operator.getLeftBumperPressed()) {
+      //     autoAlignment.calibrateOdometry(vision.getPose(), vision.getTagID());
+      //   }
+
+      //   else if (operator.getRightBumper()) {
+      //     if (!isAlligning) {
+      //       aprilPos
+      //     }
+      //   }
+      // }
+    } else {
+
+      swerve.drive(driverLeftY * 0.25, driverLeftX * 0.25, driverRightX * 0.25, true);
+
+    }
+  }
 }

@@ -1,55 +1,53 @@
-package hardware;
+package subsystems;
 
 import java.util.HashMap;
 
-import org.opencv.photo.Photo;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.photonvision.targeting.TargetCorner;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Vision {
 
-    public static final double rotDeadzone = 10;
+    public static final double rotDeadzone = 0.03;
 
-    public static final double xDeadZone = 0.1;
+    public static final double yDeadZone = 0.03;
 
-    public static final double allignmentSpeed = 0.5;
+    public static final double xDeadZone = 0.05;
     
-    public static final double allignmentRotSpeed = 0.05;
+    public static final double xDistance = 1.5;
 
+    public static final double alignmentSpeed = 0.005;
 
-    private final PhotonCamera camera = new PhotonCamera("Patribots4738");
+    public static final double alignmentRotSpeed = 0.05;
 
-    private final HashMap<String, Double> tagInfo = new HashMap<String, Double>();
+    private PhotonCamera camera = new PhotonCamera("Patribots4738");
+
+    private HashMap<String, Double> tagInfo = new HashMap<String, Double>();
 
     private boolean hasTargets;
 
 
-    public Vision(){}
-
+    public Vision() {}
 
     /**
      * Converts the PhotonPipelineResult to an easier to use format
      * @return A HashMap<String, Double> representing the most visible AprilTag, null if no tag is visible
      */
-    public HashMap<String, Double> pereodic(){
+    public HashMap<String, Double> periodic() {
 
         // Get the most recent image from the camera and run the calculations
         // necessary to get AprilTag data
         PhotonPipelineResult result = camera.getLatestResult();
 
         // Make sure that the camera can see an AprilTag
-        if (!result.hasTargets()){
+        if (!result.hasTargets()) {
             hasTargets = false;
             return null;
         }
@@ -74,9 +72,9 @@ public class Vision {
 
         tagInfo.put("z", position.getZ());
 
-        tagInfo.put("yaw", target.getYaw());
+        tagInfo.put("yaw", position.getRotation().getZ());
 
-        tagInfo.put("pitch", target.getPitch());
+        tagInfo.put("pitch", position.getRotation().getY());
 
         // Returns the HashMap
         return tagInfo;
@@ -86,31 +84,35 @@ public class Vision {
         return this.hasTargets;
     }
 
-    public Double getX(){
+    public double getX() {
         return tagInfo.get("x");
     }
 
-    public Double getY(){
+    public double getY() {
         return tagInfo.get("y");
     }
 
-    public Double getZ(){
+    public double getZ() {
         return tagInfo.get("z");
     }
 
-    public Double getYaw(){
+    public double getYaw() {
         return tagInfo.get("yaw");
     }
 
-    public Double getPitch(){
+    public double getPitch() {
         return tagInfo.get("pitch");
     }
 
-    public int getTagID(){
+    public int getTagID() {
         return tagInfo.get("tagID").intValue();
     }
 
-    public Pose2d getPose(){
+    public Pose2d getPose() {
         return new Pose2d(getX(), getY(), new Rotation2d(getYaw()));
+    }
+
+    public Transform3d getTransform() {
+        return new Transform3d(new Translation3d(getX(), getY(), getZ()), new Rotation3d(0, getPitch(), getYaw()));
     }
 }
