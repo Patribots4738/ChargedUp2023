@@ -24,7 +24,7 @@ public class Vision {
     public static final double xDistance = 1.5;
 
     public static final double alignmentSpeed = 0.005;
-    
+
     public static final double alignmentRotSpeed = 0.05;
 
     private PhotonCamera camera = new PhotonCamera("Patribots4738");
@@ -80,8 +80,8 @@ public class Vision {
         return tagInfo;
     }
 
-    public boolean hasTargets() {
-        return true ? this.hasTargets : false;
+    public boolean hasTargets(){
+        return this.hasTargets;
     }
 
     public double getX() {

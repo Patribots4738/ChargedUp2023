@@ -89,9 +89,9 @@ public class AutoAlignment {
 
   }
 
-  public void moveToTag(int tagID, HolonomicDriveController HDC, AutoWaypoints autoWaypoints) {
+  public void moveToTag(int tagID, HolonomicDriveController HDC, AutoSegmentedWaypoints autoSegmentedWaypoints) {
 
-    autoWaypoints.autoPeriodic();
+    autoSegmentedWaypoints.periodic();
 
     Pose2d targetPose = getTagPos(tagID).toPose2d();
     
