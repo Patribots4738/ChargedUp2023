@@ -4,7 +4,11 @@
 
 package math;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -191,18 +195,18 @@ public final class Constants {
         // The length of the second pivot point to the claw, in inches
         public static final double UPPER_ARM_LENGTH = 21;
 
-        // The max reach of the bot horizontally, in inches
-        public static final double MAX_REACH = LOWER_ARM_LENGTH + UPPER_ARM_LENGTH;
+    // The max reach of the bot horizontally, in inches
+    public static final double MAX_REACH = LOWER_ARM_LENGTH + UPPER_ARM_LENGTH;
 
-        // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
-        // 78 inches is the rule, 11 inches is the base of the arm to the ground
-        public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
+    // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
+    // 78 inches is the rule, 11 inches is the base of the arm to the ground
+    public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
 
-        // The gear ratio of the lower arm is 60:1
-        public static final double LOWER_ARM_GEAR_RATIO = 60;
+    // The gear ratio of the lower arm is 60:1
+    public static final double LOWER_ARM_GEAR_RATIO = 60;
 
-        // The gear ratio of the upper arm is 25:7
-        public static final double UPPER_ARM_GEAR_RATIO = (85.0 / 9.0);
+    // The gear ratio of the upper arm is 25:7
+    public static final double UPPER_ARM_GEAR_RATIO = (85.0 / 9.0);
 
         // The factor that the encoder is multiplied by to get the actual position
         public static final double LOWER_ENCODER_POSITION_FACTOR = (LOWER_ARM_LENGTH * Math.PI) / (LOWER_ARM_GEAR_RATIO);
@@ -272,11 +276,38 @@ public final class Constants {
         public static final double V_UPPER = 0.95764;
         public static final double A_UPPER = 0.19957;
     }
-
     public static final class VisionConstants {
+
+        public static final String CAMERA_NAME = "Patribots4738";
+
+        // Distance from the camera to the front of the bot
+        public static final Transform3d kCameraPosition = new Transform3d(
+            new Translation3d(
+              Units.inchesToMeters(9.5),
+              Units.inchesToMeters(8),
+              Units.inchesToMeters(15)),
+            new Rotation3d(0, 0, 0));
+
         public static final double CONE_OFFSET_METERS = 0.5;
 
         public static final double DESIRED_VELOCITY_METERS_PER_SECOND = 1.5;
+
+
     }
 
-  }
+    public static final class AlignmentConstants {
+
+        private static final double GRID_TAG_HEIGHT  = Units.inchesToMeters(18.22);
+        private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
+
+        public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
+        public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
+        public static final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
+        public static final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        public static final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25),  Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+        public static final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(174.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
+        public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(108.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
+        public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    }
+
+}

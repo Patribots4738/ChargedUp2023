@@ -27,24 +27,6 @@ public class ArmCalcuations {
      */
     public double getUpperAngle(double y, double x)
     {
-      
-        // Make sure the values are not over the max reach (-1)
-        // The -1 is applied as a bufffer to prevent the math from going over
-        // (just in case)
-        if (x >= ArmConstants.MAX_REACH - 1) {
-          x = ArmConstants.MAX_REACH - 1;
-        }
-        if (y >= ArmConstants.MAX_REACH - 1) {
-          y = ArmConstants.MAX_REACH - 1;
-        }
-
-        if (x >= ArmConstants.MAX_REACH) {
-            x = ArmConstants.MAX_REACH - 1;
-        }
-        if (y >= ArmConstants.MAX_REACH) {
-            y = ArmConstants.MAX_REACH - 1;
-        }
-
         double upperAngle =
                 (Math.acos(
                         (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(ArmConstants.LOWER_ARM_LENGTH, 2)) +
@@ -65,24 +47,15 @@ public class ArmCalcuations {
      */
     public double getLowerAngle(double y, double x, double q2)
     {
-
-        // Make sure the values are not over the max reach (-1)
-        // The -1 is applied as a bufffer to prevent the math from going over
-        // (just in case)
-        if (x >= ArmConstants.MAX_REACH - 1) {
-          x = ArmConstants.MAX_REACH - 1;
-        }
-        if (y >= ArmConstants.MAX_REACH - 1) {
-          y = ArmConstants.MAX_REACH - 1;
-        }
+        double aTanFraction =
+                (ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) /
+                (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2)));
 
         double leftAngle = Math.atan(y / x) +
-                Math.atan((ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2))
-                        / (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));
+                Math.atan(aTanFraction);
 
         double rightAngle = Math.atan(y / x) -
-                Math.atan((ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2))
-                        / (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));
+                Math.atan(aTanFraction);
 
         return rightAngle; // ((x < 0) ? leftAngle : rightAngle);
     }
