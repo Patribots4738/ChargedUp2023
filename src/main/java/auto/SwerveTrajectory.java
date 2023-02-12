@@ -112,7 +112,7 @@ public class SwerveTrajectory implements Loggable {
     }
   }
 
-  public void resetTrajectoryStatus() {
+  public static void resetTrajectoryStatus() {
 
     trajectoryStatus = "setup";
 

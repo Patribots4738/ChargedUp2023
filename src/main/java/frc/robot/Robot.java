@@ -28,7 +28,6 @@ public class Robot extends TimedRobot {
     // The robot's subsystems and commands are defined here...
 
   Swerve swerve;
-  SwerveTrajectory swerveTrajectory;
 
   XboxController driver;
   XboxController operator;
@@ -75,8 +74,7 @@ public class Robot extends TimedRobot {
         autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm);
         autoSegmentedWaypoints.loadAutoPaths();
 
-        swerveTrajectory = new SwerveTrajectory();
-        swerveTrajectory.resetTrajectoryStatus();
+        SwerveTrajectory.resetTrajectoryStatus();
 
         vision = new Vision();
 
@@ -110,7 +108,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
 
-        swerveTrajectory.resetTrajectoryStatus();
+        SwerveTrajectory.resetTrajectoryStatus();
 
     }
 
@@ -179,9 +177,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    
     swerve.resetEncoders();
     swerve.setBrakeMode();
-    swerveTrajectory.resetTrajectoryStatus();
+    SwerveTrajectory.resetTrajectoryStatus();
 
   }
 
@@ -216,7 +215,7 @@ public class Robot extends TimedRobot {
           System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
 
           autoAlignment.calibrateOdometry(vision.getTransform());
-          swerveTrajectory.resetTrajectoryStatus();
+          SwerveTrajectory.resetTrajectoryStatus();
 
           System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
 
