@@ -117,7 +117,7 @@ public class Swerve {
 
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
-                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(m_gyro.getAngle()))
+                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getOdometry().getPoseMeters().getRotation())
                         : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
 
         setModuleStates(swerveModuleStates);

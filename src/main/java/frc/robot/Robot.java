@@ -156,7 +156,7 @@ public class Robot extends TimedRobot {
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
         // If we are on blue alliance, flip the driverLeftAxis
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-            driverLeftAxis.unaryMinus();
+            driverLeftAxis = driverLeftAxis.unaryMinus();
         }
 
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
@@ -227,7 +227,7 @@ public class Robot extends TimedRobot {
         if (driver.getLeftBumperPressed()) {
           
           System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
-          System.out.println("Distance from april to bot: " + vision.getTransform() + "\n\n");
+          System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
           
           autoAlignment.calibrateOdometry(tagID, vision.getTransform());
 
@@ -264,7 +264,7 @@ public class Robot extends TimedRobot {
       // }
     } else {
 
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX, true);
+      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX*.25, true);
       
     }
   }

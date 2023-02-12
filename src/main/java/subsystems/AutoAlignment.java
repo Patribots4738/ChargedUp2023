@@ -9,13 +9,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
-
-import javax.sql.rowset.spi.TransactionalWriter;
-import javax.xml.crypto.dsig.Transform;
-
-import org.ejml.dense.row.misc.TransposeAlgs_DDRM;
-import org.photonvision.PhotonUtils;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -26,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import auto.*;
 import hardware.Swerve;
 import math.Constants;
+import math.Constants.AlignmentConstants;
 import math.Constants.VisionConstants;
 
 
@@ -63,29 +57,15 @@ public class AutoAlignment {
    * @param aprilTagID the ID of the tag being watched
    */
   public void calibrateOdometry(int aprilTagID, Transform3d visionTransform3d) {
-    
-    // divide by -100 to convert negative centimeters to meters
-    double rangeMeters =
-                  (PhotonUtils.calculateDistanceToTargetMeters(
-                          VisionConstants.CAMERA_POSITION.getZ(),
-                          getTagPos(aprilTagID).getZ(),
-                          VisionConstants.CAMERA_POSITION.getRotation().getY(),
-                          (visionTransform3d.getRotation().getY())));
 
-    Translation2d targetPosition = getTagPos(aprilTagID).toPose2d().getTranslation();
+    double headingToReference = visionTransform3d.getRotation().getZ() + Math.PI * -Math.signum(visionTransform3d.getRotation().getZ());
 
-    Pose2d generatedPose = new Pose2d(
-      PhotonUtils.estimateCameraToTargetTranslation(rangeMeters, Rotation2d.fromDegrees(-visionTransform3d.getRotation().getZ())).minus(new Translation2d(targetPosition.getX(),0)),
-      Rotation2d.fromDegrees(visionTransform3d.getRotation().getZ())
-    );
+    Translation2d targetPosition = getTagPos(aprilTagID).getTranslation();
+    Translation2d visionTranslation2d = visionTransform3d.getTranslation().toTranslation2d().unaryMinus();
 
-    // NEED TO FIND A WAY TO FLIP THE X ON VISIONTRANSFORM3D
-    Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(visionTransform3d, getTagPos(aprilTagID), VisionConstants.CAMERA_POSITION);
-    Translation2d noCameraOffset = targetPosition.plus(visionTransform3d.getTranslation().toTranslation2d().unaryMinus());
+    Translation2d robotPose = targetPosition.plus(visionTranslation2d).plus(VisionConstants.CAMERA_POSITION.getTranslation().toTranslation2d());
 
-    System.out.println("\nRangeMeters" + rangeMeters + "\nTargetPosition" + targetPosition + "\nGenerated Pose: " + generatedPose + "\nRobot Pose: " + robotPose + "\nnoCameraOffset" + noCameraOffset + "\n");
-    
-    swerve.resetOdometry(robotPose.toPose2d());
+    swerve.resetOdometry(new Pose2d(robotPose, Rotation2d.fromRadians(headingToReference)));
 
     SwerveTrajectory.resetTrajectoryStatus();
 
@@ -95,37 +75,37 @@ public class AutoAlignment {
 
     // autoSegmentedWaypoints.periodic();
 
-    Pose2d targetPose = getTagPos(tagID).toPose2d();
+    Pose2d targetPose = getTagPos(tagID);
     
     if (0 < tagID && tagID < 5) {
-        targetPose = targetPose.plus(new Transform2d(new Translation2d(-Units.inchesToMeters(15), 0), new Rotation2d(0)));
+        targetPose = targetPose.plus(new Transform2d(new Translation2d(AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(180)));
     } else {
-          targetPose = targetPose.plus(new Transform2d(new Translation2d(Units.inchesToMeters(15), 0), new Rotation2d(0)));
+        targetPose = targetPose.plus(new Transform2d(new Translation2d(-AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
     }
     
-    int direction = (0 < tagID && tagID < 5) ? -1 : 1;
-
-    // targetPose = new Pose2d(
-    //   new Translation2d(
-    //     targetPose.getX() + ((Units.inchesToMeters(15) + (VisionConstants.kCameraPosition.getX())) * direction), 
-    //     targetPose.getY() + (VisionConstants.kCameraPosition.getY())
-    //   ),
-    //   targetPose.getRotation()
-    // );
-
     if (swerve.getOdometry().getPoseMeters().getTranslation().getX() - targetPose.getTranslation().getX() < 0.1) {
       // we are close enough to the target
     }
 
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
       new PathConstraints(0.1, 0.1),
-      new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(),
-        swerve.getOdometry().getPoseMeters().getRotation()),
-      new PathPoint(targetPose.getTranslation(), targetPose.getRotation()));
+      new PathPoint(
+        swerve.getOdometry().getPoseMeters().getTranslation(),
+        // Might be useful to make this heading dynamic based on tag...
+        // @see pathplanner
+        Rotation2d.fromDegrees(0), 
+        swerve.getOdometry().getPoseMeters().getRotation()
+      ),
+      new PathPoint(
+        targetPose.getTranslation(),
+        Rotation2d.fromDegrees(0),
+        targetPose.getRotation()
+      )
     
-    SwerveTrajectory.PathPlannerRunner(tagPos, swerve, swerve.getOdometry(), swerve.getPose().getRotation());
+      );
     
-    System.out.println("Direction: " + direction);
+    SwerveTrajectory.PathPlannerRunner(tagPos, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
+    
     System.out.println("April Pose: " + getTagPos(tagID));
     System.out.println("Modified Target Pose: " + targetPose);
     System.out.println("Current Pose: " + swerve.getOdometry().getPoseMeters() + "\n\n");
@@ -160,56 +140,56 @@ public class AutoAlignment {
     return false;
   }
 
-  private Pose3d getTagPos(int tagID) {
+  private Pose2d getTagPos(int tagID) {
     double tagX = 0.0;
     double tagY = 0.0;
     double tagZ = 0.0;
-    Rotation3d rotation = new Rotation3d(0,0,0);
+    Rotation2d rotation = Rotation2d.fromRadians(0);
 
     switch (tagID) {
       case 1:
         tagX = Constants.AlignmentConstants.TAG_1_POSE.getX();
         tagY = Constants.AlignmentConstants.TAG_1_POSE.getY();
         tagZ = Constants.AlignmentConstants.TAG_1_POSE.getZ();
-        rotation = Constants.AlignmentConstants.TAG_1_POSE.getRotation();
+        rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_1_POSE.getRotation().getZ());
         break;
 
       case 2:
         tagX = Constants.AlignmentConstants.TAG_2_POSE.getX();
         tagY = Constants.AlignmentConstants.TAG_2_POSE.getY();
         tagZ = Constants.AlignmentConstants.TAG_2_POSE.getZ();
-        rotation = Constants.AlignmentConstants.TAG_2_POSE.getRotation();
+        rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_1_POSE.getRotation().getZ());
         break;
 
       case 3:
         tagX = Constants.AlignmentConstants.TAG_3_POSE.getX();
         tagY = Constants.AlignmentConstants.TAG_3_POSE.getY();
         tagZ = Constants.AlignmentConstants.TAG_3_POSE.getZ();
-        rotation = Constants.AlignmentConstants.TAG_3_POSE.getRotation();
+        rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_1_POSE.getRotation().getZ());
         break;
 
       case 6:
         tagX = Constants.AlignmentConstants.TAG_7_POSE.getX();
         tagY = Constants.AlignmentConstants.TAG_7_POSE.getY();
         tagZ = Constants.AlignmentConstants.TAG_7_POSE.getZ();
-        rotation = Constants.AlignmentConstants.TAG_7_POSE.getRotation();
+        rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_1_POSE.getRotation().getZ());
         break;
 
       case 7:
         tagX = Constants.AlignmentConstants.TAG_8_POSE.getX();
         tagY = Constants.AlignmentConstants.TAG_8_POSE.getY();
         tagZ = Constants.AlignmentConstants.TAG_8_POSE.getZ();
-        rotation = Constants.AlignmentConstants.TAG_8_POSE.getRotation();
+        rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_1_POSE.getRotation().getZ());
         break;
 
       case 8: 
         tagX = Constants.AlignmentConstants.TAG_8_POSE.getX();
         tagY = Constants.AlignmentConstants.TAG_8_POSE.getY();
         tagZ = Constants.AlignmentConstants.TAG_8_POSE.getZ();
-        rotation = Constants.AlignmentConstants.TAG_8_POSE.getRotation();
+        rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_1_POSE.getRotation().getZ());
         break;
     }
-    return new Pose3d(tagX, tagY, tagZ, rotation);
+    return new Pose2d(tagX, tagY, rotation);
   }
 
   public void setTagID(int tagID) {
