@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -118,7 +119,7 @@ public final class Constants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final int OPERATOR_CONTROLLER_PORT = 1;
 
-        public static final double DRIVER_DEADBAND = 0.09;
+        public static final double DRIVER_DEADBAND = 0.1;
         public static final double OPERATOR_DEADBAND = 0.15;
 
         // See https://www.desmos.com/calculator/e07raajzh5
@@ -276,6 +277,7 @@ public final class Constants {
         public static final double V_UPPER = 0.95764;
         public static final double A_UPPER = 0.19957;
     }
+
     public static final class VisionConstants {
 
         public static final String CAMERA_NAME = "Patribots4738";
@@ -300,6 +302,7 @@ public final class Constants {
         private static final double GRID_TAG_HEIGHT  = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
         public static final double GRID_BARRIER = Units.inchesToMeters(15);
+        public static final double ALLOWABLE_ERROR = Units.inchesToMeters(3);
 
         public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 0));
         public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 0));

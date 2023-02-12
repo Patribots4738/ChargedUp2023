@@ -1,10 +1,8 @@
 package subsystems;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,14 +12,13 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import auto.*;
+import edu.wpi.first.math.util.Units;
 import hardware.Swerve;
 import math.Constants;
 import math.Constants.AlignmentConstants;
 import math.Constants.VisionConstants;
-
 
 public class AutoAlignment {
 
@@ -40,12 +37,8 @@ public class AutoAlignment {
    */
   
   Swerve swerve;
-
-  SwerveDriveOdometry odometry;
-
-  Pose2d targetPose;
-
-  int tagID;
+  private int tagID;
+  private int coneOffset;
 
   public AutoAlignment(Swerve swerve) {
     this.swerve = swerve;
@@ -54,9 +47,8 @@ public class AutoAlignment {
   /**
    * Calibrate the odometry for the swerve
    * @param visionTransform3d the position of the aprilTag relative to the bot
-   * @param aprilTagID the ID of the tag being watched
    */
-  public void calibrateOdometry(int aprilTagID, Transform3d visionTransform3d) {
+  public void calibrateOdometry(Transform3d visionTransform3d) {
 
     double headingToReference = -visionTransform3d.getRotation().getZ();
     if (0 < tagID && tagID < 5) {
@@ -70,7 +62,7 @@ public class AutoAlignment {
       visionTransform3d.getX() * Math.sin(headingToReference)
     );
 
-    Translation2d targetPosition = getTagPos(aprilTagID).getTranslation();
+    Translation2d targetPosition = getTagPos(tagID).getTranslation();
     Translation2d visionTranslation2d = visionTransform3d.getTranslation().toTranslation2d().unaryMinus();
 
     Translation2d robotPose = targetPosition.plus(visionTranslation2d).plus(VisionConstants.CAMERA_POSITION.getTranslation().toTranslation2d());
@@ -79,62 +71,62 @@ public class AutoAlignment {
     System.out.println("Calibrated to: " + robotPose);
     swerve.resetOdometry(new Pose2d(trigPose, Rotation2d.fromRadians(headingToReference)));
 
-    // SwerveTrajectory.resetTrajectoryStatus();
-
   }
 
-  public boolean isAtTarget(Pose2d targetPose) {
-    boolean atTarget = swerve.getOdometry().getPoseMeters().getTranslation().getX() 
-                      - targetPose.getTranslation().getX() < 0.1; // close enough to target
-    return atTarget;
-  }
+  public void moveToTag() {
 
-  public Pose2d moveToTag(int tagID, AutoSegmentedWaypoints autoSegmentedWaypoints, int coneOffset) {
-
-    // autoSegmentedWaypoints.periodic();
+    if (tagID == 0) {
+      return;
+    }
 
     Pose2d targetPose = getTagPos(tagID);
-    
+
+    Rotation2d heading = Rotation2d.fromDegrees(0);
+
+    double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
+
+    if (0 < tagID && tagID < 5) {
+      coneOffsetLeft *= -1;
+    }
+    else if (4 < tagID && tagID < 9) {
+      heading = Rotation2d.fromDegrees(180);
+    }
+
     if (0 < tagID && tagID < 5) {
         targetPose = targetPose.plus(new Transform2d(new Translation2d(-AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
     } else {
         targetPose = targetPose.plus(new Transform2d(new Translation2d(AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
     }
-    if (coneOffset == 1) {
-      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, VisionConstants.CONE_OFFSET_METERS), Rotation2d.fromDegrees(0)));
+
+    if (coneOffset == -1) {
+      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
     }
-    else if (coneOffset == -1) {
-      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -VisionConstants.CONE_OFFSET_METERS), Rotation2d.fromDegrees(0)));
-    }
-    
-    if (isAtTarget(targetPose)) {
-      return targetPose;
+    else if (coneOffset == 1) {
+      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
     }
 
-    PathPlannerTrajectory tagPos = PathPlanner.generatePath(
-      new PathConstraints(0.1, 0.1),
-      new PathPoint(
-        swerve.getOdometry().getPoseMeters().getTranslation(),
-        // Might be useful to make this heading dynamic based on tag...
-        // @see pathplanner
-        Rotation2d.fromDegrees(0), 
-        swerve.getOdometry().getPoseMeters().getRotation()
-      ),
-      new PathPoint(
-        targetPose.getTranslation(),
-        Rotation2d.fromDegrees(0),
-        targetPose.getRotation()
-      )
-    
+    if (swerve.getOdometry().getPoseMeters().minus(targetPose).getTranslation().getNorm() < Units.inchesToMeters(AlignmentConstants.ALLOWABLE_ERROR)) {
+      swerve.drive(0,0,0,false);
+      SwerveTrajectory.trajectoryStatus = "done";
+      return;
+    }
+
+    PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
+      (
+        new PathConstraints(0.1, 0.1),
+        new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(),
+                      heading,
+                      swerve.getOdometry().getPoseMeters().getRotation()),
+        new PathPoint(targetPose.getTranslation(),
+                      heading,
+                      targetPose.getRotation())
       );
     
-    SwerveTrajectory.PathPlannerRunner(tagPos, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
+    SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
     
     System.out.println("April Pose: " + getTagPos(tagID));
     System.out.println("Modified Target Pose: " + targetPose);
     System.out.println("Current Pose: " + swerve.getOdometry().getPoseMeters() + "\n\n");
-
-    return null;
   }
 
   public void moveRelative(double x, double y, double rotation) {
@@ -157,13 +149,6 @@ public class AutoAlignment {
       speeds.vyMetersPerSecond*0.25, 
       speeds.omegaRadiansPerSecond,false);
 
-  }
-
-  public boolean isAligned() {
-    if (swerve.getOdometry().getPoseMeters() == targetPose) {
-      return true;
-    }
-    return false;
   }
 
   private Pose2d getTagPos(int tagID) {
@@ -232,12 +217,20 @@ public class AutoAlignment {
     return new Pose2d(tagX, tagY, rotation);
   }
 
+  public int getTagID() {
+    return tagID;
+  }
+
   public void setTagID(int tagID) {
     this.tagID = tagID;
   }
 
-  public int getTagID() {
-    return tagID;
+  public int getConeOffset() {
+    return coneOffset;
+  }
+
+  public void setConeOffset(int coneOffset) {
+    this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
   }
 
 }

@@ -10,11 +10,9 @@ import math.Constants.*;
 import auto.*;
 import subsystems.*;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import math.OICalc;
@@ -30,6 +28,7 @@ public class Robot extends TimedRobot {
     // The robot's subsystems and commands are defined here...
 
   Swerve swerve;
+  SwerveTrajectory swerveTrajectory;
 
   XboxController driver;
   XboxController operator;
@@ -40,11 +39,7 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
-  Vision vision = new Vision();
-
-  boolean isAligned;
-
-  Pose2d aprilPos;
+  Vision vision;
 
   AutoAlignment autoAlignment;
 
@@ -56,7 +51,6 @@ public class Robot extends TimedRobot {
         // Debug class for Shuffleboard
         debug = new Debug();
         debug.debugInit();
-
 
         /*
           For swerve drive, the following is the order of the motors
@@ -78,10 +72,13 @@ public class Robot extends TimedRobot {
         arm.resetEncoders();
         arm.setBrakeMode();
 
-        autoSegmentedWaypoints = new AutoSegmentedWaypoints();
-        // autoSegmentedWaypoints.init(swerve, arm);
+        autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm);
         autoSegmentedWaypoints.loadAutoPaths();
-        SwerveTrajectory.resetTrajectoryStatus();
+
+        swerveTrajectory = new SwerveTrajectory();
+        swerveTrajectory.resetTrajectoryStatus();
+
+        vision = new Vision();
 
         // Configure the logger for shuffleboard
         Logger.configureLoggingAndConfig(this, false);
@@ -105,11 +102,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {
-
-      isAligned = false;
-
-  }
+  public void disabledInit() {}
 
     @Override
     public void disabledPeriodic() {}
@@ -117,8 +110,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
 
-        autoSegmentedWaypoints.init(swerve, arm);
-        SwerveTrajectory.resetTrajectoryStatus();
+        swerveTrajectory.resetTrajectoryStatus();
 
     }
 
@@ -189,13 +181,12 @@ public class Robot extends TimedRobot {
   public void testInit() {
     swerve.resetEncoders();
     swerve.setBrakeMode();
+    swerveTrajectory.resetTrajectoryStatus();
 
   }
 
   @Override
   public void testPeriodic() {
-
-    int tagID = autoAlignment.getTagID();
 
     double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
     double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
@@ -205,7 +196,7 @@ public class Robot extends TimedRobot {
     // If we are on blue alliance, flip the driverLeftAxis
 
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-      driverLeftAxis.unaryMinus();
+      driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
     // Use the A button to activate the alignment process
@@ -216,7 +207,6 @@ public class Robot extends TimedRobot {
 
       // Make sure that the camera has tags in view
       if (vision.hasTargets()) {
-
         
         autoAlignment.setTagID(vision.getTagID());
         
@@ -225,61 +215,44 @@ public class Robot extends TimedRobot {
           System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
           System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
 
-          autoAlignment.calibrateOdometry(tagID, vision.getTransform());
+          autoAlignment.calibrateOdometry(vision.getTransform());
+          swerveTrajectory.resetTrajectoryStatus();
 
           System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
 
-          isAligned = true;
-
         }
       }
-      if (driver.getRightBumperPressed()) {
-        SwerveTrajectory.resetTrajectoryStatus();
-      }
 
-      if (isAligned && driver.getRightBumper()) {
+      autoAlignment.moveToTag();
 
-        autoAlignment.calibrateOdometry(tagID, vision.getTransform());
-        if(autoAlignment.moveToTag(tagID, autoSegmentedWaypoints, 0) != null)
-        {
-          if (driver.getPOV() == 0) {
+      if (driver.getRightBumper()) {
+        switch (driver.getPOV()) {
+          // Not clicked
+          case -1:
+            break;
 
+          // Clicking up
+          case 0:
             arm.setArmIndex(arm.getArmIndex() + 1);
+            break;
 
-          } else if (driver.getPOV() == 180) {
-
+          // Clicking down
+          case 180:
             arm.setArmIndex(arm.getArmIndex() - 1);
+            break;
 
-          } else if (driver.getPOV() == 90) {
+          // Clicking left
+          case 270:
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+            break;
 
-            autoAlignment.moveRelative(0, VisionConstants.CONE_OFFSET_METERS, 0);
-
-          } else if (driver.getPOV() == 270) {
-
-            autoAlignment.moveRelative(0, -VisionConstants.CONE_OFFSET_METERS, 0);
-
-          }
+          // Clicking right
+          case 90:
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+            break;
         }
       }
 
-      // Make the controller buzz if there are no targets in view
-      else {
-
-        driver.setRumble(RumbleType.kLeftRumble, 0.0);
-
-      }
-
-      // if (vision.hasTargets()) {
-      //   if (operator.getLeftBumperPressed()) {
-      //     autoAlignment.calibrateOdometry(vision.getPose(), vision.getTagID());
-      //   }
-
-      //   else if (operator.getRightBumper()) {
-      //     if (!isAlligning) {
-      //       aprilPos
-      //     }
-      //   }
-      // }
     } else {
 
       swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX*.25, true);
