@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import hardware.*;
+import subsystems.PhotonCameraPose;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -20,14 +21,17 @@ public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   /* ExampleSubsystem exampleSubsystem; */
 
-  NewSwerve swerve;
+  // NewSwerve swerve;
 
   XboxController driver;
+  PhotonCameraPose photonPose;
 
   @Override
   public void robotInit() {
-    swerve = new NewSwerve();
+
     driver = new XboxController(0);
+    photonPose = new PhotonCameraPose();
+    // swerve = new NewSwerve();
   }
 
   @Override
@@ -56,17 +60,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-
-      swerve.periodic(driver.getAButton());
-
-      swerve.drive(
-              new Translation2d(
-                      driver.getLeftX(),
-                      driver.getLeftY()),
-              new Translation2d(
-                      driver.getRightX(),
-                      driver.getRightY()
-              ),
-              true);
+    photonPose.updateOdometry();
   }
 }

@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -139,23 +141,7 @@ public class NewSwerve extends SubsystemBase {
                 pose);
     }
 
-    public void updateOdometry(boolean alignment) {
-
-        poseEstimator.update(getYaw(), getModulePositions());
-
-        Optional<EstimatedRobotPose> result = photonPose.getEstimatedRobotPose(poseEstimator.getEstimatedPosition());
-
-        if (result.isPresent() && alignment) {
-            EstimatedRobotPose camPose = result.get();
-            poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
-            field.getObject("Estimated Vision Position").setPose(camPose.estimatedPose.toPose2d());
-        } else {
-            field.getObject("Estimated Vision Position").setPose(new Pose2d(-100, -100, new Rotation2d()));
-        }
-
-        field.getObject("Actual Pos").setPose(getPose());
-        field.setRobotPose(poseEstimator.getEstimatedPosition());
-    }
+    
 
 //    public SwerveModuleState[] getModuleStates() {
 //
@@ -192,8 +178,6 @@ public class NewSwerve extends SubsystemBase {
     }
 
     public void periodic(boolean alignment) {
-
-        updateOdometry(alignment);
 
         for (int modNum = 0; modNum < mSwerveMods.length; modNum++) {
             SmartDashboard.putNumber("Mod " + modNum + " Angle", mSwerveMods[modNum].getPosition().angle.getDegrees());
