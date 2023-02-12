@@ -53,7 +53,7 @@ public class AutoAlignment {
 
   /**
    * Calibrate the odometry for the swerve
-   * @param visionPitch the position of the aprilTag relative to the bot
+   * @param visionTransform3d the position of the aprilTag relative to the bot
    * @param aprilTagID the ID of the tag being watched
    */
   public void calibrateOdometry(int aprilTagID, Transform3d visionTransform3d) {
@@ -89,7 +89,7 @@ public class AutoAlignment {
     return atTarget;
   }
 
-  public Pose2d moveToTag(int tagID, HolonomicDriveController HDC, AutoSegmentedWaypoints autoSegmentedWaypoints, int coneOffset) {
+  public Pose2d moveToTag(int tagID, AutoSegmentedWaypoints autoSegmentedWaypoints, int coneOffset) {
 
     // autoSegmentedWaypoints.periodic();
 
@@ -137,18 +137,18 @@ public class AutoAlignment {
     return null;
   }
 
-  public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {
+  public void moveRelative(double x, double y, double rotation) {
 
     Pose2d currentPose = swerve.getOdometry().getPoseMeters();
     
     Pose2d targetPose = new Pose2d(
-      currentPose.getX() + x,
-      currentPose.getY() + y,
-      new Rotation2d(currentPose.getY() + rotation));
+        currentPose.getX() + x,
+        currentPose.getY() + y,
+        new Rotation2d(currentPose.getY() + rotation));
 
     State targetState = new State(0, 0, 0, targetPose, 0);
 
-    ChassisSpeeds speeds = HDC.calculate(
+    ChassisSpeeds speeds = SwerveTrajectory.HDC.calculate(
       currentPose,
       targetState,
       targetPose.getRotation());

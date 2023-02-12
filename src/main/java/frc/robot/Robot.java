@@ -44,13 +44,9 @@ public class Robot extends TimedRobot {
 
   boolean isAligned;
 
-  HolonomicDriveController HDC;
-
   Pose2d aprilPos;
 
   AutoAlignment autoAlignment;
-
-  boolean isAlligning;
 
   @Override
   public void robotInit() {
@@ -193,7 +189,6 @@ public class Robot extends TimedRobot {
   public void testInit() {
     swerve.resetEncoders();
     swerve.setBrakeMode();
-    HDC = SwerveTrajectory.getHDC();
 
   }
 
@@ -245,7 +240,7 @@ public class Robot extends TimedRobot {
       if (isAligned && driver.getRightBumper()) {
 
         autoAlignment.calibrateOdometry(tagID, vision.getTransform());
-        if(autoAlignment.moveToTag(tagID, HDC, autoSegmentedWaypoints, 0) != null)
+        if(autoAlignment.moveToTag(tagID, autoSegmentedWaypoints, 0) != null)
         {
           if (driver.getPOV() == 0) {
 
@@ -257,11 +252,11 @@ public class Robot extends TimedRobot {
 
           } else if (driver.getPOV() == 90) {
 
-            autoAlignment.moveRelative(0, 0.5, 0, HDC);
+            autoAlignment.moveRelative(0, VisionConstants.CONE_OFFSET_METERS, 0);
 
           } else if (driver.getPOV() == 270) {
 
-            autoAlignment.moveRelative(0, -0.5, 0, HDC);
+            autoAlignment.moveRelative(0, -VisionConstants.CONE_OFFSET_METERS, 0);
 
           }
         }
