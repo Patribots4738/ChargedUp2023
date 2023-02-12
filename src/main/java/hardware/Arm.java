@@ -32,20 +32,35 @@ public class Arm implements Loggable {
 
     // All armPos values are in inches
     Translation2d[][] armPos = {
-    {
-        new Translation2d(-20, 30),
-        new Translation2d(-36, 23),
-    },
-    {
-        new Translation2d(0, ArmConstants.MAX_REACH)
-    },
-    {
-        new Translation2d(-12, 19),
-        new Translation2d(-28, 13),
-        new Translation2d(-32, 10)
-    }
+      {
+          new Translation2d(-20, 30),
+          new Translation2d(-36, 23),
+      },
+      {
+          new Translation2d(0, ArmConstants.MAX_REACH)
+      },
+      {
+          new Translation2d(-12, 19),
+          new Translation2d(-28, 13),
+          new Translation2d(-32, 10)
+      }
     };
-    
+
+    Translation2d[][] placementPositions = {
+      {
+          new Translation2d(-20, 1),
+          new Translation2d(-36, 23),
+          new Translation2d(-52.6, 33),
+      },
+      {
+          new Translation2d(0, ArmConstants.MAX_REACH)
+      },
+      {
+          new Translation2d(-20, 2),
+          new Translation2d(-36, 25),
+          new Translation2d(-52.6, 33)
+      }
+    };
     // ceil -- force round up
     int armPosDimention1 = (int) Math.ceil(armPos.length / 2);
     int armPosDimention2 = 0;
@@ -269,7 +284,7 @@ public class Arm implements Loggable {
      * @param position the position to set the upper arm to
      *                 This unit is in revolutions
      */
-    private void setUpperArmPosition(double position) {
+    public void setUpperArmPosition(double position) {
 
         position = MathUtil.clamp(
             position, 
@@ -307,7 +322,7 @@ public class Arm implements Loggable {
      * @param position the position to set the lower arm to
      *                 This unit is in full rotations
      */
-    private void setLowerArmPosition(double position) {
+    public void setLowerArmPosition(double position) {
         
         position = MathUtil.clamp(
             position, 

@@ -212,6 +212,7 @@ public class Robot extends TimedRobot {
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       driverLeftAxis.unaryMinus();
     }
+
     // Use the A button to activate the alignment process
     if (driver.getAButton()) {
 
@@ -243,8 +244,27 @@ public class Robot extends TimedRobot {
 
       if (isAligned && driver.getRightBumper()) {
 
-        autoAlignment.moveToTag(tagID, HDC, autoSegmentedWaypoints);
+        autoAlignment.calibrateOdometry(tagID, vision.getTransform());
+        if(autoAlignment.moveToTag(tagID, HDC, autoSegmentedWaypoints, 0) != null)
+        {
+          if (driver.getPOV() == 0) {
 
+            arm.setArmIndex(arm.getArmIndex() + 1);
+
+          } else if (driver.getPOV() == 180) {
+
+            arm.setArmIndex(arm.getArmIndex() - 1);
+
+          } else if (driver.getPOV() == 90) {
+
+            autoAlignment.moveRelative(0, 0.5, 0, HDC);
+
+          } else if (driver.getPOV() == 270) {
+
+            autoAlignment.moveRelative(0, -0.5, 0, HDC);
+
+          }
+        }
       }
 
       // Make the controller buzz if there are no targets in view

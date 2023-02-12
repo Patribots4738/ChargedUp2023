@@ -83,7 +83,13 @@ public class AutoAlignment {
 
   }
 
-  public void moveToTag(int tagID, HolonomicDriveController HDC, AutoSegmentedWaypoints autoSegmentedWaypoints) {
+  public boolean isAtTarget(Pose2d targetPose) {
+    boolean atTarget = swerve.getOdometry().getPoseMeters().getTranslation().getX() 
+                      - targetPose.getTranslation().getX() < 0.1; // close enough to target
+    return atTarget;
+  }
+
+  public Pose2d moveToTag(int tagID, HolonomicDriveController HDC, AutoSegmentedWaypoints autoSegmentedWaypoints, int coneOffset) {
 
     // autoSegmentedWaypoints.periodic();
 
@@ -94,9 +100,15 @@ public class AutoAlignment {
     } else {
         targetPose = targetPose.plus(new Transform2d(new Translation2d(AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
     }
+    if (coneOffset == 1) {
+      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, VisionConstants.CONE_OFFSET_METERS), Rotation2d.fromDegrees(0)));
+    }
+    else if (coneOffset == -1) {
+      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -VisionConstants.CONE_OFFSET_METERS), Rotation2d.fromDegrees(0)));
+    }
     
-    if (swerve.getOdometry().getPoseMeters().getTranslation().getX() - targetPose.getTranslation().getX() < 0.1) {
-      // we are close enough to the target
+    if (isAtTarget(targetPose)) {
+      return targetPose;
     }
 
     PathPlannerTrajectory tagPos = PathPlanner.generatePath(
@@ -121,6 +133,8 @@ public class AutoAlignment {
     System.out.println("April Pose: " + getTagPos(tagID));
     System.out.println("Modified Target Pose: " + targetPose);
     System.out.println("Current Pose: " + swerve.getOdometry().getPoseMeters() + "\n\n");
+
+    return null;
   }
 
   public void moveRelative(double x, double y, double rotation, HolonomicDriveController HDC) {
