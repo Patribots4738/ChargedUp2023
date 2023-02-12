@@ -225,10 +225,10 @@ public class Robot extends TimedRobot {
         autoAlignment.setTagID(vision.getTagID());
         
         if (driver.getLeftBumperPressed()) {
-          
+
           System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
           System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
-          
+
           autoAlignment.calibrateOdometry(tagID, vision.getTransform());
 
           System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
@@ -236,6 +236,9 @@ public class Robot extends TimedRobot {
           isAligned = true;
 
         }
+      }
+      if (driver.getRightBumperPressed()) {
+        SwerveTrajectory.resetTrajectoryStatus();
       }
 
       if (isAligned && driver.getRightBumper()) {
@@ -265,7 +268,7 @@ public class Robot extends TimedRobot {
     } else {
 
       swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX*.25, true);
-      
+
     }
   }
 }
