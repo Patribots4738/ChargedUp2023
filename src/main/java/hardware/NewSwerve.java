@@ -14,8 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,7 +29,7 @@ public class NewSwerve extends SubsystemBase {
     private MAXSwerveModule[] mSwerveMods;
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
     private PhotonCameraPose photonPose = new PhotonCameraPose();
-    ;
+    
     private final Field2d field = new Field2d();
 
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(

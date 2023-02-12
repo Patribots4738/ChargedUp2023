@@ -13,9 +13,11 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class PhotonCameraPose {
+    
     public PhotonCamera photonCamera;
     public PhotonPoseEstimator photonPoseEstimator;
     public AprilTagFieldLayout aprilTagFieldLayout;
+
     public PhotonCameraPose() {
 
         try {

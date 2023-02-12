@@ -23,19 +23,15 @@ public class Robot extends TimedRobot {
   NewSwerve swerve;
 
   XboxController driver;
-  XboxController operator;
 
   @Override
   public void robotInit() {
     swerve = new NewSwerve();
     driver = new XboxController(0);
-    operator = new XboxController(1);
   }
 
   @Override
-  public void robotPeriodic() {
-    swerve.periodic(driver.getAButton());
-  }
+  public void robotPeriodic() {}
   
   @Override
   public void disabledInit() {}
@@ -60,6 +56,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
+
+      swerve.periodic(driver.getAButton());
+
       swerve.drive(
               new Translation2d(
                       driver.getLeftX(),
@@ -68,6 +67,6 @@ public class Robot extends TimedRobot {
                       driver.getRightX(),
                       driver.getRightY()
               ),
-              !driver.getAButton());
+              true);
   }
 }
