@@ -4,8 +4,9 @@
 
 package frc.robot;
 
-import debug.*;
+import edu.wpi.first.math.geometry.Translation2d;
 import hardware.*;
+import subsystems.PhotonCameraPose;
 import math.Constants.*;
 import auto.*;
 import subsystems.*;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+
 import io.github.oblarg.oblog.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import math.OICalc;
@@ -42,6 +44,8 @@ public class Robot extends TimedRobot {
   Vision vision;
 
   AutoAlignment autoAlignment;
+
+  PhotonCameraPose photonPose;
 
   @Override
   public void robotInit() {
@@ -207,15 +211,17 @@ public class Robot extends TimedRobot {
 
       // Make sure that the camera has tags in view
       if (vision.hasTargets()) {
-        
+
         autoAlignment.setTagID(vision.getTagID());
-        
+
         if (driver.getLeftBumperPressed()) {
 
           System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
           System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
 
-          autoAlignment.calibrateOdometry(vision.getTransform());
+          // Use the new vision system to get odometry here...
+          // May be swerve.updateOdometry...
+          //autoAlignment.calibrateOdometry(vision.getTransform());
           swerveTrajectory.resetTrajectoryStatus();
 
           System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");

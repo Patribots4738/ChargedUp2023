@@ -285,19 +285,30 @@ public final class Constants {
         // Distance from the camera to the front of the bot
         public static final Transform3d CAMERA_POSITION = new Transform3d(
             new Translation3d(
-              Units.inchesToMeters(9.5),
-              Units.inchesToMeters(8),
-              Units.inchesToMeters(15)),
-            new Rotation3d(0, 0, 0));
+                    // Forward
+                    Units.inchesToMeters(-13),
+                    // Left (neg because it's right)
+                    Units.inchesToMeters(-8.5),
+                    // Up
+                    Units.inchesToMeters(19)),
+            new Rotation3d(
+                    0,
+                    0,
+                    0));
 
-        public static final double CONE_OFFSET_METERS = 0.5;
-
-        public static final double DESIRED_VELOCITY_METERS_PER_SECOND = 1.5;
-
-
-    }
-
-    public static final class AlignmentConstants {
+      public static final double CONE_OFFSET_METERS = 0.5;
+  }
+  
+  public static final class AlignmentConstants {
+    
+    // Distance from the camera to the IMU
+    // First is the direction of the arm, 
+    // then perpendicular to the arm, 
+    // then rotation
+    public static final Transform2d kCameraPosition = 
+        new Transform2d( new Translation2d(Units.inchesToMeters(7.75), 
+                    Units.inchesToMeters(5.5)), 
+                    Rotation2d.fromDegrees(0));
 
         private static final double GRID_TAG_HEIGHT  = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
