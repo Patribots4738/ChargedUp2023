@@ -44,8 +44,6 @@ public class Robot extends TimedRobot {
 
     AutoAlignment autoAlignment;
 
-    PhotonCameraPose photonPose;
-
     @Override
     public void robotInit() {
 
@@ -56,9 +54,9 @@ public class Robot extends TimedRobot {
         debug.debugInit();
 
         /*
-          For swerve drive, the following is the order of the motors
-          odd CAN IDs drive the robot
-          even CAN IDs are the turning motors
+         * For swerve drive, the following is the order of the motors
+         * odd CAN IDs drive the robot
+         * even CAN IDs are the turning motors
          */
         // Drivetrain instantiation
         swerve = new Swerve();
