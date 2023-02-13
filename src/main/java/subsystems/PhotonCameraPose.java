@@ -39,23 +39,4 @@ public class PhotonCameraPose {
     photonPoseEstimator.setReferencePose(pevEstimatedRobotPose);
     return photonPoseEstimator.update();
   }
-
-  // public void periodic() {
-  //     System.out.println(photonCamera.getLatestResult().hasTargets());
-  // }
-
-  // public void updateOdometry() {
-
-
-
-  //   if (photonCamera.getLatestResult().hasTargets()) {
-
-  //       photonPoseEstimator.update();
-
-  //       Optional<EstimatedRobotPose> result = getEstimatedRobotPose(previousEstimatedRobotPose);
-  //       previousEstimatedRobotPose = result.get().estimatedPose.toPose2d();
-  //       EstimatedRobotPose camPose = result.get();
-
-  //   }
-  // }
 }
