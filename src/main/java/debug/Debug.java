@@ -1,12 +1,12 @@
 package debug;
 
-import java.util.Map;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+
+import java.util.Map;
 
 public class Debug {
 

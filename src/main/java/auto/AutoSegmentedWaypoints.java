@@ -4,14 +4,13 @@ package auto;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
+import hardware.Arm;
+import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import math.Constants.ArmConstants;
-import hardware.*;
 
 public class AutoSegmentedWaypoints implements Loggable {
 

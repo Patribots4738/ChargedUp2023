@@ -4,19 +4,21 @@
 
 package frc.robot;
 
+import auto.AutoSegmentedWaypoints;
+import auto.SwerveTrajectory;
 import debug.Debug;
-import edu.wpi.first.math.geometry.Translation2d;
-import hardware.*;
-import math.Constants.*;
-import auto.*;
-import subsystems.*;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-
+import hardware.Arm;
+import hardware.Swerve;
 import io.github.oblarg.oblog.Logger;
-import edu.wpi.first.wpilibj.DriverStation;
+import math.Constants.OIConstants;
 import math.OICalc;
+import subsystems.AutoAlignment;
+import subsystems.Vision;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to

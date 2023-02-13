@@ -1,6 +1,6 @@
 package math;
 
-import math.Constants.*;
+import math.Constants.ArmConstants;
 
 public class ArmCalculations {
 
