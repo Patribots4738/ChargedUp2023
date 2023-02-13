@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import debug.Debug;
 import edu.wpi.first.math.geometry.Translation2d;
 import hardware.*;
 import subsystems.PhotonCameraPose;

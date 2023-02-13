@@ -17,6 +17,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import math.*;
 import math.Constants.ArmConstants;
 
+import java.util.ArrayList;
+
 public class Arm implements Loggable {
 
   /**
