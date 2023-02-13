@@ -1,6 +1,5 @@
 package subsystems;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,6 +8,7 @@ import math.Constants.PoseEstimationConstants;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonUtils;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class PhotonCameraPose {
     public PhotonCamera photonCamera;
     public PhotonPoseEstimator photonPoseEstimator;
     public AprilTagFieldLayout aprilTagFieldLayout;
-
+    private Pose2d previousEstimatedRobotPose = new Pose2d(0,0,Rotation2d.fromDegrees(0));
     public PhotonCameraPose() {
 
         try {
@@ -43,20 +43,22 @@ public class PhotonCameraPose {
         return photonPoseEstimator.update();
     }
     
-    public void periodic() {
-        System.out.println(photonCamera.getLatestResult().hasTargets());
-    }
+    // public void periodic() {
+    //     System.out.println(photonCamera.getLatestResult().hasTargets());
+    // }
 
-    public void updateOdometry() {
+    // public void updateOdometry() {
 
-      photonPoseEstimator.update();
 
-      Optional<EstimatedRobotPose> result = getEstimatedRobotPose(new Pose2d(0,0,Rotation2d.fromDegrees(0)));
 
-      if (result.isPresent()) {
-          EstimatedRobotPose camPose = result.get();   
-          System.out.println("Position: " + camPose.estimatedPose.getTranslation() + 
-                           "\nRotation:" + Rotation2d.fromRadians(camPose.estimatedPose.getRotation().getZ()) + "\n\n");
-      }
-    }
+    //   if (photonCamera.getLatestResult().hasTargets()) {
+
+    //       photonPoseEstimator.update();
+
+    //       Optional<EstimatedRobotPose> result = getEstimatedRobotPose(previousEstimatedRobotPose);
+    //       previousEstimatedRobotPose = result.get().estimatedPose.toPose2d();
+    //       EstimatedRobotPose camPose = result.get();   
+
+    //   }
+    // }
 }

@@ -25,7 +25,7 @@ public class AutoWaypoints implements Loggable {
 
     public PathPlannerTrajectory testTraj;
 
-    NewSwerve swerve;
+    Swerve swerve;
 
     private double currentX;
     private double currentY;
@@ -34,7 +34,7 @@ public class AutoWaypoints implements Loggable {
         return SINGLE_INSTANCE;
     }
 
-    public void init(NewSwerve swerve) {
+    public void init(Swerve swerve) {
         this.swerve = swerve;
         squarePath = PathPlanner.loadPath(
                 "Square",

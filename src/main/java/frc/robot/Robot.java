@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
   /* ExampleSubsystem exampleSubsystem; */
 
-  // NewSwerve swerve;
+  Swerve swerve;
 
   XboxController driver;
   PhotonCameraPose photonPose;
@@ -30,8 +30,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
 
     driver = new XboxController(0);
-    photonPose = new PhotonCameraPose();
-    // swerve = new NewSwerve();
+    swerve = new Swerve();
   }
 
   @Override
@@ -59,7 +58,5 @@ public class Robot extends TimedRobot {
   public void testInit() {}
 
   @Override
-  public void testPeriodic() {
-    photonPose.updateOdometry();
-  }
+  public void testPeriodic() {}
 }

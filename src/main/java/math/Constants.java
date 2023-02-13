@@ -245,9 +245,12 @@ public final class Constants
 
     public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(
             new Translation3d(
-                    Units.inchesToMeters(7.75),
-                    Units.inchesToMeters(5.5),
-                    0),
+                    // Forward
+                    Units.inchesToMeters(-13),
+                    // Left (neg because it's right)
+                    Units.inchesToMeters(-8.5),
+                    // Up
+                    Units.inchesToMeters(19)),
             new Rotation3d(
                     0,
                     0,
