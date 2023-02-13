@@ -93,7 +93,7 @@ public class Arm implements Loggable {
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
 
-    final ArmCalcuations armCalculations = new ArmCalcuations();
+    final ArmCalculations armCalculations = new ArmCalculations();
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
