@@ -93,6 +93,17 @@ public class Swerve {
     SmartDashboard.putData("Field", field);
   }
 
+  public void periodic() {
+    // Update the poseEstimator to account for the changes in the modules since the last loop
+    poseEstimator.update(getYaw(), getModulePositions());
+
+    for (int modNum = 0; modNum < swerveModules.length; modNum++) {
+      SmartDashboard.putNumber("Mod " + modNum + " Angle", swerveModules[modNum].getPosition().angle.getDegrees());
+      SmartDashboard.putNumber("Mod " + modNum + " Velocity", swerveModules[modNum].getState().speedMetersPerSecond);
+    }
+    SmartDashboard.putNumber("Heading", getYaw().getDegrees());
+  }
+
   public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
 
     xSpeed *= DriveConstants.MAX_SPEED_METERS_PER_SECOND;
@@ -134,35 +145,34 @@ public class Swerve {
         pose);
   }
 
-  public void updateOdometry() {
+  public void addVisionMeasurement() {
+    Optional<EstimatedRobotPose> result = photonPose.getEstimatedRobotPose(poseEstimator.getEstimatedPosition());
 
-        poseEstimator.update(getYaw(),getModulePositions());
+    if (result.isPresent()) {
 
-        Optional<EstimatedRobotPose> result = photonPose.getEstimatedRobotPose(poseEstimator.getEstimatedPosition());
+      EstimatedRobotPose camPose = result.get();
+      poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
 
-        if (result.isPresent()) {
+      field.getObject("Estimated Vision Position").setPose(camPose.estimatedPose.toPose2d());
 
-        EstimatedRobotPose camPose = result.get();
-        poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
-        field.getObject("Estimated Vision Position").setPose(camPose.estimatedPose.toPose2d());
+    } else {
+      field.getObject("Estimated Vision Position").setPose(new Pose2d(-100,-100,new Rotation2d()));
+    }
 
-        } else {
-        field.getObject("Estimated Vision Position").setPose(new Pose2d(-100,-100,new Rotation2d()));
-        }
-
-        field.getObject("Actual Pos").setPose(getPose());
-        field.setRobotPose(poseEstimator.getEstimatedPosition());
+    field.getObject("Actual Pos").setPose(getPose());
+    field.setRobotPose(poseEstimator.getEstimatedPosition());
   }
 
-  // public SwerveModuleState[] getModuleStates() {
-  //
-  //     SwerveModuleState[] states = new SwerveModuleState[4];
-  //     for (int modNum = 0; modNum < mSwerveMods.length; modNum++) {
-  //         states[modNum] = mSwerveMods[modNum].getState();
-  //     }
-  //     return states;
-  //
-  // }
+  public SwerveModuleState[] getModuleStates() {
+
+      SwerveModuleState[] states = new SwerveModuleState[4];
+      
+      for (int modNum = 0; modNum < swerveModules.length; modNum++) {
+          states[modNum] = swerveModules[modNum].getState();
+      }
+      return states;
+
+  }
 
   public SwerveModulePosition[] getModulePositions() {
 
@@ -191,16 +201,6 @@ public class Swerve {
     return (DriveConstants.GYRO_REVERSED) ?
         Rotation2d.fromDegrees(360 - m_gyro.getAngle()) :
         Rotation2d.fromDegrees(m_gyro.getAngle());
-  }
-  public void periodic() {
-
-    updateOdometry();
-
-    for (int modNum = 0; modNum < swerveModules.length; modNum++) {
-      SmartDashboard.putNumber("Mod " + modNum + " Angle", swerveModules[modNum].getPosition().angle.getDegrees());
-      SmartDashboard.putNumber("Mod " + modNum + " Velocity", swerveModules[modNum].getState().speedMetersPerSecond);
-    }
-    SmartDashboard.putNumber("Heading", getYaw().getDegrees());
   }
 
   public void setBrakeMode() {
