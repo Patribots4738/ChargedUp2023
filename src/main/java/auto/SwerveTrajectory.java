@@ -1,4 +1,4 @@
-// Refrenced from https://github.com/Stampede3630/2022-Code/blob/MK3Practice/src/main/java/frc/robot/SwerveTrajectory.java
+// Referenced from https://github.com/Stampede3630/2022-Code/blob/MK3Practice/src/main/java/frc/robot/SwerveTrajectory.java
 package auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -10,7 +10,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
@@ -37,7 +36,7 @@ public class SwerveTrajectory implements Loggable {
    * The ProfiledPIDController for the rotation of the robot,
    * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
    */
-  public static HolonomicDriveController HDC = new HolonomicDriveController(
+  public static final HolonomicDriveController HDC = new HolonomicDriveController(
       new PIDController(Constants.AutoConstants.X_CORRECTION_P, Constants.AutoConstants.X_CORRECTION_I, Constants.AutoConstants.X_CORRECTION_D),
       new PIDController(Constants.AutoConstants.Y_CORRECTION_P, Constants.AutoConstants.Y_CORRECTION_I, Constants.AutoConstants.Y_CORRECTION_D),
       new ProfiledPIDController(Constants.AutoConstants.ROTATION_CORRECTION_P, Constants.AutoConstants.ROTATION_CORRECTION_I, Constants.AutoConstants.ROTATION_CORRECTION_D,
@@ -58,7 +57,7 @@ public class SwerveTrajectory implements Loggable {
    * @param _odometry   SwerveDrive.java's odometry
    * @param _rotation2d Pass in the current angle of the robot
    */
-  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, Pose2d _odometry, Rotation2d _rotation2d) {
+  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, Pose2d _odometry) {
 
     elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
 

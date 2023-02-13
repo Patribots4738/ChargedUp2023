@@ -31,7 +31,7 @@ public class Arm implements Loggable {
      */
 
     // All armPos values are in inches
-    Translation2d[][] armPos = {
+    final Translation2d[][] armPos = {
             {
                     new Translation2d(-20, 30),
                     new Translation2d(-36, 23),
@@ -62,7 +62,7 @@ public class Arm implements Loggable {
             }
     };
     // ceil -- force round up
-    int armPosDimension1 = (int) Math.ceil(armPos.length / 2);
+    int armPosDimension1 = (int) Math.ceil(armPos.length / 2.0);
     int armPosDimension2 = 0;
 
     private boolean operatorOverride = false;
@@ -93,7 +93,7 @@ public class Arm implements Loggable {
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
 
-    ArmCalcuations armCalculations = new ArmCalcuations();
+    final ArmCalcuations armCalculations = new ArmCalcuations();
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -117,8 +117,6 @@ public class Arm implements Loggable {
         _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
         _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
 
-        // _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
-        // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
         _lowerArmPIDController = _lowerArm.getPIDController();
         _upperArmPIDController = _upperArm.getPIDController();
         _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
@@ -175,7 +173,7 @@ public class Arm implements Loggable {
 
     public void indexPeriodic() {
 
-        // armPos[armPosDimention1][armPosDimention2]
+        // armPos[armPosDimension1][armPosDimension2]
         if (armPosDimension1 == armPos.length ||
                 armPosDimension2 == armPos[armPosDimension1].length) {
             return;

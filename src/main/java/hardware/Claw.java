@@ -7,6 +7,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import math.Constants.ClawConstants;
 
+@SuppressWarnings("EmptyMethod")
 public class Claw {
     private final CANSparkMax _claw;
     private final RelativeEncoder _clawEncoder;

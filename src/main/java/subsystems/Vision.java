@@ -26,7 +26,7 @@ public class Vision {
 
     public static final double alignmentRotSpeed = 0.05;
 
-    private PhotonCamera camera = new PhotonCamera("Patribots4738");
+    private final PhotonCamera camera = new PhotonCamera("Patribots4738");
 
     private HashMap<String, Double> tagInfo = new HashMap<String, Double>();
 
@@ -65,7 +65,7 @@ public class Vision {
         Transform3d position = target.getBestCameraToTarget();
 
         // Add all the required info to the HashMap
-        tagInfo.put("tagID", Double.valueOf(target.getFiducialId()));
+        tagInfo.put("tagID", (double) target.getFiducialId());
 
         tagInfo.put("x", position.getX());
 

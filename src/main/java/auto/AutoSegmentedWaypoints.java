@@ -263,6 +263,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   }
 
 
+  @SuppressWarnings({"CanBeFinal", "SameParameterValue"})
   public static class AutoPose {
 
     public double thisX;
@@ -287,7 +288,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       StateHasInitialized = true;
     }
 
-    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getPose(), swerve.getPose().getRotation());
+    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getPose());
 
     thisWaypointSet[currentWaypointNumber].action.run();
 
