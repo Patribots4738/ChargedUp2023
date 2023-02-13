@@ -121,7 +121,7 @@ public class AutoAlignment {
                                 targetPose.getRotation())
                 );
 
-        SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose(), swerve.getPose().getRotation());
+        SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose());
 
         System.out.println("April Pose: " + getTagPos(tagID));
         System.out.println("Modified Target Pose: " + targetPose);
