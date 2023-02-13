@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import io.github.oblarg.oblog.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import math.OICalc;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -28,25 +29,25 @@ public class Robot extends TimedRobot {
 
     // The robot's subsystems and commands are defined here...
 
-  Swerve swerve;
+    Swerve swerve;
 
-  XboxController driver;
-  XboxController operator;
+    XboxController driver;
+    XboxController operator;
 
-  AutoSegmentedWaypoints autoSegmentedWaypoints;
+    AutoSegmentedWaypoints autoSegmentedWaypoints;
 
-  Arm arm;
+    Arm arm;
 
-  Debug debug;
+    Debug debug;
 
-  Vision vision;
+    Vision vision;
 
-  AutoAlignment autoAlignment;
+    AutoAlignment autoAlignment;
 
-  PhotonCameraPose photonPose;
+    PhotonCameraPose photonPose;
 
-  @Override
-  public void robotInit() {
+    @Override
+    public void robotInit() {
 
         // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
@@ -98,13 +99,15 @@ public class Robot extends TimedRobot {
 
         Logger.updateEntries();
 
-  }
-
-  @Override
-  public void disabledInit() {}
+    }
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledInit() {
+    }
+
+    @Override
+    public void disabledPeriodic() {
+    }
 
     @Override
     public void autonomousInit() {
@@ -122,7 +125,8 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void teleopInit() {}
+    public void teleopInit() {
+    }
 
     @Override
     public void teleopPeriodic() {
@@ -130,13 +134,13 @@ public class Robot extends TimedRobot {
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
-        double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
-        double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+        double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+        double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
         double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
         double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
-        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.DRIVER_DEADBAND);
-        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.DRIVER_DEADBAND);
+        double operatorLeftX = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.DRIVER_DEADBAND);
+        double operatorLeftY = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.DRIVER_DEADBAND);
         double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
         double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
 
@@ -166,96 +170,94 @@ public class Robot extends TimedRobot {
         }
         if (arm.getOperatorOverride()) {
             arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
-        }
-        else if (operator.getRightBumperPressed()) {
+        } else if (operator.getRightBumperPressed()) {
             arm.setArmIndex(arm.getArmIndex() + 1);
-        }
-        else if (operator.getLeftBumperPressed()) {
+        } else if (operator.getLeftBumperPressed()) {
             arm.setArmIndex(arm.getArmIndex() - 1);
         }
 
     }
 
-  @Override
-  public void testInit() {
-    swerve.resetEncoders();
-    swerve.setBrakeMode();
-    SwerveTrajectory.resetTrajectoryStatus();
-
-  }
-
-  @Override
-  public void testPeriodic() {
-
-    double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
-    double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
-    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
-
-    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
-    // If we are on blue alliance, flip the driverLeftAxis
-
-    if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-      driverLeftAxis = driverLeftAxis.unaryMinus();
-    }
-
-    // Use the A button to activate the alignment process
-    if (driver.getAButton()) {
-
-      // Run the vision calculations and get the most visible tag
-      vision.periodic();
-
-      // Make sure that the camera has tags in view
-      if (vision.hasTargets()) {
-
-        autoAlignment.setTagID(vision.getTagID());
-
-        if (driver.getRightBumperPressed()) {
-
-          System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
-          System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
-
-          swerve.addVisionMeasurement();
-          SwerveTrajectory.resetTrajectoryStatus();
-
-          System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
-
-        }
-      }
-
-      autoAlignment.moveToTag();
-
-      if (driver.getRightBumper()) {
-        switch (driver.getPOV()) {
-          // Not clicked
-          case -1:
-            break;
-
-          // Clicking up
-          case 0:
-            arm.setArmIndex(arm.getArmIndex() + 1);
-            break;
-
-          // Clicking down
-          case 180:
-            arm.setArmIndex(arm.getArmIndex() - 1);
-            break;
-
-          // Clicking left
-          case 270:
-            autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
-            break;
-
-          // Clicking right
-          case 90:
-            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
-            break;
-        }
-      }
-
-    } else {
-
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX*.25, true);
+    @Override
+    public void testInit() {
+        swerve.resetEncoders();
+        swerve.setBrakeMode();
+        SwerveTrajectory.resetTrajectoryStatus();
 
     }
-  }
+
+    @Override
+    public void testPeriodic() {
+
+        double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+        double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+        double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+
+        Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+        // If we are on blue alliance, flip the driverLeftAxis
+
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+            driverLeftAxis = driverLeftAxis.unaryMinus();
+        }
+
+        // Use the A button to activate the alignment process
+        if (driver.getAButton()) {
+
+            // Run the vision calculations and get the most visible tag
+            vision.periodic();
+
+            // Make sure that the camera has tags in view
+            if (vision.hasTargets()) {
+
+                autoAlignment.setTagID(vision.getTagID());
+
+                if (driver.getRightBumperPressed()) {
+
+                    System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
+                    System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
+
+                    swerve.addVisionMeasurement();
+                    SwerveTrajectory.resetTrajectoryStatus();
+
+                    System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+
+                }
+            }
+
+            autoAlignment.moveToTag();
+
+            if (driver.getRightBumper()) {
+                switch (driver.getPOV()) {
+                    // Not clicked
+                    case -1:
+                        break;
+
+                    // Clicking up
+                    case 0:
+                        arm.setArmIndex(arm.getArmIndex() + 1);
+                        break;
+
+                    // Clicking down
+                    case 180:
+                        arm.setArmIndex(arm.getArmIndex() - 1);
+                        break;
+
+                    // Clicking left
+                    case 270:
+                        autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+                        break;
+
+                    // Clicking right
+                    case 90:
+                        autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+                        break;
+                }
+            }
+
+        } else {
+
+            swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX * .25, true);
+
+        }
+    }
 }

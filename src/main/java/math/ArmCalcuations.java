@@ -25,8 +25,7 @@ public class ArmCalcuations {
      *          Due to an axis controlling the range, they will not go over
      * @return the angle to set the motor to, in radians
      */
-    public double getUpperAngle(double y, double x)
-    {
+    public double getUpperAngle(double y, double x) {
         double upperAngle =
                 (Math.acos(
                         (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(ArmConstants.LOWER_ARM_LENGTH, 2)) +
@@ -45,11 +44,10 @@ public class ArmCalcuations {
      *          Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
      *          Due to an axis controlling the range, they will not go over
      */
-    public double getLowerAngle(double y, double x, double q2)
-    {
+    public double getLowerAngle(double y, double x, double q2) {
         double aTanFraction =
                 (Constants.ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) /
-                (Constants.ArmConstants.LOWER_ARM_LENGTH + (Constants.ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2)));
+                        (Constants.ArmConstants.LOWER_ARM_LENGTH + (Constants.ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2)));
 
         double leftAngle = Math.atan(y / x) +
                 Math.atan(aTanFraction);

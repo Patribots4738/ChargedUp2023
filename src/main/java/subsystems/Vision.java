@@ -19,7 +19,7 @@ public class Vision {
     public static final double yDeadZone = 0.03;
 
     public static final double xDeadZone = 0.05;
-    
+
     public static final double xDistance = 1.5;
 
     public static final double alignmentSpeed = 0.005;
@@ -33,10 +33,12 @@ public class Vision {
     private boolean hasTargets;
 
 
-    public Vision() {}
+    public Vision() {
+    }
 
     /**
      * Converts the PhotonPipelineResult to an easier to use format
+     *
      * @return A HashMap<String, Double> representing the most visible AprilTag, null if no tag is visible
      */
     public HashMap<String, Double> periodic() {
@@ -52,16 +54,16 @@ public class Vision {
         }
 
         hasTargets = true;
-        
+
         // Create the HashMap that represents the most visible tag
-        
-        
+
+
         // Get the best tag visible
         PhotonTrackedTarget target = result.getBestTarget();
 
         // Extract the position of the best tag
         Transform3d position = target.getBestCameraToTarget();
-        
+
         // Add all the required info to the HashMap
         tagInfo.put("tagID", Double.valueOf(target.getFiducialId()));
 
@@ -79,7 +81,7 @@ public class Vision {
         return tagInfo;
     }
 
-    public boolean hasTargets(){
+    public boolean hasTargets() {
         return this.hasTargets;
     }
 
