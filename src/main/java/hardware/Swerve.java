@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import math.Constants;
 import math.Constants.*;
 import org.photonvision.EstimatedRobotPose;
 import subsystems.PhotonCameraPose;
@@ -28,7 +27,7 @@ public class Swerve {
     private PhotonCameraPose photonPose = new PhotonCameraPose();
     private double speedMultiplier = 1;
     private final Field2d field = new Field2d();
-    private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+    private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
@@ -61,7 +60,7 @@ public class Swerve {
     // Odometry class for tracking robot pose
     //  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
     //      DriveConstants.DRIVE_KINEMATICS,
-    //      Rotation2d.fromDegrees(m_gyro.getAngle()),
+    //      Rotation2d.fromDegrees(gyro.getAngle()),
     //      new SwerveModulePosition[]{
     //          m_frontLeft.getPosition(),
     //          m_frontRight.getPosition(),
@@ -189,7 +188,7 @@ public class Swerve {
      * Zeroes the heading of the robot.
      */
     public void zeroHeading() {
-        m_gyro.reset();
+        gyro.reset();
     }
 
     /**
@@ -199,8 +198,8 @@ public class Swerve {
      */
     public Rotation2d getYaw() {
         return (DriveConstants.GYRO_REVERSED) ?
-                Rotation2d.fromDegrees(360 - m_gyro.getAngle()) :
-                Rotation2d.fromDegrees(m_gyro.getAngle());
+                Rotation2d.fromDegrees(360 - gyro.getAngle()) :
+                Rotation2d.fromDegrees(gyro.getAngle());
     }
 
     public void setBrakeMode() {
@@ -221,7 +220,7 @@ public class Swerve {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return m_gyro.getRate();
+        return gyro.getRate();
     }
 
     public void toggleSpeed() {
