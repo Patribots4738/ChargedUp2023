@@ -105,7 +105,7 @@ public class AutoAlignment {
       targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
     }
 
-    if (swerve.getOdometry().getPoseMeters().minus(targetPose).getTranslation().getNorm() < Units.inchesToMeters(AlignmentConstants.ALLOWABLE_ERROR)) {
+    if (swerve.getPose().minus(targetPose).getTranslation().getNorm() < Units.inchesToMeters(AlignmentConstants.ALLOWABLE_ERROR)) {
       swerve.drive(0,0,0,false);
       SwerveTrajectory.trajectoryStatus = "done";
       return;
@@ -114,24 +114,24 @@ public class AutoAlignment {
     PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(swerve.getOdometry().getPoseMeters().getTranslation(),
+        new PathPoint(swerve.getPose().getTranslation(),
                       heading,
-                      swerve.getOdometry().getPoseMeters().getRotation()),
+                      swerve.getPose().getRotation()),
         new PathPoint(targetPose.getTranslation(),
                       heading,
                       targetPose.getRotation())
       );
     
-    SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
+    SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose(), swerve. getPose().getRotation());
     
     System.out.println("April Pose: " + getTagPos(tagID));
     System.out.println("Modified Target Pose: " + targetPose);
-    System.out.println("Current Pose: " + swerve.getOdometry().getPoseMeters() + "\n\n");
+    System.out.println("Current Pose: " + swerve. getPose() + "\n\n");
   }
 
   public void moveRelative(double x, double y, double rotation) {
 
-    Pose2d currentPose = swerve.getOdometry().getPoseMeters();
+    Pose2d currentPose = swerve. getPose();
     
     Pose2d targetPose = new Pose2d(
         currentPose.getX() + x,

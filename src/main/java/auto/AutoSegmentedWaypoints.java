@@ -287,7 +287,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       StateHasInitialized = true;
     }
 
-    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getOdometry(), swerve.getOdometry().getPoseMeters().getRotation());
+    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getPose(), swerve.getPose().getRotation());
 
     thisWaypointSet[currentWaypointNumber].action.run();
 

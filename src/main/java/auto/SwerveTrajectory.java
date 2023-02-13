@@ -7,6 +7,7 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -57,7 +58,7 @@ public class SwerveTrajectory implements Loggable {
    * @param _odometry   SwerveDrive.java's odometry
    * @param _rotation2d Pass in the current angle of the robot
    */
-  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, SwerveDriveOdometry _odometry, Rotation2d _rotation2d) {
+  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, Pose2d _odometry, Rotation2d _rotation2d) {
 
     elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
 
@@ -71,9 +72,9 @@ public class SwerveTrajectory implements Loggable {
       case "execute":
 
         Debug.debugPeriodic(
-            _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getPoseMeters().getX(),
-            _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getPoseMeters().getY(),
-            _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getPoseMeters().getRotation().getDegrees());
+            _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getX(),
+            _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getY(),
+            _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
         if (elapsedTime < _pathTraj.getEndState().timeSeconds + 1) {
@@ -82,7 +83,7 @@ public class SwerveTrajectory implements Loggable {
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
           ChassisSpeeds _speeds = HDC.calculate(
-              _odometry.getPoseMeters(),
+              _odometry,
               _pathTraj.sample(elapsedTime),
               ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
 
@@ -112,7 +113,7 @@ public class SwerveTrajectory implements Loggable {
     }
   }
 
-  public void resetTrajectoryStatus() {
+  public static void resetTrajectoryStatus() {
 
     trajectoryStatus = "setup";
 
