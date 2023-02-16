@@ -43,7 +43,7 @@ public class Swerve {
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
             DriveConstants.DRIVE_KINEMATICS,
-            Rotation2d.fromDegrees(m_gyro.getAngle()),
+            Rotation2d.fromDegrees(getTotalDegrees()),
             new SwerveModulePosition[]{
                     m_frontLeft.getPosition(),
                     m_frontRight.getPosition(),
@@ -63,7 +63,7 @@ public class Swerve {
     public void periodic() {
         // Update the odometry in the periodic block
         m_odometry.update(
-                Rotation2d.fromDegrees(m_gyro.getAngle()),
+                Rotation2d.fromDegrees(getTotalDegrees()),
                 new SwerveModulePosition[]{
                         m_frontLeft.getPosition(),
                         m_frontRight.getPosition(),
@@ -120,7 +120,7 @@ public class Swerve {
 
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
-                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(m_gyro.getAngle()))
+                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(getTotalDegrees()))
                         : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
 
         setModuleStates(swerveModuleStates);
@@ -130,10 +130,10 @@ public class Swerve {
      * Sets the wheels into an X formation to prevent movement.
      */
     public void setX() {
-        m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     }
 
     /**
@@ -170,10 +170,10 @@ public class Swerve {
     /**
      * Returns the heading of the robot.
      *
-     * @return the robot's heading in degrees, from -180 to 180
+     * @return the robot's total degrees traveled from the start
      */
-    public double getHeading() {
-        return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
+    public double getTotalDegrees() {
+        return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     /**
