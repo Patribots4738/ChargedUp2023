@@ -55,6 +55,9 @@ public class Swerve {
      * Creates a new DriveSubsystem.
      */
     public Swerve() {
+      resetEncoders();
+      zeroHeading();
+      setBrakeMode();
     }
 
     public void periodic() {

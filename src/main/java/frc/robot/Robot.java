@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
 
     Debug debug;
 
-    ArmCalcuations armCalcuations = new ArmCalcuations();
+    ArmCalcuations armCalcuations;
 
 
     @Override
@@ -47,22 +47,16 @@ public class Robot extends TimedRobot {
 
         // Debug class for ShuffleBoard
         debug = new Debug();
-        debug.debugInit();
 
         // Drivetrain instantiation
         swerve = new Swerve();
-        // Zero the IMU for field-oriented driving
-        swerve.resetEncoders();
-        swerve.zeroHeading();
-
-        swerve.setBrakeMode();
 
         driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
         operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
         arm = new Arm();
-        arm.resetEncoders();
-        arm.setBrakeMode();
+
+        armCalcuations = new ArmCalcuations();
 
         autoSegmentedWaypoints = new AutoSegmentedWaypoints();
         autoSegmentedWaypoints.loadAutoPaths();
@@ -119,20 +113,21 @@ public class Robot extends TimedRobot {
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
-        double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
-        double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
-        double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
-        double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
+        double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
+        double driverLeftY    = MathUtil.applyDeadband(driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
+        double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
+        double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
 
-        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.DRIVER_DEADBAND);
-        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.DRIVER_DEADBAND);
+        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX() , OIConstants.DRIVER_DEADBAND);
+        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
         double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
         double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+        
         // If we are on blue alliance, flip the driverLeftAxis
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-            driverLeftAxis.unaryMinus();
+            driverLeftAxis = driverLeftAxis.unaryMinus();
         }
 
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);

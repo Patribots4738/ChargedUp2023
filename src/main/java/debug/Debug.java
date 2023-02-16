@@ -22,7 +22,7 @@ public class Debug {
     public static GenericEntry xPos;
     public static GenericEntry yPos;
 
-    public void debugInit() {
+    public Debug() {
 
         xP = Shuffleboard.getTab("Drive")
                 .add("xP", 1)
