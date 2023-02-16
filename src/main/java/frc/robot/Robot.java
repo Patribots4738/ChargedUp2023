@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 
     AutoSegmentedWaypoints autoSegmentedWaypoints;
 
-    Arm arm;
+    // Arm arm;
 
     Debug debug;
 
@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
         driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
         operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
-        arm = new Arm();
+        // arm = new Arm();
 
         armCalcuations = new ArmCalcuations();
 
@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
 
-        autoSegmentedWaypoints.init(swerve, arm);
+        // autoSegmentedWaypoints.init(swerve, arm);
         SwerveTrajectory.resetTrajectoryStatus();
 
     }
@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
 
         autoSegmentedWaypoints.periodic();
-        arm.periodic();
+        // arm.periodic();
 
     }
 
@@ -109,12 +109,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        arm.periodic();
+        // arm.periodic();
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
         double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
-        double driverLeftY    = MathUtil.applyDeadband(driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
+        double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
         double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
         double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
 
@@ -127,36 +127,35 @@ public class Robot extends TimedRobot {
         
         // If we are on blue alliance, flip the driverLeftAxis
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-            driverLeftAxis = driverLeftAxis.unaryMinus();
+          driverLeftAxis = driverLeftAxis.unaryMinus();
         }
-
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         if (driver.getRightBumper()) {
-            swerve.setX();
+          swerve.setX();
         } else {
-            //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-            swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
+          //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
         if (driver.getLeftStickButtonPressed()) {
-            swerve.toggleSpeed();
+          swerve.toggleSpeed();
         }
 
         // Toggle the operator override when the operator's left stick is pressed
-        if (operator.getLeftStickButtonPressed()) {
-            arm.toggleOperatorOverride();
-        }
-        if (arm.getOperatorOverride()) {
-            arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
-        }
-        else if (operator.getRightBumperPressed()) {
-            arm.setArmIndex(arm.getArmIndex() + 1);
-        }
-        else if (operator.getLeftBumperPressed()) {
-            arm.setArmIndex(arm.getArmIndex() - 1);
-        }
+        // if (operator.getLeftStickButtonPressed()) {
+        //     arm.toggleOperatorOverride();
+        // }
+        // if (arm.getOperatorOverride()) {
+        //     arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
+        // }
+        // else if (operator.getRightBumperPressed()) {
+        //     arm.setArmIndex(arm.getArmIndex() + 1);
+        // }
+        // else if (operator.getLeftBumperPressed()) {
+        //     arm.setArmIndex(arm.getArmIndex() - 1);
+        // }
 
     }
 

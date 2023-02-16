@@ -15,7 +15,7 @@ public class OICalc {
 
         double slope = y / x;
 
-        if (slope == 0 || Double.isNaN(slope)) {
+        if (slope == 0 || Double.isNaN(slope) || Double.isInfinite(slope)) {
 
             output = new Translation2d(x, y);
             return output;
