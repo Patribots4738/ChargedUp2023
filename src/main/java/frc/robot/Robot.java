@@ -18,6 +18,7 @@ import io.github.oblarg.oblog.Logger;
 import math.Constants.OIConstants;
 import math.OICalc;
 import subsystems.AutoAlignment;
+import subsystems.PhotonCameraPose;
 import subsystems.Vision;
 
 /**
@@ -40,8 +41,6 @@ public class Robot extends TimedRobot {
     Arm arm;
 
     Debug debug;
-
-    Vision vision;
 
     AutoAlignment autoAlignment;
 
@@ -76,8 +75,6 @@ public class Robot extends TimedRobot {
 
         autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm);
         autoSegmentedWaypoints.loadAutoPaths();
-
-        vision = new Vision();
 
         // Configure the logger for shuffleboard
         Logger.configureLoggingAndConfig(this, false);
@@ -202,56 +199,43 @@ public class Robot extends TimedRobot {
         // Use the A button to activate the alignment process
         if (driver.getAButton()) {
 
-            // Run the vision calculations and get the most visible tag
-            vision.periodic();
+          if (driver.getRightBumperPressed()) {
 
-            // Make sure that the camera has tags in view
-            if (vision.hasTargets()) {
+            autoAlignment.calibrateOdometry();
 
-                autoAlignment.setTagID(vision.getTagID());
+            System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
 
-                if (driver.getRightBumperPressed()) {
+          }
 
-                    System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
-                    System.out.println("Distance from april to bot: " + vision.getTransform().getTranslation() + " " + vision.getTransform().getRotation().getZ() + "\n\n");
+          autoAlignment.moveToTag();
 
-                    swerve.addVisionMeasurement();
-                    SwerveTrajectory.resetTrajectoryStatus();
+          if (driver.getRightBumper()) {
+            switch (driver.getPOV()) {
+              // Not clicked
+              case -1:
+                break;
 
-                    System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+              // Clicking up
+              case 0:
+                arm.setArmIndex(arm.getArmIndex() + 1);
+                break;
 
-                }
+              // Clicking down
+              case 180:
+                arm.setArmIndex(arm.getArmIndex() - 1);
+                break;
+
+              // Clicking left
+              case 270:
+                autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+                break;
+
+              // Clicking right
+              case 90:
+                autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+                break;
             }
-
-            autoAlignment.moveToTag();
-
-            if (driver.getRightBumper()) {
-                switch (driver.getPOV()) {
-                    // Not clicked
-                    case -1:
-                        break;
-
-                    // Clicking up
-                    case 0:
-                        arm.setArmIndex(arm.getArmIndex() + 1);
-                        break;
-
-                    // Clicking down
-                    case 180:
-                        arm.setArmIndex(arm.getArmIndex() - 1);
-                        break;
-
-                    // Clicking left
-                    case 270:
-                        autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
-                        break;
-
-                    // Clicking right
-                    case 90:
-                        autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
-                        break;
-                }
-            }
+          }
 
         } else {
 

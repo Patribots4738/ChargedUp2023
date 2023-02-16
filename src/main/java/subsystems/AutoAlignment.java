@@ -1,11 +1,17 @@
 package subsystems;
 
 import auto.SwerveTrajectory;
+
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -32,6 +38,7 @@ public class AutoAlignment {
      */
 
     Swerve swerve;
+    PhotonCameraPose photonCameraPose;
     private int tagID;
     private int coneOffset;
 
@@ -44,29 +51,18 @@ public class AutoAlignment {
      *
      * @param visionTransform3d the position of the aprilTag relative to the bot
      */
-    public void calibrateOdometry(Transform3d visionTransform3d) {
+    public void calibrateOdometry() {
 
-        double headingToReference = -visionTransform3d.getRotation().getZ();
-        if (0 < tagID && tagID < 5) {
-            headingToReference -= Math.PI;
-        } else {
-            headingToReference += Math.PI;
-        }
+      Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPoseEstimator().getEstimatedPosition());
 
-        Translation2d trigPose = new Translation2d(
-                visionTransform3d.getX() * Math.cos(headingToReference),
-                visionTransform3d.getX() * Math.sin(headingToReference)
-        );
+      if (result.isPresent()) {
 
-        Translation2d targetPosition = getTagPos(tagID).getTranslation();
-        Translation2d visionTranslation2d = visionTransform3d.getTranslation().toTranslation2d().unaryMinus();
+        EstimatedRobotPose camEstimatedPose = result.get();
+          swerve.getPoseEstimator().addVisionMeasurement(camEstimatedPose.estimatedPose.toPose2d(), camEstimatedPose.timestampSeconds);
 
-        Translation2d robotPose = targetPosition.plus(visionTranslation2d).plus(VisionConstants.CAMERA_POSITION.getTranslation().toTranslation2d());
-        trigPose = targetPosition.plus(trigPose.unaryMinus()).minus(VisionConstants.CAMERA_POSITION.getTranslation().toTranslation2d());
-
-        System.out.println("Calibrated to: " + robotPose);
-        swerve.resetOdometry(new Pose2d(trigPose, Rotation2d.fromRadians(headingToReference)));
-
+          setTagID(photonCameraPose.getPhotonCamera().getLatestResult().getBestTarget().getFiducialId());
+          setConeOffset(0);
+      }
     }
 
     public void moveToTag() {
@@ -224,7 +220,31 @@ public class AutoAlignment {
     }
 
     public void setConeOffset(int coneOffset) {
-        this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
+
+      // Pan the coneOffset to the next tag if it is able to do so
+      // It cannot do so if there is no grid in the desired direction
+      if (coneOffset < -1) {
+        if (tagID == 2 || tagID == 3) {
+          this.tagID--;
+          this.coneOffset = 1;
+        }
+        else if (tagID == 6 || tagID == 7) {
+          this.tagID++;
+          this.coneOffset = 1;
+        }
+      }
+      else if (coneOffset > 1) {
+        if (tagID == 1 || tagID == 2) {
+          this.tagID++;
+          this.coneOffset = 1;
+        }
+        else if (tagID == 7 || tagID == 8) {
+          this.tagID--;
+          this.coneOffset = 1;
+        }
+      }
+
+      this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
     }
 
 }

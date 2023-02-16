@@ -18,15 +18,16 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import math.Constants.DriveConstants;
 import org.photonvision.EstimatedRobotPose;
+
+import subsystems.AutoAlignment;
 import subsystems.PhotonCameraPose;
 
 import java.util.Optional;
 
 public class Swerve {
     private SwerveDrivePoseEstimator poseEstimator;
-    private PhotonCameraPose photonPose = new PhotonCameraPose();
+    
     private double speedMultiplier = 1;
-    private final Field2d field = new Field2d();
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
@@ -89,7 +90,6 @@ public class Swerve {
         // standard deviations.
         // X, Y, theta.);
 
-        SmartDashboard.putData("Field", field);
     }
 
     public void periodic() {
@@ -144,18 +144,20 @@ public class Swerve {
                 pose);
     }
 
-    public void addVisionMeasurement() {
-        Optional<EstimatedRobotPose> result = photonPose.getEstimatedRobotPose(poseEstimator.getEstimatedPosition());
+    public void addVisionMeasurement(Optional<EstimatedRobotPose> result) {
+        Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(poseEstimator.getEstimatedPosition());
 
         if (result.isPresent()) {
 
-            EstimatedRobotPose camPose = result.get();
-            poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
-
-            field.getObject("Estimated Vision Position").setPose(camPose.estimatedPose.toPose2d());
+            EstimatedRobotPose camEstimatedPose = result.get();
+            poseEstimator.addVisionMeasurement(camEstimatedPose.estimatedPose.toPose2d(), camEstimatedPose.timestampSeconds);
+            
+            field.getObject("Estimated Vision Position").setPose(camEstimatedPose.estimatedPose.toPose2d());
 
         } else {
+
             field.getObject("Estimated Vision Position").setPose(new Pose2d(-100, -100, new Rotation2d()));
+        
         }
 
         field.getObject("Actual Pos").setPose(getPose());

@@ -50,9 +50,6 @@ public class Vision {
 
         hasTargets = true;
 
-        // Create the HashMap that represents the most visible tag
-
-
         // Get the best tag visible
         PhotonTrackedTarget target = result.getBestTarget();
 
