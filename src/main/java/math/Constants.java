@@ -181,8 +181,9 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-        public static final int LOWER_ARM_MOTOR_CAN_ID = 10;
-        public static final int UPPER_ARM_MOTOR_CAN_ID = 9;
+        public static final int LOWER_ARM_LEFT_MOTOR_CAN_ID = 10;
+        public static final int LOWER_ARM_RIGHT_MOTOR_CAN_ID = 9;
+        public static final int UPPER_ARM_MOTOR_CAN_ID = 11;
 
         // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
         public static final int UPPER_CURRENT_LIMIT = 80;
@@ -275,6 +276,7 @@ public final class Constants {
         public static final double V_UPPER = 0.95764;
         public static final double A_UPPER = 0.19957;
     }
+    
     public static final class VisionConstants {
 
         public static final String CAMERA_NAME = "Patribots4738";
