@@ -72,65 +72,79 @@ public class Arm implements Loggable {
      */
     public Arm() {
 
-        _lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-        _lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
-        _lowerArmLeft.follow(_lowerArmRight, true);
-        _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+      _lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
+      _lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+      _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-        _lowerArmRight.setIdleMode(IdleMode.kBrake);
-        _lowerArmLeft.setIdleMode(IdleMode.kBrake);
-        _upperArm.setIdleMode(IdleMode.kBrake);
+      _lowerArmRight.setIdleMode(IdleMode.kBrake);
+      _lowerArmLeft.setIdleMode(IdleMode.kBrake);
+      _upperArm.setIdleMode(IdleMode.kBrake);
 
-        // Factory reset, so we get the SPARK MAX to a known state before configuring
-        // them. This is useful in case a SPARK MAX is swapped out.
-        _lowerArmRight.restoreFactoryDefaults();
-        _lowerArmLeft.restoreFactoryDefaults();
-        _upperArm.restoreFactoryDefaults();
+      // Factory reset, so we get the SPARK MAX to a known state before configuring
+      // them. This is useful in case a SPARK MAX is swapped out.
+      _lowerArmRight.restoreFactoryDefaults();
+      _lowerArmLeft.restoreFactoryDefaults();
+      _upperArm.restoreFactoryDefaults();
 
-        _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
-        _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
+      _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
+      _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
 
-        _lowerArmPIDController = _lowerArmRight.getPIDController();
-        _upperArmPIDController = _upperArm.getPIDController();
-        _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
-        _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
+      _lowerArmPIDController = _lowerArmRight.getPIDController();
+      _upperArmPIDController = _upperArm.getPIDController();
+      _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
+      _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
 
-        // Set PID constants for the lower and upper SPARK MAX(s)
-        _lowerArmPIDController.setP(ArmConstants.LOWER_P);
-        _lowerArmPIDController.setI(ArmConstants.LOWER_I);
-        _lowerArmPIDController.setD(ArmConstants.LOWER_D);
-        _lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
-        _lowerArmPIDController.setOutputRange(
-                ArmConstants.LOWER_MIN_OUTPUT,
-                ArmConstants.LOWER_MAX_OUTPUT);
+      _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
+      _lowerArmEncoder.setVelocityConversionFactor(ArmConstants.LOWER_ENCODER_VELOCITY_FACTOR);
 
-        _upperArmPIDController.setP(ArmConstants.UPPER_P);
-        _upperArmPIDController.setI(ArmConstants.UPPER_I);
-        _upperArmPIDController.setD(ArmConstants.UPPER_D);
-        _upperArmPIDController.setFF(ArmConstants.UPPER_FF);
-        _upperArmPIDController.setOutputRange(
-                ArmConstants.UPPER_MIN_OUTPUT,
-                ArmConstants.UPPER_MAX_OUTPUT);
+      _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
+      _upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
 
-        _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
-        _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
-        _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_STALL_LIMIT, ArmConstants.UPPER_FREE_LIMIT, ArmConstants.UPPER_MAX_RPM);
+      _lowerArmPIDController.setPositionPIDWrappingEnabled(true);
+      _lowerArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MIN_INPUT);
+      _lowerArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MAX_INPUT);
 
-        // Save the SPARK MAX configuration. If a SPARK MAX
-        // browns out, it will retain the last configuration
-        _lowerArmRight.burnFlash();
-        _lowerArmLeft.burnFlash();
-        _upperArm.burnFlash();
+      _upperArmPIDController.setPositionPIDWrappingEnabled(true);
+      _upperArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MIN_INPUT);
+      _upperArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MAX_INPUT);
+
+      // Set PID constants for the lower and upper SPARK MAX(s)
+      _lowerArmPIDController.setP(ArmConstants.LOWER_P);
+      _lowerArmPIDController.setI(ArmConstants.LOWER_I);
+      _lowerArmPIDController.setD(ArmConstants.LOWER_D);
+      _lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
+      _lowerArmPIDController.setOutputRange(
+      ArmConstants.LOWER_MIN_OUTPUT,
+      ArmConstants.LOWER_MAX_OUTPUT);
+
+      _upperArmPIDController.setP(ArmConstants.UPPER_P);
+      _upperArmPIDController.setI(ArmConstants.UPPER_I);
+      _upperArmPIDController.setD(ArmConstants.UPPER_D);
+      _upperArmPIDController.setFF(ArmConstants.UPPER_FF);
+      _upperArmPIDController.setOutputRange(
+      ArmConstants.UPPER_MIN_OUTPUT,
+      ArmConstants.UPPER_MAX_OUTPUT);
+
+      // _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
+      // _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
+      _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_STALL_LIMIT, ArmConstants.UPPER_FREE_LIMIT, ArmConstants.UPPER_MAX_RPM);
+
+      // Save the SPARK MAX configuration. If a SPARK MAX
+      // browns out, it will retain the last configuration
+      _lowerArmLeft.follow(_lowerArmRight, true);
+      _lowerArmRight.burnFlash();
+      _lowerArmLeft.burnFlash();
+      _upperArm.burnFlash();
     }
-
+          
     public void toggleOperatorOverride() {
       this.operatorOverride = !operatorOverride;
     }
 
     public void periodic() {
-        indexPeriodic();
+        // indexPeriodic();
         setLowerArmPosition(lowerReference);
-        setUpperArmPosition(upperReference);
+        // setUpperArmPosition(upperReference);
     }
 
     public void indexPeriodic() {
@@ -299,7 +313,7 @@ public class Arm implements Loggable {
                 ArmConstants.A_LOWER);
 
         // Get the feedforward value for the position,
-        // Using a predictive formula with sysID given data of the motor
+        // Using a predictive formula with sysID given data of the motor  
         double FF = feedForward.calculate(position, 0);
         _lowerArmPIDController.setFF(FF);
 
@@ -356,5 +370,9 @@ public class Arm implements Loggable {
 
     public void printList() {
       System.out.println(upperRotationList);
+    }
+
+    public void zeroLowerArm(double speed) {
+      _lowerArmPIDController.setReference(speed/3, ControlType.kPosition);
     }
 }

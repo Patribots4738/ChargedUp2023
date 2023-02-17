@@ -53,7 +53,7 @@ public class Claw {
     }
 
     private void setSpeed(double speed) {
-        _clawPIDController.setReference(speed, ControlType.kVelocity);
+        _claw.set(speed);
     }
 
     public void setBrakeMode() {
