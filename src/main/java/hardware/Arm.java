@@ -32,18 +32,19 @@ public class Arm implements Loggable {
 
     // All armPos values are in inches
     Translation2d[][] armPos = {
-    {
+      {
         new Translation2d(-20, 30),
-        new Translation2d(-36, 23),
-    },
-    {
-        new Translation2d(0, ArmConstants.MAX_REACH)
-    },
-    {
+        new Translation2d(-36, 23)
+      },
+      // Stowed position
+      {
+        new Translation2d(-9, 18)
+      },
+      {
         new Translation2d(-12, 19),
         new Translation2d(-28, 13),
         new Translation2d(-32, 10)
-    }
+      }
     };
     
     // ceil -- force round up
@@ -69,8 +70,8 @@ public class Arm implements Loggable {
     private double upperReference = 0;
     private double lowerReference = 0;
     
-    private final CANSparkMax _lowerArmLeft;
     private final CANSparkMax _lowerArmRight;
+    private final CANSparkMax _lowerArmLeft;
     private final CANSparkMax _upperArm;
     
     private final RelativeEncoder _lowerArmEncoder;
@@ -86,30 +87,30 @@ public class Arm implements Loggable {
      */
     public Arm() {
 
-        _lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
         _lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-        _lowerArmRight.follow(_lowerArmLeft, true);
+        _lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+        _lowerArmLeft.follow(_lowerArmRight, true);
         _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-        _lowerArmLeft.setIdleMode(IdleMode.kBrake);
         _lowerArmRight.setIdleMode(IdleMode.kBrake);
+        _lowerArmLeft.setIdleMode(IdleMode.kBrake);
         _upperArm.setIdleMode(IdleMode.kBrake);
 
         // Factory reset, so we get the SPARK MAX to a known state before configuring
         // them. This is useful in case a SPARK MAX is swapped out.
-        _lowerArmLeft.restoreFactoryDefaults();
         _lowerArmRight.restoreFactoryDefaults();
+        _lowerArmLeft.restoreFactoryDefaults();
         _upperArm.restoreFactoryDefaults();
 
         // Setup encoders and PID controllers for the lower and upper SPARK MAX(s)
-        _lowerArmEncoder = _lowerArmLeft.getEncoder();
+        _lowerArmEncoder = _lowerArmRight.getEncoder();
         _upperArmEncoder = _upperArm.getEncoder();
         _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
         _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
 
         // _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
         // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
-        _lowerArmPIDController = _lowerArmLeft.getPIDController();
+        _lowerArmPIDController = _lowerArmRight.getPIDController();
         _upperArmPIDController = _upperArm.getPIDController();
         _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
         _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
@@ -131,14 +132,14 @@ public class Arm implements Loggable {
                 ArmConstants.UPPER_MIN_OUTPUT,
                 ArmConstants.UPPER_MAX_OUTPUT);
 
-        _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_CURRENT_LIMIT);
-        _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_CURRENT_LIMIT);
-        _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_CURRENT_LIMIT);
+        _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
+        _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
+        _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_STALL_LIMIT, ArmConstants.UPPER_FREE_LIMIT, ArmConstants.UPPER_MAX_RPM);
 
         // Save the SPARK MAX configuration. If a SPARK MAX
         // browns out, it will retain the last configuration
-        _lowerArmLeft.burnFlash();
         _lowerArmRight.burnFlash();
+        _lowerArmLeft.burnFlash();
         _upperArm.burnFlash();
 
         resetEncoders();
@@ -161,6 +162,8 @@ public class Arm implements Loggable {
 
     public void periodic() {
         indexPeriodic();
+        setLowerArmPosition(lowerReference);
+        setUpperArmPosition(upperReference);
     }
 
     public void indexPeriodic() {
@@ -368,8 +371,8 @@ public class Arm implements Loggable {
      * Set the motor to coast mode
      */
     public void setCoastMode() {
-        _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
         _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
         _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
@@ -377,12 +380,12 @@ public class Arm implements Loggable {
      * Set the motor to brake mode
      */
     public void setBrakeMode() {
-        _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
     public void printList() {
-        System.out.println(upperRotationList);
+      System.out.println(upperRotationList);
     }
 }
