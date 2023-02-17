@@ -19,6 +19,8 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public Waypoint[] HighFiveBallAutoWPs;
   public Waypoint[] SquareAutoWPs;
+  public Waypoint[] ConeToCubeWPs;
+
   public Waypoint[] chosenWaypoints;
 
   public int currentWaypointNumber = 0;
@@ -26,10 +28,14 @@ public class AutoSegmentedWaypoints implements Loggable {
   public AutoPose chosenPath;
   public AutoPose[] myAutoContainer;
 
-  public PathPlannerTrajectory seg1;
-  public PathPlannerTrajectory seg2;
-  public PathPlannerTrajectory seg3;
-  public PathPlannerTrajectory seg4;
+  public PathPlannerTrajectory square1;
+  public PathPlannerTrajectory square2;
+  public PathPlannerTrajectory square3;
+  public PathPlannerTrajectory square4;
+
+  public PathPlannerTrajectory coneToCube1;
+  public PathPlannerTrajectory coneToCube2;
+  public PathPlannerTrajectory coneToCube3;
 
   @Log
   public double autoDelay;
@@ -70,21 +76,32 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public void loadAutoPaths() {
 
-    seg1 = PathPlanner.loadPath("4", 2.0, 1.5);
-    seg2 = PathPlanner.loadPath("5", 2.0, 1.5);
-    seg3 = PathPlanner.loadPath("6", 2.0, 1.5);
-    seg4 = PathPlanner.loadPath("7", 2.0, 1.5);
+    square1 = PathPlanner.loadPath("4", 2.0, 1.5);
+    square2 = PathPlanner.loadPath("5", 2.0, 1.5);
+    square3 = PathPlanner.loadPath("6", 2.0, 1.5);
+    square4 = PathPlanner.loadPath("7", 2.0, 1.5);
+
+    coneToCube1 = PathPlanner.loadPath("ConeToCube1", 2.0, 1.5);
+    coneToCube2 = PathPlanner.loadPath("ConeToCube2", 2.0, 1.5);
+    coneToCube3 = PathPlanner.loadPath("ConeToCube3", 2.0, 1.5);
 
     SquareAutoWPs = new Waypoint[]{
         // new Waypoint(new AutoSegmentedWaypoints()::moveUpperArm, 7.62, 0.75, seg1),
         // new Waypoint(new AutoSegmentedWaypoints()::moveLowerArm, 5.23, 1.97, seg2),
         // new Waypoint(new AutoSegmentedWaypoints()::moveBothArms, 0.74, 1.02, seg3)
 
-        new Waypoint(this::moveUpperArm, seg1.getEndState().poseMeters.getX(), seg1.getEndState().poseMeters.getY(), seg1),
-        new Waypoint(this::moveLowerArm, seg2.getEndState().poseMeters.getX(), seg2.getEndState().poseMeters.getY(), seg2),
-        new Waypoint(this::moveBothArms, seg3.getEndState().poseMeters.getX(), seg3.getEndState().poseMeters.getY(), seg3),
-        new Waypoint(this::moveUpperArm, seg4.getEndState().poseMeters.getX(), seg4.getEndState().poseMeters.getY(), seg4)
+        new Waypoint(this::moveUpperArm, square1.getEndState().poseMeters.getX(), square1.getEndState().poseMeters.getY(), square1),
+        new Waypoint(this::moveLowerArm, square2.getEndState().poseMeters.getX(), square2.getEndState().poseMeters.getY(), square2),
+        new Waypoint(this::moveBothArms, square3.getEndState().poseMeters.getX(), square3.getEndState().poseMeters.getY(), square3),
+        new Waypoint(this::moveUpperArm, square4.getEndState().poseMeters.getX(), square4.getEndState().poseMeters.getY(), square4)
 
+    };
+
+    ConeToCubeWPs = new Waypoint[] {
+      new Waypoint(this::moveBothArms, coneToCube1.getInitialState().poseMeters.getX(), coneToCube1.getInitialState().poseMeters.getY(), coneToCube1),
+      new Waypoint(this::moveUpperArm, coneToCube1.getEndState().poseMeters.getX(), coneToCube1.getEndState().poseMeters.getY(), coneToCube1),
+      new Waypoint(this::moveLowerArm, coneToCube2.getEndState().poseMeters.getX(), coneToCube2.getEndState().poseMeters.getY(), coneToCube2),
+      new Waypoint(this::moveBothArms, coneToCube3.getEndState().poseMeters.getX(), coneToCube3.getEndState().poseMeters.getY(), coneToCube3)
     };
 
     myAutoContainer = new AutoPose[]{
