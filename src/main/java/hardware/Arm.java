@@ -369,6 +369,7 @@ public class Arm implements Loggable {
      */
     public void setCoastMode() {
         _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
         _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
