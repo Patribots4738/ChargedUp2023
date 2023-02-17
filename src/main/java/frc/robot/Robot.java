@@ -7,7 +7,7 @@ package frc.robot;
 import debug.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import hardware.*;
-import math.ArmCalcuations;
+import math.ArmCalculations;
 import math.OICalc;
 import math.Constants.*;
 import auto.*;
@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
 
     Debug debug;
 
-    ArmCalcuations armCalcuations;
+    ArmCalculations armCalcuations;
 
 
     @Override
@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
 
         // arm = new Arm();
 
-        armCalcuations = new ArmCalcuations();
+        armCalcuations = new ArmCalculations();
 
         autoSegmentedWaypoints = new AutoSegmentedWaypoints();
         autoSegmentedWaypoints.loadAutoPaths();
