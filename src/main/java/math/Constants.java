@@ -272,6 +272,20 @@ public final class Constants {
         public static final double A_UPPER = 0.19957;
     }
 
+    public static final class PlacementConstants {
+        public static final int STOWED_PLACEMENT_INDEX = 0;
+        public static final int HYBRID_PLACEMENT_INDEX = 1;
+        public static final int MEDIUM_CONE_PLACEMENT_INDEX = 2;
+        public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
+        public static final int MEDIUM_CUBE_PLACEMENT_INDEX = 5;
+        public static final int HIGH_CUBE_PLACEMENT_INDEX = 6;
+        public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
+
+        public static final int CLAW_INTAKE_SPEED = 1;
+        public static final int CLAW_OUTAKE_SPEED = -1;
+        public static final int CLAW_STOPPED_SPEED = 0;
+    }
+
     public static final class VisionConstants {
 
         public static final String CAMERA_NAME = "Patribots4738";
