@@ -82,40 +82,47 @@ public class Arm implements Loggable {
     private double upperReference = 0;
     private double lowerReference = 0;
 
-    private final CANSparkMax _lowerArm;
+    private final CANSparkMax _lowerArmLeft;
+    private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _upperArm;
-
+    
     private final RelativeEncoder _lowerArmEncoder;
     private final RelativeEncoder _upperArmEncoder;
-
+    
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
-
-    final ArmCalculations armCalculations;
+    
+    ArmCalculations armCalculations = new ArmCalculations();
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
      */
     public Arm() {
 
-        _lowerArm = new CANSparkMax(ArmConstants.LOWER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+        _lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+        _lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
+        _lowerArmRight.follow(_lowerArmLeft, true);
         _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-        _lowerArm.setIdleMode(IdleMode.kBrake);
+        _lowerArmLeft.setIdleMode(IdleMode.kBrake);
+        _lowerArmRight.setIdleMode(IdleMode.kBrake);
         _upperArm.setIdleMode(IdleMode.kBrake);
 
         // Factory reset, so we get the SPARK MAX to a known state before configuring
         // them. This is useful in case a SPARK MAX is swapped out.
-        _lowerArm.restoreFactoryDefaults();
+        _lowerArmLeft.restoreFactoryDefaults();
+        _lowerArmRight.restoreFactoryDefaults();
         _upperArm.restoreFactoryDefaults();
 
         // Setup encoders and PID controllers for the lower and upper SPARK MAX(s)
-        _lowerArmEncoder = _lowerArm.getEncoder();
+        _lowerArmEncoder = _lowerArmLeft.getEncoder();
         _upperArmEncoder = _upperArm.getEncoder();
         _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
         _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
 
-        _lowerArmPIDController = _lowerArm.getPIDController();
+        // _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
+        // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
+        _lowerArmPIDController = _lowerArmLeft.getPIDController();
         _upperArmPIDController = _upperArm.getPIDController();
         _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
         _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
@@ -137,22 +144,17 @@ public class Arm implements Loggable {
                 ArmConstants.UPPER_MIN_OUTPUT,
                 ArmConstants.UPPER_MAX_OUTPUT);
 
-        _lowerArm.setSmartCurrentLimit(ArmConstants.LOWER_CURRENT_LIMIT);
-        // _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_CURRENT_LIMIT);
-
-        // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
-        _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_CURRENT_LIMIT);
+        _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_CURRENT_LIMIT);
+        _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_CURRENT_LIMIT);
 
         // Save the SPARK MAX configuration. If a SPARK MAX
         // browns out, it will retain the last configuration
-        _lowerArm.burnFlash();
+        _lowerArmLeft.burnFlash();
+        _lowerArmRight.burnFlash();
         _upperArm.burnFlash();
 
-        armCalculations = new ArmCalculations();
-
         resetEncoders();
-        setBrakeMode();
     }
 
     public void toggleOperatorOverride() {
@@ -376,16 +378,18 @@ public class Arm implements Loggable {
      * Set the motor to coast mode
      */
     public void setCoastMode() {
-        _lowerArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
-        _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+      _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
+      _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
+      _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
     /**
      * Set the motor to brake mode
      */
     public void setBrakeMode() {
-        _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
     public void printList() {

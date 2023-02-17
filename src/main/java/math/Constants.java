@@ -150,7 +150,7 @@ public final class Constants {
     }
 
     public static final class ClawConstants {
-        public static final int CLAW_CAN_ID = 11;
+        public static final int CLAW_CAN_ID = 12;
 
         public static final double CLAW_POSITION_CONVERSION_FACTOR = 50;
 
@@ -177,8 +177,9 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-        public static final int LOWER_ARM_MOTOR_CAN_ID = 10;
-        public static final int UPPER_ARM_MOTOR_CAN_ID = 9;
+        public static final int LOWER_ARM_LEFT_MOTOR_CAN_ID = 9;
+        public static final int LOWER_ARM_RIGHT_MOTOR_CAN_ID = 10;
+        public static final int UPPER_ARM_MOTOR_CAN_ID = 11;
 
         // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
         public static final int UPPER_CURRENT_LIMIT = 80;
