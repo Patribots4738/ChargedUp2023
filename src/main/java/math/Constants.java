@@ -167,7 +167,7 @@ public final class Constants {
         public static final double CLAW_MAX_OUTPUT = 1;
 
         public static final int CLAW_STALL_LIMIT = 20;
-        public static final int CLAW_FREE_LIMIT = 20;
+        public static final int CLAW_FREE_LIMIT = 40;
 
 
         // from the edge of the upper arm, straight out,
@@ -217,8 +217,11 @@ public final class Constants {
       public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
 
       // Multiply the absolute encoder output to get radians instead of rotations
-      public static final double LOWER_ENCODER_POSITION_FACTOR = (2 * Math.PI);
-      public static final double UPPER_ENCODER_POSITION_FACTOR = (2 * Math.PI);
+      public static final double LOWER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
+      public static final double UPPER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
+
+      public static final double LOWER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
+      public static final double UPPER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
 
       // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
       public static final double LOWER_ARM_FREEDOM_DEGREES = 60;
@@ -247,17 +250,21 @@ public final class Constants {
        * <p>
        */
       // PID values for the lower and upper arm
-      public static final double LOWER_P = 0.1;
+      public static final double LOWER_P = 1;
       public static final double LOWER_I = 0;
-      public static final double LOWER_D = 0.025;
+      public static final double LOWER_D = 0;
       public static final double LOWER_FF = 1;
 
+      public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
+      public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
       public static final double UPPER_P = 1;    //46.6;
       public static final double UPPER_D = 0; //34.2;
       public static final double UPPER_I = 0;//.035;
       public static final double UPPER_FF = 1;
 
+      public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
+      public static final double UPPER_ENCODER_POSITION_PID_MAX_INPUT = UPPER_ENCODER_POSITION_FACTOR; // radians
 
       /**
        * FF is a predictive formula that uses the input of where we want to be to predict the path required to get there

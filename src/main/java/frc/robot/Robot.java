@@ -30,11 +30,12 @@ public class Robot extends TimedRobot {
     Swerve swerve;
 
     XboxController driver;
-    XboxController operator;
+    // XboxController operator;
 
     AutoSegmentedWaypoints autoSegmentedWaypoints;
 
     Arm arm;
+    Claw claw;
 
     Debug debug;
 
@@ -52,9 +53,10 @@ public class Robot extends TimedRobot {
         swerve = new Swerve();
 
         driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
-        operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
+        // operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
         arm = new Arm();
+        claw = new Claw();
 
         armCalcuations = new ArmCalculations();
 
@@ -75,7 +77,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
 
-        swerve.periodic();
+        // swerve.periodic();
         // arm.periodic();
 
         Logger.updateEntries();
@@ -109,7 +111,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        arm.periodic();
+        // arm.periodic();
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
@@ -118,10 +120,11 @@ public class Robot extends TimedRobot {
         double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
         double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
 
-        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX() , OIConstants.DRIVER_DEADBAND);
-        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
-        double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
-        double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
+        // double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX() , OIConstants.DRIVER_DEADBAND);
+        // double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
+        // double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
+        // double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
+        // Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
         
@@ -129,7 +132,6 @@ public class Robot extends TimedRobot {
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
           driverLeftAxis = driverLeftAxis.unaryMinus();
         }
-        Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         if (driver.getRightBumper()) {
           swerve.setX();
@@ -144,18 +146,18 @@ public class Robot extends TimedRobot {
         // }
 
         // Toggle the operator override when the operator's left stick is pressed
-        if (operator.getLeftStickButtonPressed()) {
-            arm.toggleOperatorOverride();
-        }
-        if (arm.getOperatorOverride()) {
-            arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
-        }
-        else if (operator.getRightBumperPressed()) {
-            arm.setArmIndex(arm.getArmIndex() + 1);
-        }
-        else if (operator.getLeftBumperPressed()) {
-            arm.setArmIndex(arm.getArmIndex() - 1);
-        }
+        // if (operator.getLeftStickButtonPressed()) {
+        //     arm.toggleOperatorOverride();
+        // }
+        // if (arm.getOperatorOverride()) {
+        //     arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
+        // }
+        // else if (operator.getRightBumperPressed()) {
+        //     arm.setArmIndex(arm.getArmIndex() + 1);
+        // }
+        // else if (operator.getLeftBumperPressed()) {
+        //     arm.setArmIndex(arm.getArmIndex() - 1);
+        // }
 
     }
 
@@ -164,5 +166,9 @@ public class Robot extends TimedRobot {
 
 
     @Override
-    public void testPeriodic() {}
+    public void testPeriodic() {
+      arm.setLowerArmReference(MathUtil.applyDeadband(driver.getLeftX(), 0.15));
+      arm.periodic();
+      System.out.println("Arm Pos: " + arm.getLowerArmPosition());
+    }
 }
