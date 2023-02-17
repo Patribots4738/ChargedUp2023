@@ -2,7 +2,7 @@ package math;
 
 import math.Constants.*;
 
-public class ArmCalcuations {
+public class ArmCalculations {
 
     /*
      *   |
