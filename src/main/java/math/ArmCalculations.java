@@ -1,8 +1,8 @@
 package math;
 
-import math.Constants.ArmConstants;
+import math.Constants.*;
 
-public class ArmCalculations {
+public class ArmCalcuations {
 
     /*
      *   |
@@ -21,7 +21,7 @@ public class ArmCalculations {
      *
      * @param x the absolute x position from the first pivot point to position the claw
      * @param y the absolute y position from the first pivot point to position the claw
-     *          Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
+     *          Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectively
      *          Due to an axis controlling the range, they will not go over
      * @return the angle to set the motor to, in radians
      */
@@ -41,13 +41,14 @@ public class ArmCalculations {
      *
      * @param x the absolute x position from the first pivot point to position the claw
      * @param y the absolute y position from the first pivot point to position the claw
-     *          Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
+     *          Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectively
      *          Due to an axis controlling the range, they will not go over
      */
-    public double getLowerAngle(double y, double x, double q2) {
+    public double getLowerAngle(double y, double x, double q2)
+    {
         double aTanFraction =
-                (Constants.ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) /
-                        (Constants.ArmConstants.LOWER_ARM_LENGTH + (Constants.ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2)));
+                (ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) /
+                (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2)));
 
         double leftAngle = Math.atan(y / x) +
                 Math.atan(aTanFraction);

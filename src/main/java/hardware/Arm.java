@@ -91,7 +91,7 @@ public class Arm implements Loggable {
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
 
-    final ArmCalculations armCalculations = new ArmCalculations();
+    final ArmCalculations armCalculations;
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -148,6 +148,11 @@ public class Arm implements Loggable {
         // browns out, it will retain the last configuration
         _lowerArm.burnFlash();
         _upperArm.burnFlash();
+
+        armCalculations = new ArmCalculations();
+
+        resetEncoders();
+        setBrakeMode();
     }
 
     public void toggleOperatorOverride() {
@@ -252,7 +257,7 @@ public class Arm implements Loggable {
         if (armPos.getY() > ArmConstants.MAX_REACH_Y) {
             armPos = new Translation2d(armPos.getX(), ArmConstants.MAX_REACH_Y);
         }
-
+        
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
         double upperArmAngle = armCalculations.getUpperAngle(armPos.getX(), armPos.getY());

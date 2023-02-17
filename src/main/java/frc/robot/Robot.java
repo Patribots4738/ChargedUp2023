@@ -37,12 +37,11 @@ public class Robot extends TimedRobot {
     XboxController operator;
 
     AutoSegmentedWaypoints autoSegmentedWaypoints;
+    AutoAlignment autoAlignment;
 
-    Arm arm;
+     Arm arm;
 
     Debug debug;
-
-    AutoAlignment autoAlignment;
 
     @Override
     public void robotInit() {
@@ -51,27 +50,14 @@ public class Robot extends TimedRobot {
 
         // Debug class for Shuffleboard
         debug = new Debug();
-        debug.debugInit();
 
-        /*
-         * For swerve drive, the following is the order of the motors
-         * odd CAN IDs drive the robot
-         * even CAN IDs are the turning motors
-         */
         // Drivetrain instantiation
         swerve = new Swerve();
-        autoAlignment = new AutoAlignment(swerve);
-        // // Zero the IMU for field-oriented driving
-        swerve.resetEncoders();
-        swerve.zeroHeading();
-        swerve.setBrakeMode();
 
         driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
         operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
-        arm = new Arm();
-        arm.resetEncoders();
-        arm.setBrakeMode();
+         arm = new Arm();
 
         autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm);
         autoSegmentedWaypoints.loadAutoPaths();
@@ -98,12 +84,10 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void disabledInit() {
-    }
+    public void disabledInit() {}
 
     @Override
-    public void disabledPeriodic() {
-    }
+    public void disabledPeriodic() {}
 
     @Override
     public void autonomousInit() {
@@ -116,48 +100,47 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
 
         autoSegmentedWaypoints.periodic();
-        arm.periodic();
+        // arm.periodic();
 
     }
 
     @Override
-    public void teleopInit() {
-    }
+    public void teleopInit() {}
 
     @Override
     public void teleopPeriodic() {
-        arm.periodic();
+        // arm.periodic();
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
-        double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
-        double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
-        double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
-        double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
+        double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
+        double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()  , OIConstants.DRIVER_DEADBAND);
+        double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
+        double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
 
-        double operatorLeftX = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.DRIVER_DEADBAND);
-        double operatorLeftY = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.DRIVER_DEADBAND);
+        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX() , OIConstants.DRIVER_DEADBAND);
+        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
         double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
         double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+
         // If we are on blue alliance, flip the driverLeftAxis
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-            driverLeftAxis = driverLeftAxis.unaryMinus();
+          driverLeftAxis = driverLeftAxis.unaryMinus();
         }
-
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         if (driver.getRightBumper()) {
-            swerve.setX();
+          swerve.setX();
         } else {
-            //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-            swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
+          //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
         if (driver.getLeftStickButtonPressed()) {
-            swerve.toggleSpeed();
+          swerve.toggleSpeed();
         }
 
         // Toggle the operator override when the operator's left stick is pressed
@@ -166,9 +149,11 @@ public class Robot extends TimedRobot {
         }
         if (arm.getOperatorOverride()) {
             arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
-        } else if (operator.getRightBumperPressed()) {
+        }
+        else if (operator.getRightBumperPressed()) {
             arm.setArmIndex(arm.getArmIndex() + 1);
-        } else if (operator.getLeftBumperPressed()) {
+        }
+        else if (operator.getLeftBumperPressed()) {
             arm.setArmIndex(arm.getArmIndex() - 1);
         }
 

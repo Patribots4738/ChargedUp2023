@@ -1,7 +1,7 @@
-/*
- * See: https://github.com/commodores/ChargedUpCode
- * for referenced code
- */
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package hardware;
 
 import edu.wpi.first.math.MatBuilder;
@@ -14,19 +14,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import math.Constants.DriveConstants;
 import org.photonvision.EstimatedRobotPose;
-
-import subsystems.AutoAlignment;
-import subsystems.PhotonCameraPose;
-
 import java.util.Optional;
+
 
 public class Swerve {
     private SwerveDrivePoseEstimator poseEstimator;
-    
+
     private double speedMultiplier = 1;
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
@@ -59,20 +55,23 @@ public class Swerve {
 
 
     // Odometry class for tracking robot pose
-    //  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-    //      DriveConstants.DRIVE_KINEMATICS,
-    //      Rotation2d.fromDegrees(gyro.getAngle()),
-    //      new SwerveModulePosition[]{
-    //          m_frontLeft.getPosition(),
-    //          m_frontRight.getPosition(),
-    //          m_rearLeft.getPosition(),
-    //          m_rearRight.getPosition()
-    //      });
+    // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+    //         DriveConstants.DRIVE_KINEMATICS,
+    //         Rotation2d.fromDegrees(getTotalDegrees()),
+    //         new SwerveModulePosition[]{
+    //                 m_frontLeft.getPosition(),
+    //                 m_frontRight.getPosition(),
+    //                 m_rearLeft.getPosition(),
+    //                 m_rearRight.getPosition()
+    //         });
 
     /**
      * Creates a new DriveSubsystem.
      */
     public Swerve() {
+      resetEncoders();
+      zeroHeading();
+      setBrakeMode();
 
         poseEstimator = new SwerveDrivePoseEstimator(
                 DriveConstants.DRIVE_KINEMATICS,
@@ -82,14 +81,13 @@ public class Swerve {
                 new MatBuilder<>(
                         Nat.N3(),
                         Nat.N1()).fill(0.1, 0.1, 0.1),// State measurement
-                // standard deviations.
-                // X, Y, theta.
+                        // standard deviations
+                        // X, Y, theta
                 new MatBuilder<>(
                         Nat.N3(),
                         Nat.N1()).fill(1.25, 1.25, 1.25));// Vision measurement
-        // standard deviations.
-        // X, Y, theta.);
-
+                        // standard deviations
+                        // X, Y, theta
     }
 
     public void periodic() {
@@ -144,26 +142,6 @@ public class Swerve {
                 pose);
     }
 
-    public void addVisionMeasurement(Optional<EstimatedRobotPose> result) {
-        Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(poseEstimator.getEstimatedPosition());
-
-        if (result.isPresent()) {
-
-            EstimatedRobotPose camEstimatedPose = result.get();
-            poseEstimator.addVisionMeasurement(camEstimatedPose.estimatedPose.toPose2d(), camEstimatedPose.timestampSeconds);
-            
-            field.getObject("Estimated Vision Position").setPose(camEstimatedPose.estimatedPose.toPose2d());
-
-        } else {
-
-            field.getObject("Estimated Vision Position").setPose(new Pose2d(-100, -100, new Rotation2d()));
-        
-        }
-
-        field.getObject("Actual Pos").setPose(getPose());
-        field.setRobotPose(poseEstimator.getEstimatedPosition());
-    }
-
     public SwerveModuleState[] getModuleStates() {
 
         SwerveModuleState[] states = new SwerveModuleState[4];
@@ -196,12 +174,20 @@ public class Swerve {
     /**
      * Returns the heading of the robot.
      *
-     * @return the robot's heading in degrees, from -180 to 180
+     * @return the robot's total degrees traveled from the start
      */
+    public double getTotalDegrees() {
+        return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+    }
+
     public Rotation2d getYaw() {
-        return (DriveConstants.GYRO_REVERSED) ?
-                Rotation2d.fromDegrees(360 - gyro.getAngle()) :
-                Rotation2d.fromDegrees(gyro.getAngle());
+        Rotation2d yaw = Rotation2d.fromDegrees(gyro.getAngle());
+
+        if (DriveConstants.GYRO_REVERSED) {
+            yaw.unaryMinus();
+        }
+
+        return yaw;
     }
 
     public void setBrakeMode() {
@@ -222,7 +208,7 @@ public class Swerve {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return gyro.getRate();
+        return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public void toggleSpeed() {

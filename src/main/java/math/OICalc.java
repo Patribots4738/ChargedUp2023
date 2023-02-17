@@ -14,6 +14,7 @@ public class OICalc {
         Translation2d output;
 
         double slope = y / x;
+
         if (slope == 0 || Double.isNaN(slope) || Double.isInfinite(slope)) {
 
             output = new Translation2d(x, y);
@@ -65,9 +66,8 @@ public class OICalc {
     public static double getDistance(double x1, double y1, double x2, double y2) {
         return
                 Math.sqrt(
-                        (Math.pow(x1, 2) + Math.pow(y1, 2))
-                                /
-                                (Math.pow(x2, 2) + Math.pow(y2, 2)));
+                        (Math.pow(x1, 2) + Math.pow(y1, 2)) /
+                        (Math.pow(x2, 2) + Math.pow(y2, 2)));
     }
 
 }

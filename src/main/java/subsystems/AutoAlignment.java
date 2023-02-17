@@ -102,15 +102,15 @@ public class AutoAlignment {
         }
 
         PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
-                (
-                        new PathConstraints(0.1, 0.1),
-                        new PathPoint(swerve.getPose().getTranslation(),
-                                heading,
-                                swerve.getPose().getRotation()),
-                        new PathPoint(targetPose.getTranslation(),
-                                heading,
-                                targetPose.getRotation())
-                );
+        (
+            new PathConstraints(0.1, 0.1),
+            new PathPoint(swerve.getPose().getTranslation(),
+                heading,
+                swerve.getPose().getRotation()),
+            new PathPoint(targetPose.getTranslation(),
+                heading,
+                targetPose.getRotation())
+        );
 
         SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose());
 
