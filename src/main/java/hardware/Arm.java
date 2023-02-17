@@ -30,34 +30,36 @@ public class Arm implements Loggable {
 
     // All armPos values are in inches
     final Translation2d[][] armPos = {
-            {
-                    new Translation2d(-20, 30),
-                    new Translation2d(-36, 23),
-            },
-            {
-                    new Translation2d(0, ArmConstants.MAX_REACH)
-            },
-            {
-                    new Translation2d(-12, 19),
-                    new Translation2d(-28, 13),
-                    new Translation2d(-32, 10)
-            }
+        {
+            new Translation2d(-20, 30),
+            new Translation2d(-36, 23),
+        },
+        {
+            new Translation2d(0, ArmConstants.MAX_REACH)
+        },
+        {
+            new Translation2d(-12, 19),
+            new Translation2d(-28, 13),
+            new Translation2d(-32, 10)
+        }
     };
 
     Translation2d[][] placementPositions = {
-            {
-                    new Translation2d(-20, 1),
-                    new Translation2d(-36, 23),
-                    new Translation2d(-52.6, 33),
-            },
-            {
-                    new Translation2d(0, ArmConstants.MAX_REACH)
-            },
-            {
-                    new Translation2d(-20, 2),
-                    new Translation2d(-36, 25),
-                    new Translation2d(-52.6, 33)
-            }
+        // top cone placement positions
+        {
+            new Translation2d(-16, 30),
+            new Translation2d(-30, 45),
+            new Translation2d(-43, 47),
+        },
+        // default arm position
+        {
+            new Translation2d(-6, 24)
+        },
+        {
+            new Translation2d(-20, 2),
+            new Translation2d(-36, 25),
+            new Translation2d(-52.6, 33)
+        }
     };
     // ceil -- force round up
     int armPosDimension1 = (int) Math.ceil(armPos.length / 2.0);
@@ -265,9 +267,7 @@ public class Arm implements Loggable {
 
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
-        if (Double.isNaN(upperArmAngle)) {
-            return;
-        }
+        if (Double.isNaN(upperArmAngle)) { return; }
 
         setLowerArmReference(Units.radiansToRotations(lowerArmAngle));
         setUpperArmReference(Units.radiansToRotations(upperArmAngle));
@@ -370,6 +370,21 @@ public class Arm implements Loggable {
      */
     public double getLowerArmPosition() {
         return _lowerArmEncoder.getPosition();
+    }
+
+    public boolean getAtDesiredPositions() {
+
+        // get the desired position of the arms, using the last index in the armPos[armPosDimension1]
+        double upperArmAngle = armCalculations.getUpperAngle(
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY());
+
+        double lowerArmAngle = armCalculations.getLowerAngle(
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY(), upperArmAngle);
+
+        return (Math.abs(Units.radiansToRotations(upperArmAngle) - getUpperArmPosition()) < 0.01) &&
+                (Math.abs(Units.radiansToRotations(lowerArmAngle) - getLowerArmPosition()) < 0.01);
     }
 
     /**
