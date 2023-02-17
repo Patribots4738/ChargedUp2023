@@ -2,11 +2,13 @@ package hardware;
 
 import java.util.ArrayList;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -15,9 +17,9 @@ import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import math.*;
 import math.Constants.ArmConstants;
+import math.Constants.PlacementConstants;
 
 public class Arm implements Loggable {
 
@@ -29,32 +31,15 @@ public class Arm implements Loggable {
      *           3 | 5
      *        2  |||||  6
      */
-
-    // All armPos values are in inches
-    Translation2d[][] armPos = {
-      {
-        new Translation2d(-20, 30),
-        new Translation2d(-36, 23)
-      },
-      // Stowed position
-      {
-        new Translation2d(-9, 18)
-      },
-      {
-        new Translation2d(-12, 19),
-        new Translation2d(-28, 13),
-        new Translation2d(-32, 10)
-      }
-    };
     
     // ceil -- force round up
-    int armPosDimention1 = (int) Math.ceil(armPos.length / 2);
+    int armPosDimention1 = (int) Math.ceil(PlacementConstants.ARM_POSITIONS.length / 2);
     int armPosDimention2 = 0;
     
     private boolean operatorOverride = false;
 
-    private double armXPos = 0;
-    private double armYPos = 0;
+    private double armXReference = 0;
+    private double armYReference = 0;
 
     // The current rotation of the upper arm
     @Log
@@ -73,10 +58,10 @@ public class Arm implements Loggable {
     private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _lowerArmLeft;
     private final CANSparkMax _upperArm;
-    
-    private final RelativeEncoder _lowerArmEncoder;
-    private final RelativeEncoder _upperArmEncoder;
-    
+
+    private final AbsoluteEncoder _lowerArmEncoder;
+    private final AbsoluteEncoder _upperArmEncoder;
+
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
     
@@ -102,14 +87,9 @@ public class Arm implements Loggable {
         _lowerArmLeft.restoreFactoryDefaults();
         _upperArm.restoreFactoryDefaults();
 
-        // Setup encoders and PID controllers for the lower and upper SPARK MAX(s)
-        _lowerArmEncoder = _lowerArmRight.getEncoder();
-        _upperArmEncoder = _upperArm.getEncoder();
-        _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
-        _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
+        _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
+        _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
 
-        // _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
-        // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
         _lowerArmPIDController = _lowerArmRight.getPIDController();
         _upperArmPIDController = _upperArm.getPIDController();
         _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
@@ -141,23 +121,10 @@ public class Arm implements Loggable {
         _lowerArmRight.burnFlash();
         _lowerArmLeft.burnFlash();
         _upperArm.burnFlash();
-
-        resetEncoders();
     }
 
     public void toggleOperatorOverride() {
       this.operatorOverride = !operatorOverride;
-    }
-
-    /**
-     * Reset the encoders to zero the arm when initiating the arm
-     * Will not be needed in the future because we will have absolute encoders
-     */
-    public void resetEncoders() {
-
-        _lowerArmEncoder.setPosition(0);
-        _upperArmEncoder.setPosition(0);//-0.5687823825412326);
-
     }
 
     public void periodic() {
@@ -168,9 +135,9 @@ public class Arm implements Loggable {
 
     public void indexPeriodic() {
 
-        // armPos[armPosDimention1][armPosDimention2]
-        if (armPosDimention1 == armPos.length ||
-            armPosDimention2 == armPos[armPosDimention1].length) 
+        // PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]
+        if (armPosDimention1 == PlacementConstants.ARM_POSITIONS.length ||
+            armPosDimention2 == PlacementConstants.ARM_POSITIONS[armPosDimention1].length) 
         {
             return;
         }
@@ -179,7 +146,7 @@ public class Arm implements Loggable {
             Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.UPPER_ARM_DEADBAND)
         {
             armPosDimention2++;
-            drive(armPos[armPosDimention1][armPosDimention2]);
+            drive(PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
         }
     }
 
@@ -196,13 +163,13 @@ public class Arm implements Loggable {
     }
 
     /**
-     * Sets arm index from the armPos array
-     *
+     * Sets arm index from the {@link PlacementConstants.ARM_POSITIONS} array
+     * 
      * @param index the direction to change the arm index by
      */
     public void setArmIndex(int index) {
 
-        index = MathUtil.clamp(index, 0, armPos.length-1);
+        index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
         
         armPosDimention1 += index;
         armPosDimention2 = 0;
@@ -226,37 +193,39 @@ public class Arm implements Loggable {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-            this.armXPos += position.getX();
-            this.armYPos += position.getY();
+          // Divide by 250 becuase the code runs 500 times a second
+          // This will make an input of 1 move the arm only 2 inches a second
+          this.armXReference += (position.getX()/250);
+          this.armYReference += (position.getY()/250);
         }
         else {
-            this.armXPos = position.getX();
-            this.armYPos = position.getY();
+          this.armXReference = position.getX();
+          this.armYReference = position.getY();
         }
 
         // Make sure armX and armY are within the range of 0 to infinity
         // Because we cannot reach below the ground.
         // Even though our arm starts 11 inches above the ground,
         // the claw will be 11 inches from the arm end
-        armYPos = (position.getY() < 0) ? 0 : armYPos;
+        armYReference = (position.getY() < 0) ? 0 : armYReference;
 
-        Translation2d armPos = new Translation2d(armXPos, armYPos);
+        Translation2d armPosition = new Translation2d(armXReference, armYReference);
 
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
         // Give it a one-inch cushion
-        if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.MAX_REACH) {
-            armPos = armPos.times((ArmConstants.MAX_REACH) / armPos.getDistance(new Translation2d(0, 0)));
+        if (armPosition.getDistance(new Translation2d(0,0)) > ArmConstants.MAX_REACH) {
+            armPosition = armPosition.times((ArmConstants.MAX_REACH) / armPosition.getDistance(new Translation2d(0, 0)));
         }
 
-        if (armPos.getY() > ArmConstants.MAX_REACH_Y) {
-            armPos = new Translation2d(armPos.getX(), ArmConstants.MAX_REACH_Y);
+        if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
+            armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
         }
         
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-        double upperArmAngle = armCalculations.getUpperAngle(armPos.getX(), armPos.getY());
-        double lowerArmAngle = armCalculations.getLowerAngle(armPos.getX(), armPos.getY(), upperArmAngle);
+        double upperArmAngle = armCalculations.getUpperAngle(armPosition.getX(), armPosition.getY());
+        double lowerArmAngle = armCalculations.getLowerAngle(armPosition.getX(), armPosition.getY(), upperArmAngle);
 
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle

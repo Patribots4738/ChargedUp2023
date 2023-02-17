@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 
     AutoSegmentedWaypoints autoSegmentedWaypoints;
 
-    // Arm arm;
+    Arm arm;
 
     Debug debug;
 
@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
         driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
         operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
-        // arm = new Arm();
+        arm = new Arm();
 
         armCalcuations = new ArmCalculations();
 
@@ -109,7 +109,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // arm.periodic();
+        arm.periodic();
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
@@ -135,27 +135,27 @@ public class Robot extends TimedRobot {
           swerve.setX();
         } else {
           //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
+          // swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-        if (driver.getLeftStickButtonPressed()) {
-          swerve.toggleSpeed();
-        }
+        // if (driver.getLeftStickButtonPressed()) {
+        //   swerve.toggleSpeed();
+        // }
 
         // Toggle the operator override when the operator's left stick is pressed
-        // if (operator.getLeftStickButtonPressed()) {
-        //     arm.toggleOperatorOverride();
-        // }
-        // if (arm.getOperatorOverride()) {
-        //     arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
-        // }
-        // else if (operator.getRightBumperPressed()) {
-        //     arm.setArmIndex(arm.getArmIndex() + 1);
-        // }
-        // else if (operator.getLeftBumperPressed()) {
-        //     arm.setArmIndex(arm.getArmIndex() - 1);
-        // }
+        if (operator.getLeftStickButtonPressed()) {
+            arm.toggleOperatorOverride();
+        }
+        if (arm.getOperatorOverride()) {
+            arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
+        }
+        else if (operator.getRightBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() + 1);
+        }
+        else if (operator.getLeftBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() - 1);
+        }
 
     }
 

@@ -185,14 +185,23 @@ public final class Constants {
       public static final int LOWER_ARM_RIGHT_MOTOR_CAN_ID = 9;
       public static final int UPPER_ARM_MOTOR_CAN_ID = 11;
 
+      // The gear ratio of the lower arm is 84:1
+      public static final double LOWER_ARM_GEAR_RATIO = (84 / 1);
+
+      // The gear ratio of the upper arm is 115:1
+      public static final double UPPER_ARM_GEAR_RATIO = (115 / 1);
+
       // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
       public static final int LOWER_FREE_LIMIT = 80;
       public static final int LOWER_STALL_LIMIT = 80;
-      public static final int LOWER_MAX_RPM = 84*15;
-          
+      // Make the max RPM equal to 1/4 rotations per second
+      public static final int LOWER_MAX_RPM = ((int) (LOWER_ARM_GEAR_RATIO) * 15);
+      
       public static final int UPPER_FREE_LIMIT = 80;
       public static final int UPPER_STALL_LIMIT = 80;
-      public static final int UPPER_MAX_RPM = 115*15;
+      // Make the max RPM equal to 1/4 rotations per second
+
+      public static final int UPPER_MAX_RPM = ((int) (UPPER_ARM_GEAR_RATIO) * 15);
 
       // The length of the first pivot point to the second pivot point, in inches
       public static final double LOWER_ARM_LENGTH = 34.096;
@@ -207,15 +216,9 @@ public final class Constants {
       // 78 inches is the rule, 11 inches is the base of the arm to the ground
       public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
 
-      // The gear ratio of the lower arm is 60:1
-      public static final double LOWER_ARM_GEAR_RATIO = 60;
-
-      // The gear ratio of the upper arm is 25:7
-      public static final double UPPER_ARM_GEAR_RATIO = (85.0 / 9.0);
-
-      // The factor that the encoder is multiplied by to get the actual position
-      public static final double LOWER_ENCODER_POSITION_FACTOR = (LOWER_ARM_LENGTH * Math.PI) / (LOWER_ARM_GEAR_RATIO);
-      public static final double UPPER_ENCODER_POSITION_FACTOR = (UPPER_ARM_LENGTH * Math.PI) / (UPPER_ARM_GEAR_RATIO);
+      // Multiply the absolute encoder output to get radians instead of rotations
+      public static final double LOWER_ENCODER_POSITION_FACTOR = (2 * Math.PI);
+      public static final double UPPER_ENCODER_POSITION_FACTOR = (2 * Math.PI);
 
       // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
       public static final double LOWER_ARM_FREEDOM_DEGREES = 60;
@@ -315,5 +318,47 @@ public final class Constants {
         public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(108.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
         public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
     }
+
+    public static final class PlacementConstants {
+
+    public static final int STOWED_PLACEMENT_INDEX = 0;
+    public static final int HYBRID_PLACEMENT_INDEX = 1;
+    public static final int MEDIUM_GRID_PLACEMENT_INDEX = 2;
+    public static final int HIGH_GRID_PLACEMENT_INDEX = 3;
+    public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
+
+    public static final int CLAW_INTAKE_SPEED = 1;
+    public static final int CLAW_OUTAKE_SPEED = -1;
+    public static final int CLAW_STOPPED_SPEED = 0;
+
+    public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(-15, 30);
+    public static final Translation2d ARM_STOWED_POSITION = new Translation2d(-9, 18);
+    public static final Translation2d ARM_HYBRID_POSITION = new Translation2d(-14, 13);
+    public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(-28, 27);
+    public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(-43, 35);
+    public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(-27, -5);
+    
+    public static final Translation2d[][] ARM_POSITIONS = {
+      {
+        ARM_TRANSITION_POSITION,
+        ARM_STOWED_POSITION
+      },
+      {
+        ARM_TRANSITION_POSITION,
+        ARM_HYBRID_POSITION
+      },
+      {
+        ARM_TRANSITION_POSITION,
+        ARM_MEDIUM_GRID_POSITION
+      },
+      {
+        ARM_TRANSITION_POSITION,
+        ARM_HIGH_GRID_POSITION
+      },
+      {
+        ARM_FLOOR_INTAKE_POSITION
+      }
+    };
+  }
 
 }
