@@ -282,7 +282,7 @@ public final class Constants {
         public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
 
         public static final int CLAW_INTAKE_SPEED = 1;
-        public static final int CLAW_OUTAKE_SPEED = -1;
+        public static final int CLAW_OUTTAKE_SPEED = -1;
         public static final int CLAW_STOPPED_SPEED = 0;
     }
 
