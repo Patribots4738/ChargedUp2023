@@ -58,10 +58,10 @@ public class AutoAlignment {
       if (result.isPresent()) {
 
         EstimatedRobotPose camEstimatedPose = result.get();
-          swerve.getPoseEstimator().addVisionMeasurement(camEstimatedPose.estimatedPose.toPose2d(), camEstimatedPose.timestampSeconds);
+        swerve.getPoseEstimator().addVisionMeasurement(camEstimatedPose.estimatedPose.toPose2d(), camEstimatedPose.timestampSeconds);
 
-          setTagID(photonCameraPose.getPhotonCamera().getLatestResult().getBestTarget().getFiducialId());
-          setConeOffset(0);
+        setTagID(photonCameraPose.getPhotonCamera().getLatestResult().getBestTarget().getFiducialId());
+        setConeOffset(0);
       }
     }
 
@@ -236,11 +236,11 @@ public class AutoAlignment {
       else if (coneOffset > 1) {
         if (tagID == 1 || tagID == 2) {
           this.tagID++;
-          this.coneOffset = 1;
+          this.coneOffset = -1;
         }
         else if (tagID == 7 || tagID == 8) {
           this.tagID--;
-          this.coneOffset = 1;
+          this.coneOffset = -1;
         }
       }
 
