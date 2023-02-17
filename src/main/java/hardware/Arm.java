@@ -1,55 +1,68 @@
 package hardware;
 
-import java.util.ArrayList;
-
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
-
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import math.*;
+import math.ArmCalculations;
 import math.Constants.ArmConstants;
+
+import java.util.ArrayList;
 
 public class Arm implements Loggable {
 
     /**
      * What the arm positions look like and the index in the array
-     *               4
-     *      O        __     8
-     *       1      |      7
-     *           3 | 5
-     *        2  |||||  6
+     * 4
+     * O        __     8
+     * 1      |      7
+     * 3 | 5
+     * 2  |||||  6
      */
 
     // All armPos values are in inches
-    Translation2d[][] armPos = {
-    {
-        new Translation2d(-20, 30),
-        new Translation2d(-36, 23),
-    },
-    {
-        new Translation2d(0, ArmConstants.MAX_REACH)
-    },
-    {
-        new Translation2d(-12, 19),
-        new Translation2d(-28, 13),
-        new Translation2d(-32, 10)
-    }
+    final Translation2d[][] armPos = {
+            {
+                    new Translation2d(-20, 30),
+                    new Translation2d(-36, 23),
+            },
+            {
+                    new Translation2d(0, ArmConstants.MAX_REACH)
+            },
+            {
+                    new Translation2d(-12, 19),
+                    new Translation2d(-28, 13),
+                    new Translation2d(-32, 10)
+            }
     };
-    
+
+    Translation2d[][] placementPositions = {
+            {
+                    new Translation2d(-20, 1),
+                    new Translation2d(-36, 23),
+                    new Translation2d(-52.6, 33),
+            },
+            {
+                    new Translation2d(0, ArmConstants.MAX_REACH)
+            },
+            {
+                    new Translation2d(-20, 2),
+                    new Translation2d(-36, 25),
+                    new Translation2d(-52.6, 33)
+            }
+    };
     // ceil -- force round up
-    int armPosDimention1 = (int) Math.ceil(armPos.length / 2);
-    int armPosDimention2 = 0;
-    
+    int armPosDimension1 = (int) Math.ceil(armPos.length / 2.0);
+    int armPosDimension2 = 0;
+
     private boolean operatorOverride = false;
 
     private double armXPos = 0;
@@ -68,17 +81,17 @@ public class Arm implements Loggable {
     // The DESIRED rotation of the upper and lower arm(s)
     private double upperReference = 0;
     private double lowerReference = 0;
-    
+
     private final CANSparkMax _lowerArm;
     private final CANSparkMax _upperArm;
-    
+
     private final RelativeEncoder _lowerArmEncoder;
     private final RelativeEncoder _upperArmEncoder;
-    
+
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
-    
-    ArmCalcuations armCalculations = new ArmCalcuations();
+
+    final ArmCalculations armCalculations;
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -102,8 +115,6 @@ public class Arm implements Loggable {
         _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
         _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
 
-        // _lowerArmEncoder = _lowerArm.getAbsoluteEncoder(Type.kDutyCycle);
-        // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
         _lowerArmPIDController = _lowerArm.getPIDController();
         _upperArmPIDController = _upperArm.getPIDController();
         _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
@@ -138,12 +149,14 @@ public class Arm implements Loggable {
         _lowerArm.burnFlash();
         _upperArm.burnFlash();
 
+        armCalculations = new ArmCalculations();
+
         resetEncoders();
         setBrakeMode();
     }
 
     public void toggleOperatorOverride() {
-      this.operatorOverride = !operatorOverride;
+        this.operatorOverride = !operatorOverride;
     }
 
     /**
@@ -163,23 +176,21 @@ public class Arm implements Loggable {
 
     public void indexPeriodic() {
 
-        // armPos[armPosDimention1][armPosDimention2]
-        if (armPosDimention1 == armPos.length ||
-            armPosDimention2 == armPos[armPosDimention1].length) 
-        {
+        // armPos[armPosDimension1][armPosDimension2]
+        if (armPosDimension1 == armPos.length ||
+                armPosDimension2 == armPos[armPosDimension1].length) {
             return;
         }
 
         if (Math.abs(getLowerArmPosition() - lowerReference) > ArmConstants.LOWER_ARM_DEADBAND ||
-            Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.UPPER_ARM_DEADBAND)
-        {
-            armPosDimention2++;
-            drive(armPos[armPosDimention1][armPosDimention2]);
+                Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.UPPER_ARM_DEADBAND) {
+            armPosDimension2++;
+            drive(armPos[armPosDimension1][armPosDimension2]);
         }
     }
 
     public boolean getOperatorOverride() {
-      return this.operatorOverride;
+        return this.operatorOverride;
     }
 
     public void setLowerArmReference(double reference) {
@@ -197,15 +208,15 @@ public class Arm implements Loggable {
      */
     public void setArmIndex(int index) {
 
-        index = MathUtil.clamp(index, 0, armPos.length-1);
-        
-        armPosDimention1 += index;
-        armPosDimention2 = 0;
+        index = MathUtil.clamp(index, 0, armPos.length - 1);
+
+        armPosDimension1 = index;
+        armPosDimension2 = 0;
 
     }
 
     public int getArmIndex() {
-        return armPosDimention1;
+        return armPosDimension1;
     }
 
     /**
@@ -223,8 +234,7 @@ public class Arm implements Loggable {
         if (operatorOverride) {
             this.armXPos += position.getX();
             this.armYPos += position.getY();
-        }
-        else {
+        } else {
             this.armXPos = position.getX();
             this.armYPos = position.getY();
         }
@@ -240,7 +250,7 @@ public class Arm implements Loggable {
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
         // Give it a one-inch cushion
-        if (armPos.getDistance(new Translation2d(0,0)) > ArmConstants.MAX_REACH) {
+        if (armPos.getDistance(new Translation2d(0, 0)) > ArmConstants.MAX_REACH) {
             armPos = armPos.times((ArmConstants.MAX_REACH) / armPos.getDistance(new Translation2d(0, 0)));
         }
 
@@ -272,12 +282,12 @@ public class Arm implements Loggable {
      * @param position the position to set the upper arm to
      *                 This unit is in revolutions
      */
-    private void setUpperArmPosition(double position) {
+    public void setUpperArmPosition(double position) {
 
         position = MathUtil.clamp(
-            position, 
-            ArmConstants.UPPER_ARM_FREEDOM_DEGREES, 
-            -ArmConstants.UPPER_ARM_FREEDOM_DEGREES
+                position,
+                ArmConstants.UPPER_ARM_FREEDOM_DEGREES,
+                -ArmConstants.UPPER_ARM_FREEDOM_DEGREES
         );
 
         // Description of FF in Constants :D
@@ -310,12 +320,12 @@ public class Arm implements Loggable {
      * @param position the position to set the lower arm to
      *                 This unit is in full rotations
      */
-    private void setLowerArmPosition(double position) {
-        
+    public void setLowerArmPosition(double position) {
+
         position = MathUtil.clamp(
-            position, 
-            ArmConstants.LOWER_ARM_FREEDOM_DEGREES, 
-            -ArmConstants.LOWER_ARM_FREEDOM_DEGREES
+                position,
+                ArmConstants.LOWER_ARM_FREEDOM_DEGREES,
+                -ArmConstants.LOWER_ARM_FREEDOM_DEGREES
         );
 
         ArmFeedforward feedForward = new ArmFeedforward(
