@@ -154,7 +154,7 @@ public final class Constants {
     }
 
     public static final class ClawConstants {
-        public static final int CLAW_CAN_ID = 11;
+        public static final int CLAW_CAN_ID = 12;
 
         public static final double CLAW_POSITION_CONVERSION_FACTOR = 50;
 

@@ -377,7 +377,7 @@ public class Arm implements Loggable {
      */
     public void setBrakeMode() {
         _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake)
+        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
         _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
