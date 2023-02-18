@@ -174,17 +174,20 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
 
-    double driverLeftX = -MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
-    double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
-    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+    
+    // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
+    // This is to ensure that the up direction on the joystick is positive inputs
+    double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
+    double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()  , OIConstants.DRIVER_DEADBAND);
+    double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
+    double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
 
     Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+    
     // If we are on blue alliance, flip the driverLeftAxis
-
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
-
     // Use the A button to activate the alignment process
     if (driver.getAButton()) {
 
