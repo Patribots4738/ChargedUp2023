@@ -163,6 +163,7 @@ public class Swerve {
 
         for (int modNum = 0; modNum < swerveModules.length; modNum++) {
             positions[modNum] = swerveModules[modNum].getPosition();
+            
         }
         
         return positions;

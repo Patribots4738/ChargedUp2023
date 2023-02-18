@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
       swerve.setX();
     } else {
       //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-      swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
+      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX, true);
     }
 
     // Toggle the speed to be 10% of max speed when the driver's left stick is pressed

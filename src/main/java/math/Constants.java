@@ -39,16 +39,16 @@ public final class Constants {
         // Rear Right
         // Left Positive, Forward Positive
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+          new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+          new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+          new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+          new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
         // Angular offsets of the modules relative to the chassis in radians
-        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0);
-        public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90);
-        public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90);
-        public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180);
+        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180+90);
+        public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90+90);
+        public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90+90);
+        public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0+90);
 
         // Driving motors CAN IDs (EVEN)
         public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;
