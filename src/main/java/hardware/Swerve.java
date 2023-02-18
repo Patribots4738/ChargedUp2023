@@ -21,7 +21,6 @@ import java.util.Optional;
 
 
 public class Swerve {
-    private SwerveDrivePoseEstimator poseEstimator;
 
     private double speedMultiplier = 1;
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
@@ -53,6 +52,27 @@ public class Swerve {
             m_rearRight
     };
 
+    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+          DriveConstants.DRIVE_KINEMATICS,
+          getYaw(),
+          getModulePositions(),
+          new Pose2d(),
+          // Trust the information of the vision more
+          // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
+          // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
+          new MatBuilder<>(
+                  Nat.N3(),
+                  Nat.N1()).fill(1.25, 1.25, 1.25),// State measurement
+                  // standard deviations
+                  // X, Y, theta
+          new MatBuilder<>(
+                  Nat.N3(),
+                  Nat.N1()).fill(0.1, 0.1, 0.1)// Vision measurement
+                  // standard deviations
+                  // X, Y, theta
+      );
+  
+
 
     // Odometry class for tracking robot pose
     // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -72,25 +92,6 @@ public class Swerve {
       resetEncoders();
       zeroHeading();
       setBrakeMode();
-
-        poseEstimator = new SwerveDrivePoseEstimator(
-                DriveConstants.DRIVE_KINEMATICS,
-                getYaw(),
-                getModulePositions(),
-                new Pose2d(),
-                // Trust the information of the vision more
-                // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
-                // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
-                new MatBuilder<>(
-                        Nat.N3(),
-                        Nat.N1()).fill(1.25, 1.25, 1.25),// State measurement
-                        // standard deviations
-                        // X, Y, theta
-                new MatBuilder<>(
-                        Nat.N3(),
-                        Nat.N1()).fill(0.1, 0.1, 0.1));// Vision measurement
-                        // standard deviations
-                        // X, Y, theta
     }
 
     public void periodic() {
@@ -113,7 +114,7 @@ public class Swerve {
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getPose().getRotation())
-                        : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
+                        : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed));
 
         setModuleStates(swerveModuleStates);
     }
@@ -163,6 +164,7 @@ public class Swerve {
         for (int modNum = 0; modNum < swerveModules.length; modNum++) {
             positions[modNum] = swerveModules[modNum].getPosition();
         }
+        
         return positions;
 
     }
@@ -188,7 +190,7 @@ public class Swerve {
         Rotation2d yaw = Rotation2d.fromDegrees(gyro.getAngle());
 
         if (DriveConstants.GYRO_REVERSED) {
-            yaw.unaryMinus();
+            yaw = yaw.unaryMinus();
         }
 
         return yaw;
