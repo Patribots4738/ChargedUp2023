@@ -85,7 +85,9 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        arm.setUpperArmCoastMode();
+    }
 
     @Override
     public void disabledPeriodic() {}
@@ -107,7 +109,9 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void teleopInit() {}
+    public void teleopInit() {
+        arm.setBrakeMode();
+    }
 
     @Override
     public void teleopPeriodic() {
@@ -130,11 +134,11 @@ public class Robot extends TimedRobot {
         
         // If we are on blue alliance, flip the driverLeftAxis
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-          driverLeftAxis = driverLeftAxis.unaryMinus();
+            driverLeftAxis = driverLeftAxis.unaryMinus();
         }
 
         if (driver.getRightBumper()) {
-          swerve.setX();
+            swerve.setX();
         } else {
           //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
           // swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
@@ -167,7 +171,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-      arm.setLowerArmReference(MathUtil.applyDeadband((driver.getLeftX()), 0.1));
-      arm.periodic();
+        arm.setLowerArmReference(MathUtil.applyDeadband((driver.getLeftX()), 0.1));
+        arm.periodic();
     }
 }

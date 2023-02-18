@@ -356,6 +356,10 @@ public class Arm implements Loggable {
         _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
+    public void setUpperArmCoastMode() {
+      _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    }
+
     /**
      * Set the motor to brake mode
      */
