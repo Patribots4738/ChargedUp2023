@@ -281,11 +281,12 @@ public final class Constants {
         public static final Transform3d CAMERA_POSITION = new Transform3d(
                 new Translation3d(
                         // Forward
-                        Units.inchesToMeters(-13),
+
+                        Units.inchesToMeters(2),
                         // Left (neg because it's right)
-                        Units.inchesToMeters(-8.5),
+                        Units.inchesToMeters(-6),
                         // Up
-                        Units.inchesToMeters(19)),
+                        Units.inchesToMeters(10.25)),
                 new Rotation3d(
                         0,
                         0,

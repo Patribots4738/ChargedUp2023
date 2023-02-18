@@ -8,6 +8,8 @@ import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import debug.Debug;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -39,7 +41,7 @@ public class Robot extends TimedRobot {
 
   Arm arm;
 
-  Debug debug;
+  // Debug debug;
 
   @Override
   public void robotInit() {
@@ -47,7 +49,7 @@ public class Robot extends TimedRobot {
     // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
     // Debug class for Shuffleboard
-    debug = new Debug();
+    // debug = new Debug();
 
     // Drivetrain instantiation
     swerve = new Swerve();
@@ -59,6 +61,8 @@ public class Robot extends TimedRobot {
 
     autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm);
     autoSegmentedWaypoints.loadAutoPaths();
+
+    autoAlignment = new AutoAlignment(swerve);
 
     // Configure the logger for shuffleboard
     Logger.configureLoggingAndConfig(this, false);
@@ -142,18 +146,18 @@ public class Robot extends TimedRobot {
     }
 
     // Toggle the operator override when the operator's left stick is pressed
-    if (operator.getLeftStickButtonPressed()) {
-      arm.toggleOperatorOverride();
-    }
-    if (arm.getOperatorOverride()) {
-      arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
-    }
-    else if (operator.getRightBumperPressed()) {
-      arm.setArmIndex(arm.getArmIndex() + 1);
-    }
-    else if (operator.getLeftBumperPressed()) {
-      arm.setArmIndex(arm.getArmIndex() - 1);
-    }
+    // if (operator.getLeftStickButtonPressed()) {
+    //   arm.toggleOperatorOverride();
+    // // }
+    // if (arm.getOperatorOverride()) {
+    //   arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
+    // }
+    // else if (operator.getRightBumperPressed()) {
+    //   arm.setArmIndex(arm.getArmIndex() + 1);
+    // }
+    // else if (operator.getLeftBumperPressed()) {
+    //   arm.setArmIndex(arm.getArmIndex() - 1);
+    // }
 
   }
 
@@ -163,12 +167,14 @@ public class Robot extends TimedRobot {
     swerve.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
 
+    swerve.resetOdometry(new Pose2d(11.07, 4.69, Rotation2d.fromDegrees(0)));
+    System.out.println(swerve.getPose());
   }
 
   @Override
   public void testPeriodic() {
 
-    double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+    double driverLeftX = -MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
     double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
     double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
 
@@ -183,6 +189,7 @@ public class Robot extends TimedRobot {
     if (driver.getAButton()) {
 
       if (driver.getRightBumperPressed()) {
+        System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
 
         autoAlignment.calibrateOdometry();
 
@@ -200,12 +207,12 @@ public class Robot extends TimedRobot {
 
           // Clicking up
           case 0:
-            arm.setArmIndex(arm.getArmIndex() + 1);
+            // arm.setArmIndex(arm.getArmIndex() + 1);
             break;
 
           // Clicking down
           case 180:
-            arm.setArmIndex(arm.getArmIndex() - 1);
+            // arm.setArmIndex(arm.getArmIndex() - 1);
             break;
 
           // Clicking left
@@ -222,7 +229,7 @@ public class Robot extends TimedRobot {
 
     } else {
 
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX * .25, true);
+      swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX * .25, true);
 
     }
   }
