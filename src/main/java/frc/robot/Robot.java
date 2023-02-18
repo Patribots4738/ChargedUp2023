@@ -167,8 +167,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-      arm.setLowerArmReference(MathUtil.applyDeadband(driver.getLeftX(), 0.15));
+      arm.setLowerArmReference(MathUtil.applyDeadband((driver.getLeftX()), 0.1));
       arm.periodic();
-      System.out.println("Arm Pos: " + arm.getLowerArmPosition());
     }
 }

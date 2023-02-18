@@ -78,7 +78,7 @@ public class Arm implements Loggable {
 
       _lowerArmRight.setIdleMode(IdleMode.kBrake);
       _lowerArmLeft.setIdleMode(IdleMode.kBrake);
-      _upperArm.setIdleMode(IdleMode.kBrake);
+      _upperArm.setIdleMode(IdleMode.kCoast);
 
       // Factory reset, so we get the SPARK MAX to a known state before configuring
       // them. This is useful in case a SPARK MAX is swapped out.
@@ -247,8 +247,8 @@ public class Arm implements Loggable {
             return;
         }
 
-        setLowerArmReference(Units.radiansToRotations(lowerArmAngle));
-        setUpperArmReference(Units.radiansToRotations(upperArmAngle));
+        setLowerArmReference(lowerArmAngle);
+        setUpperArmReference(upperArmAngle);
 
         System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
                 " Lower: " + Units.radiansToDegrees(lowerArmAngle));
@@ -300,10 +300,11 @@ public class Arm implements Loggable {
      */
     private void setLowerArmPosition(double position) {
         
+      System.out.println(position);
         position = MathUtil.clamp(
             position, 
-            ArmConstants.LOWER_ARM_FREEDOM_DEGREES, 
-            -ArmConstants.LOWER_ARM_FREEDOM_DEGREES
+            -Math.toRadians(ArmConstants.LOWER_ARM_FREEDOM_DEGREES), 
+            Math.toRadians(ArmConstants.LOWER_ARM_FREEDOM_DEGREES)
         );
 
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -316,18 +317,14 @@ public class Arm implements Loggable {
         // Using a predictive formula with sysID given data of the motor  
         double FF = feedForward.calculate(position, 0);
         _lowerArmPIDController.setFF(FF);
-
-        // Calculate the rotations needed to get to the position
-        // By multiplying the position by the gear ratio
-        double neoPosition = position;
-
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
-        _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
-
+        _lowerArmPIDController.setReference(position, ControlType.kPosition);
+        
         lowerRotation = _lowerArmEncoder.getPosition();
-
+        
         lowerRotationList.add(lowerRotation);
+        System.out.println("Ref " + lowerReference + " Real: " + lowerRotation + " Position " + position);
     }
 
     /**

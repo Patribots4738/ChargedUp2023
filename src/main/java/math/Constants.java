@@ -250,9 +250,9 @@ public final class Constants {
        * <p>
        */
       // PID values for the lower and upper arm
-      public static final double LOWER_P = 1;
+      public static final double LOWER_P = 0.3;//0.25;
       public static final double LOWER_I = 0;
-      public static final double LOWER_D = 0;
+      public static final double LOWER_D = 0.075;
       public static final double LOWER_FF = 1;
 
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
@@ -281,10 +281,10 @@ public final class Constants {
        * FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
        * 👌
        */
-      public static final double S_LOWER = 0;//.15999;
-      public static final double G_LOWER = 0;//0.33966; (We don't like gravity)
-      public static final double V_LOWER = 0;//.24941;
-      public static final double A_LOWER = 0;//4.3455;
+      public static final double S_LOWER = -0.0002443;
+      public static final double G_LOWER = 0;//.52912;//0.53589
+      public static final double V_LOWER = 9.0264;
+      public static final double A_LOWER = 2.9776;
 
       public static final double S_UPPER = 0.47727;
       public static final double G_UPPER = 0; //1.0051; // (We don't like gravity)
