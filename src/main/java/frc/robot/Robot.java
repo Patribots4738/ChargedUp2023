@@ -233,7 +233,7 @@ public class Robot extends TimedRobot {
     } else {
 
       swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX * .25, true);
-
+      System.out.println(swerve.getPose());
     }
   }
 }

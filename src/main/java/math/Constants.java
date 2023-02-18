@@ -33,11 +33,15 @@ public final class Constants {
         // Distance between centers of right and left wheels on robot
         public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
         // Distance between front and back wheels on robot
+        // Front Left
+        // Front Right
+        // Rear Left
+        // Rear Right
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
         // Angular offsets of the modules relative to the chassis in radians
         public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0);
