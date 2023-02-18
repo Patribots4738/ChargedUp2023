@@ -378,18 +378,22 @@ public class Arm implements Loggable {
      * Set the motor to coast mode
      */
     public void setCoastMode() {
-      _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
-      _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
-      _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    }
+
+    public void setUpperArmCoastMode() {
+        _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
     /**
      * Set the motor to brake mode
      */
     public void setBrakeMode() {
-      _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
-      _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
-      _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
     public void printList() {

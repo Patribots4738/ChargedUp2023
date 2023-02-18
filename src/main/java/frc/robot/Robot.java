@@ -86,7 +86,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    arm.setUpperArmCoastMode();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -107,7 +109,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    arm.setBrakeMode();
+  }
 
   @Override
   public void teleopPeriodic() {
@@ -165,10 +169,13 @@ public class Robot extends TimedRobot {
   public void testInit() {
     swerve.resetEncoders();
     swerve.setBrakeMode();
+
+    arm.setBrakeMode();
+
     SwerveTrajectory.resetTrajectoryStatus();
 
     swerve.resetOdometry(new Pose2d(11.07, 4.69, Rotation2d.fromDegrees(0)));
-    System.out.println(swerve.getPose());
+
   }
 
   @Override
@@ -177,10 +184,10 @@ public class Robot extends TimedRobot {
     
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
-    double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
-    double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()  , OIConstants.DRIVER_DEADBAND);
-    double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
-    double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
+    double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX() , OIConstants.DRIVER_DEADBAND);
+    double driverLeftY  = MathUtil.applyDeadband(-driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+    double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
     Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
     
