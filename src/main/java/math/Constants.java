@@ -37,6 +37,7 @@ public final class Constants {
         // Front Right
         // Rear Left
         // Rear Right
+        // Left Positive, Forward Positive
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
