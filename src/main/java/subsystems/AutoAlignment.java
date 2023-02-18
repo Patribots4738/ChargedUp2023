@@ -4,6 +4,7 @@ import auto.SwerveTrajectory;
 
 import java.util.Optional;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import org.photonvision.EstimatedRobotPose;
 
 import com.pathplanner.lib.PathConstraints;
@@ -49,31 +50,31 @@ public class AutoAlignment {
 
     /**
      * Calibrate the odometry for the swerve
-     *
-     * @param visionTransform3d the position of the aprilTag relative to the bot
      */
     public void calibrateOdometry() {
 
       Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPoseEstimator().getEstimatedPosition());
 
       if (result.isPresent()) {
+        try {
 
-        EstimatedRobotPose camEstimatedPose = result.get();
+          EstimatedRobotPose camEstimatedPose = result.get();
 
-        setTagID(photonCameraPose.getPhotonCamera().getLatestResult().getBestTarget().getFiducialId());
-        
-        // Pose2d robotPose = getTagPos(tagID).plus(camEstimatedPose.estimatedPose.toPose2d());
+          //setTagID(photonCameraPose.getPhotonCamera().getLatestResult().getBestTarget().getFiducialId());
+          setTagID(getNearestTag());
 
-        swerve.getPoseEstimator().addVisionMeasurement(
-          camEstimatedPose.estimatedPose.toPose2d(),
-          camEstimatedPose.timestampSeconds);
-          
-          
-        System.out.println(camEstimatedPose.estimatedPose.toPose2d());
+          swerve.getPoseEstimator().addVisionMeasurement(
+              camEstimatedPose.estimatedPose.toPose2d(),
+              camEstimatedPose.timestampSeconds);
 
-        setConeOffset(0);
-        SwerveTrajectory.resetTrajectoryStatus();
+          System.out.println(camEstimatedPose.estimatedPose.toPose2d());
 
+          setConeOffset(0);
+          SwerveTrajectory.resetTrajectoryStatus();
+        } catch (Exception e) {
+          // Target lost
+          return;
+        }
       }
     }
 
@@ -218,6 +219,53 @@ public class AutoAlignment {
                 break;
         }
         return new Pose2d(tagX, tagY, rotation);
+    }
+
+  /**
+   * Get the tag nearest to the robot using its position
+   * while using the alliance color to factor out tags
+   * @return the nearest tag to the bot that is for the same alliance
+   */
+  private int getNearestTag() {
+
+      // A reminder that tag 0 sets this.moveToTag() to return;
+      int nearestTag = 0;
+      double nearestDistance = 1000;
+      double currentDistance = 0;
+
+      Translation2d currentPosition = swerve.getPose().getTranslation();
+
+      if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+        for (int i = 8; i > 4; i--) {
+          // Tag 4 is for the red alliance
+          if (i == 5) { i = 4; }
+
+          currentDistance = currentPosition.getDistance(getTagPos(i).getTranslation());
+
+          if (currentDistance < nearestDistance) {
+
+            nearestDistance = currentDistance;
+            nearestTag = i;
+
+          }
+        }
+      }
+      else {
+        for (int i = 1; i < 5; i++) {
+          // Tag 4 is for the blue alliance
+          if (i == 4) { i = 5; }
+
+          currentDistance = currentPosition.getDistance(getTagPos(i).getTranslation());
+
+          if (currentDistance < nearestDistance) {
+
+            nearestDistance = currentDistance;
+            nearestTag = i;
+
+          }
+        }
+      }
+      return nearestTag;
     }
 
     public int getTagID() {
