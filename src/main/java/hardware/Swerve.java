@@ -78,14 +78,17 @@ public class Swerve {
                 getYaw(),
                 getModulePositions(),
                 new Pose2d(),
+                // Trust the information of the vision more
+                // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
+                // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
                 new MatBuilder<>(
                         Nat.N3(),
-                        Nat.N1()).fill(0.1, 0.1, 0.1),// State measurement
+                        Nat.N1()).fill(1.25, 1.25, 1.25),// State measurement
                         // standard deviations
                         // X, Y, theta
                 new MatBuilder<>(
                         Nat.N3(),
-                        Nat.N1()).fill(1.25, 1.25, 1.25));// Vision measurement
+                        Nat.N1()).fill(0.1, 0.1, 0.1));// Vision measurement
                         // standard deviations
                         // X, Y, theta
     }
@@ -177,7 +180,8 @@ public class Swerve {
      * @return the robot's total degrees traveled from the start
      */
     public double getTotalDegrees() {
-        return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+        return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees() 
+                * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public Rotation2d getYaw() {

@@ -44,6 +44,7 @@ public class AutoAlignment {
 
     public AutoAlignment(Swerve swerve) {
         this.swerve = swerve;
+        photonCameraPose = new PhotonCameraPose();
     }
 
     /**
@@ -58,65 +59,77 @@ public class AutoAlignment {
       if (result.isPresent()) {
 
         EstimatedRobotPose camEstimatedPose = result.get();
-        swerve.getPoseEstimator().addVisionMeasurement(camEstimatedPose.estimatedPose.toPose2d(), camEstimatedPose.timestampSeconds);
 
         setTagID(photonCameraPose.getPhotonCamera().getLatestResult().getBestTarget().getFiducialId());
+        
+        // Pose2d robotPose = getTagPos(tagID).plus(camEstimatedPose.estimatedPose.toPose2d());
+
+        swerve.getPoseEstimator().addVisionMeasurement(
+          camEstimatedPose.estimatedPose.toPose2d(),
+          camEstimatedPose.timestampSeconds);
+          
+          
+        System.out.println(camEstimatedPose.estimatedPose.toPose2d());
+
         setConeOffset(0);
+        SwerveTrajectory.resetTrajectoryStatus();
+
       }
     }
 
     public void moveToTag() {
 
-        if (tagID == 0) {
-            return;
-        }
+      // If cannot see tag
+      if (tagID == 0) {
+          return;
+      }
 
-        Pose2d targetPose = getTagPos(tagID);
+      Pose2d targetPose = getTagPos(tagID);
 
-        Rotation2d heading = Rotation2d.fromDegrees(0);
+      Rotation2d heading = Rotation2d.fromDegrees(0);
 
-        double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
+      double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
 
-        if (0 < tagID && tagID < 5) {
-            coneOffsetLeft *= -1;
-        } else if (4 < tagID && tagID < 9) {
-            heading = Rotation2d.fromDegrees(180);
-        }
+      if (0 < tagID && tagID < 5) {
+          coneOffsetLeft *= -1;
+      } else if (4 < tagID && tagID < 9) {
+          heading = Rotation2d.fromDegrees(180);
+      }
 
-        if (0 < tagID && tagID < 5) {
-            targetPose = targetPose.plus(new Transform2d(new Translation2d(-AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
-        } else {
-            targetPose = targetPose.plus(new Transform2d(new Translation2d(AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
-        }
+      if (0 < tagID && tagID < 5) {
+          targetPose = targetPose.plus(new Transform2d(new Translation2d(-AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
+      } else {
+          targetPose = targetPose.plus(new Transform2d(new Translation2d(AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
+      }
 
-        if (coneOffset == -1) {
-            targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
-        } else if (coneOffset == 1) {
-            targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
-        }
+      if (coneOffset == -1) {
+          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
+      } else if (coneOffset == 1) {
+          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
+      }
 
-        if (swerve.getPose().minus(targetPose).getTranslation().getNorm() < Units.inchesToMeters(AlignmentConstants.ALLOWABLE_ERROR)) {
-            swerve.drive(0, 0, 0, false);
-            SwerveTrajectory.trajectoryStatus = "done";
-            return;
-        }
+      if (swerve.getPose().minus(targetPose).getTranslation().getNorm() < Units.inchesToMeters(AlignmentConstants.ALLOWABLE_ERROR)) {
+          swerve.drive(0, 0, 0, false);
+          SwerveTrajectory.trajectoryStatus = "done";
+          return;
+      }
 
-        PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
-        (
-            new PathConstraints(0.1, 0.1),
-            new PathPoint(swerve.getPose().getTranslation(),
-                heading,
-                swerve.getPose().getRotation()),
-            new PathPoint(targetPose.getTranslation(),
-                heading,
-                targetPose.getRotation())
-        );
+      PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
+      (
+          new PathConstraints(0.1, 0.1),
+          new PathPoint(swerve.getPose().getTranslation(),
+              heading,
+              swerve.getPose().getRotation()),
+          new PathPoint(targetPose.getTranslation(),
+              heading,
+              targetPose.getRotation())
+      );
 
-        SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose());
+      SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose());
 
-        System.out.println("April Pose: " + getTagPos(tagID));
-        System.out.println("Modified Target Pose: " + targetPose);
-        System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
+      System.out.println("April Pose: " + getTagPos(tagID));
+      System.out.println("Modified Target Pose: " + targetPose);
+      System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
     }
 
     public void moveRelative(double x, double y, double rotation) {

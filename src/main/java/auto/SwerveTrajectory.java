@@ -68,10 +68,10 @@ public class SwerveTrajectory implements Loggable {
 
       case "execute":
 
-        Debug.debugPeriodic(
-            _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getX(),
-            _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getY(),
-            _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
+        // Debug.debugPeriodic(
+        //     _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getX(),
+        //     _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getY(),
+        //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
         if (elapsedTime < _pathTraj.getEndState().timeSeconds + 1) {
