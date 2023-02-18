@@ -127,11 +127,12 @@ public class Arm implements Loggable {
 
       // _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
       // _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
-      _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_STALL_LIMIT, ArmConstants.UPPER_FREE_LIMIT, ArmConstants.UPPER_MAX_RPM);
+      // _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_STALL_LIMIT, ArmConstants.UPPER_FREE_LIMIT, ArmConstants.UPPER_MAX_RPM);
 
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration
       _lowerArmLeft.follow(_lowerArmRight, true);
+      _upperArm.setInverted(true);
       _lowerArmRight.burnFlash();
       _lowerArmLeft.burnFlash();
       _upperArm.burnFlash();
@@ -141,10 +142,10 @@ public class Arm implements Loggable {
       this.operatorOverride = !operatorOverride;
     }
 
-    public void periodic() {
+    public void  periodic() {
         // indexPeriodic();
         setLowerArmPosition(lowerReference);
-        // setUpperArmPosition(upperReference);
+        setUpperArmPosition(upperReference);
     }
 
     public void indexPeriodic() {
@@ -262,11 +263,11 @@ public class Arm implements Loggable {
      */
     private void setUpperArmPosition(double position) {
 
-        position = MathUtil.clamp(
-            position, 
-            ArmConstants.UPPER_ARM_FREEDOM_DEGREES, 
-            -ArmConstants.UPPER_ARM_FREEDOM_DEGREES
-        );
+        // position = MathUtil.clamp(
+        //   position, 
+        //   -Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES), 
+        //   Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES)
+        // );
 
         // Description of FF in Constants :D
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -280,16 +281,13 @@ public class Arm implements Loggable {
         double FF = feedForward.calculate(position, 0);
         _upperArmPIDController.setFF(FF);
 
-        // Calculate the rotations needed to get to the position
-        double neoPosition = position;
-
         // Set the position of the neo controlling the upper arm to
-        // the converted position, neoPosition
-        _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
+        _upperArmPIDController.setReference(position, ControlType.kPosition);
 
         upperRotation = _upperArmEncoder.getPosition();
 
         upperRotationList.add(upperRotation);
+        System.out.println("Ref " + Math.toDegrees(upperReference) + " Real: " + Math.toDegrees(upperRotation) + " Position " + Math.toDegrees(position));
     }
 
     /**
@@ -300,7 +298,6 @@ public class Arm implements Loggable {
      */
     private void setLowerArmPosition(double position) {
         
-      System.out.println(position);
         position = MathUtil.clamp(
             position, 
             -Math.toRadians(ArmConstants.LOWER_ARM_FREEDOM_DEGREES), 
@@ -324,7 +321,6 @@ public class Arm implements Loggable {
         lowerRotation = _lowerArmEncoder.getPosition();
         
         lowerRotationList.add(lowerRotation);
-        System.out.println("Ref " + lowerReference + " Real: " + lowerRotation + " Position " + position);
     }
 
     /**
@@ -373,7 +369,7 @@ public class Arm implements Loggable {
       System.out.println(upperRotationList);
     }
 
-    public void zeroLowerArm(double speed) {
-      _lowerArmPIDController.setReference(speed/3, ControlType.kPosition);
+    public void setUpperSpeed(double speed) {
+      _upperArm.set(speed/10);
     }
 }

@@ -166,12 +166,15 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void testInit() {}
+    public void testInit() {
+      arm.setBrakeMode();
+    }
 
 
     @Override
     public void testPeriodic() {
-        arm.setLowerArmReference(MathUtil.applyDeadband((driver.getLeftX()), 0.1));
-        arm.periodic();
+      arm.setLowerArmReference(MathUtil.applyDeadband((driver.getLeftX()), 0.1));
+      arm.setUpperArmReference(MathUtil.applyDeadband((driver.getRightX()), 0.1));
+      arm.periodic();
     }
 }

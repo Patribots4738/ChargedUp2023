@@ -250,7 +250,7 @@ public final class Constants {
        * <p>
        */
       // PID values for the lower and upper arm
-      public static final double LOWER_P = 0.3;//0.25;
+      public static final double LOWER_P = 0.25;//0.25;
       public static final double LOWER_I = 0;
       public static final double LOWER_D = 0.075;
       public static final double LOWER_FF = 1;
@@ -258,9 +258,9 @@ public final class Constants {
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double UPPER_P = 1;    //46.6;
-      public static final double UPPER_D = 0; //34.2;
-      public static final double UPPER_I = 0;//.035;
+      public static final double UPPER_P = .25;
+      public static final double UPPER_I = 0;
+      public static final double UPPER_D = 0.075;
       public static final double UPPER_FF = 1;
 
       public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
@@ -281,15 +281,15 @@ public final class Constants {
        * FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
        * 👌
        */
-      public static final double S_LOWER = -0.0002443;
+      public static final double S_LOWER = -0.10452;
       public static final double G_LOWER = 0;//.52912;//0.53589
-      public static final double V_LOWER = 9.0264;
-      public static final double A_LOWER = 2.9776;
+      public static final double V_LOWER = 10.914;
+      public static final double A_LOWER = 1.7823;
 
-      public static final double S_UPPER = 0.47727;
+      public static final double S_UPPER = 0.1709;
       public static final double G_UPPER = 0; //1.0051; // (We don't like gravity)
-      public static final double V_UPPER = 0.95764;
-      public static final double A_UPPER = 0.19957;
+      public static final double V_UPPER = 12.915;
+      public static final double A_UPPER = 3.5019;
     }
     
     public static final class VisionConstants {
