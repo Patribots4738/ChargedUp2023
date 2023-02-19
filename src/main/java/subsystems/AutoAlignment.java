@@ -54,10 +54,9 @@ public class AutoAlignment {
     public void calibrateOdometry() {
 
       Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPoseEstimator().getEstimatedPosition());
-
+      
       // I do not believe this if statement gets what we want it to get...
       if (result.isPresent()) {
-        try {
 
           EstimatedRobotPose camEstimatedPose = result.get();
 
@@ -73,10 +72,6 @@ public class AutoAlignment {
           setConeOffset(0);
           SwerveTrajectory.resetTrajectoryStatus();
 
-        } catch (Exception e) {
-          // Target lost
-          return;
-        }
       }
     }
 
