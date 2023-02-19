@@ -55,13 +55,13 @@ public class AutoAlignment {
 
       Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPoseEstimator().getEstimatedPosition());
 
+      // I do not believe this if statement gets what we want it to get...
       if (result.isPresent()) {
         try {
 
           EstimatedRobotPose camEstimatedPose = result.get();
 
           //setTagID(photonCameraPose.getPhotonCamera().getLatestResult().getBestTarget().getFiducialId());
-          setTagID(getNearestTag());
 
           swerve.getPoseEstimator().addVisionMeasurement(
               camEstimatedPose.estimatedPose.toPose2d(),
@@ -69,8 +69,10 @@ public class AutoAlignment {
 
           System.out.println(camEstimatedPose.estimatedPose.toPose2d());
 
+          setTagID(getNearestTag());
           setConeOffset(0);
           SwerveTrajectory.resetTrajectoryStatus();
+
         } catch (Exception e) {
           // Target lost
           return;
@@ -85,22 +87,35 @@ public class AutoAlignment {
           return;
       }
 
-      Pose2d targetPose = getTagPos(tagID);
+      Pose2d targetPose = AlignmentConstants.TAG_POSES[tagID].toPose2d();
 
       Rotation2d heading = Rotation2d.fromDegrees(0);
 
       double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
 
-      if (0 < tagID && tagID < 5) {
+      if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+
           coneOffsetLeft *= -1;
-      } else if (4 < tagID && tagID < 9) {
+
+      }
+      if (4 < tagID && tagID < 9) {
+
           heading = Rotation2d.fromDegrees(180);
+
       }
 
       if (0 < tagID && tagID < 5) {
-          targetPose = targetPose.plus(new Transform2d(new Translation2d(-AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
+          targetPose = targetPose.plus(new Transform2d(
+              new Translation2d(
+                  -(AlignmentConstants.GRID_BARRIER + (AlignmentConstants.ROBOT_LENGTH/2) + AlignmentConstants.BUMPER_LENGTH),
+                  0),
+              Rotation2d.fromDegrees(0)));
       } else {
-          targetPose = targetPose.plus(new Transform2d(new Translation2d(AlignmentConstants.GRID_BARRIER, 0), Rotation2d.fromDegrees(0)));
+          targetPose = targetPose.plus(new Transform2d(
+              new Translation2d(
+                  (AlignmentConstants.GRID_BARRIER + (AlignmentConstants.ROBOT_LENGTH/2) + AlignmentConstants.BUMPER_LENGTH),
+                  0),
+              Rotation2d.fromDegrees(0)));
       }
 
       if (coneOffset == -1) {
@@ -128,99 +143,11 @@ public class AutoAlignment {
 
       SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose());
 
-      System.out.println("April Pose: " + getTagPos(tagID));
+      System.out.println("April Pose: " + AlignmentConstants.TAG_POSES[tagID].toPose2d());
       System.out.println("Modified Target Pose: " + targetPose);
       System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
     }
-
-    public void moveRelative(double x, double y, double rotation) {
-
-        Pose2d currentPose = swerve.getPose();
-
-        Pose2d targetPose = new Pose2d(
-                currentPose.getX() + x,
-                currentPose.getY() + y,
-                new Rotation2d(currentPose.getY() + rotation));
-
-        State targetState = new State(0, 0, 0, targetPose, 0);
-
-        ChassisSpeeds speeds = SwerveTrajectory.HDC.calculate(
-                currentPose,
-                targetState,
-                targetPose.getRotation());
-
-        swerve.drive(speeds.vxMetersPerSecond * 0.25,
-                speeds.vyMetersPerSecond * 0.25,
-                speeds.omegaRadiansPerSecond, false);
-
-    }
-
-    private Pose2d getTagPos(int tagID) {
-        double tagX = 0.0;
-        double tagY = 0.0;
-        double tagZ = 0.0;
-        Rotation2d rotation = Rotation2d.fromRadians(0);
-
-        switch (tagID) {
-            case 1:
-                tagX = Constants.AlignmentConstants.TAG_1_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_1_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_1_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_1_POSE.getRotation().getZ());
-                break;
-
-            case 2:
-                tagX = Constants.AlignmentConstants.TAG_2_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_2_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_2_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_2_POSE.getRotation().getZ());
-                break;
-
-            case 3:
-                tagX = Constants.AlignmentConstants.TAG_3_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_3_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_3_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_3_POSE.getRotation().getZ());
-                break;
-
-            case 4:
-                tagX = Constants.AlignmentConstants.TAG_4_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_4_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_4_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_4_POSE.getRotation().getZ());
-                break;
-
-            case 5:
-                tagX = Constants.AlignmentConstants.TAG_5_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_5_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_5_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_5_POSE.getRotation().getZ());
-                break;
-
-            case 6:
-                tagX = Constants.AlignmentConstants.TAG_6_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_6_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_6_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_6_POSE.getRotation().getZ());
-                break;
-
-            case 7:
-                tagX = Constants.AlignmentConstants.TAG_7_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_7_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_7_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_7_POSE.getRotation().getZ());
-                break;
-
-            case 8:
-                tagX = Constants.AlignmentConstants.TAG_8_POSE.getX();
-                tagY = Constants.AlignmentConstants.TAG_8_POSE.getY();
-                tagZ = Constants.AlignmentConstants.TAG_8_POSE.getZ();
-                rotation = Rotation2d.fromRadians(Constants.AlignmentConstants.TAG_8_POSE.getRotation().getZ());
-                break;
-        }
-        return new Pose2d(tagX, tagY, rotation);
-    }
-
+    
   /**
    * Get the tag nearest to the robot using its position
    * while using the alliance color to factor out tags
@@ -240,7 +167,7 @@ public class AutoAlignment {
           // Tag 4 is for the red alliance
           if (i == 5) { i = 4; }
 
-          currentDistance = currentPosition.getDistance(getTagPos(i).getTranslation());
+          currentDistance = currentPosition.getDistance(AlignmentConstants.TAG_POSES[i].toPose2d().getTranslation());
 
           if (currentDistance < nearestDistance) {
 
@@ -255,7 +182,7 @@ public class AutoAlignment {
           // Tag 4 is for the blue alliance
           if (i == 4) { i = 5; }
 
-          currentDistance = currentPosition.getDistance(getTagPos(i).getTranslation());
+          currentDistance = currentPosition.getDistance(AlignmentConstants.TAG_POSES[i].toPose2d().getTranslation());
 
           if (currentDistance < nearestDistance) {
 

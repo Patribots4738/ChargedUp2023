@@ -29,20 +29,20 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED = 6 * Math.PI; // radians per second
 
         // Chassis configuration
-        public static final double TRACK_WIDTH = Units.inchesToMeters(21.5);
         // Distance between centers of right and left wheels on robot
-        public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
+        public static final double TRACK_WIDTH = Units.inchesToMeters(21.5);
         // Distance between front and back wheels on robot
+        public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
         // Front Left
         // Front Right
         // Rear Left
         // Rear Right
         // Left Positive, Forward Positive
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-          new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-          new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-          new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-          new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
         // Angular offsets of the modules relative to the chassis in radians
         public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180+90);
@@ -307,6 +307,12 @@ public final class Constants {
         public static final double GRID_BARRIER = Units.inchesToMeters(15);
         public static final double ALLOWABLE_ERROR = Units.inchesToMeters(3);
 
+        // The length of the robot
+        public static final double ROBOT_LENGTH = Units.inchesToMeters(25);
+        // Length of the bumpers on the robot
+        public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
+
+        public static final Pose3d TAG_0_POSE = null;
         public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
         public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
         public static final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
@@ -315,6 +321,19 @@ public final class Constants {
         public static final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
         public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
         public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+
+        public static final Pose3d[] TAG_POSES = new Pose3d[]
+            {
+                TAG_0_POSE,
+                TAG_1_POSE,
+                TAG_2_POSE,
+                TAG_3_POSE,
+                TAG_4_POSE,
+                TAG_5_POSE,
+                TAG_6_POSE,
+                TAG_7_POSE,
+                TAG_8_POSE,
+            };
 
 
     }

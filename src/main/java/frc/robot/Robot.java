@@ -207,9 +207,11 @@ public class Robot extends TimedRobot {
 
       }
 
-      autoAlignment.moveToTag();
 
       if (driver.getRightBumper()) {
+
+        autoAlignment.moveToTag();
+
         switch (driver.getPOV()) {
           // Not clicked
           case -1:
