@@ -172,7 +172,7 @@ public class Arm implements Loggable {
         {
           return;
         }
-        System.out.println("Switching dim2 from " + (armPosDimention2-1) + " to " + (armPosDimention2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
+        // System.out.println("Switching dim2 from " + (armPosDimention2-1) + " to " + (armPosDimention2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
         drive(PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
       }
     }
@@ -243,7 +243,7 @@ public class Arm implements Loggable {
           armPosition = armPosition.times((ArmConstants.MAX_REACH) / armPosition.getDistance(new Translation2d(0, 0)));
         }
         
-        System.out.println(armPosition);
+        // System.out.println(armPosition);
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
@@ -257,8 +257,8 @@ public class Arm implements Loggable {
             return;
         }
         
-        System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
-                " Lower: " + Units.radiansToDegrees(lowerArmAngle));
+        // System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
+        //         " Lower: " + Units.radiansToDegrees(lowerArmAngle));
         setLowerArmReference(lowerArmAngle);
         setUpperArmReference(upperArmAngle);
 

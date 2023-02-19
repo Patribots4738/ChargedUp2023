@@ -186,7 +186,7 @@ public class Robot extends TimedRobot {
       else if (driver.getLeftBumperPressed()) {
           arm.setArmIndex(arm.getArmIndex() - 1);
       }
-      
+
       // Toggle the operator override when the operator's left stick is pressed
       if (driver.getLeftStickButtonPressed()) {
           arm.toggleOperatorOverride();

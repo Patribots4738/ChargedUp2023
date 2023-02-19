@@ -225,10 +225,10 @@ public final class Constants {
       public static final double UPPER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
 
       // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-      public static final double LOWER_ARM_FREEDOM_DEGREES = 60;
+      public static final double LOWER_ARM_FREEDOM_DEGREES = 70;
 
       // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
-      public static final double UPPER_ARM_FREEDOM_DEGREES = 100;
+      public static final double UPPER_ARM_FREEDOM_DEGREES = 145;
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
@@ -251,7 +251,7 @@ public final class Constants {
        * <p>
        */
       // PID values for the lower and upper arm
-      public static final double LOWER_P = 0.15;//0.25;
+      public static final double LOWER_P = 0.275;//0.25;
       public static final double LOWER_I = 0;
       public static final double LOWER_D = 0.075;
       public static final double LOWER_FF = 1;
@@ -259,7 +259,7 @@ public final class Constants {
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double UPPER_P = 0.25;//.25;
+      public static final double UPPER_P = 0.35;//.25;
       public static final double UPPER_I = 0;
       public static final double UPPER_D = 0;
       public static final double UPPER_FF = 1;
@@ -283,14 +283,14 @@ public final class Constants {
        * 👌
        */
       public static final double S_LOWER = -0.10452;
-      public static final double G_LOWER = 0;//.52912;//0.53589
+      public static final double G_LOWER = 0;
       public static final double V_LOWER = 10.914;
       public static final double A_LOWER = 1.7823;
 
-      public static final double S_UPPER = 0.1709;
+      public static final double S_UPPER = 0.57642;
       public static final double G_UPPER = 0; //1.0051; // (We don't like gravity)
-      public static final double V_UPPER = 12.915;
-      public static final double A_UPPER = 3.5019;
+      public static final double V_UPPER = 5.7601;
+      public static final double A_UPPER = 3.0187;
     }
     
     public static final class VisionConstants {
