@@ -41,7 +41,7 @@ public class Robot extends TimedRobot {
 
   Arm arm;
 
-  // Debug debug;
+  Debug debug;
 
   @Override
   public void robotInit() {
@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
     // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
     // Debug class for Shuffleboard
-    // debug = new Debug();
+    debug = new Debug();
 
     // Drivetrain instantiation
     swerve = new Swerve();
@@ -87,6 +87,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    SwerveTrajectory.resetHDC();
     arm.setUpperArmCoastMode();
   }
 

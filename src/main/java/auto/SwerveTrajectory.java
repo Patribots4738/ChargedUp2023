@@ -34,11 +34,36 @@ public class SwerveTrajectory implements Loggable {
    * The ProfiledPIDController for the rotation of the robot,
    * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
    */
-  public static final HolonomicDriveController HDC = new HolonomicDriveController(
-      new PIDController(Constants.AutoConstants.X_CORRECTION_P, Constants.AutoConstants.X_CORRECTION_I, Constants.AutoConstants.X_CORRECTION_D),
-      new PIDController(Constants.AutoConstants.Y_CORRECTION_P, Constants.AutoConstants.Y_CORRECTION_I, Constants.AutoConstants.Y_CORRECTION_D),
-      new ProfiledPIDController(Constants.AutoConstants.ROTATION_CORRECTION_P, Constants.AutoConstants.ROTATION_CORRECTION_I, Constants.AutoConstants.ROTATION_CORRECTION_D,
-          new TrapezoidProfile.Constraints(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
+  public static HolonomicDriveController HDC = new HolonomicDriveController(
+      new PIDController(
+        Constants.AutoConstants.X_CORRECTION_P, 
+        Constants.AutoConstants.X_CORRECTION_I, 
+        Constants.AutoConstants.X_CORRECTION_D),
+      new PIDController(
+        Constants.AutoConstants.Y_CORRECTION_P, 
+        Constants.AutoConstants.Y_CORRECTION_I, 
+        Constants.AutoConstants.Y_CORRECTION_D),
+      new ProfiledPIDController(
+        Constants.AutoConstants.ROTATION_CORRECTION_P, 
+        Constants.AutoConstants.ROTATION_CORRECTION_I, 
+        Constants.AutoConstants.ROTATION_CORRECTION_D,
+          new TrapezoidProfile.Constraints(
+            Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 
+            Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
+
+  // public static HolonomicDriveController HDC = new HolonomicDriveController(
+  //   new PIDController(Debug.xP.getDouble(Constants.AutoConstants.X_CORRECTION_P),
+  //                     0,
+  //                     Debug.xD.getDouble(Constants.AutoConstants.X_CORRECTION_D)),
+  //   new PIDController(Debug.yP.getDouble(Constants.AutoConstants.Y_CORRECTION_P),
+  //                     0,
+  //                     Debug.yD.getDouble(Constants.AutoConstants.Y_CORRECTION_D)),
+  //   new ProfiledPIDController(Debug.rotP.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_P),
+  //                             0,
+  //                             Debug.rotD.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_D),
+  //                             new TrapezoidProfile.Constraints(
+  //                               Debug.maxAngularSpeed.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND),
+  //                               Debug.maxAngularAccel.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED))));
 
   /**
    * This is PathPlanner.
@@ -114,6 +139,22 @@ public class SwerveTrajectory implements Loggable {
 
     trajectoryStatus = "setup";
 
+  }
+
+  public static void resetHDC() {
+    HDC = new HolonomicDriveController(
+    new PIDController(Debug.xP.getDouble(Constants.AutoConstants.X_CORRECTION_P),
+                      0,
+                      Debug.xD.getDouble(Constants.AutoConstants.X_CORRECTION_D)),
+    new PIDController(Debug.yP.getDouble(Constants.AutoConstants.Y_CORRECTION_P),
+                      0,
+                      Debug.yD.getDouble(Constants.AutoConstants.Y_CORRECTION_D)),
+    new ProfiledPIDController(Debug.rotP.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_P),
+                              0,
+                              Debug.rotD.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_D),
+                              new TrapezoidProfile.Constraints(
+                                Debug.maxAngularSpeed.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND),
+                                Debug.maxAngularAccel.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED))));
   }
 
 }

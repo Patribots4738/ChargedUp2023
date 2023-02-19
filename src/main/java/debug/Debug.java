@@ -10,24 +10,26 @@ import java.util.Map;
 
 public class Debug {
 
-  public static GenericEntry xP;
-  public static GenericEntry xD;
-  public static GenericEntry yP;
-  public static GenericEntry yD;
-  public static GenericEntry rotP;
-  public static GenericEntry rotD;
-  public static GenericEntry xDiff;
-  public static GenericEntry yDiff;
-  public static GenericEntry rotDiff;
-  public static GenericEntry xPos;
-  public static GenericEntry yPos;
+    public static GenericEntry xP;
+    public static GenericEntry xD;
+    public static GenericEntry yP;
+    public static GenericEntry yD;
+    public static GenericEntry rotP;
+    public static GenericEntry rotD;
+    public static GenericEntry xDiff;
+    public static GenericEntry yDiff;
+    public static GenericEntry rotDiff;
+    public static GenericEntry xPos;
+    public static GenericEntry yPos;
+    public static GenericEntry maxAngularSpeed;
+    public static GenericEntry maxAngularAccel;
 
-  public void debugInit() {
+  public Debug() {
 
     xP = Shuffleboard.getTab("Drive")
         .add("xP", 1)
         .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+        .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
         .getEntry();
 
     xD = Shuffleboard.getTab("Drive")
@@ -39,7 +41,7 @@ public class Debug {
     yP = Shuffleboard.getTab("Drive")
         .add("yP", 1)
         .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
+        .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
         .getEntry();
 
     yD = Shuffleboard.getTab("Drive")
@@ -51,7 +53,7 @@ public class Debug {
     rotP = Shuffleboard.getTab("Turn")
         .add("rotP", 0.22)
         .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", -5, "max", 5)) // specify widget properties here
+        .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
         .getEntry();
 
     rotD = Shuffleboard.getTab("Turn")
@@ -66,7 +68,7 @@ public class Debug {
         .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
         .getEntry();
 
-    yDiff = Shuffleboard.getTab("Drive")
+    yDiff = Shuffleboard.getTab("Dri-1")
         .add("yDiff", 0)
         .withWidget(BuiltInWidgets.kGraph)
         .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
@@ -89,7 +91,20 @@ public class Debug {
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
         .getEntry();
+
+    maxAngularSpeed = Shuffleboard.getTab("Turn")
+        .add("maxAngularSpeed", 0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
+        .getEntry();
+
+    maxAngularAccel = Shuffleboard.getTab("Turn")
+        .add("maxAngularAccel", 0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(Map.of("min", -Math.pow(Math.PI,2), "max", Math.pow(Math.PI,2))) // specify widget properties here
+        .getEntry();
   }
+
 
   public static void debugPeriodic(double x, double y, double rot) {
 
@@ -106,5 +121,6 @@ public class Debug {
             " Q1: " + String.format("%.3f", Units.radiansToDegrees(lowerAngle)) +
             " Q2: " + String.format("%.3f", Units.radiansToDegrees(upperAngle) - 90));
   }
+  
 
 }

@@ -35,7 +35,6 @@ public final class Constants {
         public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
         
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-          
                            // Front Positive,   Left Positive
             new Translation2d( WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Front Left
             new Translation2d( WHEEL_BASE / 2, -TRACK_WIDTH / 2),  // Front Right
@@ -128,7 +127,7 @@ public final class Constants {
     public static final class AutoConstants {
         public static final double MAX_SPEED_METERS_PER_SECOND = 3;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI ;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
         public static final double PX_CONTROLLER = 1;
