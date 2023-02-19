@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
             swerve.setX();
         } else {
           //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-          // swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX, true);
+          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
@@ -173,8 +173,26 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-      arm.setLowerArmReference(MathUtil.applyDeadband((driver.getLeftX()), 0.1));
-      arm.setUpperArmReference(MathUtil.applyDeadband((driver.getRightX()), 0.1));
+      
+      double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
+      double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
+      
+      Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+      
       arm.periodic();
+      if (driver.getRightBumperPressed()) {
+          arm.setArmIndex(arm.getArmIndex() + 1);
+      }
+      else if (driver.getLeftBumperPressed()) {
+          arm.setArmIndex(arm.getArmIndex() - 1);
+      }
+      
+      // Toggle the operator override when the operator's left stick is pressed
+      if (driver.getLeftStickButtonPressed()) {
+          arm.toggleOperatorOverride();
+      }
+      if (arm.getOperatorOverride()) {
+          arm.drive(new Translation2d(driverLeftAxis.getX(), driverLeftAxis.getY()));
+      }
     }
 }

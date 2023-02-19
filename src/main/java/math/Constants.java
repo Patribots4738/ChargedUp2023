@@ -215,6 +215,7 @@ public final class Constants {
       // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
       // 78 inches is the rule, 11 inches is the base of the arm to the ground
       public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
+      public static final double MAX_REACH_X = 48 + 12.5 - ClawConstants.CLAW_LENGTH_X_INCHES;
 
       // Multiply the absolute encoder output to get radians instead of rotations
       public static final double LOWER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
@@ -229,10 +230,10 @@ public final class Constants {
       // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
       public static final double UPPER_ARM_FREEDOM_DEGREES = 100;
 
-      // The amount of error allowed for the arm's position, in FULL ROTATIONS
+      // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
-      public static final double LOWER_ARM_DEADBAND = 0.01;
-      public static final double UPPER_ARM_DEADBAND = 0.01;
+      public static final double LOWER_ARM_DEADBAND = Math.toRadians(15);
+      public static final double UPPER_ARM_DEADBAND = Math.toRadians(15);
 
       // The outputs used in the output range for the lower and upper arms
       public static final double LOWER_MIN_OUTPUT = -1;
@@ -250,7 +251,7 @@ public final class Constants {
        * <p>
        */
       // PID values for the lower and upper arm
-      public static final double LOWER_P = 0.25;//0.25;
+      public static final double LOWER_P = 0.15;//0.25;
       public static final double LOWER_I = 0;
       public static final double LOWER_D = 0.075;
       public static final double LOWER_FF = 1;
@@ -258,9 +259,9 @@ public final class Constants {
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double UPPER_P = .25;
+      public static final double UPPER_P = 0.25;//.25;
       public static final double UPPER_I = 0;
-      public static final double UPPER_D = 0.075;
+      public static final double UPPER_D = 0;
       public static final double UPPER_FF = 1;
 
       public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
@@ -338,12 +339,13 @@ public final class Constants {
     public static final int CLAW_OUTAKE_SPEED = -1;
     public static final int CLAW_STOPPED_SPEED = 0;
 
-    public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(-15, 30);
-    public static final Translation2d ARM_STOWED_POSITION = new Translation2d(-9, 18);
-    public static final Translation2d ARM_HYBRID_POSITION = new Translation2d(-14, 13);
-    public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(-28, 27);
-    public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(-43, 35);
-    public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(-27, -5);
+    public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(15, 30);
+    public static final Translation2d ARM_STOWED_POSITION = new Translation2d(9, 18);
+    public static final Translation2d ARM_HYBRID_POSITION = new Translation2d(14, 13);
+    public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
+    public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
+    public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(27, 0);
+    
     
     public static final Translation2d[][] ARM_POSITIONS = {
       {

@@ -33,8 +33,9 @@ public class Arm implements Loggable {
      */
     
     // ceil -- force round up
-    int armPosDimention1 = (int) Math.ceil(PlacementConstants.ARM_POSITIONS.length / 2);
+    int armPosDimention1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
     int armPosDimention2 = 0;
+    private boolean startedTransition = false;
     
     private boolean operatorOverride = false;
 
@@ -142,27 +143,38 @@ public class Arm implements Loggable {
       this.operatorOverride = !operatorOverride;
     }
 
-    public void  periodic() {
-        // indexPeriodic();
+    public void periodic() {
+        if (!getOperatorOverride()) { indexPeriodic(); }
         setLowerArmPosition(lowerReference);
         setUpperArmPosition(upperReference);
     }
 
-    public void indexPeriodic() {
+    public void indexPeriodic() {    
 
-        // PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]
-        if (armPosDimention1 == PlacementConstants.ARM_POSITIONS.length ||
-            armPosDimention2 == PlacementConstants.ARM_POSITIONS[armPosDimention1].length) 
-        {
-            return;
-        }
+      // // PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]
+      if (!startedTransition)
+      {
+        startedTransition = true;
+        drive(PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
+        return;
+      }
 
-        if (Math.abs(getLowerArmPosition() - lowerReference) > ArmConstants.LOWER_ARM_DEADBAND ||
-            Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.UPPER_ARM_DEADBAND)
+      // armPosDimention1 = MathUtil.clamp(armPosDimention1, 0, PlacementConstants.ARM_POSITIONS.length-1);
+      // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
+      
+      if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND &&
+          Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
+      {
+        armPosDimention2++;
+        // armPosDimention2 = MathUtil.clamp(armPosDimention2, 0, PlacementConstants.ARM_POSITIONS[armPosDimention1].length-1);
+        if (armPosDimention1 >= PlacementConstants.ARM_POSITIONS.length ||
+        armPosDimention2 >= PlacementConstants.ARM_POSITIONS[armPosDimention1].length) 
         {
-            armPosDimention2++;
-            drive(PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
+          return;
         }
+        System.out.println("Switching dim2 from " + (armPosDimention2-1) + " to " + (armPosDimention2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
+        drive(PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
+      }
     }
 
     public boolean getOperatorOverride() {
@@ -186,8 +198,9 @@ public class Arm implements Loggable {
 
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
         
-        armPosDimention1 += index;
+        armPosDimention1 = index;
         armPosDimention2 = 0;
+        startedTransition = false;
 
     }
 
@@ -208,10 +221,8 @@ public class Arm implements Loggable {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-          // Divide by 250 becuase the code runs 500 times a second
-          // This will make an input of 1 move the arm only 2 inches a second
-          this.armXReference += (position.getX()/250);
-          this.armYReference += (position.getY()/250);
+          this.armXReference += (position.getX()/10);
+          this.armYReference += (position.getY()/10);
         }
         else {
           this.armXReference = position.getX();
@@ -222,21 +233,18 @@ public class Arm implements Loggable {
         // Because we cannot reach below the ground.
         // Even though our arm starts 11 inches above the ground,
         // the claw will be 11 inches from the arm end
-        armYReference = (position.getY() < 0) ? 0 : armYReference;
+        armYReference = (armYReference < 0) ? 0 : armYReference;
 
         Translation2d armPosition = new Translation2d(armXReference, armYReference);
 
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
-        // Give it a one-inch cushion
-        if (armPosition.getDistance(new Translation2d(0,0)) > ArmConstants.MAX_REACH) {
-            armPosition = armPosition.times((ArmConstants.MAX_REACH) / armPosition.getDistance(new Translation2d(0, 0)));
-        }
-
-        if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
-            armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
+        if (armPosition.getDistance(new Translation2d(0,0)) >= ArmConstants.MAX_REACH) {
+          armPosition = armPosition.times((ArmConstants.MAX_REACH) / armPosition.getDistance(new Translation2d(0, 0)));
         }
         
+        System.out.println(armPosition);
+
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
         double upperArmAngle = armCalculations.getUpperAngle(armPosition.getX(), armPosition.getY());
@@ -245,14 +253,15 @@ public class Arm implements Loggable {
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
         if (Double.isNaN(upperArmAngle)) {
+            System.out.println("Upper angle NAN");
             return;
         }
-
+        
+        System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
+                " Lower: " + Units.radiansToDegrees(lowerArmAngle));
         setLowerArmReference(lowerArmAngle);
         setUpperArmReference(upperArmAngle);
 
-        System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
-                " Lower: " + Units.radiansToDegrees(lowerArmAngle));
     }
 
     /**
@@ -263,11 +272,11 @@ public class Arm implements Loggable {
      */
     private void setUpperArmPosition(double position) {
 
-        // position = MathUtil.clamp(
-        //   position, 
-        //   -Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES), 
-        //   Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES)
-        // );
+        position = MathUtil.clamp(
+          position, 
+          -Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES), 
+          Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES)
+        );
 
         // Description of FF in Constants :D
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -278,16 +287,15 @@ public class Arm implements Loggable {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate(position, 0);
+        double FF = feedForward.calculate((position), 0);
         _upperArmPIDController.setFF(FF);
 
         // Set the position of the neo controlling the upper arm to
-        _upperArmPIDController.setReference(position, ControlType.kPosition);
+        _upperArmPIDController.setReference((position), ControlType.kPosition);
 
         upperRotation = _upperArmEncoder.getPosition();
 
         upperRotationList.add(upperRotation);
-        System.out.println("Ref " + Math.toDegrees(upperReference) + " Real: " + Math.toDegrees(upperRotation) + " Position " + Math.toDegrees(position));
     }
 
     /**
@@ -312,12 +320,12 @@ public class Arm implements Loggable {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor  
-        double FF = feedForward.calculate(position, 0);
+        double FF = feedForward.calculate((position), 0);
         _lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
-        _lowerArmPIDController.setReference(position, ControlType.kPosition);
-        
+        _lowerArmPIDController.setReference((position), ControlType.kPosition);
+
         lowerRotation = _lowerArmEncoder.getPosition();
         
         lowerRotationList.add(lowerRotation);

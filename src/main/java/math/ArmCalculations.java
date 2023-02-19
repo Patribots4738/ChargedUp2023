@@ -1,3 +1,4 @@
+// Kudos to https://youtu.be/IKOGwoJ2HLk for the theory!
 package math;
 
 import math.Constants.*;
@@ -29,9 +30,10 @@ public class ArmCalculations {
     {
         double upperAngle =
                 (Math.acos(
-                        (((Math.pow(x, 2)) + (Math.pow(y, 2))) - ((Math.pow(ArmConstants.LOWER_ARM_LENGTH, 2)) +
-                                (Math.pow(ArmConstants.UPPER_ARM_LENGTH, 2))))
-                                / (2 * (ArmConstants.LOWER_ARM_LENGTH * ArmConstants.UPPER_ARM_LENGTH))));
+                        (((Math.pow(x, 2)) + (Math.pow(y, 2))) - 
+                            ((Math.pow(ArmConstants.LOWER_ARM_LENGTH, 2)) +
+                                (Math.pow(ArmConstants.UPPER_ARM_LENGTH, 2)))) / 
+                        (2 * (ArmConstants.LOWER_ARM_LENGTH * ArmConstants.UPPER_ARM_LENGTH))));
 
         return upperAngle * ((x > 0) ? 1 : -1);
     }
@@ -47,16 +49,11 @@ public class ArmCalculations {
      */
     public double getLowerAngle(double y, double x, double q2)
     {
-        double aTanFraction =
-                (ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) /
-                (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2)));
+        double alpha = Math.atan2(
+                (ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) ,
+                (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));
 
-        double leftAngle = Math.atan(y / x) +
-                Math.atan(aTanFraction);
-
-        double rightAngle = Math.atan(y / x) -
-                Math.atan(aTanFraction);
-
-        return rightAngle; // ((x < 0) ? leftAngle : rightAngle);
+        double q1 = ((Math.atan2(y , x) + alpha) - (Math.PI / 2));
+        return q1;
     }
 }
