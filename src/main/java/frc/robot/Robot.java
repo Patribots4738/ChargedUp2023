@@ -240,9 +240,8 @@ public class Robot extends TimedRobot {
       }
 
     } else {
-
       swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX * .25, true);
-      System.out.println(swerve.getPose());
+      System.out.println("Robot Pos: " + swerve.getPose());
     }
   }
 }
