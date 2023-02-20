@@ -191,7 +191,7 @@ public class Arm implements Loggable {
     }
 
     /**
-     * Sets arm index from the {@link PlacementConstants.ARM_POSITIONS} array
+     * Sets arm index from the PlacementConstants.ARM_POSITIONS array
      * 
      * @param index the direction to change the arm index by
      */
@@ -389,5 +389,27 @@ public class Arm implements Loggable {
 
     public void setUpperSpeed(double speed) {
       _upperArm.set(speed/10);
+    }
+
+    public void zeroLowerArmEncoder() {
+
+        double unadjustedAngle = (_lowerArmEncoder.getPosition() - _lowerArmEncoder.getZeroOffset());
+
+        double zeroAngle = (ArmConstants.LOWER_ARM_HARDSTOP_OFFSET) - unadjustedAngle;
+
+        Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
+
+        _lowerArmEncoder.setZeroOffset(referenceAngle.getRadians());
+    }
+
+    public void zeroUpperArmEncoder() {
+
+          double unadjustedAngle = (_upperArmEncoder.getPosition() - _upperArmEncoder.getZeroOffset());
+
+          double zeroAngle = (ArmConstants.UPPER_ARM_HARDSTOP_OFFSET) - unadjustedAngle;
+
+          Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
+
+          _upperArmEncoder.setZeroOffset(referenceAngle.getRadians());
     }
 }

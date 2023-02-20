@@ -224,11 +224,14 @@ public final class Constants {
       public static final double LOWER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
       public static final double UPPER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
 
-      // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
+      // The number of degrees that the upper arm can rotate from parallel to the front of the bot
       public static final double LOWER_ARM_FREEDOM_DEGREES = 70;
 
-      // The number of degrees that the upper arm can rotate EITHER WAY, in degrees
+      // The number of degrees that the upper arm can rotate from the base of the lower arm
       public static final double UPPER_ARM_FREEDOM_DEGREES = 145;
+
+      public static final double LOWER_ARM_HARDSTOP_OFFSET = Math.toRadians(160+90);
+      public static final double UPPER_ARM_HARDSTOP_OFFSET = Math.toRadians(13);
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
