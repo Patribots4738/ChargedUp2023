@@ -134,8 +134,8 @@ public class Arm implements Loggable {
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration
       _lowerArmLeft.follow(_lowerArmRight, true);
-      // _upperArm.setInverted(true);
       _upperArmEncoder.setInverted(true);
+      
       _lowerArmRight.burnFlash();
       _lowerArmLeft.burnFlash();
       _upperArm.burnFlash();
@@ -242,9 +242,9 @@ public class Arm implements Loggable {
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
         if (armPosition.getDistance(new Translation2d(0,0)) >= ArmConstants.MAX_REACH) {
-            armPosition = armPosition.times((ArmConstants.MAX_REACH) / armPosition.getDistance(new Translation2d(0, 0)));
+          armPosition = armPosition.times((ArmConstants.MAX_REACH) / armPosition.getDistance(new Translation2d(0, 0)));
         }
-
+        
         if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
             armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
         }
@@ -253,7 +253,7 @@ public class Arm implements Loggable {
         }
         else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
             armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
-        }
+        }        
         // System.out.println(armPosition);
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm

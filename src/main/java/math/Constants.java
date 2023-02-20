@@ -262,7 +262,7 @@ public final class Constants {
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double UPPER_P = 0.35;//.25;
+      public static final double UPPER_P = 0.225;//.25;
       public static final double UPPER_I = 0;
       public static final double UPPER_D = 0;
       public static final double UPPER_FF = 1;
