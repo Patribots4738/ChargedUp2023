@@ -134,7 +134,8 @@ public class Arm implements Loggable {
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration
       _lowerArmLeft.follow(_lowerArmRight, true);
-      _upperArm.setInverted(true);
+      // _upperArm.setInverted(true);
+      _upperArmEncoder.setInverted(true);
       _lowerArmRight.burnFlash();
       _lowerArmLeft.burnFlash();
       _upperArm.burnFlash();
