@@ -180,6 +180,8 @@ public class Robot extends TimedRobot {
       Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
       
       arm.periodic();
+      claw.periodic();
+      
       if (driver.getRightBumperPressed()) {
           arm.setArmIndex(arm.getArmIndex() + 1);
       }
@@ -192,7 +194,18 @@ public class Robot extends TimedRobot {
           arm.toggleOperatorOverride();
       }
       if (arm.getOperatorOverride()) {
-          arm.drive(new Translation2d(driverLeftAxis.getX(), driverLeftAxis.getY()));
+          arm.drive(new Translation2d(-driverLeftAxis.getX(), driverLeftAxis.getY()));
       }
+
+      if (driver.getRightTriggerAxis() > 0 ) {
+        claw.setDesiredSpeed(driver.getRightTriggerAxis());
+      }
+      else if (driver.getLeftTriggerAxis() > 0) {
+        claw.setDesiredSpeed(-driver.getLeftTriggerAxis());
+      }
+      else {
+        claw.setDesiredSpeed(0);
+      }
+
     }
 }

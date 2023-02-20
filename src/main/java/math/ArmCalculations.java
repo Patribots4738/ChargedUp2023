@@ -35,7 +35,7 @@ public class ArmCalculations {
                                 (Math.pow(ArmConstants.UPPER_ARM_LENGTH, 2)))) / 
                         (2 * (ArmConstants.LOWER_ARM_LENGTH * ArmConstants.UPPER_ARM_LENGTH))));
 
-        return upperAngle * ((x > 0) ? 1 : -1);
+        return upperAngle * ((x < 0) ? 1 : -1);
     }
 
 
@@ -53,7 +53,7 @@ public class ArmCalculations {
                 (ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) ,
                 (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));
 
-        double q1 = ((Math.atan2(y , x) + alpha) - (Math.PI / 2));
+        double q1 = ((Math.atan2(y , x) - alpha));
         return q1;
     }
 }

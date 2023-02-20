@@ -12,6 +12,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
@@ -101,14 +102,14 @@ public class Arm implements Loggable {
       _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
       _upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
 
-      _lowerArmPIDController.setPositionPIDWrappingEnabled(true);
-      _lowerArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MIN_INPUT);
-      _lowerArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MAX_INPUT);
+      // _lowerArmPIDController.setPositionPIDWrappingEnabled(true);
+      // _lowerArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MIN_INPUT);
+      // _lowerArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MAX_INPUT);
 
-      _upperArmPIDController.setPositionPIDWrappingEnabled(true);
-      _upperArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MIN_INPUT);
-      _upperArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MAX_INPUT);
-
+      // _upperArmPIDController.setPositionPIDWrappingEnabled(true);
+      // _upperArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MIN_INPUT);
+      // _upperArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MAX_INPUT);
+  
       // Set PID constants for the lower and upper SPARK MAX(s)
       _lowerArmPIDController.setP(ArmConstants.LOWER_P);
       _lowerArmPIDController.setI(ArmConstants.LOWER_I);
@@ -221,8 +222,8 @@ public class Arm implements Loggable {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-          this.armXReference += (position.getX()/10);
-          this.armYReference += (position.getY()/10);
+          this.armXReference += (position.getX()/5);
+          this.armYReference += (position.getY()/5);
         }
         else {
           this.armXReference = position.getX();
@@ -257,10 +258,10 @@ public class Arm implements Loggable {
             return;
         }
         
-        // System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
-        //         " Lower: " + Units.radiansToDegrees(lowerArmAngle));
-        setLowerArmReference(lowerArmAngle);
-        setUpperArmReference(upperArmAngle);
+        System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle + (Math.PI)) +
+                " Lower: " + Units.radiansToDegrees(lowerArmAngle + (Math.PI/2)));
+        setLowerArmReference(lowerArmAngle + (Math.PI/2));
+        setUpperArmReference(upperArmAngle + (Math.PI));
 
     }
 
@@ -274,8 +275,8 @@ public class Arm implements Loggable {
 
         position = MathUtil.clamp(
           position, 
-          -Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES), 
-          Math.toRadians(ArmConstants.UPPER_ARM_FREEDOM_DEGREES)
+          Math.toRadians(20), 
+          Math.toRadians(270)
         );
 
         // Description of FF in Constants :D
@@ -308,8 +309,8 @@ public class Arm implements Loggable {
         
         position = MathUtil.clamp(
             position, 
-            -Math.toRadians(ArmConstants.LOWER_ARM_FREEDOM_DEGREES), 
-            Math.toRadians(ArmConstants.LOWER_ARM_FREEDOM_DEGREES)
+            Math.toRadians(90), 
+            Math.toRadians(270)
         );
 
         ArmFeedforward feedForward = new ArmFeedforward(
