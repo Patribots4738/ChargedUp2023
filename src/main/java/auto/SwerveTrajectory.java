@@ -153,8 +153,8 @@ public class SwerveTrajectory implements Loggable {
                               0,
                               Debug.rotD.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_D),
                               new TrapezoidProfile.Constraints(
-                                Debug.maxAngularSpeed.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND),
-                                Debug.maxAngularAccel.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED))));
+                                Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                                Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
   }
 
 }

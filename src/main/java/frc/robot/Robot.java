@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    SwerveTrajectory.resetHDC();
+    // SwerveTrajectory.resetHDC();
     arm.setUpperArmCoastMode();
   }
 
@@ -175,7 +175,7 @@ public class Robot extends TimedRobot {
 
     SwerveTrajectory.resetTrajectoryStatus();
 
-    swerve.resetOdometry(new Pose2d(11.07, 4.69, Rotation2d.fromDegrees(0)));
+    swerve.resetOdometry(new Pose2d(13.59, 4.09, Rotation2d.fromDegrees(15)));
 
   }
 
@@ -186,7 +186,7 @@ public class Robot extends TimedRobot {
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
     double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX() , OIConstants.DRIVER_DEADBAND);
-    double driverLeftY  = MathUtil.applyDeadband(-driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
     double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
     double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
@@ -197,12 +197,15 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
     // Use the A button to activate the alignment process
+
     if (driver.getAButton()) {
 
       if (driver.getRightBumperPressed()) {
         System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
 
         autoAlignment.calibrateOdometry();
+        autoAlignment.setConeOffset(0);
+        SwerveTrajectory.resetTrajectoryStatus();
 
         System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
 
@@ -241,8 +244,8 @@ public class Robot extends TimedRobot {
       }
 
     } else {
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX * .25, true);
-      System.out.println("Robot Pos: " + swerve.getPose());
+      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), - driverRightX * .25, true);
+      // System.out.println("Robot Pos: " + swerve.getPose());
     }
   }
 }

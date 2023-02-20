@@ -127,8 +127,8 @@ public final class Constants {
     public static final class AutoConstants {
         public static final double MAX_SPEED_METERS_PER_SECOND = 3;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI ;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND/2;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -138,13 +138,13 @@ public final class Constants {
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 0.3;
+        public static final double Y_CORRECTION_P = 1;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
-        public static final double ROTATION_CORRECTION_P = -0.22;
+        public static final double ROTATION_CORRECTION_P = .6;
         public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0;//.74;
+        public static final double ROTATION_CORRECTION_D = 0;
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
@@ -294,7 +294,7 @@ public final class Constants {
                         0,
                         0));
 
-        public static final double CONE_OFFSET_METERS = 0.5;
+        public static final double CONE_OFFSET_METERS = 0.6;
     }
 
     public static final class AlignmentConstants {

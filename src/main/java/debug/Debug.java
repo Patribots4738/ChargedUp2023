@@ -5,6 +5,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import math.Constants.AlignmentConstants;
+import math.Constants.AutoConstants;
 
 import java.util.Map;
 
@@ -51,13 +53,13 @@ public class Debug {
         .getEntry();
 
     rotP = Shuffleboard.getTab("Turn")
-        .add("rotP", 0.22)
+        .add("rotP", AutoConstants.ROTATION_CORRECTION_D)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
         .getEntry();
 
     rotD = Shuffleboard.getTab("Turn")
-        .add("rotD", 0.74)
+        .add("rotD", AutoConstants.ROTATION_CORRECTION_D)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
         .getEntry();
@@ -90,18 +92,6 @@ public class Debug {
         .add("yPos", 0)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
-        .getEntry();
-
-    maxAngularSpeed = Shuffleboard.getTab("Turn")
-        .add("maxAngularSpeed", 0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
-        .getEntry();
-
-    maxAngularAccel = Shuffleboard.getTab("Turn")
-        .add("maxAngularAccel", 0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", -Math.pow(Math.PI,2), "max", Math.pow(Math.PI,2))) // specify widget properties here
         .getEntry();
   }
 
