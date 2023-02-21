@@ -11,17 +11,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import debug.Debug;
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.simulation.DriverStationDataJNI;
-import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.Robot;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -69,9 +64,6 @@ public class Arm implements Loggable {
 
     @Log 
     private double upperDiff = 0;
-
-    @Log
-    private double currentVoltage = 0;
     
     private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _lowerArmLeft;
@@ -167,7 +159,6 @@ public class Arm implements Loggable {
         setUpperArmPosition(upperReference);
         upperDiff = (Units.radiansToDegrees(upperReference) - Units.radiansToDegrees(getUpperArmPosition()));
         lowerDiff = (Units.radiansToDegrees(lowerReference) - Units.radiansToDegrees(getLowerArmPosition()));
-        currentVoltage = _upperArm.getAppliedOutput()*RobotController.getBatteryVoltage();
     }
 
     public void indexPeriodic() {    
@@ -320,38 +311,7 @@ public class Arm implements Loggable {
         _upperArmPIDController.setFF(FF);
 
         // Set the position of the neo controlling the upper arm to
-        //_upperArmPIDController.setReference((position), ControlType.kPosition);
-
-        if (Math.abs(upperDiff) < 10) {
-
-          double voltageAdded = 0.000000001;
-
-          if (Math.abs(upperDiff) < 5 && 4 < Math.abs(upperDiff)) {
-            
-            _upperArmPIDController.setReference(0.35, ControlType.kVoltage);
-            
-          } else if (Math.abs(upperDiff) < 4) {
-
-            _upperArmPIDController.setReference((position), ControlType.kPosition);
-
-          } else if (upperDiff > 0.0) {
-
-            currentVoltage += voltageAdded;
-            _upperArm.setVoltage(currentVoltage);          
-
-          } else {
-
-            currentVoltage -= voltageAdded;
-            _upperArm.setVoltage(currentVoltage);          
-
-          }
-
-
-        } else {
-
-          _upperArmPIDController.setReference((position), ControlType.kPosition);
-
-        }
+        _upperArmPIDController.setReference((position), ControlType.kPosition);
 
         upperRotation = _upperArmEncoder.getPosition();
 
