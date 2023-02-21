@@ -10,11 +10,18 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
+import debug.Debug;
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
+import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.Robot;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -56,6 +63,15 @@ public class Arm implements Loggable {
     // The DESIRED rotation of the upper and lower arm(s)
     private double upperReference = 0;
     private double lowerReference = 0;
+
+    @Log
+    private double lowerDiff = 0;
+
+    @Log 
+    private double upperDiff = 0;
+
+    @Log
+    private double currentVoltage = 0;
     
     private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _lowerArmLeft;
@@ -149,6 +165,9 @@ public class Arm implements Loggable {
         if (!getOperatorOverride()) { indexPeriodic(); }
         setLowerArmPosition(lowerReference);
         setUpperArmPosition(upperReference);
+        upperDiff = (Units.radiansToDegrees(upperReference) - Units.radiansToDegrees(getUpperArmPosition()));
+        lowerDiff = (Units.radiansToDegrees(lowerReference) - Units.radiansToDegrees(getLowerArmPosition()));
+        currentVoltage = _upperArm.getAppliedOutput()*RobotController.getBatteryVoltage();
     }
 
     public void indexPeriodic() {    
@@ -223,8 +242,8 @@ public class Arm implements Loggable {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-          this.armXReference += (position.getX()/5);
-          this.armYReference += (position.getY()/5);
+          this.armXReference += (position.getX());
+          this.armYReference += (position.getY());
         }
         else {
           this.armXReference = position.getX();
@@ -241,19 +260,19 @@ public class Arm implements Loggable {
 
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
-        if (armPosition.getDistance(new Translation2d(0,0)) >= ArmConstants.MAX_REACH) {
-          armPosition = armPosition.times((ArmConstants.MAX_REACH) / armPosition.getDistance(new Translation2d(0, 0)));
+        if (armPosition.getNorm() >= ArmConstants.MAX_REACH) {
+          armPosition = armPosition.times((ArmConstants.MAX_REACH+1) / armPosition.getNorm());
         }
         
-        if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
-            armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
-        }
-        if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
-            armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
-        }
-        else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
-            armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
-        }        
+        // if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
+        //     armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
+        // }
+        // if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
+        //     armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
+        // }
+        // else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
+        //     armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
+        // }        
         // System.out.println(armPosition);
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
@@ -264,12 +283,11 @@ public class Arm implements Loggable {
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
         if (Double.isNaN(upperArmAngle)) {
-            System.out.println("Upper angle NAN");
+            System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
             return;
         }
-        
-        System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle + (Math.PI)) +
-                " Lower: " + Units.radiansToDegrees(lowerArmAngle + (Math.PI/2)));
+
+       
         setLowerArmReference(lowerArmAngle + (Math.PI/2));
         setUpperArmReference(upperArmAngle + (Math.PI));
 
@@ -302,7 +320,38 @@ public class Arm implements Loggable {
         _upperArmPIDController.setFF(FF);
 
         // Set the position of the neo controlling the upper arm to
-        _upperArmPIDController.setReference((position), ControlType.kPosition);
+        //_upperArmPIDController.setReference((position), ControlType.kPosition);
+
+        if (Math.abs(upperDiff) < 10) {
+
+          double voltageAdded = 0.000000001;
+
+          if (Math.abs(upperDiff) < 5 && 4 < Math.abs(upperDiff)) {
+            
+            _upperArmPIDController.setReference(0.35, ControlType.kVoltage);
+            
+          } else if (Math.abs(upperDiff) < 4) {
+
+            _upperArmPIDController.setReference((position), ControlType.kPosition);
+
+          } else if (upperDiff > 0.0) {
+
+            currentVoltage += voltageAdded;
+            _upperArm.setVoltage(currentVoltage);          
+
+          } else {
+
+            currentVoltage -= voltageAdded;
+            _upperArm.setVoltage(currentVoltage);          
+
+          }
+
+
+        } else {
+
+          _upperArmPIDController.setReference((position), ControlType.kPosition);
+
+        }
 
         upperRotation = _upperArmEncoder.getPosition();
 
@@ -388,10 +437,6 @@ public class Arm implements Loggable {
       System.out.println(upperRotationList);
     }
 
-    public void setUpperSpeed(double speed) {
-      _upperArm.set(speed/10);
-    }
-
     public void zeroLowerArmEncoder() {
 
         double unadjustedAngle = (_lowerArmEncoder.getPosition() - _lowerArmEncoder.getZeroOffset());
@@ -412,5 +457,11 @@ public class Arm implements Loggable {
           Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
 
           _upperArmEncoder.setZeroOffset(referenceAngle.getRadians());
+    }
+
+    public void setUpperPID() {
+      _upperArmPIDController.setP(Debug.armP.getDouble(ArmConstants.UPPER_P));
+      _upperArmPIDController.setI(Debug.armI.getDouble(ArmConstants.UPPER_I));
+      _upperArmPIDController.setD(Debug.armD.getDouble(ArmConstants.UPPER_D));
     }
 }

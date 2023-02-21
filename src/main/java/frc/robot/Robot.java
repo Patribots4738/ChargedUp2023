@@ -86,11 +86,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-        arm.setUpperArmCoastMode();
     }
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+      arm.setUpperPID();
+    }
 
     @Override
     public void autonomousInit() {
@@ -194,7 +195,7 @@ public class Robot extends TimedRobot {
           arm.toggleOperatorOverride();
       }
       if (arm.getOperatorOverride()) {
-          arm.drive(new Translation2d(-driverLeftAxis.getX(), driverLeftAxis.getY()));
+          arm.drive(new Translation2d(driverLeftAxis.getX(), driverLeftAxis.getY()));
       }
 
       if (driver.getRightTriggerAxis() > 0 ) {

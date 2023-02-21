@@ -156,7 +156,7 @@ public final class Constants {
     public static final class ClawConstants {
         public static final int CLAW_CAN_ID = 12;
 
-        public static final double CLAW_POSITION_CONVERSION_FACTOR = 50;
+        public static final double CLAW_POSITION_CONVERSION_FACTOR = 25;
 
         public static final double CLAW_P = 1;
         public static final double CLAW_I = 0;
@@ -167,7 +167,7 @@ public final class Constants {
         public static final double CLAW_MAX_OUTPUT = 1;
 
         public static final int CLAW_STALL_LIMIT = 20;
-        public static final int CLAW_FREE_LIMIT = 40;
+        public static final int CLAW_FREE_LIMIT = 30;
 
 
         // from the edge of the upper arm, straight out,
@@ -239,11 +239,11 @@ public final class Constants {
       public static final double UPPER_ARM_DEADBAND = Math.toRadians(15);
 
       // The outputs used in the output range for the lower and upper arms
-      public static final double LOWER_MIN_OUTPUT = -1;
       public static final double LOWER_MAX_OUTPUT = 1;
+      public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MIN_OUTPUT = -1;
-      public static final double UPPER_MAX_OUTPUT = 1;
+      public static final double UPPER_MAX_OUTPUT = 0.25;
+      public static final double UPPER_MIN_OUTPUT = -UPPER_MAX_OUTPUT;
 
       /**
        * SysID values:
@@ -263,7 +263,7 @@ public final class Constants {
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
       public static final double UPPER_P = 0.225;//.25;
-      public static final double UPPER_I = 0;
+      public static final double UPPER_I = 0.0001;
       public static final double UPPER_D = 0;
       public static final double UPPER_FF = 1;
 

@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import math.Constants.ArmConstants;
 
 public class Debug {
 
@@ -21,6 +22,9 @@ public class Debug {
     public static GenericEntry rotDiff;
     public static GenericEntry xPos;
     public static GenericEntry yPos;
+    public static GenericEntry armP;
+    public static GenericEntry armI;
+    public static GenericEntry armD;
 
     public Debug() {
 
@@ -88,6 +92,24 @@ public class Debug {
                 .add("yPos", 0)
                 .withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
+                .getEntry();
+
+        armP = Shuffleboard.getTab("Arm")
+                .add("armP", ArmConstants.UPPER_P)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
+                .getEntry();
+
+        armI = Shuffleboard.getTab("Arm")
+                .add("armI", ArmConstants.UPPER_I)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 0.001, "increment", 0.01)) // specify widget properties here
+                .getEntry();
+
+        armD = Shuffleboard.getTab("Arm")
+                .add("armD", ArmConstants.UPPER_D)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", -3, "max", 3)) // specify widget properties here
                 .getEntry();
     }
 
