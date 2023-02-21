@@ -66,8 +66,6 @@ public class AutoAlignment {
 
           System.out.println("Target found! " + camEstimatedPose.estimatedPose.toPose2d());
 
-          setTagID(getNearestTag());
-
       }
     }
 
@@ -80,8 +78,6 @@ public class AutoAlignment {
 
       Pose2d targetPose = AlignmentConstants.TAG_POSES[tagID].toPose2d();
 
-      Rotation2d heading = Rotation2d.fromDegrees(0);
-
       double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
 
       if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
@@ -89,18 +85,7 @@ public class AutoAlignment {
           coneOffsetLeft *= -1;
 
       }
-      if (4 < tagID && tagID < 9) {
-
-          heading = Rotation2d.fromDegrees(180);
-
-      }
-      if (coneOffset == 1) {
-          heading = Rotation2d.fromDegrees(90);
-      }
-      else if (coneOffset == -1) {
-          heading = Rotation2d.fromDegrees(-90);
-      }
-
+      
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
@@ -116,9 +101,9 @@ public class AutoAlignment {
       }
 
       if (coneOffset == -1) {
-          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
-      } else if (coneOffset == 1) {
           targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
+      } else if (coneOffset == 1) {
+          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
       }
 
       if (swerve.getPose().minus(targetPose).getTranslation().getNorm() < Units.inchesToMeters(AlignmentConstants.ALLOWABLE_ERROR)) {
@@ -127,9 +112,11 @@ public class AutoAlignment {
           return;
       }
 
+      Rotation2d heading = Rotation2d.fromRadians(Math.atan2(targetPose.getY() - swerve.getPose().getY(),targetPose.getX() - swerve.getPose().getX() ));
+      System.out.println("Heading: " + heading.getDegrees());
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
-          new PathConstraints(0.1, 0.1),
+          new PathConstraints(1, 0.33),
           new PathPoint(swerve.getPose().getTranslation(),
               heading,
               swerve.getPose().getRotation()),
@@ -150,7 +137,7 @@ public class AutoAlignment {
    * while using the alliance color to factor out tags
    * @return the nearest tag to the bot that is for the same alliance
    */
-  private int getNearestTag() {
+  public int getNearestTag() {
 
       // A reminder that tag 0 sets this.moveToTag() to return;
       int nearestTag = 0;
@@ -207,37 +194,43 @@ public class AutoAlignment {
     public void setConeOffset(int coneOffset) {
 
       int previousConeOffset = this.coneOffset;
+      System.out.println("Started another: " + coneOffset);
       // Pan the coneOffset to the next tag if it is able to do so
       // It cannot do so if there is no grid in the desired direction
       if (coneOffset < -1) {
         if (tagID == 2 || tagID == 3) {
           this.tagID--;
-          this.coneOffset = 1;
+          coneOffset = 1;
           System.out.println("Tag minus; ConeOffset = 1");
         }
         else if (tagID == 6 || tagID == 7) {
           this.tagID++;
-          this.coneOffset = 1;
+          coneOffset = 1;
           System.out.println("Tag plus; ConeOffset = 1");
         }
       }
       else if (coneOffset > 1) {
         if (tagID == 1 || tagID == 2) {
           this.tagID++;
-          this.coneOffset = -1;
+          coneOffset = -1;
           System.out.println("Tag plus; ConeOffset = -1");
         }
         else if (tagID == 7 || tagID == 8) {
           this.tagID--;
-          this.coneOffset = -1;
+          coneOffset = -1;
           System.out.println("Tag minus; ConeOffset = -1");
         }
       }
+
+      System.out.println("Pre clamp: " + coneOffset);
+
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
+      
       if (previousConeOffset != this.coneOffset) {
         SwerveTrajectory.resetTrajectoryStatus();
       }
-      System.out.println(this.coneOffset);
+      
+      System.out.println("Post clamp: " + this.coneOffset);
       
     }
 

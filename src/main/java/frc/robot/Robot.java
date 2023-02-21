@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
 import hardware.Arm;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Logger;
@@ -196,15 +197,17 @@ public class Robot extends TimedRobot {
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
+    autoAlignment.calibrateOdometry();
+    
     // Use the A button to activate the alignment process
-
     if (driver.getAButton()) {
 
-      if (driver.getRightBumperPressed()) {
+      if (!driver.getRightBumper()) {
         System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
 
-        autoAlignment.calibrateOdometry();
         autoAlignment.setConeOffset(0);
+        autoAlignment.setTagID(autoAlignment.getNearestTag());
+
         SwerveTrajectory.resetTrajectoryStatus();
 
         System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
@@ -216,31 +219,14 @@ public class Robot extends TimedRobot {
 
         autoAlignment.moveToTag();
 
-        switch (driver.getPOV()) {
-          // Not clicked
-          case -1:
-            break;
-
-          // Clicking up
-          case 0:
-            // arm.setArmIndex(arm.getArmIndex() + 1);
-            break;
-
-          // Clicking down
-          case 180:
-            // arm.setArmIndex(arm.getArmIndex() - 1);
-            break;
-
-          // Clicking left
-          case 270:
+        if (driver.getXButtonPressed()) {
             autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
-            break;
-
-          // Clicking right
-          case 90:
-            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
-            break;
         }
+
+        else if (driver.getBButtonPressed()) {
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+        }
+
       }
 
     } else {

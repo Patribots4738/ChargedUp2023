@@ -294,7 +294,7 @@ public final class Constants {
                         0,
                         0));
 
-        public static final double CONE_OFFSET_METERS = 0.6;
+        public static final double CONE_OFFSET_METERS = 0.542615;
     }
 
     public static final class AlignmentConstants {
