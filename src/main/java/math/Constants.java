@@ -156,7 +156,7 @@ public final class Constants {
     public static final class ClawConstants {
         public static final int CLAW_CAN_ID = 12;
 
-        public static final double CLAW_POSITION_CONVERSION_FACTOR = 50;
+        public static final double CLAW_POSITION_CONVERSION_FACTOR = 25;
 
         public static final double CLAW_P = 1;
         public static final double CLAW_I = 0;
@@ -167,7 +167,7 @@ public final class Constants {
         public static final double CLAW_MAX_OUTPUT = 1;
 
         public static final int CLAW_STALL_LIMIT = 20;
-        public static final int CLAW_FREE_LIMIT = 40;
+        public static final int CLAW_FREE_LIMIT = 30;
 
 
         // from the edge of the upper arm, straight out,
@@ -212,6 +212,8 @@ public final class Constants {
       // The max reach of the bot horizontally, in inches
       public static final double MAX_REACH = LOWER_ARM_LENGTH + UPPER_ARM_LENGTH;
 
+      public static final double MIN_REACH = LOWER_ARM_LENGTH - UPPER_ARM_LENGTH;
+
       // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
       // 78 inches is the rule, 11 inches is the base of the arm to the ground
       public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
@@ -239,11 +241,11 @@ public final class Constants {
       public static final double UPPER_ARM_DEADBAND = Math.toRadians(15);
 
       // The outputs used in the output range for the lower and upper arms
-      public static final double LOWER_MIN_OUTPUT = -1;
       public static final double LOWER_MAX_OUTPUT = 1;
+      public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MIN_OUTPUT = -1;
-      public static final double UPPER_MAX_OUTPUT = 1;
+      public static final double UPPER_MAX_OUTPUT = 0.25;
+      public static final double UPPER_MIN_OUTPUT = -UPPER_MAX_OUTPUT;
 
       /**
        * SysID values:
@@ -263,7 +265,7 @@ public final class Constants {
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
       public static final double UPPER_P = 0.225;//.25;
-      public static final double UPPER_I = 0;
+      public static final double UPPER_I = 0.0001;
       public static final double UPPER_D = 0;
       public static final double UPPER_FF = 1;
 
@@ -319,6 +321,8 @@ public final class Constants {
 
         private static final double GRID_TAG_HEIGHT  = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
+        public static final double HUMAN_TAG_OFFSET_X_INCHES = 30;
+
 
         public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
         public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
@@ -342,13 +346,27 @@ public final class Constants {
     public static final int CLAW_OUTAKE_SPEED = -1;
     public static final int CLAW_STOPPED_SPEED = 0;
 
-    public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(15, 30);
+    public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(10, 37);
     public static final Translation2d ARM_STOWED_POSITION = new Translation2d(9, 18);
     public static final Translation2d ARM_HYBRID_POSITION = new Translation2d(14, 13);
     public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
     public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
     public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(27, 0);
-    
+
+    public static final Translation2d ARM_MID_GRID_POSITION_0 = new Translation2d(30.75, 41.88);
+    public static final Translation2d ARM_MID_GRID_POSITION_1 = new Translation2d(32.34, 19.00);
+
+    public static final Translation2d ARM_HIGH_GRID_POSITION_0 = new Translation2d(29.03, 46.46);
+    public static final Translation2d ARM_HIGH_GRID_POSITION_1 = new Translation2d(46.65, 31.34);
+    public static final Translation2d ARM_HIGH_GRID_POSITION_2 = new Translation2d(49.09, 26.90);
+
+    public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
+
+    public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(0.22, 38.25);
+    public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
+
+
+
     
     public static final Translation2d[][] ARM_POSITIONS = {
       {
@@ -361,14 +379,23 @@ public final class Constants {
       },
       {
         ARM_TRANSITION_POSITION,
-        ARM_MEDIUM_GRID_POSITION
+        ARM_MID_GRID_POSITION_0,
+        ARM_MID_GRID_POSITION_1
       },
       {
         ARM_TRANSITION_POSITION,
-        ARM_HIGH_GRID_POSITION
+        ARM_HIGH_GRID_POSITION_0,
+        ARM_HIGH_GRID_POSITION_1,
+        ARM_HIGH_GRID_POSITION_2
       },
       {
-        ARM_FLOOR_INTAKE_POSITION
+        HUMAN_TAG_PICKUP
+      },
+      {
+        CUBE_MID_LAUNCH
+      },
+      {
+        CUBE_HIGH_LAUNCH
       }
     };
   }
