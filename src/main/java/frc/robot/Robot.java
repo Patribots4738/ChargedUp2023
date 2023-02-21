@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
     Swerve swerve;
 
     XboxController driver;
-    // XboxController operator;
+    XboxController operator;
 
     AutoSegmentedWaypoints autoSegmentedWaypoints;
 
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
         swerve = new Swerve();
 
         driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
-        // operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
+        operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
         arm = new Arm();
         claw = new Claw();
@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
 
-        // swerve.periodic();
+        swerve.periodic();
         // arm.periodic();
 
         Logger.updateEntries();
@@ -116,7 +116,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // arm.periodic();
+        arm.periodic();
+        claw.periodic();
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
@@ -125,11 +126,11 @@ public class Robot extends TimedRobot {
         double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
         double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
 
-        // double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX() , OIConstants.DRIVER_DEADBAND);
-        // double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
-        // double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
-        // double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
-        // Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
+        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX() , OIConstants.DRIVER_DEADBAND);
+        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
+        double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
+        double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
+        Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
         
@@ -141,28 +142,39 @@ public class Robot extends TimedRobot {
         if (driver.getRightBumper()) {
             swerve.setX();
         } else {
-          //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
+            //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+            swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-        // if (driver.getLeftStickButtonPressed()) {
-        //   swerve.toggleSpeed();
-        // }
+        if (driver.getLeftStickButtonPressed()) {
+          swerve.toggleSpeed();
+        }
 
         // Toggle the operator override when the operator's left stick is pressed
-        // if (operator.getLeftStickButtonPressed()) {
-        //     arm.toggleOperatorOverride();
-        // }
-        // if (arm.getOperatorOverride()) {
-        //     arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
-        // }
-        // else if (operator.getRightBumperPressed()) {
-        //     arm.setArmIndex(arm.getArmIndex() + 1);
-        // }
-        // else if (operator.getLeftBumperPressed()) {
-        //     arm.setArmIndex(arm.getArmIndex() - 1);
-        // }
+        if (operator.getLeftStickButtonPressed()) {
+            arm.toggleOperatorOverride();
+        }
+        if (arm.getOperatorOverride()) {
+            arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+        }
+        else if (operator.getRightBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() + 1);
+        }
+        else if (operator.getLeftBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() - 1);
+        }
+
+        
+        if (operator.getRightTriggerAxis() > 0 ) {
+          claw.setDesiredSpeed(operator.getRightTriggerAxis());
+        }
+        else if (operator.getLeftTriggerAxis() > 0) {
+          claw.setDesiredSpeed(-operator.getLeftTriggerAxis());
+        }
+        else {
+          claw.setDesiredSpeed(0);
+        }
 
     }
 
@@ -177,8 +189,11 @@ public class Robot extends TimedRobot {
       
       double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
       double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
+      double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
+      double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
       
       Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+      Translation2d driverRightAxis = OICalc.toCircle(driverRightX, driverRightY);
       
       arm.periodic();
       claw.periodic();
@@ -195,7 +210,10 @@ public class Robot extends TimedRobot {
           arm.toggleOperatorOverride();
       }
       if (arm.getOperatorOverride()) {
-          arm.drive(new Translation2d(driverLeftAxis.getX(), driverLeftAxis.getY()));
+          arm.drive(new Translation2d(driverRightAxis.getX(), driverRightAxis.getY()));
+      }
+      else {
+        swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
       }
 
       if (driver.getRightTriggerAxis() > 0 ) {
@@ -207,6 +225,7 @@ public class Robot extends TimedRobot {
       else {
         claw.setDesiredSpeed(0);
       }
+      
 
     }
 }

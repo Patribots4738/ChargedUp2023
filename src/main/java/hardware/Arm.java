@@ -64,6 +64,12 @@ public class Arm implements Loggable {
 
     @Log 
     private double upperDiff = 0;
+
+    @Log 
+    private double armXPos = 0;
+
+    @Log
+    private double armYPos = 0;
     
     private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _lowerArmLeft;
@@ -159,6 +165,10 @@ public class Arm implements Loggable {
         setUpperArmPosition(upperReference);
         upperDiff = (Units.radiansToDegrees(upperReference) - Units.radiansToDegrees(getUpperArmPosition()));
         lowerDiff = (Units.radiansToDegrees(lowerReference) - Units.radiansToDegrees(getLowerArmPosition()));
+        // Use forward kinematics to get the x and y position of the end effector
+        armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmPosition() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmPosition() - Math.PI) + (getLowerArmPosition() - (Math.PI/2)))));
+        armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmPosition() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmPosition() - Math.PI) + (getLowerArmPosition() - (Math.PI/2)))));
+        System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
     public void indexPeriodic() {    
@@ -252,7 +262,10 @@ public class Arm implements Loggable {
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
         if (armPosition.getNorm() >= ArmConstants.MAX_REACH) {
-          armPosition = armPosition.times((ArmConstants.MAX_REACH+1) / armPosition.getNorm());
+          armPosition = armPosition.times((ArmConstants.MAX_REACH-1) / armPosition.getNorm());
+        }
+        if (armPosition.getNorm() <= ArmConstants.MIN_REACH) {
+          armPosition = armPosition.times((ArmConstants.MIN_REACH+1) / armPosition.getNorm());
         }
         
         // if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
@@ -355,7 +368,7 @@ public class Arm implements Loggable {
      * Get the current position of the upper arm
      *
      * @return the current position of the upper arm
-     * This unit is in revolutions
+     * This unit is in rads
      */
     public double getUpperArmPosition() {
         return _upperArmEncoder.getPosition();
@@ -365,7 +378,7 @@ public class Arm implements Loggable {
      * Get the current position of the lower arm
      *
      * @return the current position of the lower arm
-     * This unit is in revolutions
+     * This unit is in rads
      */
     public double getLowerArmPosition() {
         return _lowerArmEncoder.getPosition();
