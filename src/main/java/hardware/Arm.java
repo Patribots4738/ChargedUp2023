@@ -2,6 +2,7 @@ package hardware;
 
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -243,8 +244,8 @@ public class Arm implements Loggable {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-          this.armXReference += (position.getX());
-          this.armYReference += (position.getY());
+          this.armXReference += (position.getX()/5);
+          this.armYReference += (position.getY()/5);
         } else {
           this.armXReference = position.getX();
           this.armYReference = position.getY();
@@ -260,23 +261,23 @@ public class Arm implements Loggable {
 
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
-        if (armPosition.getNorm() >= ArmConstants.MAX_REACH) {
-          armPosition = armPosition.times((ArmConstants.MAX_REACH-1) / armPosition.getNorm());
+        if (armPosition.getNorm() > ArmConstants.MAX_REACH) {
+          armPosition = armPosition.times((ArmConstants.MAX_REACH - 0.1) / armPosition.getNorm());
         }
-        if (armPosition.getNorm() <= ArmConstants.MIN_REACH) {
-          armPosition = armPosition.times((ArmConstants.MIN_REACH+1) / armPosition.getNorm());
+        if (armPosition.getNorm() < ArmConstants.MIN_REACH) {
+          armPosition = armPosition.times((ArmConstants.MIN_REACH + 0.1) / armPosition.getNorm());
         }
         
-        // if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
-        //     armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
-        // }
-        // if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
-        //     armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
-        // }
-        // else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
-        //     armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
-        // }
-        // System.out.println(armPosition);
+        if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
+          armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
+        }
+        if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
+          armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
+        }
+        else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
+          armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
+        }
+
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
@@ -286,10 +287,14 @@ public class Arm implements Loggable {
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
         if (Double.isNaN(upperArmAngle)) {
-            System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
-            return;
+          System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
+          return;
         }
 
+        System.out.println(String.format("Lower Angle: %.1f, Upper Angle: %.1f Arm Position: %.1f, %.1f; Norm: %.1f", Units.radiansToDegrees(lowerArmAngle + (Math.PI/2)), Units.radiansToDegrees(upperArmAngle + (Math.PI)), armPosition.getX(), armPosition.getY(), armPosition.getNorm()));
+        
+        this.armXReference = armPosition.getX();
+        this.armYReference = armPosition.getY();
 
         setLowerArmReference(lowerArmAngle + (Math.PI/2));
         setUpperArmReference(upperArmAngle + (Math.PI));
