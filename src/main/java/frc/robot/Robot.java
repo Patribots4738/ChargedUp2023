@@ -161,18 +161,18 @@ public class Robot extends TimedRobot {
         }
 
         // Toggle the operator override when the operator's left stick is pressed
-        //if (operator.getLeftStickButtonPressed()) {
-          //  arm.toggleOperatorOverride();
-        // //}
-        //if (arm.getOperatorOverride()) {
-          //   arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+        if (operator.getLeftStickButtonPressed()) {
+           arm.toggleOperatorOverride();
         //}
-        //else if (operator.getRightBumperPressed()) {
-          //  arm.setArmIndex(arm.getArmIndex() + 1);
-        //}
-        //else if (operator.getLeftBumperPressed()) {
-          //  arm.setArmIndex(arm.getArmIndex() - 1);
-        // }
+        if (arm.getOperatorOverride()) {
+            arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+        }
+        else if (operator.getRightBumperPressed()) {
+           arm.setArmIndex(arm.getArmIndex() + 1);
+        }
+        else if (operator.getLeftBumperPressed()) {
+           arm.setArmIndex(arm.getArmIndex() - 1);
+        }
 
 
         if (operator.getRightTriggerAxis() > 0 ) {
@@ -184,7 +184,7 @@ public class Robot extends TimedRobot {
         else {
           claw.setDesiredSpeed(0);
         }
-        System.out.println(swerve.getPose());
+      }
 
     }
 
