@@ -4,11 +4,7 @@
 
 package math;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -196,7 +192,7 @@ public final class Constants {
       public static final int LOWER_STALL_LIMIT = 80;
       // Make the max RPM equal to 1/4 rotations per second
       public static final int LOWER_MAX_RPM = ((int) (LOWER_ARM_GEAR_RATIO) * 15);
-      
+
       public static final int UPPER_FREE_LIMIT = 80;
       public static final int UPPER_STALL_LIMIT = 80;
       // Make the max RPM equal to 1/4 rotations per second
@@ -297,7 +293,21 @@ public final class Constants {
       public static final double V_UPPER = 5.7601;
       public static final double A_UPPER = 3.0187;
     }
-    
+
+    public static final class PlacementConstants {
+        public static final int STOWED_PLACEMENT_INDEX = 0;
+        public static final int HYBRID_PLACEMENT_INDEX = 1;
+        public static final int MEDIUM_CONE_PLACEMENT_INDEX = 2;
+        public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
+        public static final int MEDIUM_CUBE_PLACEMENT_INDEX = 5;
+        public static final int HIGH_CUBE_PLACEMENT_INDEX = 6;
+        public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
+
+        public static final int CLAW_INTAKE_SPEED = 1;
+        public static final int CLAW_OUTTAKE_SPEED = -1;
+        public static final int CLAW_STOPPED_SPEED = 0;
+    }
+
     public static final class VisionConstants {
 
         public static final String CAMERA_NAME = "Patribots4738";
@@ -311,15 +321,11 @@ public final class Constants {
             new Rotation3d(0, 0, 0));
 
         public static final double CONE_OFFSET_METERS = 0.5;
-
-        public static final double DESIRED_VELOCITY_METERS_PER_SECOND = 1.5;
-
-
     }
 
     public static final class AlignmentConstants {
 
-        private static final double GRID_TAG_HEIGHT  = Units.inchesToMeters(18.22);
+        private static final double GRID_TAG_HEIGHT = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
         public static final double HUMAN_TAG_OFFSET_X_INCHES = 30;
 
@@ -367,7 +373,7 @@ public final class Constants {
 
 
 
-    
+
     public static final Translation2d[][] ARM_POSITIONS = {
       {
         ARM_TRANSITION_POSITION,

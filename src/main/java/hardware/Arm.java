@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -19,22 +23,23 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
-import math.*;
+import math.ArmCalculations;
 import math.Constants.ArmConstants;
 import math.Constants.PlacementConstants;
+
+import java.util.ArrayList;
 
 public class Arm implements Loggable {
 
     /**
      * What the arm positions look like and the index in the array
-     *               4
-     *      O        __     8
-     *       1      |      7
-     *           3 | 5
-     *        2  |||||  6
+     * 4
+     * O        __     8
+     * 1      |      7
+     * 3 | 5
+     * 2  |||||  6
      */
-    
+
     // ceil -- force round up
     int armPosDimention1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
     int armPosDimention2 = 0;
@@ -62,26 +67,25 @@ public class Arm implements Loggable {
     @Log
     private double lowerDiff = 0;
 
-    @Log 
+    @Log
     private double upperDiff = 0;
 
-    @Log 
+    @Log
     private double armXPos = 0;
 
     @Log
     private double armYPos = 0;
-    
+
     private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _lowerArmLeft;
     private final CANSparkMax _upperArm;
 
     private final AbsoluteEncoder _lowerArmEncoder;
     private final AbsoluteEncoder _upperArmEncoder;
-
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
-    
-    ArmCalculations armCalculations = new ArmCalculations();
+
+    private final ArmCalculations armCalculations;
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -123,7 +127,7 @@ public class Arm implements Loggable {
       // _upperArmPIDController.setPositionPIDWrappingEnabled(true);
       // _upperArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MIN_INPUT);
       // _upperArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MAX_INPUT);
-  
+
       // Set PID constants for the lower and upper SPARK MAX(s)
       _lowerArmPIDController.setP(ArmConstants.LOWER_P);
       _lowerArmPIDController.setI(ArmConstants.LOWER_I);
@@ -149,14 +153,16 @@ public class Arm implements Loggable {
       // browns out, it will retain the last configuration
       _lowerArmLeft.follow(_lowerArmRight, true);
       _upperArmEncoder.setInverted(true);
-      
+
       _lowerArmRight.burnFlash();
       _lowerArmLeft.burnFlash();
       _upperArm.burnFlash();
+
+      armCalculations = new ArmCalculations();
     }
-          
+
     public void toggleOperatorOverride() {
-      this.operatorOverride = !operatorOverride;
+        this.operatorOverride = !operatorOverride;
     }
 
     public void periodic() {
@@ -171,7 +177,7 @@ public class Arm implements Loggable {
         System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
-    public void indexPeriodic() {    
+    public void indexPeriodic() {
 
       // // PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]
       if (!startedTransition)
@@ -183,14 +189,14 @@ public class Arm implements Loggable {
 
       // armPosDimention1 = MathUtil.clamp(armPosDimention1, 0, PlacementConstants.ARM_POSITIONS.length-1);
       // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
-      
+
       if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND &&
           Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
       {
         armPosDimention2++;
         // armPosDimention2 = MathUtil.clamp(armPosDimention2, 0, PlacementConstants.ARM_POSITIONS[armPosDimention1].length-1);
         if (armPosDimention1 >= PlacementConstants.ARM_POSITIONS.length ||
-        armPosDimention2 >= PlacementConstants.ARM_POSITIONS[armPosDimention1].length) 
+        armPosDimention2 >= PlacementConstants.ARM_POSITIONS[armPosDimention1].length)
         {
           return;
         }
@@ -200,7 +206,7 @@ public class Arm implements Loggable {
     }
 
     public boolean getOperatorOverride() {
-      return this.operatorOverride;
+        return this.operatorOverride;
     }
 
     public void setLowerArmReference(double reference) {
@@ -213,13 +219,13 @@ public class Arm implements Loggable {
 
     /**
      * Sets arm index from the PlacementConstants.ARM_POSITIONS array
-     * 
+     *
      * @param index the direction to change the arm index by
      */
     public void setArmIndex(int index) {
 
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
-        
+
         armPosDimention1 = index;
         armPosDimention2 = 0;
         startedTransition = false;
@@ -227,7 +233,7 @@ public class Arm implements Loggable {
     }
 
     public int getArmIndex() {
-        return armPosDimention1;
+        return armPosDimension1;
     }
 
     /**
@@ -245,8 +251,7 @@ public class Arm implements Loggable {
         if (operatorOverride) {
           this.armXReference += (position.getX());
           this.armYReference += (position.getY());
-        }
-        else {
+        } else {
           this.armXReference = position.getX();
           this.armYReference = position.getY();
         }
@@ -276,7 +281,7 @@ public class Arm implements Loggable {
         // }
         // else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
         //     armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
-        // }        
+        // }
         // System.out.println(armPosition);
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
@@ -291,7 +296,7 @@ public class Arm implements Loggable {
             return;
         }
 
-       
+
         setLowerArmReference(lowerArmAngle + (Math.PI/2));
         setUpperArmReference(upperArmAngle + (Math.PI));
 
@@ -303,11 +308,11 @@ public class Arm implements Loggable {
      * @param position the position to set the upper arm to
      *                 This unit is in revolutions
      */
-    private void setUpperArmPosition(double position) {
+    public void setUpperArmPosition(double position) {
 
         position = MathUtil.clamp(
-          position, 
-          Math.toRadians(20), 
+          position,
+          Math.toRadians(20),
           Math.toRadians(270)
         );
 
@@ -337,12 +342,12 @@ public class Arm implements Loggable {
      * @param position the position to set the lower arm to
      *                 This unit is in full rotations
      */
-    private void setLowerArmPosition(double position) {
-        
+    public void setLowerArmPosition(double position) {
+
         position = MathUtil.clamp(
-            position, 
-            Math.toRadians(90), 
-            Math.toRadians(270)
+                position,
+                Math.toRadians(90),
+                Math.toRadians(270)
         );
 
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -352,7 +357,7 @@ public class Arm implements Loggable {
                 ArmConstants.A_LOWER);
 
         // Get the feedforward value for the position,
-        // Using a predictive formula with sysID given data of the motor  
+        // Using a predictive formula with sysID given data of the motor
         double FF = feedForward.calculate((position), 0);
         _lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
@@ -360,7 +365,7 @@ public class Arm implements Loggable {
         _lowerArmPIDController.setReference((position), ControlType.kPosition);
 
         lowerRotation = _lowerArmEncoder.getPosition();
-        
+
         lowerRotationList.add(lowerRotation);
     }
 
@@ -382,6 +387,21 @@ public class Arm implements Loggable {
      */
     public double getLowerArmPosition() {
         return _lowerArmEncoder.getPosition();
+    }
+
+    public boolean getAtDesiredPositions() {
+
+        // get the desired position of the arms, using the last index in the armPos[armPosDimension1]
+        double upperArmAngle = armCalculations.getUpperAngle(
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY());
+
+        double lowerArmAngle = armCalculations.getLowerAngle(
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
+                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY(), upperArmAngle);
+
+        return (Math.abs(Units.radiansToRotations(upperArmAngle) - getUpperArmPosition()) < 0.01) &&
+                (Math.abs(Units.radiansToRotations(lowerArmAngle) - getLowerArmPosition()) < 0.01);
     }
 
     /**
