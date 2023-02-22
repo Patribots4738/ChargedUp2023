@@ -7,11 +7,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import debug.Debug;
@@ -20,14 +16,11 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import math.ArmCalculations;
 import math.Constants.ArmConstants;
 import math.Constants.PlacementConstants;
-
-import java.util.ArrayList;
 
 public class Arm implements Loggable {
 
@@ -41,8 +34,8 @@ public class Arm implements Loggable {
      */
 
     // ceil -- force round up
-    int armPosDimention1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
-    int armPosDimention2 = 0;
+    int armPosDimension1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
+    int armPosDimension2 = 0;
     private boolean startedTransition = false;
     
     private boolean operatorOverride = false;
@@ -179,29 +172,29 @@ public class Arm implements Loggable {
 
     public void indexPeriodic() {
 
-      // // PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]
+      // // PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]
       if (!startedTransition)
       {
         startedTransition = true;
-        drive(PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
+        drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
         return;
       }
 
-      // armPosDimention1 = MathUtil.clamp(armPosDimention1, 0, PlacementConstants.ARM_POSITIONS.length-1);
+      // armPosDimension1 = MathUtil.clamp(armPosDimension1, 0, PlacementConstants.ARM_POSITIONS.length-1);
       // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
 
       if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND &&
           Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
       {
-        armPosDimention2++;
-        // armPosDimention2 = MathUtil.clamp(armPosDimention2, 0, PlacementConstants.ARM_POSITIONS[armPosDimention1].length-1);
-        if (armPosDimention1 >= PlacementConstants.ARM_POSITIONS.length ||
-        armPosDimention2 >= PlacementConstants.ARM_POSITIONS[armPosDimention1].length)
+        armPosDimension2++;
+        // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
+        if (armPosDimension1 >= PlacementConstants.ARM_POSITIONS.length ||
+        armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
           return;
         }
-        // System.out.println("Switching dim2 from " + (armPosDimention2-1) + " to " + (armPosDimention2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
-        drive(PlacementConstants.ARM_POSITIONS[armPosDimention1][armPosDimention2]);
+        // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
+        drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
       }
     }
 
@@ -226,14 +219,14 @@ public class Arm implements Loggable {
 
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
 
-        armPosDimention1 = index;
-        armPosDimention2 = 0;
+        armPosDimension1 = index;
+        armPosDimension2 = 0;
         startedTransition = false;
 
     }
 
     public int getArmIndex() {
-        return armPosDimension1;
+        return this.armPosDimension1;
     }
 
     /**
@@ -393,12 +386,12 @@ public class Arm implements Loggable {
 
         // get the desired position of the arms, using the last index in the armPos[armPosDimension1]
         double upperArmAngle = armCalculations.getUpperAngle(
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY());
+                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getX(),
+                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getY());
 
         double lowerArmAngle = armCalculations.getLowerAngle(
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY(), upperArmAngle);
+                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getX(),
+                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getY(), upperArmAngle);
 
         return (Math.abs(Units.radiansToRotations(upperArmAngle) - getUpperArmPosition()) < 0.01) &&
                 (Math.abs(Units.radiansToRotations(lowerArmAngle) - getLowerArmPosition()) < 0.01);

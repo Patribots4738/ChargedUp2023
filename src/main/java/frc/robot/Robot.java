@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
 
         armCalcuations = new ArmCalculations();
 
-        autoSegmentedWaypoints = new AutoSegmentedWaypoints();
+        autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
         autoSegmentedWaypoints.loadAutoPaths();
 
         // Configure the logger for shuffleboard

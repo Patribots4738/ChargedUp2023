@@ -294,20 +294,6 @@ public final class Constants {
       public static final double A_UPPER = 3.0187;
     }
 
-    public static final class PlacementConstants {
-        public static final int STOWED_PLACEMENT_INDEX = 0;
-        public static final int HYBRID_PLACEMENT_INDEX = 1;
-        public static final int MEDIUM_CONE_PLACEMENT_INDEX = 2;
-        public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
-        public static final int MEDIUM_CUBE_PLACEMENT_INDEX = 5;
-        public static final int HIGH_CUBE_PLACEMENT_INDEX = 6;
-        public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
-
-        public static final int CLAW_INTAKE_SPEED = 1;
-        public static final int CLAW_OUTTAKE_SPEED = -1;
-        public static final int CLAW_STOPPED_SPEED = 0;
-    }
-
     public static final class VisionConstants {
 
         public static final String CAMERA_NAME = "Patribots4738";
@@ -341,69 +327,65 @@ public final class Constants {
     }
 
     public static final class PlacementConstants {
+      public static final int STOWED_PLACEMENT_INDEX = 0;
+      public static final int HYBRID_PLACEMENT_INDEX = 1;
+      public static final int MEDIUM_CONE_PLACEMENT_INDEX = 2;
+      public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
+      public static final int MEDIUM_CUBE_PLACEMENT_INDEX = 5;
+      public static final int HIGH_CUBE_PLACEMENT_INDEX = 6;
+      public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
 
-    public static final int STOWED_PLACEMENT_INDEX = 0;
-    public static final int HYBRID_PLACEMENT_INDEX = 1;
-    public static final int MEDIUM_GRID_PLACEMENT_INDEX = 2;
-    public static final int HIGH_GRID_PLACEMENT_INDEX = 3;
-    public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
+      public static final int CLAW_INTAKE_SPEED = 1;
+      public static final int CLAW_OUTTAKE_SPEED = -1;
+      public static final int CLAW_STOPPED_SPEED = 0;
 
-    public static final int CLAW_INTAKE_SPEED = 1;
-    public static final int CLAW_OUTAKE_SPEED = -1;
-    public static final int CLAW_STOPPED_SPEED = 0;
+      public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(10, 37);
+      public static final Translation2d ARM_STOWED_POSITION = new Translation2d(9, 18);
+      public static final Translation2d ARM_HYBRID_POSITION = new Translation2d(14, 13);
+      public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
+      public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
+      public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(27, 0);
 
-    public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(10, 37);
-    public static final Translation2d ARM_STOWED_POSITION = new Translation2d(9, 18);
-    public static final Translation2d ARM_HYBRID_POSITION = new Translation2d(14, 13);
-    public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
-    public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
-    public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(27, 0);
+      public static final Translation2d ARM_MID_GRID_POSITION_0 = new Translation2d(30.75, 41.88);
+      public static final Translation2d ARM_MID_GRID_POSITION_1 = new Translation2d(32.34, 19.00);
 
-    public static final Translation2d ARM_MID_GRID_POSITION_0 = new Translation2d(30.75, 41.88);
-    public static final Translation2d ARM_MID_GRID_POSITION_1 = new Translation2d(32.34, 19.00);
+      public static final Translation2d ARM_HIGH_GRID_POSITION_0 = new Translation2d(29.03, 46.46);
+      public static final Translation2d ARM_HIGH_GRID_POSITION_1 = new Translation2d(46.65, 31.34);
+      public static final Translation2d ARM_HIGH_GRID_POSITION_2 = new Translation2d(49.09, 26.90);
 
-    public static final Translation2d ARM_HIGH_GRID_POSITION_0 = new Translation2d(29.03, 46.46);
-    public static final Translation2d ARM_HIGH_GRID_POSITION_1 = new Translation2d(46.65, 31.34);
-    public static final Translation2d ARM_HIGH_GRID_POSITION_2 = new Translation2d(49.09, 26.90);
+      public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
+      public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(0.22, 38.25);
+      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
 
-    public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
-
-    public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(0.22, 38.25);
-    public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
-
-
-
-
-    public static final Translation2d[][] ARM_POSITIONS = {
-      {
-        ARM_TRANSITION_POSITION,
-        ARM_STOWED_POSITION
-      },
-      {
-        ARM_TRANSITION_POSITION,
-        ARM_HYBRID_POSITION
-      },
-      {
-        ARM_TRANSITION_POSITION,
-        ARM_MID_GRID_POSITION_0,
-        ARM_MID_GRID_POSITION_1
-      },
-      {
-        ARM_TRANSITION_POSITION,
-        ARM_HIGH_GRID_POSITION_0,
-        ARM_HIGH_GRID_POSITION_1,
-        ARM_HIGH_GRID_POSITION_2
-      },
-      {
-        HUMAN_TAG_PICKUP
-      },
-      {
-        CUBE_MID_LAUNCH
-      },
-      {
-        CUBE_HIGH_LAUNCH
-      }
-    };
+      public static final Translation2d[][] ARM_POSITIONS = {
+        {
+          ARM_TRANSITION_POSITION,
+          ARM_STOWED_POSITION
+        },
+        {
+          ARM_TRANSITION_POSITION,
+          ARM_HYBRID_POSITION
+        },
+        {
+          ARM_TRANSITION_POSITION,
+          ARM_MID_GRID_POSITION_0,
+          ARM_MID_GRID_POSITION_1
+        },
+        {
+          ARM_TRANSITION_POSITION,
+          ARM_HIGH_GRID_POSITION_0,
+          ARM_HIGH_GRID_POSITION_1,
+          ARM_HIGH_GRID_POSITION_2
+        },
+        {
+          HUMAN_TAG_PICKUP
+        },
+        {
+          CUBE_MID_LAUNCH
+        },
+        {
+          CUBE_HIGH_LAUNCH
+        }
+      };
   }
-
 }
