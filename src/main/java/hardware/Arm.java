@@ -37,7 +37,7 @@ public class Arm implements Loggable {
     int armPosDimension1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
     int armPosDimension2 = 0;
     private boolean startedTransition = false;
-    
+
     private boolean operatorOverride = false;
 
     private double armXReference = 0;
@@ -104,7 +104,9 @@ public class Arm implements Loggable {
       _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
       _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
 
-      _lowerArmPIDController = _lowerArmRight.getPIDController();
+      // _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
+      // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
+      _lowerArmPIDController = _lowerArmLeft.getPIDController();
       _upperArmPIDController = _upperArm.getPIDController();
       _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
       _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
@@ -114,14 +116,6 @@ public class Arm implements Loggable {
 
       _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
       _upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
-
-      // _lowerArmPIDController.setPositionPIDWrappingEnabled(true);
-      // _lowerArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MIN_INPUT);
-      // _lowerArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MAX_INPUT);
-
-      // _upperArmPIDController.setPositionPIDWrappingEnabled(true);
-      // _upperArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MIN_INPUT);
-      // _upperArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MAX_INPUT);
 
       // Set PID constants for the lower and upper SPARK MAX(s)
       _lowerArmPIDController.setP(ArmConstants.LOWER_P);
@@ -139,10 +133,6 @@ public class Arm implements Loggable {
       _upperArmPIDController.setOutputRange(
       ArmConstants.UPPER_MIN_OUTPUT,
       ArmConstants.UPPER_MAX_OUTPUT);
-
-      // _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
-      // _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
-      // _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_STALL_LIMIT, ArmConstants.UPPER_FREE_LIMIT, ArmConstants.UPPER_MAX_RPM);
 
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration

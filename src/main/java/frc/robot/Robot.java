@@ -12,6 +12,8 @@ import math.OICalc;
 import math.Constants.*;
 import auto.*;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -63,7 +65,7 @@ public class Robot extends TimedRobot {
         autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
         autoSegmentedWaypoints.loadAutoPaths();
 
-        // Configure the logger for shuffleboard
+        autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
         Logger.configureLoggingAndConfig(this, false);
     }
 
@@ -86,7 +88,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-    }
+    // SwerveTrajectory.resetHDC();
+    arm.setUpperArmCoastMode();
+  }
 
     @Override
     public void disabledPeriodic() {
@@ -135,7 +139,7 @@ public class Robot extends TimedRobot {
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
-        
+
         // If we are on blue alliance, flip the driverLeftAxis
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
             driverLeftAxis = driverLeftAxis.unaryMinus();
@@ -145,7 +149,7 @@ public class Robot extends TimedRobot {
             swerve.setX();
         } else {
             //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-            swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
+            swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX*0.25, true);
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
@@ -154,20 +158,20 @@ public class Robot extends TimedRobot {
         }
 
         // Toggle the operator override when the operator's left stick is pressed
-        if (operator.getLeftStickButtonPressed()) {
-            arm.toggleOperatorOverride();
-        }
-        if (arm.getOperatorOverride()) {
-            arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
-        }
-        else if (operator.getRightBumperPressed()) {
-            arm.setArmIndex(arm.getArmIndex() + 1);
-        }
-        else if (operator.getLeftBumperPressed()) {
-            arm.setArmIndex(arm.getArmIndex() - 1);
-        }
+        //if (operator.getLeftStickButtonPressed()) {
+          //  arm.toggleOperatorOverride();
+        // //}
+        //if (arm.getOperatorOverride()) {
+          //   arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+        //}
+        //else if (operator.getRightBumperPressed()) {
+          //  arm.setArmIndex(arm.getArmIndex() + 1);
+        //}
+        //else if (operator.getLeftBumperPressed()) {
+          //  arm.setArmIndex(arm.getArmIndex() - 1);
+        // }
 
-        
+
         if (operator.getRightTriggerAxis() > 0 ) {
           claw.setDesiredSpeed(operator.getRightTriggerAxis());
         }
@@ -181,54 +185,70 @@ public class Robot extends TimedRobot {
 
     }
 
-    @Override
-    public void testInit() {
-      arm.setBrakeMode();
+  @Override
+  public void testInit() {
+    swerve.resetEncoders();
+    swerve.setBrakeMode();
+
+    arm.setBrakeMode();
+
+    SwerveTrajectory.resetTrajectoryStatus();
+
+    swerve.resetOdometry(new Pose2d(13.59, 4.09, Rotation2d.fromDegrees(15)));
+
+  }
+
+  @Override
+  public void testPeriodic() {
+
+
+    // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
+    // This is to ensure that the up direction on the joystick is positive inputs
+    double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX() , OIConstants.DRIVER_DEADBAND);
+    double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+    double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
+
+    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+
+    // If we are on blue alliance, flip the driverLeftAxis
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+      driverLeftAxis = driverLeftAxis.unaryMinus();
     }
+    autoAlignment.calibrateOdometry();
+
+    // Use the A button to activate the alignment process
+    if (driver.getAButton()) {
+
+      if (!driver.getRightBumper()) {
+        System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
+
+        autoAlignment.setConeOffset(0);
+        autoAlignment.setTagID(autoAlignment.getNearestTag());
+
+        SwerveTrajectory.resetTrajectoryStatus();
+
+        System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+
+      }
 
 
-    @Override
-    public void testPeriodic() {
-      
-      double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
-      double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
-      double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
-      double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
-      
-      Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
-      Translation2d driverRightAxis = OICalc.toCircle(driverRightX, driverRightY);
-      
-      arm.periodic();
-      claw.periodic();
-      
-      if (driver.getRightBumperPressed()) {
-          arm.setArmIndex(arm.getArmIndex() + 1);
-      }
-      else if (driver.getLeftBumperPressed()) {
-          arm.setArmIndex(arm.getArmIndex() - 1);
+      if (driver.getRightBumper()) {
+
+        autoAlignment.moveToTag();
+
+        if (driver.getXButtonPressed()) {
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+        }
+
+        else if (driver.getBButtonPressed()) {
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+        }
+
       }
 
-      // Toggle the operator override when the operator's left stick is pressed
-      if (driver.getLeftStickButtonPressed()) {
-          arm.toggleOperatorOverride();
-      }
-      if (arm.getOperatorOverride()) {
-          arm.drive(new Translation2d(driverRightAxis.getX(), driverRightAxis.getY()));
-      }
-      else {
-        swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
-      }
-
-      if (driver.getRightTriggerAxis() > 0 ) {
-        claw.setDesiredSpeed(driver.getRightTriggerAxis());
-      }
-      else if (driver.getLeftTriggerAxis() > 0) {
-        claw.setDesiredSpeed(-driver.getLeftTriggerAxis());
-      }
-      else {
-        claw.setDesiredSpeed(0);
-      }
-      
-
+    } else {
+      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), - driverRightX * .25, true);
+      // System.out.println("Robot Pos: " + swerve.getPose());
     }
 }

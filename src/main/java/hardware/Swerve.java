@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import math.Constants.DriveConstants;
 
 public class Swerve {
+
     private double speedMultiplier = 1;
 
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
@@ -39,6 +40,35 @@ public class Swerve {
 
     // The gyro sensor
     private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+
+    private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[]{
+            m_frontLeft,
+            m_frontRight,
+            m_rearLeft,
+            m_rearRight
+    };
+
+    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+          DriveConstants.DRIVE_KINEMATICS,
+          getYaw(),
+          getModulePositions(),
+          new Pose2d(),
+          // Trust the information of the vision more
+          // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
+          // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
+          new MatBuilder<>(
+                  Nat.N3(),
+                  Nat.N1()).fill(1, 1, 1),// State measurement
+                  // standard deviations
+                  // X, Y, theta
+          new MatBuilder<>(
+                  Nat.N3(),
+                  Nat.N1()).fill(0, 0, 0)// Vision measurement
+                  // standard deviations
+                  // X, Y, theta
+      );
+
+
 
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -121,7 +151,7 @@ public class Swerve {
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(getTotalDegrees()))
-                        : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
+                        : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed));
 
         setModuleStates(swerveModuleStates);
     }
@@ -150,14 +180,33 @@ public class Swerve {
         m_rearRight.setDesiredState(desiredStates[3]);
     }
 
-    /**
-     * Resets the drive encoders to currently read a position of 0.
-     */
-    public void resetEncoders() {
-        m_frontLeft.resetEncoders();
-        m_rearLeft.resetEncoders();
-        m_frontRight.resetEncoders();
-        m_rearRight.resetEncoders();
+    public void resetOdometry(Pose2d pose) {
+        poseEstimator.resetPosition(
+                getYaw(),
+                getModulePositions(),
+                pose);
+    }
+
+    public SwerveModuleState[] getModuleStates() {
+
+        SwerveModuleState[] states = new SwerveModuleState[4];
+
+        for (int modNum = 0; modNum < swerveModules.length; modNum++) {
+            states[modNum] = swerveModules[modNum].getState();
+        }
+        return states;
+
+    }
+
+    public SwerveModulePosition[] getModulePositions() {
+
+        SwerveModulePosition[] positions = new SwerveModulePosition[4];
+
+        for (int modNum = 0; modNum < swerveModules.length; modNum++) {
+            positions[modNum] = swerveModules[modNum].getPosition();
+        }
+        return positions;
+
     }
 
     /**
@@ -173,7 +222,30 @@ public class Swerve {
      * @return the robot's total degrees traveled from the start
      */
     public double getTotalDegrees() {
-        return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+        return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees()
+                * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+    }
+
+    public Rotation2d getYaw() {
+        Rotation2d yaw = Rotation2d.fromDegrees(gyro.getAngle());
+
+        if (DriveConstants.GYRO_REVERSED) {
+            yaw = yaw.unaryMinus();
+        }
+
+        return yaw;
+    }
+
+    public void setBrakeMode() {
+        for (MAXSwerveModule mSwerveMod : swerveModules) {
+            mSwerveMod.setBrakeMode();
+        }
+    }
+
+    public void resetEncoders() {
+        for (MAXSwerveModule mSwerveMod : swerveModules) {
+            mSwerveMod.resetEncoders();
+        }
     }
 
     /**

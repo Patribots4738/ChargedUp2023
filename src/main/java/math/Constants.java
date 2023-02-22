@@ -29,21 +29,23 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED = 6 * Math.PI; // radians per second
 
         // Chassis configuration
-        public static final double TRACK_WIDTH = Units.inchesToMeters(21.5);
         // Distance between centers of right and left wheels on robot
-        public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
+        public static final double TRACK_WIDTH = Units.inchesToMeters(21.5);
         // Distance between front and back wheels on robot
+        public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
+
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+                           // Front Positive,   Left Positive
+            new Translation2d( WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Front Left
+            new Translation2d( WHEEL_BASE / 2, -TRACK_WIDTH / 2),  // Front Right
+            new Translation2d(-WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Rear Left
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
 
         // Angular offsets of the modules relative to the chassis in radians
-        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0);
-        public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90);
-        public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90);
-        public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180);
+        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180+90);
+        public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90+90);
+        public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90+90);
+        public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0+90);
 
         // Driving motors CAN IDs (EVEN)
         public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;
@@ -126,7 +128,7 @@ public final class Constants {
         public static final double MAX_SPEED_METERS_PER_SECOND = 3;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND/2;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -136,13 +138,13 @@ public final class Constants {
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 0.3;
+        public static final double Y_CORRECTION_P = 1;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
-        public static final double ROTATION_CORRECTION_P = -0.22;
+        public static final double ROTATION_CORRECTION_P = .6;
         public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0;//.74;
+        public static final double ROTATION_CORRECTION_D = 0;
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
@@ -298,15 +300,22 @@ public final class Constants {
 
         public static final String CAMERA_NAME = "Patribots4738";
 
-        // Distance from the camera to the front of the bot
-        public static final Transform3d kCameraPosition = new Transform3d(
-            new Translation3d(
-              Units.inchesToMeters(9.5),
-              Units.inchesToMeters(8),
-              Units.inchesToMeters(15)),
-            new Rotation3d(0, 0, 0));
+        // Distance from the camera to the center
+        public static final Transform3d CAMERA_POSITION = new Transform3d(
+                new Translation3d(
+                        // Forward
 
-        public static final double CONE_OFFSET_METERS = 0.5;
+                        Units.inchesToMeters(2),
+                        // Left (neg because it's right)
+                        Units.inchesToMeters(-6),
+                        // Up
+                        Units.inchesToMeters(10.25)),
+                new Rotation3d(
+                        0,
+                        0,
+                        0));
+
+        public static final double CONE_OFFSET_METERS = 0.542615;
     }
 
     public static final class AlignmentConstants {
@@ -349,13 +358,17 @@ public final class Constants {
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
       public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
 
-      public static final Translation2d ARM_MID_CONE_POSITION_0 = new Translation2d(30.75, 41.88);
-      public static final Translation2d ARM_MID_CONE_POSITION_1 = new Translation2d(32.34, 19.00);
+      // The length of the robot
+        public static final double ROBOT_LENGTH = Units.inchesToMeters(25);
+        // Length of the bumpers on the robot
+        public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
 
+        public static final Pose3d TAG_0_POSE = null;
+        public static final Translation2d ARM_MID_CONE_POSITION_0 = new Translation2d(30.75, 41.88);
+      public static final Translation2d ARM_MID_CONE_POSITION_1 = new Translation2d(32.34, 19.00);
       public static final Translation2d ARM_HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d ARM_HIGH_CONE_POSITION_1 = new Translation2d(46.65, 31.34);
       public static final Translation2d ARM_HIGH_CONE_POSITION_2 = new Translation2d(49.09, 26.90);
-
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
       public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(0.22, 38.25);
       public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
