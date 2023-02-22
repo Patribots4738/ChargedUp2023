@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -65,7 +66,8 @@ public class AutoAlignment {
               camEstimatedPose.estimatedPose.toPose2d(),
               camEstimatedPose.timestampSeconds);
 
-          System.out.println("Target found! " + camEstimatedPose.estimatedPose.toPose2d());
+          System.out.println(camEstimatedPose.timestampSeconds);
+          setTagID(getNearestTag());
 
       }
     }
@@ -152,7 +154,7 @@ public class AutoAlignment {
           // Tag 4 is for the red alliance
           if (i == 5) { i = 4; }
 
-          currentDistance = currentPosition.getDistance(AlignmentConstants.TAG_POSES[i].toPose2d().getTranslation());
+          currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
 
           if (currentDistance < nearestDistance) {
 
@@ -167,7 +169,7 @@ public class AutoAlignment {
           // Tag 4 is for the blue alliance
           if (i == 4) { i = 5; }
 
-          currentDistance = currentPosition.getDistance(AlignmentConstants.TAG_POSES[i].toPose2d().getTranslation());
+          currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
 
           if (currentDistance < nearestDistance) {
 
@@ -195,43 +197,34 @@ public class AutoAlignment {
     public void setConeOffset(int coneOffset) {
 
       int previousConeOffset = this.coneOffset;
-      System.out.println("Started another: " + coneOffset);
       // Pan the coneOffset to the next tag if it is able to do so
       // It cannot do so if there is no grid in the desired direction
       if (coneOffset < -1) {
         if (tagID == 2 || tagID == 3) {
           this.tagID--;
           coneOffset = 1;
-          System.out.println("Tag minus; ConeOffset = 1");
         }
         else if (tagID == 6 || tagID == 7) {
           this.tagID++;
           coneOffset = 1;
-          System.out.println("Tag plus; ConeOffset = 1");
         }
       }
       else if (coneOffset > 1) {
         if (tagID == 1 || tagID == 2) {
           this.tagID++;
           coneOffset = -1;
-          System.out.println("Tag plus; ConeOffset = -1");
         }
         else if (tagID == 7 || tagID == 8) {
           this.tagID--;
           coneOffset = -1;
-          System.out.println("Tag minus; ConeOffset = -1");
         }
       }
-
-      System.out.println("Pre clamp: " + coneOffset);
 
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
       
       if (previousConeOffset != this.coneOffset) {
         SwerveTrajectory.resetTrajectoryStatus();
       }
-      
-      System.out.println("Post clamp: " + this.coneOffset);
       
     }
 

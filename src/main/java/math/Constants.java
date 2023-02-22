@@ -337,14 +337,14 @@ public final class Constants {
         public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
 
         public static final Pose3d[] TAG_POSES = new Pose3d[] {
-                TAG_1_POSE,
-                TAG_2_POSE,
-                TAG_3_POSE,
-                TAG_4_POSE,
-                TAG_5_POSE,
-                TAG_6_POSE,
-                TAG_7_POSE,
-                TAG_8_POSE
+            TAG_1_POSE,
+            TAG_2_POSE,
+            TAG_3_POSE,
+            TAG_4_POSE,
+            TAG_5_POSE,
+            TAG_6_POSE,
+            TAG_7_POSE,
+            TAG_8_POSE
         };
     }
 
