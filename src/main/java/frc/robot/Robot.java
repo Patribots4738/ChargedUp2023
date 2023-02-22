@@ -125,6 +125,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+
         arm.periodic();
         claw.periodic();
 
@@ -139,6 +140,7 @@ public class Robot extends TimedRobot {
         double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
         double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
         double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
+
         Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
@@ -153,14 +155,14 @@ public class Robot extends TimedRobot {
         if (driver.getAButton()) {
 
           if (!driver.getRightBumper()) {
-            System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
-    
-            autoAlignment.setConeOffset(0);
-            autoAlignment.setTagID(autoAlignment.getNearestTag());
-    
-            SwerveTrajectory.resetTrajectoryStatus();
-    
-            System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+              System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
+      
+              autoAlignment.setConeOffset(0);
+              autoAlignment.setTagID(autoAlignment.getNearestTag());
+      
+              SwerveTrajectory.resetTrajectoryStatus();
+      
+              System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
     
           }
     
@@ -188,7 +190,7 @@ public class Robot extends TimedRobot {
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
         if (driver.getLeftStickButtonPressed()) {
-          swerve.toggleSpeed();
+            swerve.toggleSpeed();
         }
 
         // Toggle the operator override when the operator's left stick is pressed
@@ -198,15 +200,56 @@ public class Robot extends TimedRobot {
         if (arm.getOperatorOverride()) {
             arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
         }
-        else if (operator.getRightBumperPressed()) {
-           arm.setArmIndex(arm.getArmIndex() + 1);
-        }
-        else if (operator.getLeftBumperPressed()) {
-           arm.setArmIndex(arm.getArmIndex() - 1);
+        
+        switch (OICalc.getPOVPressed(driver.getPOV())) {
+          // Not clicked
+          case -1:
+            break;
+
+          // Clicking up
+          case 0:
+            break;
+
+          // Clicking down
+          case 180:
+            break;
+
+          // Clicking left
+          case 270:
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+            break;
+
+          // Clicking right
+          case 90:
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+            break;
         }
 
+        switch (OICalc.getPOVPressed(operator.getPOV())) {
+          // Not clicked
+          case -1:
+            break;
 
-        if (operator.getRightTriggerAxis() > 0 ) {
+          // Clicking up
+          case 0:
+            arm.setArmIndex(arm.getArmIndex() + 1);
+            break;
+
+          // Clicking down
+          case 180:
+            arm.setArmIndex(arm.getArmIndex() - 1);
+            break;
+
+          // Clicking left
+          case 270:
+            break;
+
+          // Clicking right
+          case 90:
+            break;
+        }
+
+        if (operator.getRightTriggerAxis() > 0) {
           claw.setDesiredSpeed(operator.getRightTriggerAxis());
         }
         else if (operator.getLeftTriggerAxis() > 0) {
@@ -238,7 +281,7 @@ public class Robot extends TimedRobot {
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
     double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX() , OIConstants.DRIVER_DEADBAND);
-    double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY() , OIConstants.DRIVER_DEADBAND);
     double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
     double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
