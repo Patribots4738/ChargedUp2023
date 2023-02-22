@@ -327,3 +327,4 @@ bin/
 *-window.json
 simgui-ds.json
 simgui.json
+networktables.json
