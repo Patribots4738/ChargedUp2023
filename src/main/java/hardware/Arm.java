@@ -106,8 +106,10 @@ public class Arm implements Loggable {
 
       // _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
       // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
-      _lowerArmPIDController = _lowerArmLeft.getPIDController();
+
+      _lowerArmPIDController = _lowerArmRight.getPIDController();
       _upperArmPIDController = _upperArm.getPIDController();
+
       _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
       _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
 
@@ -154,7 +156,7 @@ public class Arm implements Loggable {
     public void periodic() {
         if (!getOperatorOverride()) { indexPeriodic();}
         setLowerArmPosition(lowerReference);
-        // setUpperArmPosition(upperReference);
+        setUpperArmPosition(upperReference);
         upperDiff = (Units.radiansToDegrees(upperReference) - Units.radiansToDegrees(getUpperArmPosition()));
         lowerDiff = (Units.radiansToDegrees(lowerReference) - Units.radiansToDegrees(getLowerArmPosition()));
         // Use forward kinematics to get the x and y position of the end effector
@@ -175,8 +177,8 @@ public class Arm implements Loggable {
 
       // armPosDimension1 = MathUtil.clamp(armPosDimension1, 0, PlacementConstants.ARM_POSITIONS.length-1);
       // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
-      if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND)
-      //  && Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
+      if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND
+       && Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
       {
         armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);

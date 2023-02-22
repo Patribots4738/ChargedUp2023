@@ -130,7 +130,7 @@ public class Robot extends TimedRobot {
 
         // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
         // This is to ensure that the up direction on the joystick is positive inputs
-        double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
+        double driverLeftX    = MathUtil.applyDeadband(-driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
         double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
         double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
         double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
@@ -144,15 +144,46 @@ public class Robot extends TimedRobot {
         Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
 
         // If we are on blue alliance, flip the driverLeftAxis
-        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
             driverLeftAxis = driverLeftAxis.unaryMinus();
         }
 
-        if (driver.getRightBumper()) {
+        autoAlignment.calibrateOdometry();
+        
+        if (driver.getAButton()) {
+
+          if (!driver.getRightBumper()) {
+            System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
+    
+            autoAlignment.setConeOffset(0);
+            autoAlignment.setTagID(autoAlignment.getNearestTag());
+    
+            SwerveTrajectory.resetTrajectoryStatus();
+    
+            System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+    
+          }
+    
+    
+          if (driver.getRightBumper()) {
+    
+            autoAlignment.moveToTag();
+    
+            if (driver.getXButtonPressed()) {
+                autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+            }
+    
+            else if (driver.getBButtonPressed()) {
+                autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+            }
+    
+          }
+    
+        } else if (driver.getLeftBumper()) {
             swerve.setX();
         } else {
             //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-            swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), driverRightX*0.25, true);
+            swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX*0.25, true);
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
@@ -163,7 +194,7 @@ public class Robot extends TimedRobot {
         // Toggle the operator override when the operator's left stick is pressed
         if (operator.getLeftStickButtonPressed()) {
            arm.toggleOperatorOverride();
-        //}
+        }
         if (arm.getOperatorOverride()) {
             arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
         }
@@ -184,7 +215,6 @@ public class Robot extends TimedRobot {
         else {
           claw.setDesiredSpeed(0);
         }
-      }
 
     }
 
