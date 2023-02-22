@@ -322,7 +322,9 @@ public final class Constants {
 
         private static final double GRID_TAG_HEIGHT = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
+        public static final double GRID_BARRIER = Units.inchesToMeters(15);
         public static final double HUMAN_TAG_OFFSET_X_INCHES = 30;
+        public static final double ALLOWABLE_ERROR = 5;
 
 
         public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, 180));
@@ -333,6 +335,17 @@ public final class Constants {
         public static final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(174.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
         public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(108.19), GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
         public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45),  Units.inchesToMeters(42.19),  GRID_TAG_HEIGHT,  new Rotation3d(0, 0, Units.degreesToRadians(0)));
+
+        public static final Pose3d[] TAG_POSES = new Pose3d[] {
+                TAG_1_POSE,
+                TAG_2_POSE,
+                TAG_3_POSE,
+                TAG_4_POSE,
+                TAG_5_POSE,
+                TAG_6_POSE,
+                TAG_7_POSE,
+                TAG_8_POSE
+        };
     }
 
     public static final class PlacementConstants {
@@ -363,8 +376,8 @@ public final class Constants {
         // Length of the bumpers on the robot
         public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
 
-        public static final Pose3d TAG_0_POSE = null;
-        public static final Translation2d ARM_MID_CONE_POSITION_0 = new Translation2d(30.75, 41.88);
+      public static final Pose3d TAG_0_POSE = null;
+      public static final Translation2d ARM_MID_CONE_POSITION_0 = new Translation2d(30.75, 41.88);
       public static final Translation2d ARM_MID_CONE_POSITION_1 = new Translation2d(32.34, 19.00);
       public static final Translation2d ARM_HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d ARM_HIGH_CONE_POSITION_1 = new Translation2d(46.65, 31.34);

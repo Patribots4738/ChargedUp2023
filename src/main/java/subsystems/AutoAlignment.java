@@ -20,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import hardware.Swerve;
 import math.Constants;
 import math.Constants.AlignmentConstants;
+import math.Constants.PlacementConstants;
 import math.Constants.VisionConstants;
 
 public class AutoAlignment {
@@ -53,7 +54,7 @@ public class AutoAlignment {
      */
     public void calibrateOdometry() {
 
-      Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPoseEstimator().getEstimatedPosition());
+      Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPose());
       
       // I do not believe this if statement gets what we want it to get...
       if (result.isPresent()) {
@@ -89,13 +90,13 @@ public class AutoAlignment {
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  -(AlignmentConstants.GRID_BARRIER + (AlignmentConstants.ROBOT_LENGTH/2) + AlignmentConstants.BUMPER_LENGTH),
+                  -(AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
                   0),
               Rotation2d.fromDegrees(0)));
       } else {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  (AlignmentConstants.GRID_BARRIER + (AlignmentConstants.ROBOT_LENGTH/2) + AlignmentConstants.BUMPER_LENGTH),
+                  (AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
                   0),
               Rotation2d.fromDegrees(0)));
       }

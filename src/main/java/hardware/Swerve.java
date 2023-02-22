@@ -4,11 +4,13 @@
 
 package hardware;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
@@ -39,7 +41,7 @@ public class Swerve {
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     // The gyro sensor
-    private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+    private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
     private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[]{
             m_frontLeft,
@@ -68,19 +70,6 @@ public class Swerve {
                   // X, Y, theta
       );
 
-
-
-    // Odometry class for tracking robot pose
-    SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-            DriveConstants.DRIVE_KINEMATICS,
-            Rotation2d.fromDegrees(getTotalDegrees()),
-            new SwerveModulePosition[]{
-                    m_frontLeft.getPosition(),
-                    m_frontRight.getPosition(),
-                    m_rearLeft.getPosition(),
-                    m_rearRight.getPosition()
-            });
-
     /**
      * Creates a new DriveSubsystem.
      */
@@ -92,14 +81,7 @@ public class Swerve {
 
     public void periodic() {
         // Update the odometry in the periodic block
-        m_odometry.update(
-                Rotation2d.fromDegrees(getTotalDegrees()),
-                new SwerveModulePosition[]{
-                        m_frontLeft.getPosition(),
-                        m_frontRight.getPosition(),
-                        m_rearLeft.getPosition(),
-                        m_rearRight.getPosition()
-                });
+        poseEstimator.update(getYaw(), getModulePositions());
     }
 
     /**
@@ -108,29 +90,11 @@ public class Swerve {
      * @return The pose.
      */
     public Pose2d getPose() {
-        return m_odometry.getPoseMeters();
+        return poseEstimator.getEstimatedPosition();
     }
 
-    // Get the odometry object
-    public SwerveDriveOdometry getOdometry() {
-        return m_odometry;
-    }
-
-    /**
-     * Resets the odometry to the specified pose.
-     *
-     * @param pose The pose to which to set the odometry.
-     */
-    public void resetOdometry(Pose2d pose) {
-        m_odometry.resetPosition(
-                Rotation2d.fromDegrees(m_gyro.getAngle()),
-                new SwerveModulePosition[]{
-                        m_frontLeft.getPosition(),
-                        m_frontRight.getPosition(),
-                        m_rearLeft.getPosition(),
-                        m_rearRight.getPosition()
-                },
-                pose);
+    public SwerveDrivePoseEstimator getPoseEstimator() {
+        return poseEstimator;
     }
 
     /**
@@ -213,7 +177,7 @@ public class Swerve {
      * Zeroes the heading of the robot.
      */
     public void zeroHeading() {
-        m_gyro.reset();
+        gyro.reset();
     }
 
     /**
@@ -236,11 +200,7 @@ public class Swerve {
         return yaw;
     }
 
-    public void setBrakeMode() {
-        for (MAXSwerveModule mSwerveMod : swerveModules) {
-            mSwerveMod.setBrakeMode();
-        }
-    }
+
 
     public void resetEncoders() {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
@@ -254,23 +214,11 @@ public class Swerve {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return m_gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+        return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public void toggleSpeed() {
       this.speedMultiplier = (this.speedMultiplier == 1) ? 0.1 : 1;
-    }
-
-    /**
-     * Sets the coast mode for the drive motors.
-     * This is useful for when the robot is disabled
-     * So we can freely move the robot around
-     */
-    public void setCoastMode() {
-        m_frontLeft.setCoastMode();
-        m_frontRight.setCoastMode();
-        m_rearLeft.setCoastMode();
-        m_rearRight.setCoastMode();
     }
 
     /**
@@ -280,9 +228,21 @@ public class Swerve {
      * (This is the default mode)
      */
     public void setBrakeMode() {
-        m_frontLeft.setBrakeMode();
-        m_frontRight.setBrakeMode();
-        m_rearLeft.setBrakeMode();
-        m_rearRight.setBrakeMode();
+        for (MAXSwerveModule mSwerveMod : swerveModules) {
+            mSwerveMod.setBrakeMode();
+        }
     }
+
+    /**
+     * Sets the coast mode for the drive motors.
+     * This is useful for when the robot is disabled
+     * So we can freely move the robot around
+     */
+    public void setCoastMode() {
+        for (MAXSwerveModule mSwerveMod : swerveModules) {
+            mSwerveMod.setCoastMode();
+        }
+    }
+
+
 }

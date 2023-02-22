@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import io.github.oblarg.oblog.Logger;
+import subsystems.AutoAlignment;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -42,6 +43,8 @@ public class Robot extends TimedRobot {
     Debug debug;
 
     ArmCalculations armCalcuations;
+
+    AutoAlignment autoAlignment;
 
 
     @Override
@@ -251,4 +254,5 @@ public class Robot extends TimedRobot {
       swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), - driverRightX * .25, true);
       // System.out.println("Robot Pos: " + swerve.getPose());
     }
+  }
 }
