@@ -4,21 +4,18 @@
 
 package frc.robot;
 
-import auto.AutoSegmentedWaypoints;
-import auto.SwerveTrajectory;
-import debug.Debug;
+import debug.*;
+import edu.wpi.first.wpilibj.DriverStation;
+import hardware.*;
+import math.ArmCalculations;
+import math.OICalc;
+import math.Constants.*;
+import auto.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import hardware.Arm;
-import hardware.Claw;
-import hardware.Swerve;
 import io.github.oblarg.oblog.Logger;
-import math.Constants.OIConstants;
-import math.OICalc;
-import subsystems.AutoAlignment;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -28,93 +25,210 @@ import subsystems.AutoAlignment;
  */
 public class Robot extends TimedRobot {
 
-  // The robot's subsystems and commands are defined here...
+    // The robot's subsystems and commands are defined here...
 
-  Swerve swerve;
+    Swerve swerve;
 
-  XboxController driver;
-  XboxController operator;
+    XboxController driver;
+    XboxController operator;
 
-  AutoSegmentedWaypoints autoSegmentedWaypoints;
-  AutoAlignment autoAlignment;
+    AutoSegmentedWaypoints autoSegmentedWaypoints;
 
-  Arm arm;
-  Claw claw;
+    Arm arm;
+    Claw claw;
 
-  Debug debug;
+    Debug debug;
 
-  @Override
-  public void robotInit() {
+    ArmCalculations armCalcuations;
 
-    // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
-    // Debug class for Shuffleboard
-    debug = new Debug();
+    @Override
+    public void robotInit() {
+        // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
-    // Drivetrain instantiation
-    swerve = new Swerve();
+        // Debug class for ShuffleBoard
+        debug = new Debug();
 
-    driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
-    operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
+        // Drivetrain instantiation
+        swerve = new Swerve();
 
-    arm = new Arm();
-    claw = new Claw();
+        driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
+        operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
-    autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
-    autoSegmentedWaypoints.loadAutoPaths();
+        arm = new Arm();
+        claw = new Claw();
 
-    // Configure the logger for shuffleboard
-    Logger.configureLoggingAndConfig(this, false);
-  }
+        armCalcuations = new ArmCalculations();
 
-  /**
-   * This function is called every 20 ms, no matter the mode. Used for items like diagnostics
-   * ran during disabled, autonomous, teleoperated and test. :D
-   * <p>
-   * This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
+        autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
+        autoSegmentedWaypoints.loadAutoPaths();
 
-    swerve.periodic();
-    // arm.periodic();
+        // Configure the logger for shuffleboard
+        Logger.configureLoggingAndConfig(this, false);
+    }
 
-    Logger.updateEntries();
+    /**
+     * This function is called every 20 ms, no matter the mode. Used for items like diagnostics
+     * ran during disabled, autonomous, teleoperated and test. :D
+     * <p>
+     * This runs after the mode specific periodic functions, but before LiveWindow and
+     * SmartDashboard integrated updating.
+     */
+    @Override
+    public void robotPeriodic() {
 
-  }
+        swerve.periodic();
+        // arm.periodic();
 
-  @Override
-  public void disabledInit() {}
+        Logger.updateEntries();
 
-  @Override
-  public void disabledPeriodic() {}
+    }
 
-  @Override
-  public void autonomousInit() {
+    @Override
+    public void disabledInit() {
+    }
 
-    SwerveTrajectory.resetTrajectoryStatus();
+    @Override
+    public void disabledPeriodic() {
+    }
 
-  }
+    @Override
+    public void autonomousInit() {
 
-  @Override
-  public void autonomousPeriodic() {
+        autoSegmentedWaypoints.init();
+        arm.setBrakeMode();
+        SwerveTrajectory.resetTrajectoryStatus();
 
-    autoSegmentedWaypoints.periodic();
-    arm.periodic();
-    claw.periodic();
+    }
 
-  }
+    @Override
+    public void autonomousPeriodic() {
 
-  @Override
-  public void teleopInit() {}
+      swerve.periodic();
+      arm.periodic();
+      claw.periodic();
+      autoSegmentedWaypoints.periodic();
 
-  @Override
-  public void teleopPeriodic() {}
+    }
 
-  @Override
-  public void testInit() {}
+    @Override
+    public void teleopInit() {
+        arm.setBrakeMode();
+    }
 
-  @Override
-  public void testPeriodic() {}
+    @Override
+    public void teleopPeriodic() {
+        arm.periodic();
+        claw.periodic();
+
+        // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
+        // This is to ensure that the up direction on the joystick is positive inputs
+        double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
+        double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
+        double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
+        double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
+
+        double operatorLeftX  = MathUtil.applyDeadband(operator.getLeftX() , OIConstants.DRIVER_DEADBAND);
+        double operatorLeftY  = MathUtil.applyDeadband(operator.getLeftY() , OIConstants.DRIVER_DEADBAND);
+        double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
+        double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
+        Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
+
+        Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+        
+        // If we are on blue alliance, flip the driverLeftAxis
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+            driverLeftAxis = driverLeftAxis.unaryMinus();
+        }
+
+        if (driver.getRightBumper()) {
+            swerve.setX();
+        } else {
+            //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+            swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
+        }
+
+        // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
+        if (driver.getLeftStickButtonPressed()) {
+          swerve.toggleSpeed();
+        }
+
+        // Toggle the operator override when the operator's left stick is pressed
+        if (operator.getLeftStickButtonPressed()) {
+            arm.toggleOperatorOverride();
+        }
+        if (arm.getOperatorOverride()) {
+            arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+        }
+        else if (operator.getRightBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() + 1);
+        }
+        else if (operator.getLeftBumperPressed()) {
+            arm.setArmIndex(arm.getArmIndex() - 1);
+        }
+
+        
+        if (operator.getRightTriggerAxis() > 0 ) {
+          claw.setDesiredSpeed(operator.getRightTriggerAxis());
+        }
+        else if (operator.getLeftTriggerAxis() > 0) {
+          claw.setDesiredSpeed(-operator.getLeftTriggerAxis());
+        }
+        else {
+          claw.setDesiredSpeed(0);
+        }
+        System.out.println(swerve.getPose());
+
+    }
+
+    @Override
+    public void testInit() {
+      arm.setBrakeMode();
+    }
+
+
+    @Override
+    public void testPeriodic() {
+      
+      double driverLeftX    = MathUtil.applyDeadband(driver.getLeftX()   , OIConstants.DRIVER_DEADBAND);
+      double driverLeftY    = MathUtil.applyDeadband(-driver.getLeftY()   , OIConstants.DRIVER_DEADBAND);
+      double driverRightX   = MathUtil.applyDeadband(driver.getRightX()  , OIConstants.DRIVER_DEADBAND);
+      double driverRightY   = MathUtil.applyDeadband(driver.getRightY()  , OIConstants.DRIVER_DEADBAND);
+      
+      Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+      Translation2d driverRightAxis = OICalc.toCircle(driverRightX, driverRightY);
+      
+      arm.periodic();
+      claw.periodic();
+      
+      if (driver.getRightBumperPressed()) {
+          arm.setArmIndex(arm.getArmIndex() + 1);
+      }
+      else if (driver.getLeftBumperPressed()) {
+          arm.setArmIndex(arm.getArmIndex() - 1);
+      }
+
+      // Toggle the operator override when the operator's left stick is pressed
+      if (driver.getLeftStickButtonPressed()) {
+          arm.toggleOperatorOverride();
+      }
+      if (arm.getOperatorOverride()) {
+          arm.drive(new Translation2d(driverRightAxis.getX(), driverRightAxis.getY()));
+      }
+      else {
+        swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), driverRightX*0.25, true);
+      }
+
+      if (driver.getRightTriggerAxis() > 0 ) {
+        claw.setDesiredSpeed(driver.getRightTriggerAxis());
+      }
+      else if (driver.getLeftTriggerAxis() > 0) {
+        claw.setDesiredSpeed(-driver.getLeftTriggerAxis());
+      }
+      else {
+        claw.setDesiredSpeed(0);
+      }
+      
+
+    }
 }

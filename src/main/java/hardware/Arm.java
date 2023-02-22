@@ -1,21 +1,26 @@
 package hardware;
 
+import java.util.ArrayList;
+
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+
+import debug.Debug;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import math.ArmCalculations;
 import math.Constants.ArmConstants;
-
-import java.util.ArrayList;
+import math.Constants.PlacementConstants;
 
 public class Arm implements Loggable {
 
@@ -28,47 +33,15 @@ public class Arm implements Loggable {
      * 2  |||||  6
      */
 
-    // All armPos values are in inches
-    final Translation2d[][] armPos = {
-        {
-            new Translation2d(-20, 30),
-            new Translation2d(-36, 23),
-        },
-        {
-            new Translation2d(0, ArmConstants.MAX_REACH)
-        },
-        {
-            new Translation2d(-12, 19),
-            new Translation2d(-28, 13),
-            new Translation2d(-32, 10)
-        }
-    };
-
-    Translation2d[][] placementPositions = {
-        // top cone placement positions
-        {
-            new Translation2d(-16, 30),
-            new Translation2d(-30, 45),
-            new Translation2d(-43, 47),
-        },
-        // default arm position
-        {
-            new Translation2d(-6, 24)
-        },
-        {
-            new Translation2d(-20, 2),
-            new Translation2d(-36, 25),
-            new Translation2d(-52.6, 33)
-        }
-    };
     // ceil -- force round up
-    int armPosDimension1 = (int) Math.ceil(armPos.length / 2.0);
+    int armPosDimension1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
     int armPosDimension2 = 0;
-
+    private boolean startedTransition = false;
+    
     private boolean operatorOverride = false;
 
-    private double armXPos = 0;
-    private double armYPos = 0;
+    private double armXReference = 0;
+    private double armYReference = 0;
 
     // The current rotation of the upper arm
     @Log
@@ -84,111 +57,148 @@ public class Arm implements Loggable {
     private double upperReference = 0;
     private double lowerReference = 0;
 
-    private final CANSparkMax _lowerArm;
+    @Log
+    private double lowerDiff = 0;
+
+    @Log
+    private double upperDiff = 0;
+
+    private boolean armsAtDesiredPosition = false;
+
+    @Log
+    private double armXPos = 0;
+
+    @Log
+    private double armYPos = 0;
+
+    private final CANSparkMax _lowerArmRight;
+    private final CANSparkMax _lowerArmLeft;
     private final CANSparkMax _upperArm;
 
-    private final RelativeEncoder _lowerArmEncoder;
-    private final RelativeEncoder _upperArmEncoder;
-
+    private final AbsoluteEncoder _lowerArmEncoder;
+    private final AbsoluteEncoder _upperArmEncoder;
     private final SparkMaxPIDController _lowerArmPIDController;
     private final SparkMaxPIDController _upperArmPIDController;
 
-    final ArmCalculations armCalculations;
+    private final ArmCalculations armCalculations;
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
      */
     public Arm() {
 
-        _lowerArm = new CANSparkMax(ArmConstants.LOWER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
-        _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+      _lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
+      _lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+      _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-        _lowerArm.setIdleMode(IdleMode.kBrake);
-        _upperArm.setIdleMode(IdleMode.kBrake);
+      _lowerArmRight.setIdleMode(IdleMode.kBrake);
+      _lowerArmLeft.setIdleMode(IdleMode.kBrake);
+      _upperArm.setIdleMode(IdleMode.kCoast);
 
-        // Factory reset, so we get the SPARK MAX to a known state before configuring
-        // them. This is useful in case a SPARK MAX is swapped out.
-        _lowerArm.restoreFactoryDefaults();
-        _upperArm.restoreFactoryDefaults();
+      // Factory reset, so we get the SPARK MAX to a known state before configuring
+      // them. This is useful in case a SPARK MAX is swapped out.
+      _lowerArmRight.restoreFactoryDefaults();
+      _lowerArmLeft.restoreFactoryDefaults();
+      _upperArm.restoreFactoryDefaults();
 
-        // Setup encoders and PID controllers for the lower and upper SPARK MAX(s)
-        _lowerArmEncoder = _lowerArm.getEncoder();
-        _upperArmEncoder = _upperArm.getEncoder();
-        _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
-        _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
+      _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
+      _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
 
-        _lowerArmPIDController = _lowerArm.getPIDController();
-        _upperArmPIDController = _upperArm.getPIDController();
-        _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
-        _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
+      _lowerArmPIDController = _lowerArmRight.getPIDController();
+      _upperArmPIDController = _upperArm.getPIDController();
+      _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
+      _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
 
-        // Set PID constants for the lower and upper SPARK MAX(s)
-        _lowerArmPIDController.setP(ArmConstants.LOWER_P);
-        _lowerArmPIDController.setI(ArmConstants.LOWER_I);
-        _lowerArmPIDController.setD(ArmConstants.LOWER_D);
-        _lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
-        _lowerArmPIDController.setOutputRange(
-                ArmConstants.LOWER_MIN_OUTPUT,
-                ArmConstants.LOWER_MAX_OUTPUT);
+      _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
+      _lowerArmEncoder.setVelocityConversionFactor(ArmConstants.LOWER_ENCODER_VELOCITY_FACTOR);
 
-        _upperArmPIDController.setP(ArmConstants.UPPER_P);
-        _upperArmPIDController.setI(ArmConstants.UPPER_I);
-        _upperArmPIDController.setD(ArmConstants.UPPER_D);
-        _upperArmPIDController.setFF(ArmConstants.UPPER_FF);
-        _upperArmPIDController.setOutputRange(
-                ArmConstants.UPPER_MIN_OUTPUT,
-                ArmConstants.UPPER_MAX_OUTPUT);
+      _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
+      _upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
 
-        _lowerArm.setSmartCurrentLimit(ArmConstants.LOWER_CURRENT_LIMIT);
-        // _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_CURRENT_LIMIT);
+      // _lowerArmPIDController.setPositionPIDWrappingEnabled(true);
+      // _lowerArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MIN_INPUT);
+      // _lowerArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.LOWER_ENCODER_POSITION_PID_MAX_INPUT);
 
-        // Set the idle (brake) mode for the lower and upper SPARK MAX(s)
-        _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      // _upperArmPIDController.setPositionPIDWrappingEnabled(true);
+      // _upperArmPIDController.setPositionPIDWrappingMinInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MIN_INPUT);
+      // _upperArmPIDController.setPositionPIDWrappingMaxInput(ArmConstants.UPPER_ENCODER_POSITION_PID_MAX_INPUT);
 
-        // Save the SPARK MAX configuration. If a SPARK MAX
-        // browns out, it will retain the last configuration
-        _lowerArm.burnFlash();
-        _upperArm.burnFlash();
+      // Set PID constants for the lower and upper SPARK MAX(s)
+      _lowerArmPIDController.setP(ArmConstants.LOWER_P);
+      _lowerArmPIDController.setI(ArmConstants.LOWER_I);
+      _lowerArmPIDController.setD(ArmConstants.LOWER_D);
+      _lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
+      _lowerArmPIDController.setOutputRange(
+      ArmConstants.LOWER_MIN_OUTPUT,
+      ArmConstants.LOWER_MAX_OUTPUT);
 
-        armCalculations = new ArmCalculations();
+      _upperArmPIDController.setP(ArmConstants.UPPER_P);
+      _upperArmPIDController.setI(ArmConstants.UPPER_I);
+      _upperArmPIDController.setD(ArmConstants.UPPER_D);
+      _upperArmPIDController.setFF(ArmConstants.UPPER_FF);
+      _upperArmPIDController.setOutputRange(
+      ArmConstants.UPPER_MIN_OUTPUT,
+      ArmConstants.UPPER_MAX_OUTPUT);
 
-        resetEncoders();
-        setBrakeMode();
+      // _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
+      // _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_STALL_LIMIT, ArmConstants.LOWER_FREE_LIMIT, ArmConstants.LOWER_MAX_RPM);
+      // _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_STALL_LIMIT, ArmConstants.UPPER_FREE_LIMIT, ArmConstants.UPPER_MAX_RPM);
+
+      // Save the SPARK MAX configuration. If a SPARK MAX
+      // browns out, it will retain the last configuration
+      _lowerArmLeft.follow(_lowerArmRight, true);
+      _upperArmEncoder.setInverted(true);
+
+      _lowerArmRight.burnFlash();
+      _lowerArmLeft.burnFlash();
+      _upperArm.burnFlash();
+
+      armCalculations = new ArmCalculations();
+      setBrakeMode();
     }
 
     public void toggleOperatorOverride() {
         this.operatorOverride = !operatorOverride;
     }
 
-    /**
-     * Reset the encoders to zero the arm when initiating the arm
-     * Will not be needed in the future because we will have absolute encoders
-     */
-    public void resetEncoders() {
-
-        _lowerArmEncoder.setPosition(0);
-        _upperArmEncoder.setPosition(0);//-0.5687823825412326);
-
-    }
-
     public void periodic() {
-        indexPeriodic();
+        if (!getOperatorOverride()) { indexPeriodic();}
+        setLowerArmPosition(lowerReference);
+        // setUpperArmPosition(upperReference);
+        upperDiff = (Units.radiansToDegrees(upperReference) - Units.radiansToDegrees(getUpperArmPosition()));
+        lowerDiff = (Units.radiansToDegrees(lowerReference) - Units.radiansToDegrees(getLowerArmPosition()));
+        // Use forward kinematics to get the x and y position of the end effector
+        armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmPosition() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmPosition() - Math.PI) + (getLowerArmPosition() - (Math.PI/2)))));
+        armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmPosition() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmPosition() - Math.PI) + (getLowerArmPosition() - (Math.PI/2)))));
+        // System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
     public void indexPeriodic() {
 
-        // armPos[armPosDimension1][armPosDimension2]
-        if (armPosDimension1 == armPos.length ||
-                armPosDimension2 == armPos[armPosDimension1].length) {
-            return;
-        }
+      // // PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]
+      if (!startedTransition)
+      {
+        startedTransition = true;
+        drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
+        return;
+      }
 
-        if (Math.abs(getLowerArmPosition() - lowerReference) > ArmConstants.LOWER_ARM_DEADBAND ||
-                Math.abs(getUpperArmPosition() - upperReference) > ArmConstants.UPPER_ARM_DEADBAND) {
-            armPosDimension2++;
-            drive(armPos[armPosDimension1][armPosDimension2]);
+      // armPosDimension1 = MathUtil.clamp(armPosDimension1, 0, PlacementConstants.ARM_POSITIONS.length-1);
+      // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
+      if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND)
+      //  && Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
+      {
+        armPosDimension2++;
+        // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
+        if (armPosDimension1 >= PlacementConstants.ARM_POSITIONS.length ||
+        armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
+        {
+          armsAtDesiredPosition = true;
+          return;
         }
+        // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
+        drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
+      }
     }
 
     public boolean getOperatorOverride() {
@@ -204,21 +214,28 @@ public class Arm implements Loggable {
     }
 
     /**
-     * Sets arm index from the armPos array
+     * Sets arm index from the PlacementConstants.ARM_POSITIONS array
      *
      * @param index the direction to change the arm index by
      */
     public void setArmIndex(int index) {
 
-        index = MathUtil.clamp(index, 0, armPos.length - 1);
+        index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
 
+        if (index == armPosDimension1) {
+          startedTransition = true;
+        }
+        else {
+          startedTransition = false;
+          armsAtDesiredPosition = false;
+        }
+        armPosDimension2 = (index == armPosDimension1) ? armPosDimension2 : 0;
         armPosDimension1 = index;
-        armPosDimension2 = 0;
 
     }
 
     public int getArmIndex() {
-        return armPosDimension1;
+        return this.armPosDimension1;
     }
 
     /**
@@ -234,46 +251,57 @@ public class Arm implements Loggable {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-            this.armXPos += position.getX();
-            this.armYPos += position.getY();
+          this.armXReference += (position.getX());
+          this.armYReference += (position.getY());
         } else {
-            this.armXPos = position.getX();
-            this.armYPos = position.getY();
+          this.armXReference = position.getX();
+          this.armYReference = position.getY();
         }
 
         // Make sure armX and armY are within the range of 0 to infinity
         // Because we cannot reach below the ground.
         // Even though our arm starts 11 inches above the ground,
         // the claw will be 11 inches from the arm end
-        armYPos = (position.getY() < 0) ? 0 : armYPos;
+        armYReference = (armYReference < 0) ? 0 : armYReference;
 
-        Translation2d armPos = new Translation2d(armXPos, armYPos);
+        Translation2d armPosition = new Translation2d(armXReference, armYReference);
 
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
         // If the distance from zero is greater than the max reach, cap it at the max reach
-        // Give it a one-inch cushion
-        if (armPos.getDistance(new Translation2d(0, 0)) > ArmConstants.MAX_REACH) {
-            armPos = armPos.times((ArmConstants.MAX_REACH) / armPos.getDistance(new Translation2d(0, 0)));
+        if (armPosition.getNorm() >= ArmConstants.MAX_REACH) {
+          armPosition = armPosition.times((ArmConstants.MAX_REACH-1) / armPosition.getNorm());
         }
-
-        if (armPos.getY() > ArmConstants.MAX_REACH_Y) {
-            armPos = new Translation2d(armPos.getX(), ArmConstants.MAX_REACH_Y);
+        if (armPosition.getNorm() <= ArmConstants.MIN_REACH) {
+          armPosition = armPosition.times((ArmConstants.MIN_REACH+1) / armPosition.getNorm());
         }
         
+        // if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
+        //     armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
+        // }
+        // if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
+        //     armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
+        // }
+        // else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
+        //     armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
+        // }
+        // System.out.println(armPosition);
+
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-        double upperArmAngle = armCalculations.getUpperAngle(armPos.getX(), armPos.getY());
-        double lowerArmAngle = armCalculations.getLowerAngle(armPos.getX(), armPos.getY(), upperArmAngle);
+        double upperArmAngle = armCalculations.getUpperAngle(armPosition.getX(), armPosition.getY());
+        double lowerArmAngle = armCalculations.getLowerAngle(armPosition.getX(), armPosition.getY(), upperArmAngle);
 
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
-        if (Double.isNaN(upperArmAngle)) { return; }
+        if (Double.isNaN(upperArmAngle)) {
+            System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
+            return;
+        }
 
-        setLowerArmReference(Units.radiansToRotations(lowerArmAngle));
-        setUpperArmReference(Units.radiansToRotations(upperArmAngle));
 
-        System.out.println("Upper: " + Units.radiansToDegrees(upperArmAngle) +
-                " Lower: " + Units.radiansToDegrees(lowerArmAngle));
+        setLowerArmReference(lowerArmAngle + (Math.PI/2));
+        setUpperArmReference(upperArmAngle + (Math.PI));
+
     }
 
     /**
@@ -285,9 +313,9 @@ public class Arm implements Loggable {
     public void setUpperArmPosition(double position) {
 
         position = MathUtil.clamp(
-                position,
-                ArmConstants.UPPER_ARM_FREEDOM_DEGREES,
-                -ArmConstants.UPPER_ARM_FREEDOM_DEGREES
+          position,
+          Math.toRadians(20),
+          Math.toRadians(270)
         );
 
         // Description of FF in Constants :D
@@ -299,15 +327,11 @@ public class Arm implements Loggable {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate(position, 0);
+        double FF = feedForward.calculate((position), 0);
         _upperArmPIDController.setFF(FF);
 
-        // Calculate the rotations needed to get to the position
-        double neoPosition = position;
-
         // Set the position of the neo controlling the upper arm to
-        // the converted position, neoPosition
-        _upperArmPIDController.setReference(neoPosition, ControlType.kPosition);
+        _upperArmPIDController.setReference((position), ControlType.kPosition);
 
         upperRotation = _upperArmEncoder.getPosition();
 
@@ -324,8 +348,8 @@ public class Arm implements Loggable {
 
         position = MathUtil.clamp(
                 position,
-                ArmConstants.LOWER_ARM_FREEDOM_DEGREES,
-                -ArmConstants.LOWER_ARM_FREEDOM_DEGREES
+                Math.toRadians(90),
+                Math.toRadians(270)
         );
 
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -336,16 +360,11 @@ public class Arm implements Loggable {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate(position, 0);
+        double FF = feedForward.calculate((position), 0);
         _lowerArmPIDController.setFF(FF);
-
-        // Calculate the rotations needed to get to the position
-        // By multiplying the position by the gear ratio
-        double neoPosition = position;
-
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
-        _lowerArmPIDController.setReference(neoPosition, ControlType.kPosition);
+        _lowerArmPIDController.setReference((position), ControlType.kPosition);
 
         lowerRotation = _lowerArmEncoder.getPosition();
 
@@ -356,7 +375,7 @@ public class Arm implements Loggable {
      * Get the current position of the upper arm
      *
      * @return the current position of the upper arm
-     * This unit is in revolutions
+     * This unit is in rads
      */
     public double getUpperArmPosition() {
         return _upperArmEncoder.getPosition();
@@ -366,44 +385,67 @@ public class Arm implements Loggable {
      * Get the current position of the lower arm
      *
      * @return the current position of the lower arm
-     * This unit is in revolutions
+     * This unit is in rads
      */
     public double getLowerArmPosition() {
         return _lowerArmEncoder.getPosition();
     }
 
     public boolean getAtDesiredPositions() {
-
-        // get the desired position of the arms, using the last index in the armPos[armPosDimension1]
-        double upperArmAngle = armCalculations.getUpperAngle(
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY());
-
-        double lowerArmAngle = armCalculations.getLowerAngle(
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getX(),
-                armPos[armPosDimension1][armPos[armPosDimension1].length - 1].getY(), upperArmAngle);
-
-        return (Math.abs(Units.radiansToRotations(upperArmAngle) - getUpperArmPosition()) < 0.01) &&
-                (Math.abs(Units.radiansToRotations(lowerArmAngle) - getLowerArmPosition()) < 0.01);
+        return this.armsAtDesiredPosition;
     }
 
     /**
      * Set the motor to coast mode
      */
     public void setCoastMode() {
-        _lowerArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
         _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    }
+
+    public void setUpperArmCoastMode() {
+      _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
     /**
      * Set the motor to brake mode
      */
     public void setBrakeMode() {
-        _lowerArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
     public void printList() {
-        System.out.println(upperRotationList);
+      System.out.println(upperRotationList);
+    }
+
+    public void zeroLowerArmEncoder() {
+
+        double unadjustedAngle = (_lowerArmEncoder.getPosition() - _lowerArmEncoder.getZeroOffset());
+
+        double zeroAngle = (ArmConstants.LOWER_ARM_HARDSTOP_OFFSET) - unadjustedAngle;
+
+        Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
+
+        _lowerArmEncoder.setZeroOffset(referenceAngle.getRadians());
+    }
+
+    public void zeroUpperArmEncoder() {
+
+          double unadjustedAngle = (_upperArmEncoder.getPosition() - _upperArmEncoder.getZeroOffset());
+
+          double zeroAngle = (ArmConstants.UPPER_ARM_HARDSTOP_OFFSET) - unadjustedAngle;
+
+          Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
+
+          _upperArmEncoder.setZeroOffset(referenceAngle.getRadians());
+    }
+
+    public void setUpperPID() {
+      _upperArmPIDController.setP(Debug.armP.getDouble(ArmConstants.UPPER_P));
+      _upperArmPIDController.setI(Debug.armI.getDouble(ArmConstants.UPPER_I));
+      _upperArmPIDController.setD(Debug.armD.getDouble(ArmConstants.UPPER_D));
     }
 }

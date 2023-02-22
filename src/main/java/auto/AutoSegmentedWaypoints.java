@@ -1,9 +1,15 @@
 // Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
 package auto;
 
+import java.sql.Driver;
+
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import hardware.Arm;
@@ -43,8 +49,8 @@ public class AutoSegmentedWaypoints implements Loggable {
   @Log
   public double autoDelay;
 
-  public boolean StateHasFinished = false;
-  public Boolean StateHasInitialized = false;
+  public boolean stateHasFinished = false;
+  public boolean stateHasInitialized = false;
 
   @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
   public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
@@ -85,11 +91,24 @@ public class AutoSegmentedWaypoints implements Loggable {
     square3 = PathPlanner.loadPath("6", 2.0, 1.5);
     square4 = PathPlanner.loadPath("7", 2.0, 1.5);
 
-    coneToCube0 = PathPlanner.loadPath("ConeToCube0", 2.0, 1.5);
     coneToCube1 = PathPlanner.loadPath("ConeToCube1", 2.0, 1.5);
     coneToCube2 = PathPlanner.loadPath("ConeToCube2", 2.0, 1.5);
     coneToCube3 = PathPlanner.loadPath("ConeToCube3", 2.0, 1.5);
+    // create a new path just using the initial state of coneToCube1
+    coneToCube0 =  PathPlanner.generatePath
+    (
+        new PathConstraints(0.1, 0.1),
 
+        new PathPoint(coneToCube1.getInitialState().poseMeters.getTranslation(),
+            coneToCube1.getInitialState().poseMeters.getRotation(),
+            coneToCube1.getInitialState().poseMeters.getRotation()),
+
+        new PathPoint(coneToCube1.getInitialState().poseMeters.getTranslation(),
+            coneToCube1.getInitialState().poseMeters.getRotation(),
+            coneToCube1.getInitialState().poseMeters.getRotation())
+        
+    );
+    
     SquareAutoWPs = new Waypoint[]{
       new Waypoint(
               PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
@@ -98,19 +117,20 @@ public class AutoSegmentedWaypoints implements Loggable {
       ),
       new Waypoint(
               PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_STOPPED_SPEED,
-              square2
-      ),
-      new Waypoint(
-              PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
               PlacementConstants.CLAW_INTAKE_SPEED,
-              square3
-      ),
-      new Waypoint(
-              PlacementConstants.STOWED_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_STOPPED_SPEED,
-              square4
+              square2
       )
+      // ,
+      // new Waypoint(
+      //         PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
+      //         PlacementConstants.CLAW_INTAKE_SPEED,
+      //         square3
+      // ),
+      // new Waypoint(
+      //         PlacementConstants.STOWED_PLACEMENT_INDEX,
+      //         PlacementConstants.CLAW_STOPPED_SPEED,
+      //         square4
+      // )
     };
 
     ConeToCubeWPs = new Waypoint[] {
@@ -177,19 +197,18 @@ public class AutoSegmentedWaypoints implements Loggable {
       autoDelay = Timer.getFPGATimestamp();
 
     }
-
+    
     if (SwerveTrajectory.trajectoryStatus.equals("done") && arm.getAtDesiredPositions()) {
 
       claw.setDesiredSpeed(clawSpeed);
-
+      // autoDelay = DriverStation.getMatchTime();
       // 1.5 seconds since the path has completed
       if (Timer.getFPGATimestamp() - autoDelay > 1.5) {
 
-        arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
         claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
 
-        if (chosenWaypoints.length != currentWaypointNumber + 1) {
-          StateHasFinished = true;
+        if (currentWaypointNumber < chosenWaypoints.length - 1) {
+          stateHasFinished = true;
         }
 
       }
@@ -229,20 +248,21 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public void waypointRunner(Waypoint[] thisWaypointSet) {
     // If we made one round with the state, we have successfully initialized
-    if (!StateHasInitialized) {
+    if (!stateHasInitialized) {
       SwerveTrajectory.resetTrajectoryStatus();
-      StateHasInitialized = true;
+      stateHasInitialized = true;
     }
 
     SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getPose());
 
     this.setArmIndex(thisWaypointSet[currentWaypointNumber].armPosIndex, thisWaypointSet[currentWaypointNumber].clawDirection);
 
-    if (StateHasFinished) {
+    if (stateHasFinished) {
+      arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
       currentWaypointNumber++;
 
-      StateHasFinished = false;
-      StateHasInitialized = false;
+      stateHasFinished = false;
+      stateHasInitialized = false;
     }
   }
 }
