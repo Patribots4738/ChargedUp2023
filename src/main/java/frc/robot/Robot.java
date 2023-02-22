@@ -90,13 +90,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-      arm.setUpperPID();
     }
 
     @Override
     public void autonomousInit() {
 
-        // autoSegmentedWaypoints.init(swerve, arm);
+        autoSegmentedWaypoints.init();
+        arm.setBrakeMode();
         SwerveTrajectory.resetTrajectoryStatus();
 
     }
@@ -104,8 +104,10 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
 
-        autoSegmentedWaypoints.periodic();
-        // arm.periodic();
+      swerve.periodic();
+      arm.periodic();
+      claw.periodic();
+      autoSegmentedWaypoints.periodic();
 
     }
 
@@ -175,6 +177,7 @@ public class Robot extends TimedRobot {
         else {
           claw.setDesiredSpeed(0);
         }
+        System.out.println(swerve.getPose());
 
     }
 

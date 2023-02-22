@@ -63,6 +63,8 @@ public class Arm implements Loggable {
     @Log
     private double upperDiff = 0;
 
+    private boolean armsAtDesiredPosition = false;
+
     @Log
     private double armXPos = 0;
 
@@ -152,6 +154,7 @@ public class Arm implements Loggable {
       _upperArm.burnFlash();
 
       armCalculations = new ArmCalculations();
+      setBrakeMode();
     }
 
     public void toggleOperatorOverride() {
@@ -159,15 +162,15 @@ public class Arm implements Loggable {
     }
 
     public void periodic() {
-        if (!getOperatorOverride()) { indexPeriodic(); }
+        if (!getOperatorOverride()) { indexPeriodic();}
         setLowerArmPosition(lowerReference);
-        setUpperArmPosition(upperReference);
+        // setUpperArmPosition(upperReference);
         upperDiff = (Units.radiansToDegrees(upperReference) - Units.radiansToDegrees(getUpperArmPosition()));
         lowerDiff = (Units.radiansToDegrees(lowerReference) - Units.radiansToDegrees(getLowerArmPosition()));
         // Use forward kinematics to get the x and y position of the end effector
         armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmPosition() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmPosition() - Math.PI) + (getLowerArmPosition() - (Math.PI/2)))));
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmPosition() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmPosition() - Math.PI) + (getLowerArmPosition() - (Math.PI/2)))));
-        System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
+        // System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
     public void indexPeriodic() {
@@ -182,15 +185,15 @@ public class Arm implements Loggable {
 
       // armPosDimension1 = MathUtil.clamp(armPosDimension1, 0, PlacementConstants.ARM_POSITIONS.length-1);
       // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
-
-      if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND &&
-          Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
+      if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND)
+      //  && Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
       {
         armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
         if (armPosDimension1 >= PlacementConstants.ARM_POSITIONS.length ||
         armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
+          armsAtDesiredPosition = true;
           return;
         }
         // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
@@ -219,9 +222,15 @@ public class Arm implements Loggable {
 
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
 
+        if (index == armPosDimension1) {
+          startedTransition = true;
+        }
+        else {
+          startedTransition = false;
+          armsAtDesiredPosition = false;
+        }
+        armPosDimension2 = (index == armPosDimension1) ? armPosDimension2 : 0;
         armPosDimension1 = index;
-        armPosDimension2 = 0;
-        startedTransition = false;
 
     }
 
@@ -383,18 +392,7 @@ public class Arm implements Loggable {
     }
 
     public boolean getAtDesiredPositions() {
-
-        // get the desired position of the arms, using the last index in the armPos[armPosDimension1]
-        double upperArmAngle = armCalculations.getUpperAngle(
-                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getX(),
-                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getY());
-
-        double lowerArmAngle = armCalculations.getLowerAngle(
-                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getX(),
-                PlacementConstants.ARM_POSITIONS[armPosDimension1][PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1].getY(), upperArmAngle);
-
-        return (Math.abs(Units.radiansToRotations(upperArmAngle) - getUpperArmPosition()) < 0.01) &&
-                (Math.abs(Units.radiansToRotations(lowerArmAngle) - getLowerArmPosition()) < 0.01);
+        return this.armsAtDesiredPosition;
     }
 
     /**
