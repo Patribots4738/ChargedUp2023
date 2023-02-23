@@ -4,8 +4,6 @@
 
 package hardware;
 
-import org.photonvision.EstimatedRobotPose;
-
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;

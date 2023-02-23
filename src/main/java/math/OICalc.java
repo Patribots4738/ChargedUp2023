@@ -138,21 +138,11 @@ public class OICalc {
         isHoldingRight = false;
       }
       
-      if (isClickingUp) {
-        return 0;
-      }
-      else if (isClickingDown) {
-        return 180;
-      }
-      else if (isClickingLeft) {
-        return 270;
-      }
-      else if (isClickingRight) {
-        return 90;
-      }
-      else {
-        return -1;
-      }
+      if (isClickingUp) { return 0; }
+      else if (isClickingDown) { return 180; }
+      else if (isClickingLeft) { return 270; }
+      else if (isClickingRight) { return 90; }
+      else { return -1; }
     }
 
   }

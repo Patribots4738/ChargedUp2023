@@ -66,7 +66,6 @@ public class AutoAlignment {
               camEstimatedPose.estimatedPose.toPose2d(),
               camEstimatedPose.timestampSeconds);
 
-          System.out.println(camEstimatedPose.timestampSeconds);
           setTagID(getNearestTag());
 
       }
@@ -119,7 +118,7 @@ public class AutoAlignment {
       System.out.println("Heading: " + heading.getDegrees());
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
-          new PathConstraints(1, 0.33),
+          new PathConstraints(0.1, 0.33),
           new PathPoint(swerve.getPose().getTranslation(),
               heading,
               swerve.getPose().getRotation()),
