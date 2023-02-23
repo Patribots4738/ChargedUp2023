@@ -236,6 +236,7 @@ public class Robot extends TimedRobot {
             break;
 
           // Clicking down
+
           case 180:
             arm.setArmIndex(arm.getArmIndex() - 1);
             break;
