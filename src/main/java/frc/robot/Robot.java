@@ -215,7 +215,7 @@ public class Robot extends TimedRobot {
 
           // Clicking up
           case 0:
-            arm.setArmIndex(PlacementConstants.HIGH_CONE_PLACEMENT_INDEX);
+             arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.HIGH_CUBE_LAUNCH_INDEX : PlacementConstants.HIGH_CONE_PLACEMENT_INDEX);
             break;
 
           // Clicking down
@@ -225,7 +225,7 @@ public class Robot extends TimedRobot {
 
           // Clicking left
           case 270:
-            arm.setArmIndex(PlacementConstants.MEDIUM_CONE_PLACEMENT_INDEX);
+            arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.MID_CUBE_LAUNCH_INDEX : PlacementConstants.MID_CONE_PLACEMENT_INDEX);
             break;
 
           // Clicking right
