@@ -4,6 +4,8 @@
 
 package hardware;
 
+import org.photonvision.EstimatedRobotPose;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -61,12 +63,12 @@ public class Swerve {
           // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
           new MatBuilder<>(
                   Nat.N3(),
-                  Nat.N1()).fill(1, 1, 1),// State measurement
+                  Nat.N1()).fill(0.9, 0.9, 0.9),// State measurement
                   // standard deviations
                   // X, Y, theta
           new MatBuilder<>(
                   Nat.N3(),
-                  Nat.N1()).fill(0, 0, 0)// Vision measurement
+                  Nat.N1()).fill(0.1, 0.1, 0.1)// Vision measurement
                   // standard deviations
                   // X, Y, theta
       );
@@ -115,7 +117,7 @@ public class Swerve {
 
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
-                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, Rotation2d.fromDegrees(getTotalDegrees()))
+                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation())
                         : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed));
 
         setModuleStates(swerveModuleStates);
