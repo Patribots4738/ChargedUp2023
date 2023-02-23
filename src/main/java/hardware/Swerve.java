@@ -61,12 +61,12 @@ public class Swerve {
           // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
           new MatBuilder<>(
                   Nat.N3(),
-                  Nat.N1()).fill(0.9, 0.9, 0.9),// State measurement
+                  Nat.N1()).fill(1,1,1),// State measurement
                   // standard deviations
                   // X, Y, theta
           new MatBuilder<>(
                   Nat.N3(),
-                  Nat.N1()).fill(0.1, 0.1, 0.1)// Vision measurement
+                  Nat.N1()).fill(0,0,0)// Vision measurement
                   // standard deviations
                   // X, Y, theta
       );
@@ -82,7 +82,7 @@ public class Swerve {
 
     public void periodic() {
         // Update the odometry in the periodic block
-        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getYaw(), getModulePositions());
+        poseEstimator.update(getYaw(), getModulePositions());
     }
 
     /**

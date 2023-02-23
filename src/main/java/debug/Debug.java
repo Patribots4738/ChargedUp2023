@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import math.Constants.ArmConstants;
+import math.Constants.AutoConstants;
 
 public class Debug {
 
@@ -53,13 +54,13 @@ public class Debug {
                 .getEntry();
 
         rotP = Shuffleboard.getTab("Turn")
-                .add("rotP", 0.22)
+                .add("rotP", AutoConstants.ROTATION_CORRECTION_P)
                 .withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", -5, "max", 5)) // specify widget properties here
                 .getEntry();
 
         rotD = Shuffleboard.getTab("Turn")
-                .add("rotD", 0.74)
+                .add("rotD", AutoConstants.ROTATION_CORRECTION_D)
                 .withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
                 .getEntry();
@@ -88,7 +89,7 @@ public class Debug {
                 .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here
                 .getEntry();
 
-        yPos = Shuffleboard.getTab("Arm")
+         yPos = Shuffleboard.getTab("Arm")
                 .add("yPos", 0)
                 .withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", -Math.PI, "max", Math.PI)) // specify widget properties here

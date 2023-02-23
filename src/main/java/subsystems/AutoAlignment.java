@@ -6,23 +6,16 @@ import java.util.Optional;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory.State;
-import edu.wpi.first.math.util.Units;
 import hardware.Swerve;
-import math.Constants;
 import math.Constants.AlignmentConstants;
+import math.Constants.DriveConstants;
 import math.Constants.PlacementConstants;
 import math.Constants.VisionConstants;
 
@@ -47,6 +40,11 @@ public class AutoAlignment {
     private int tagID;
     private int coneOffset;
 
+    // This variable is used to allow us to calibrate using the tag more often but not every loop
+    private double originalNorm = 1;
+    // This variable is used to tell us how far away we currently are from an april tag
+    private double currentNorm = 0;
+
     public AutoAlignment(Swerve swerve) {
         this.swerve = swerve;
         photonCameraPose = new PhotonCameraPose();
@@ -58,15 +56,24 @@ public class AutoAlignment {
     public void calibrateOdometry() {
 
       Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPose());
-      
+
       // I do not believe this if statement gets what we want it to get...
       if (result.isPresent()) {
 
           EstimatedRobotPose camEstimatedPose = result.get();
 
-          swerve.getPoseEstimator().addVisionMeasurement(
+          if (currentNorm < (originalNorm / 2) || SwerveTrajectory.trajectoryStatus == "setup") {
+            swerve.getPoseEstimator().addVisionMeasurement(
               camEstimatedPose.estimatedPose.toPose2d(),
               Timer.getFPGATimestamp());
+
+              System.out.println("Reset OG");
+              
+              setTagID(getNearestTag());
+              originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
+            }
+            
+          System.out.println(currentNorm + " " + originalNorm);
 
       }
     }
@@ -79,6 +86,8 @@ public class AutoAlignment {
       }
 
       Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+
+      currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
       
       double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
 
@@ -87,7 +96,7 @@ public class AutoAlignment {
           coneOffsetLeft *= -1;
 
       }
-      System.out.println(targetPose);
+
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
@@ -101,15 +110,13 @@ public class AutoAlignment {
                   0),
               Rotation2d.fromDegrees(180)));
       }
-      System.out.println(targetPose);
 
       if (coneOffset == -1) {
-          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
-      } else if (coneOffset == 1) {
           targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
+      } else if (coneOffset == 1) {
+          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
       }
-
-      if (swerve.getPose().minus(targetPose).getTranslation().getNorm() < Units.inchesToMeters(AlignmentConstants.ALLOWABLE_ERROR)) {
+      if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR) {
           swerve.drive(0, 0, 0, false);
           SwerveTrajectory.trajectoryStatus = "done";
           return;
@@ -119,7 +126,7 @@ public class AutoAlignment {
 
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
-          new PathConstraints(0.1, 0.33),
+          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, 1),
           new PathPoint(swerve.getPose().getTranslation(),
               heading,
               swerve.getPose().getRotation()),
@@ -130,9 +137,9 @@ public class AutoAlignment {
 
       SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve);
 
-      System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
-      System.out.println("Modified Target Pose: " + targetPose);
-      System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
+      // System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
+      // System.out.println("Modified Target Pose: " + targetPose);
+      // System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
     }
     
   /**

@@ -12,8 +12,6 @@ import math.OICalc;
 import math.Constants.*;
 import auto.*;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -153,32 +151,41 @@ public class Robot extends TimedRobot {
         autoAlignment.calibrateOdometry();
         
         if (driver.getAButton()) {
-
-          if (!driver.getRightBumper()) {
-              System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
-      
-              autoAlignment.setConeOffset(0);
-              autoAlignment.setTagID(autoAlignment.getNearestTag());
-      
-              SwerveTrajectory.resetTrajectoryStatus();
-      
-              System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
+          
+          if (driver.getRightBumper()) {  
+            autoAlignment.moveToTag();
+          }
+          else {
+            System.out.println("Reset cone offset");
+          
+            autoAlignment.setConeOffset(0);
     
+            SwerveTrajectory.resetTrajectoryStatus();
           }
     
     
-          if (driver.getRightBumper()) {
-    
-            autoAlignment.moveToTag();
-    
-            if (driver.getXButtonPressed()) {
-                autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
-            }
-    
-            else if (driver.getBButtonPressed()) {
-                autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
-            }
-    
+          switch (OICalc.getPOVPressed(driver.getPOV())) {
+            // Not clicked
+            case -1:
+              break;
+  
+            // Clicking up
+            case 0:
+              break;
+  
+            // Clicking down
+            case 180:
+              break;
+  
+            // Clicking left
+            case 270:
+              autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+              break;
+  
+            // Clicking right
+            case 90:
+              autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+              break;
           }
     
         } else if (driver.getLeftBumper()) {
@@ -200,30 +207,6 @@ public class Robot extends TimedRobot {
         if (arm.getOperatorOverride()) {
             arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
         }
-        
-        switch (OICalc.getPOVPressed(driver.getPOV())) {
-          // Not clicked
-          case -1:
-            break;
-
-          // Clicking up
-          case 0:
-            break;
-
-          // Clicking down
-          case 180:
-            break;
-
-          // Clicking left
-          case 270:
-            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
-            break;
-
-          // Clicking right
-          case 90:
-            autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
-            break;
-        }
 
         switch (OICalc.getPOVPressed(operator.getPOV())) {
           // Not clicked
@@ -232,22 +215,26 @@ public class Robot extends TimedRobot {
 
           // Clicking up
           case 0:
-            arm.setArmIndex(arm.getArmIndex() + 1);
+            arm.setArmIndex(PlacementConstants.HIGH_CONE_PLACEMENT_INDEX);
             break;
 
           // Clicking down
-
           case 180:
-            arm.setArmIndex(arm.getArmIndex() - 1);
+            arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX);
             break;
 
           // Clicking left
           case 270:
+            arm.setArmIndex(PlacementConstants.MEDIUM_CONE_PLACEMENT_INDEX);
             break;
 
           // Clicking right
           case 90:
+            arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
             break;
+        }
+        if (operator.getRightStickButtonPressed()) {
+          arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
         }
 
         if (operator.getRightTriggerAxis() > 0) {
@@ -264,70 +251,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    swerve.resetEncoders();
-    swerve.setBrakeMode();
-
-    arm.setBrakeMode();
-
-    SwerveTrajectory.resetTrajectoryStatus();
-
-    swerve.resetOdometry(new Pose2d(13.59, 4.09, Rotation2d.fromDegrees(15)));
-
+    arm.setCoastMode();
   }
 
   @Override
   public void testPeriodic() {
-
-
-    // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
-    // This is to ensure that the up direction on the joystick is positive inputs
-    double driverLeftX  = MathUtil.applyDeadband(driver.getLeftX() , OIConstants.DRIVER_DEADBAND);
-    double driverLeftY  = MathUtil.applyDeadband(driver.getLeftY() , OIConstants.DRIVER_DEADBAND);
-    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
-    double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
-
-    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
-    driverLeftAxis = driverLeftAxis.unaryMinus();
-
-    // If we are on blue alliance, flip the driverLeftAxis
-    if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-      driverLeftAxis = driverLeftAxis.unaryMinus();
-    }
-
-    autoAlignment.calibrateOdometry();
-
-    // Use the A button to activate the alignment process
-    if (driver.getAButton()) {
-
-      if (!driver.getRightBumper()) {
-        System.out.println("Swerve Before Align: " + swerve.getPose() + "\n\n");
-
-        autoAlignment.setConeOffset(0);
-        autoAlignment.setTagID(autoAlignment.getNearestTag());
-
-        SwerveTrajectory.resetTrajectoryStatus();
-
-        System.out.println("Swerve After Align: " + swerve.getPose() + "\n\n");
-
-      }
-
-
-      if (driver.getRightBumper()) {
-
-        autoAlignment.moveToTag();
-
-        if (driver.getXButtonPressed()) {
-            autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
-        }
-
-        else if (driver.getBButtonPressed()) {
-            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
-        }
-
-      }
-
-    } else {
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), - driverRightX * .25, true);
-    }
+    arm.periodic();
   }
 }

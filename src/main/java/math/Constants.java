@@ -42,6 +42,7 @@ public final class Constants {
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
 
         // Angular offsets of the modules relative to the chassis in radians
+        // add 90 degrees to change the X and Y axis
         public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180+90);
         public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90+90);
         public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90+90);
@@ -324,7 +325,7 @@ public final class Constants {
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
         public static final double GRID_BARRIER = Units.inchesToMeters(15);
         public static final double HUMAN_TAG_OFFSET_X_INCHES = 30;
-        public static final double ALLOWABLE_ERROR = 5;
+        public static final double ALLOWABLE_ERROR = Units.inchesToMeters(2);
 
         public static final Pose3d TAG_0_POSE = null;
         public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
@@ -364,7 +365,8 @@ public final class Constants {
       public static final int CLAW_OUTTAKE_SPEED = 1;
       public static final int CLAW_STOPPED_SPEED = 0;
 
-      public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(27, 5);
+      public static final Translation2d ARM_FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
+      public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
 
       public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(10, 37);
       public static final Translation2d ARM_STOWED_POSITION = new Translation2d(9, 18);
@@ -417,6 +419,7 @@ public final class Constants {
           CUBE_HIGH_LAUNCH
         },
         {
+          ARM_FLOOR_INTAKE_PREP_POSITION,
           ARM_FLOOR_INTAKE_POSITION
         }
       };
