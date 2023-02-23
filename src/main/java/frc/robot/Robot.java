@@ -202,7 +202,7 @@ public class Robot extends TimedRobot {
 
         // Toggle the operator override when the operator's left stick is pressed
         if (operator.getLeftStickButtonPressed()) {
-           arm.toggleOperatorOverride();
+            arm.toggleOperatorOverride();
         }
         if (arm.getOperatorOverride()) {
             arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
