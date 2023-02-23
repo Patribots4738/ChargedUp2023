@@ -16,10 +16,12 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import math.ArmCalculations;
 import math.Constants.ArmConstants;
+import math.Constants.ClawConstants;
 import math.Constants.PlacementConstants;
 
 public class Arm implements Loggable {
@@ -175,8 +177,10 @@ public class Arm implements Loggable {
         return;
       }
 
-      // armPosDimension1 = MathUtil.clamp(armPosDimension1, 0, PlacementConstants.ARM_POSITIONS.length-1);
       // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
+      
+      // Notice that this code is getting the difference in angle between the arms.
+      // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
       if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND
        && Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
       {
@@ -186,6 +190,25 @@ public class Arm implements Loggable {
         armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
           armsAtDesiredPosition = true;
+          
+          // The issue with the following code is that it assumes that you want to 
+          // start outtaking the claw only when the trajectory has finished.
+          // This removes a bit of modularity from the placement transitions.
+          // What if the high cone placement wanted to place and them move the 
+          // arm in a reversal motion to prevent hitting the field?
+          // But then again, how would we know when to start outtaking the claw?
+          // if (DriverStation.isTeleop()) {
+
+          //   if (armPosDimension1 == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX ||
+          //       armPosDimension1 == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX ||
+          //       armPosDimension1 == PlacementConstants.MID_CUBE_LAUNCH_INDEX ||
+          //       armPosDimension1 == PlacementConstants.MID_CONE_PLACEMENT_INDEX) 
+          //   {
+          //     claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
+          //     setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
+          //   }
+          // }
+
           return;
         }
         // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
