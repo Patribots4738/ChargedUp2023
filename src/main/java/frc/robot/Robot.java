@@ -91,12 +91,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-    // SwerveTrajectory.resetHDC();
-    arm.setUpperArmCoastMode();
-  }
-
+      arm.setUpperArmCoastMode();
+    }
+    
     @Override
     public void disabledPeriodic() {
+      SwerveTrajectory.resetHDC();
     }
 
     @Override
@@ -287,11 +287,13 @@ public class Robot extends TimedRobot {
     double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
     Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+    driverLeftAxis = driverLeftAxis.unaryMinus();
 
     // If we are on blue alliance, flip the driverLeftAxis
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
+
     autoAlignment.calibrateOdometry();
 
     // Use the A button to activate the alignment process
@@ -326,7 +328,6 @@ public class Robot extends TimedRobot {
 
     } else {
       swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), - driverRightX * .25, true);
-      // System.out.println("Robot Pos: " + swerve.getPose());
     }
   }
 }

@@ -80,7 +80,7 @@ public class SwerveTrajectory implements Loggable {
    * @param _odometry   SwerveDrive.java's odometry
    * @param _rotation2d Pass in the current angle of the robot
    */
-  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, Pose2d _odometry) {
+  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve) {
 
     elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
 
@@ -105,7 +105,7 @@ public class SwerveTrajectory implements Loggable {
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
           ChassisSpeeds _speeds = HDC.calculate(
-              _odometry,
+              swerve.getPose(),
               _pathTraj.sample(elapsedTime),
               ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
 

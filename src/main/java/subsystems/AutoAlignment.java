@@ -5,6 +5,8 @@ import auto.SwerveTrajectory;
 import java.util.Optional;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 
@@ -64,9 +66,7 @@ public class AutoAlignment {
 
           swerve.getPoseEstimator().addVisionMeasurement(
               camEstimatedPose.estimatedPose.toPose2d(),
-              camEstimatedPose.timestampSeconds);
-
-          setTagID(getNearestTag());
+              Timer.getFPGATimestamp());
 
       }
     }
@@ -78,8 +78,8 @@ public class AutoAlignment {
           return;
       }
 
-      Pose2d targetPose = AlignmentConstants.TAG_POSES[tagID].toPose2d();
-
+      Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+      
       double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
 
       if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
@@ -87,20 +87,21 @@ public class AutoAlignment {
           coneOffsetLeft *= -1;
 
       }
-      
+      System.out.println(targetPose);
       if (0 < tagID && tagID < 5) {
-          targetPose = targetPose.plus(new Transform2d(
-              new Translation2d(
-                  -(AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                  0),
-              Rotation2d.fromDegrees(0)));
-      } else {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
                   (AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
                   0),
-              Rotation2d.fromDegrees(0)));
+              Rotation2d.fromDegrees(180)));
+      } else {
+          targetPose = targetPose.plus(new Transform2d(
+              new Translation2d(
+                  -(AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  0),
+              Rotation2d.fromDegrees(180)));
       }
+      System.out.println(targetPose);
 
       if (coneOffset == -1) {
           targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
@@ -115,7 +116,7 @@ public class AutoAlignment {
       }
 
       Rotation2d heading = Rotation2d.fromRadians(Math.atan2(targetPose.getY() - swerve.getPose().getY(),targetPose.getX() - swerve.getPose().getX() ));
-      System.out.println("Heading: " + heading.getDegrees());
+
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
           new PathConstraints(0.1, 0.33),
@@ -127,11 +128,11 @@ public class AutoAlignment {
               targetPose.getRotation())
       );
 
-      SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve, swerve.getPose());
+      SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve);
 
-      // System.out.println("April Pose: " + AlignmentConstants.TAG_POSES[tagID].toPose2d());
-      // System.out.println("Modified Target Pose: " + targetPose);
-      // System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
+      System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
+      System.out.println("Modified Target Pose: " + targetPose);
+      System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
     }
     
   /**
