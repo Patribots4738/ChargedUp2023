@@ -2,7 +2,6 @@ package hardware;
 
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -290,7 +289,7 @@ public class Arm implements Loggable {
           System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
           return;
         }
-
+        
         System.out.println(String.format("Lower Angle: %.1f, Upper Angle: %.1f Arm Position: %.1f, %.1f; Norm: %.1f", Units.radiansToDegrees(lowerArmAngle + (Math.PI/2)), Units.radiansToDegrees(upperArmAngle + (Math.PI)), armPosition.getX(), armPosition.getY(), armPosition.getNorm()));
         
         this.armXReference = armPosition.getX();
