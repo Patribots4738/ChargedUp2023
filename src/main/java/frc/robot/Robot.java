@@ -152,17 +152,19 @@ public class Robot extends TimedRobot {
         
         if (driver.getAButton()) {
           
-          if (driver.getRightBumper()) {  
+          if (driver.getRightBumper()) {
+
             autoAlignment.moveToTag();
+
           }
           else {
+
             System.out.println("Reset cone offset");
           
             autoAlignment.setConeOffset(0);
-    
             SwerveTrajectory.resetTrajectoryStatus();
+
           }
-    
     
           switch (OICalc.getPOVPressed(driver.getPOV())) {
             // Not clicked
@@ -191,12 +193,17 @@ public class Robot extends TimedRobot {
         } else if (driver.getLeftBumper()) {
             swerve.setX();
         } else {
-            //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-            swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX*0.25, true);
+            if (driver.getLeftStickButton()) {
+              swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX*0.25, false);
+            }
+            else {
+              //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+              swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX*0.25, true);
+            }
         }
 
         // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-        if (driver.getLeftStickButtonPressed()) {
+        if (driver.getRightStickButtonPressed()) {
             swerve.toggleSpeed();
         }
 
