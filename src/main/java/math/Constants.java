@@ -218,6 +218,10 @@ public final class Constants {
       public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
       public static final double MAX_REACH_X = 48 + 12.5 - ClawConstants.CLAW_LENGTH_X_INCHES;
 
+      // When the arm is near the top of the limit, the arm will flip to the other solution
+      // This is to prevent the upper arm from going above the limit when that happens.
+      public static final double ARM_FLIP_POSITION = 11;
+
       // Multiply the absolute encoder output to get radians instead of rotations
       public static final double LOWER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
       public static final double UPPER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians

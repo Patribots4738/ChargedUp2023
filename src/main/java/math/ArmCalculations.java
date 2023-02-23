@@ -5,17 +5,10 @@ import math.Constants.*;
 
 public class ArmCalculations {
 
-    /*
-     *   |
-     *   |         C
-     *   |         *
-     *   |     a /   \ b
-     * x |      /     \
-     *   |    A/_______\B
-     *   |         c
-     *   |_____________________
-     *             y
-     */
+
+    // The blue arm solution found in desmos here:
+    // https://www.desmos.com/calculator/fqyyldertp
+    private boolean blueArmSolution = false;
 
     /**
      * Get the offset of the second arm relative to arm 1
@@ -35,7 +28,17 @@ public class ArmCalculations {
                                 (Math.pow(ArmConstants.UPPER_ARM_LENGTH, 2)))) / 
                         (2 * (ArmConstants.LOWER_ARM_LENGTH * ArmConstants.UPPER_ARM_LENGTH))));
 
-        return upperAngle * ((x < 0) ? 1 : -1);
+        if (blueArmSolution) {
+            if (x > ArmConstants.ARM_FLIP_POSITION) {
+                blueArmSolution = false;
+            }
+
+        }
+        else if (x < -ArmConstants.ARM_FLIP_POSITION) {
+            blueArmSolution = true;
+        }
+
+        return upperAngle * (blueArmSolution ? 1 : -1);
     }
 
 
@@ -54,6 +57,7 @@ public class ArmCalculations {
                 (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));
 
         double q1 = ((Math.atan2(y , x) - alpha));
+
         return q1;
     }
 }
