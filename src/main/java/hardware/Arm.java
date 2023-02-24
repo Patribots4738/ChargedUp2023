@@ -116,9 +116,6 @@ public class Arm implements Loggable {
       _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
       _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
 
-      // _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
-      // _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
-
       _lowerArmPIDController = _lowerArmRight.getPIDController();
       _upperArmPIDController = _upperArm.getPIDController();
 
@@ -161,10 +158,6 @@ public class Arm implements Loggable {
       setBrakeMode();
     }
 
-    public void toggleOperatorOverride() {
-        this.operatorOverride = !operatorOverride;
-    }
-
     public void periodic() {
         if (!operatorOverride) { indexPeriodic();}
         setLowerArmPosition(lowerReference);
@@ -192,7 +185,7 @@ public class Arm implements Loggable {
       // Notice that this code is getting the difference in angle between the arms.
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
       if (upperReference - getUpperArmPosition() < ArmConstants.LOWER_ARM_DEADBAND
-       && lowerReference - getLowerArmPosition() < ArmConstants.UPPER_ARM_DEADBAND)
+          && lowerReference - getLowerArmPosition() < ArmConstants.UPPER_ARM_DEADBAND)
       {
         armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
@@ -205,8 +198,8 @@ public class Arm implements Loggable {
               armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE)
           {
             // Flip the arm solution and go back to where we were
-            drive(this.armBeforeFlip);
             blueArmSolution = !blueArmSolution;
+            drive(this.armBeforeFlip);
             // Restore the operator override
             this.operatorOverride = this.previousOperatorOverride;
             // If we were using index to flip solution...
@@ -220,18 +213,6 @@ public class Arm implements Loggable {
         // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
       }
-    }
-
-    public boolean getOperatorOverride() {
-        return this.operatorOverride;
-    }
-
-    public void setLowerArmReference(double reference) {
-        this.lowerReference = reference;
-    }
-
-    public void setUpperArmReference(double reference) {
-        this.upperReference = reference;
     }
 
     /**
@@ -253,7 +234,7 @@ public class Arm implements Loggable {
 
         armPosDimension2 = (index == armPosDimension1) ? armPosDimension2 : 0;
 
-        // If we are flipping the arm solution, save the current position/override
+        // If we are flipping the arm solution, save the current position/override states
         if ((index == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
             index == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) &&
             armPosDimension1 != index)
@@ -275,7 +256,7 @@ public class Arm implements Loggable {
     /**
      * Calculate the position of the arm based on the joystick input
      * as an absolute position in inches, multiplied by
-     * Constants.ArmConstants.kMaxReachX,Y respectively
+     * Constants.ArmConstants.kMaxReachX/Y respectively
      *
      * @param position either the joystick input or the desired absolute position
      *                 this case is handled under OperatorOverride
@@ -305,13 +286,19 @@ public class Arm implements Loggable {
         if (armPosition.getNorm() > ArmConstants.MAX_REACH) {
           armPosition = armPosition.times((ArmConstants.MAX_REACH - 0.1) / armPosition.getNorm());
         }
-        if (armPosition.getNorm() < ArmConstants.MIN_REACH) {
+        // If the distance from zero is less than the min reach, cap it at the min reach
+        // This min reach is the lower arm length - the upper arm length
+        else if (armPosition.getNorm() < ArmConstants.MIN_REACH) {
           armPosition = armPosition.times((ArmConstants.MIN_REACH + 0.1) / armPosition.getNorm());
         }
-        
+
+        // If the arm is trying to reach higher than 6'6", cap it at 6'6"
+        // The field gives us this limit.
         if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
           armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
         }
+        // If the arm is trying to reach further than 48" out from the chassis, cap it at 48"
+        // The field gives us this limit.
         if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
           armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
         }
@@ -319,21 +306,21 @@ public class Arm implements Loggable {
           armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
         }
 
-        // If the arm is in the flip zone...
+
+        // Check if the arm is in the flip zone for black (but using the blue solution)
+        // aka the positive solution
         if (blueArmSolution) {
-          // Check if the arm is in the flip zone for black 
-          // aka the positive solution
-          if (armPosition.getX() > ArmConstants.ARM_FLIP_X) {
+          if (armPosition.getX() > ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE) {
             // Set the arm to go to the nearest flip position
             // in this case it is positive, because armPosition.getX() > 0
             setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE);
             return;
           }
         }
-        // Or... if blueArmSolution is FALSE && armPosition.getX() < 0 (more or less)
-        else if (armPosition.getX() < -ArmConstants.ARM_FLIP_X) {
+        // Or... if the arm is in the flip zone for blue (but using the black solution)
+        else if (armPosition.getX() < -ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) {
           // Set the arm to go to the nearest flip position
-          // in this case it is negative, because armPosition.getX() < 0
+          // in this case it is negative, because armPosition.getX() < ARM_FLIP_X
           setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE);
           return;
         }
@@ -351,14 +338,34 @@ public class Arm implements Loggable {
           return;
         }
         
-        System.out.println(String.format("Lower Angle: %.1f, Upper Angle: %.1f Arm Position: %.1f, %.1f; Norm: %.1f", Units.radiansToDegrees(lowerArmAngle + (Math.PI/2)), Units.radiansToDegrees(upperArmAngle + (Math.PI)), armPosition.getX(), armPosition.getY(), armPosition.getNorm()));
-        
+        System.out.printf("Lower Angle: %.1f, Upper Angle: %.1f Arm References: %.1f, %.1f%n",
+            Units.radiansToDegrees(lowerArmAngle + (Math.PI/2)),
+            Units.radiansToDegrees(upperArmAngle + (Math.PI)),
+            armPosition.getX(),
+            armPosition.getY());
+
+        // Set the reference values to the modified X and Y values
+        // This is especially important for the operatorOverride going OOB
         this.armXReference = armPosition.getX();
         this.armYReference = armPosition.getY();
 
+        // Finally, set the reference values for the lower and upper arm:
+        // Add PI/2 to lowerArmAngle...
+        // because the calculated angle is relative to the ground,
+        // And the zero for the encoder is the direction of gravity
+        // Add PI to upperArmAngle...
+        // because armCalculations gives us the angle relative to the upper arm
         setLowerArmReference(lowerArmAngle + (Math.PI/2));
         setUpperArmReference(upperArmAngle + (Math.PI));
 
+    }
+
+    public void setLowerArmReference(double reference) {
+      this.lowerReference = reference;
+    }
+
+    public void setUpperArmReference(double reference) {
+      this.upperReference = reference;
     }
 
     /**
@@ -468,7 +475,15 @@ public class Arm implements Loggable {
               armsAtDesiredPosition;
     }
 
-    /**
+    public void toggleOperatorOverride() {
+      this.operatorOverride = !operatorOverride;
+    }
+
+    public boolean getOperatorOverride() {
+      return this.operatorOverride;
+    }
+
+  /**
      * Set the motor to coast mode
      */
     public void setCoastMode() {
@@ -488,10 +503,6 @@ public class Arm implements Loggable {
       _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
       _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
       _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
-    }
-
-    public void printList() {
-      System.out.println(upperRotationList);
     }
 
     public void zeroLowerArmEncoder() {
@@ -521,4 +532,9 @@ public class Arm implements Loggable {
       _upperArmPIDController.setI(Debug.armI.getDouble(ArmConstants.UPPER_I));
       _upperArmPIDController.setD(Debug.armD.getDouble(ArmConstants.UPPER_D));
     }
+
+    public void printList() {
+      System.out.println(upperRotationList);
+    }
+
 }
