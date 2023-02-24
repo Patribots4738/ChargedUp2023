@@ -155,7 +155,7 @@ public class Robot extends TimedRobot {
           if (driver.getRightBumper()) {
 
             autoAlignment.moveToTag();
-            
+
             if (autoAlignment.getMoveArmToHumanTag()) {
               arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
             }
@@ -225,7 +225,7 @@ public class Robot extends TimedRobot {
 
           // Clicking up
           case 0:
-             arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.HIGH_CUBE_LAUNCH_INDEX : PlacementConstants.HIGH_CONE_PLACEMENT_INDEX);
+            arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.HIGH_CUBE_LAUNCH_INDEX : PlacementConstants.HIGH_CONE_PLACEMENT_INDEX);
             break;
 
           // Clicking down

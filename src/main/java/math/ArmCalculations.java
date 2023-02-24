@@ -5,11 +5,6 @@ import math.Constants.*;
 
 public class ArmCalculations {
 
-
-    // The blue arm solution found in desmos here:
-    // https://www.desmos.com/calculator/fqyyldertp
-    private boolean blueArmSolution = false;
-
     /**
      * Get the offset of the second arm relative to arm 1
      *
@@ -19,7 +14,7 @@ public class ArmCalculations {
      *          Due to an axis controlling the range, they will not go over
      * @return the angle to set the motor to, in radians
      */
-    public double getUpperAngle(double x, double y)
+    public double getUpperAngle(double x, double y, boolean blueArmSolution)
     {
         double upperAngle =
                 (Math.acos(
@@ -28,17 +23,7 @@ public class ArmCalculations {
                                 (Math.pow(ArmConstants.UPPER_ARM_LENGTH, 2)))) / 
                         (2 * (ArmConstants.LOWER_ARM_LENGTH * ArmConstants.UPPER_ARM_LENGTH))));
 
-        if (blueArmSolution) {
-            if (x > ArmConstants.ARM_FLIP_POSITION) {
-                blueArmSolution = false;
-            }
-
-        }
-        else if (x < -ArmConstants.ARM_FLIP_POSITION) {
-            blueArmSolution = true;
-        }
-
-        return upperAngle * (blueArmSolution ? 1 : -1);
+        return upperAngle * ((blueArmSolution) ? 1 : -1);
     }
 
 

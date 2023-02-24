@@ -2,6 +2,8 @@ package hardware;
 
 import java.util.ArrayList;
 
+import org.opencv.video.FarnebackOpticalFlow;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -38,9 +40,13 @@ public class Arm implements Loggable {
     // ceil -- force round up
     int armPosDimension1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
     int armPosDimension2 = 0;
+
     private boolean startedTransition = false;
 
     private boolean operatorOverride = false;
+    private boolean previousOperatorOverride = false;
+    private Translation2d armBeforeFlip = PlacementConstants.ARM_STOWED_POSITION;
+    private int indexBeforeFlip = PlacementConstants.STOWED_PLACEMENT_INDEX;
 
     private double armXReference = 0;
     private double armYReference = 0;
@@ -66,6 +72,10 @@ public class Arm implements Loggable {
     private double upperDiff = 0;
 
     private boolean armsAtDesiredPosition = false;
+    
+    // The blue arm solution found in desmos here:
+    // https://www.desmos.com/calculator/fqyyldertp
+    private boolean blueArmSolution = false;
 
     @Log
     private double armXPos = 0;
@@ -156,7 +166,7 @@ public class Arm implements Loggable {
     }
 
     public void periodic() {
-        if (!getOperatorOverride()) { indexPeriodic();}
+        if (!operatorOverride) { indexPeriodic();}
         setLowerArmPosition(lowerReference);
         setUpperArmPosition(upperReference);
         upperDiff = (Units.radiansToDegrees(upperReference) - Units.radiansToDegrees(getUpperArmPosition()));
@@ -177,38 +187,34 @@ public class Arm implements Loggable {
         return;
       }
 
-      // System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
+      System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
       
       // Notice that this code is getting the difference in angle between the arms.
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
-      if (Math.abs(getLowerArmPosition() - (lowerReference + ((lowerReference < 0) ? Math.PI*2 : 0))) < ArmConstants.LOWER_ARM_DEADBAND
-       && Math.abs(getUpperArmPosition() - (upperReference + ((upperReference < 0) ? Math.PI*2 : 0))) < ArmConstants.UPPER_ARM_DEADBAND)
+      if (upperReference - getUpperArmPosition() < ArmConstants.LOWER_ARM_DEADBAND
+       && lowerReference - getLowerArmPosition() < ArmConstants.UPPER_ARM_DEADBAND)
       {
         armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
         if (armPosDimension1 >= PlacementConstants.ARM_POSITIONS.length ||
-        armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
+            armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
           armsAtDesiredPosition = true;
           
-          // The issue with the following code is that it assumes that you want to 
-          // start outtaking the claw only when the trajectory has finished.
-          // This removes a bit of modularity from the placement transitions.
-          // What if the high cone placement wanted to place and them move the 
-          // arm in a reversal motion to prevent hitting the field?
-          // But then again, how would we know when to start outtaking the claw?
-          // if (DriverStation.isTeleop()) {
-
-          //   if (armPosDimension1 == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX ||
-          //       armPosDimension1 == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX ||
-          //       armPosDimension1 == PlacementConstants.MID_CUBE_LAUNCH_INDEX ||
-          //       armPosDimension1 == PlacementConstants.MID_CONE_PLACEMENT_INDEX) 
-          //   {
-          //     claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
-          //     setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
-          //   }
-          // }
-
+          if (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
+              armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE)
+          {
+            // Flip the arm solution and go back to where we were
+            drive(this.armBeforeFlip);
+            blueArmSolution = !blueArmSolution;
+            // Restore the operator override
+            this.operatorOverride = this.previousOperatorOverride;
+            // If we were using index to flip solution...
+            if (!operatorOverride) {
+              // Set the arm index to where we were before flipping
+              setArmIndex(indexBeforeFlip);
+            }
+          }
           return;
         }
         // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
@@ -244,8 +250,21 @@ public class Arm implements Loggable {
           startedTransition = false;
           armsAtDesiredPosition = false;
         }
+
         armPosDimension2 = (index == armPosDimension1) ? armPosDimension2 : 0;
+
+        // If we are flipping the arm solution, save the current position/override
+        if ((index == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
+            index == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) &&
+            armPosDimension1 != index)
+        {
+          this.armBeforeFlip = new Translation2d(armXReference, armYReference);
+          this.previousOperatorOverride = this.operatorOverride;
+          this.indexBeforeFlip = armPosDimension1;
+        }
+        
         armPosDimension1 = index;
+        this.operatorOverride = false;
 
     }
 
@@ -300,10 +319,29 @@ public class Arm implements Loggable {
           armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
         }
 
+        // If the arm is in the flip zone...
+        if (blueArmSolution) {
+          // Check if the arm is in the flip zone for black 
+          // aka the positive solution
+          if (armPosition.getX() > ArmConstants.ARM_FLIP_X) {
+            // Set the arm to go to the nearest flip position
+            // in this case it is positive, because armPosition.getX() > 0
+            setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE);
+            return;
+          }
+        }
+        // Or... if blueArmSolution is FALSE && armPosition.getX() < 0 (more or less)
+        else if (armPosition.getX() < -ArmConstants.ARM_FLIP_X) {
+          // Set the arm to go to the nearest flip position
+          // in this case it is negative, because armPosition.getX() < 0
+          setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE);
+          return;
+        }
+
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-        double upperArmAngle = armCalculations.getUpperAngle(armPosition.getX(), armPosition.getY());
+        double upperArmAngle = armCalculations.getUpperAngle(armPosition.getX(), armPosition.getY(), blueArmSolution);
         double lowerArmAngle = armCalculations.getLowerAngle(armPosition.getX(), armPosition.getY(), upperArmAngle);
 
         // If upperArmAngle is NaN, then tell the arm not to change position
@@ -421,6 +459,12 @@ public class Arm implements Loggable {
               armPosDimension1 == PlacementConstants.MID_CUBE_LAUNCH_INDEX ||
               armPosDimension1 == PlacementConstants.MID_CONE_PLACEMENT_INDEX ||
               armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
+              armsAtDesiredPosition;
+    }
+
+    public boolean getAtFlipPosition() {
+      return (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
+              armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) &&
               armsAtDesiredPosition;
     }
 
