@@ -243,7 +243,7 @@ public class Arm implements Loggable {
 
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
 
-        if (index == armPosDimension1) {
+        if (index == armPosDimension1 && !operatorOverride) {
           startedTransition = true;
         }
         else {
