@@ -191,6 +191,7 @@ public class Arm implements Loggable {
       if (upperReference - getUpperArmPosition() < ArmConstants.LOWER_ARM_DEADBAND
           && lowerReference - getLowerArmPosition() < ArmConstants.UPPER_ARM_DEADBAND)
       {
+        armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
         if (armPosDimension1 >= PlacementConstants.ARM_POSITIONS.length ||
             armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
