@@ -228,6 +228,8 @@ public class Arm implements Loggable {
 
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
 
+        // Check if we are already at the desired index and if we are not operator overriding
+        // This is because if we are operator overriding, we want to be able to go to any index
         if (index == armPosDimension1 && !operatorOverride) {
           startedTransition = true;
         }
