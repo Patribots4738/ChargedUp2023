@@ -172,7 +172,7 @@ public class Arm implements Loggable {
 
     public void indexPeriodic() {
 
-      // // PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]
+      // Syntax example: PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]
       if (!startedTransition)
       {
         startedTransition = true;
@@ -180,14 +180,17 @@ public class Arm implements Loggable {
         return;
       }
 
-      System.out.println(String.format("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition()), Math.toDegrees(lowerReference), Math.toDegrees(upperReference)));
+      System.out.printf("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f%n",
+          Math.toDegrees(getLowerArmPosition()),
+          Math.toDegrees(getUpperArmPosition()),
+          Math.toDegrees(lowerReference),
+          Math.toDegrees(upperReference));
       
       // Notice that this code is getting the difference in angle between the arms.
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
       if (upperReference - getUpperArmPosition() < ArmConstants.LOWER_ARM_DEADBAND
           && lowerReference - getLowerArmPosition() < ArmConstants.UPPER_ARM_DEADBAND)
       {
-        armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
         if (armPosDimension1 >= PlacementConstants.ARM_POSITIONS.length ||
             armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
