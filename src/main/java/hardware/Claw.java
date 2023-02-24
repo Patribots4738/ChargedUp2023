@@ -2,14 +2,23 @@ package hardware;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.Timer;
+
 import com.revrobotics.RelativeEncoder;
 import math.Constants.ClawConstants;
+import math.Constants.PlacementConstants;
 
-@SuppressWarnings("EmptyMethod")
 public class Claw {
+
     private final CANSparkMax _claw;
     private final RelativeEncoder _clawEncoder;
     private double desiredSpeed = 0;
+
+    // Timer values to have the claw auto outtake for X seconds
+    private boolean finishedOuttaking = false;
+    private double outtakeSeconds = 0;
+    private double startedOuttaking = 0;
 
     public Claw() {
 
@@ -22,6 +31,7 @@ public class Claw {
 
         _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
         _claw.burnFlash();
+        setBrakeMode();
 
     }
 
@@ -29,15 +39,13 @@ public class Claw {
         _clawEncoder.setPosition(0);
     }
 
-    public void init() {
-    }
-
     public void periodic() {
+        if ((Timer.getFPGATimestamp() - startedOuttaking) > outtakeSeconds) {
+            finishedOuttaking = true;
+            setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
+        }
+        
         setSpeed(desiredSpeed);
-    }
-
-    public void setDesiredSpeed(double speed) {
-        this.desiredSpeed = speed;
     }
 
     private void setSpeed(double speed) {
@@ -50,6 +58,26 @@ public class Claw {
 
     public void setCoastMode() {
         _claw.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    }
+
+    
+    public void setDesiredSpeed(double speed) {
+        this.desiredSpeed = speed;
+    }
+
+    public double getDesiredSpeed() {
+        return this.desiredSpeed;
+    }
+
+    public void outTakeforXSeconds(double seconds) {
+        setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
+        this.outtakeSeconds = seconds;
+        this.finishedOuttaking = false;
+        this.startedOuttaking = Timer.getFPGATimestamp();
+    }
+
+    public boolean finishedOuttaking() {
+        return this.finishedOuttaking;
     }
 
 }

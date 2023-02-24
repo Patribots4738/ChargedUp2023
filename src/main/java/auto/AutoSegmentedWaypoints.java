@@ -1,15 +1,11 @@
 // Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
 package auto;
 
-import java.sql.Driver;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import hardware.Arm;
@@ -51,6 +47,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public boolean stateHasFinished = false;
   public boolean stateHasInitialized = false;
+  public boolean clawHasStarted = false;
 
   @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
   public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
@@ -111,14 +108,14 @@ public class AutoSegmentedWaypoints implements Loggable {
     
     SquareAutoWPs = new Waypoint[]{
       new Waypoint(
-              PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_OUTTAKE_SPEED,
-              square1
+          square1,
+          PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
+          PlacementConstants.CLAW_OUTTAKE_SPEED
       ),
       new Waypoint(
-              PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_INTAKE_SPEED,
-              square2
+          square2,
+          PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
+          PlacementConstants.CLAW_CONE_INTAKE_SPEED
       )
       // ,
       // new Waypoint(
@@ -135,24 +132,24 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     ConeToCubeWPs = new Waypoint[] {
       new Waypoint(
-              PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_OUTTAKE_SPEED,
-              coneToCube0
+          coneToCube0,
+          PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
+          PlacementConstants.CLAW_OUTTAKE_SPEED
       ),
       new Waypoint(
-              PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_INTAKE_SPEED,
-              coneToCube1
+          coneToCube1,
+          PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
+          PlacementConstants.CLAW_CUBE_INTAKE_SPEED
       ),
       new Waypoint(
-              PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_OUTTAKE_SPEED,
-              coneToCube2
+          coneToCube2,
+          PlacementConstants.HIGH_CUBE_LAUNCH_INDEX,
+          PlacementConstants.CLAW_OUTTAKE_SPEED
       ),
       new Waypoint(
-              PlacementConstants.STOWED_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_STOPPED_SPEED,
-              coneToCube3
+          coneToCube3,
+          PlacementConstants.STOWED_PLACEMENT_INDEX,
+          PlacementConstants.CLAW_STOPPED_SPEED
       )
     };
 
@@ -180,12 +177,13 @@ public class AutoSegmentedWaypoints implements Loggable {
    * If both arms are in the set position, then
    * stop the auto path and move on to the next waypoint
    */
-  private void setArmIndex(int armIndex, int clawSpeed) {
+  private void setArmIndex(int armIndex, double clawSpeed) {
 
-    // Only move the claw before the arm
-    // if it needs to hold a game piece
-    if (clawSpeed == PlacementConstants.CLAW_INTAKE_SPEED) {
-      claw.setDesiredSpeed(clawSpeed);
+    // // Only move the claw before the arm
+    // // if it needs to hold a game piece
+    if (claw.getDesiredSpeed() != PlacementConstants.CLAW_CONE_INTAKE_SPEED && 
+        claw.getDesiredSpeed() != PlacementConstants.CLAW_CUBE_INTAKE_SPEED) {
+      claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
     }
 
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {
@@ -200,13 +198,14 @@ public class AutoSegmentedWaypoints implements Loggable {
     
     if (SwerveTrajectory.trajectoryStatus.equals("done") && arm.getAtDesiredPositions()) {
 
+      if (!clawHasStarted) { 
+        autoDelay = Timer.getFPGATimestamp();
+        clawHasStarted = true;
+      }
       claw.setDesiredSpeed(clawSpeed);
-      // autoDelay = DriverStation.getMatchTime();
       // 1.5 seconds since the path has completed
-      if (Timer.getFPGATimestamp() - autoDelay > 1.5) {
-
-        claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
-
+      if (Timer.getFPGATimestamp() - autoDelay > 1) {
+        
         if (currentWaypointNumber < chosenWaypoints.length - 1) {
           stateHasFinished = true;
         }
@@ -217,12 +216,12 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public static class Waypoint {
     public int armPosIndex;
-    public int clawDirection;
+    public double clawDirection;
     public PathPlannerTrajectory pathPlannerSegment;
 
-    public Waypoint(int _index, int _direction, PathPlannerTrajectory _PPS) {
+    public Waypoint(PathPlannerTrajectory _PPS, int _index, double _clawDirection) {
       armPosIndex = _index;
-      clawDirection = _direction;
+      clawDirection = _clawDirection;
       pathPlannerSegment = _PPS;
     }
   }
@@ -258,11 +257,14 @@ public class AutoSegmentedWaypoints implements Loggable {
     this.setArmIndex(thisWaypointSet[currentWaypointNumber].armPosIndex, thisWaypointSet[currentWaypointNumber].clawDirection);
 
     if (stateHasFinished) {
+
       arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
+      
       currentWaypointNumber++;
 
       stateHasFinished = false;
       stateHasInitialized = false;
+      clawHasStarted = false;
     }
   }
 }

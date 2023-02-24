@@ -365,9 +365,10 @@ public final class Constants {
       public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
       public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
 
-      public static final int CLAW_INTAKE_SPEED = -1;
-      public static final int CLAW_OUTTAKE_SPEED = 1;
-      public static final int CLAW_STOPPED_SPEED = 0;
+      public static final double CLAW_CONE_INTAKE_SPEED = -1;
+      public static final double CLAW_CUBE_INTAKE_SPEED = -0.7;      
+      public static final double CLAW_OUTTAKE_SPEED = 1;
+      public static final double CLAW_STOPPED_SPEED = 0;
 
       public static final Translation2d ARM_FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
       public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(19, 2);

@@ -414,6 +414,16 @@ public class Arm implements Loggable {
         return this.armsAtDesiredPosition;
     }
 
+    // Check if the arm is at its desired position and that position is a placement index
+    public boolean getAtPlacementPosition() {
+      return (armPosDimension1 == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX ||
+              armPosDimension1 == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX ||
+              armPosDimension1 == PlacementConstants.MID_CUBE_LAUNCH_INDEX ||
+              armPosDimension1 == PlacementConstants.MID_CONE_PLACEMENT_INDEX ||
+              armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
+              armsAtDesiredPosition;
+    }
+
     /**
      * Set the motor to coast mode
      */

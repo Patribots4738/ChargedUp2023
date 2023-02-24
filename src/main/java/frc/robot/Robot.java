@@ -159,36 +159,11 @@ public class Robot extends TimedRobot {
           }
           else {
 
-            System.out.println("Reset cone offset");
-          
-            autoAlignment.setConeOffset(0);
             SwerveTrajectory.resetTrajectoryStatus();
 
           }
     
-          switch (OICalc.getPOVPressed(driver.getPOV())) {
-            // Not clicked
-            case -1:
-              break;
-  
-            // Clicking up
-            case 0:
-              break;
-  
-            // Clicking down
-            case 180:
-              break;
-  
-            // Clicking left
-            case 270:
-              autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
-              break;
-  
-            // Clicking right
-            case 90:
-              autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
-              break;
-          }
+          
     
         } else if (driver.getLeftBumper()) {
             swerve.setX();
@@ -213,6 +188,30 @@ public class Robot extends TimedRobot {
         }
         if (arm.getOperatorOverride()) {
             arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+        }
+
+        switch (OICalc.getPOVPressed(driver.getPOV())) {
+          // Not clicked
+          case -1:
+            break;
+
+          // Clicking up
+          case 0:
+            break;
+
+          // Clicking down
+          case 180:
+            break;
+
+          // Clicking left
+          case 270:
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+            break;
+
+          // Clicking right
+          case 90:
+            autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+            break;
         }
 
         switch (OICalc.getPOVPressed(operator.getPOV())) {
@@ -240,18 +239,37 @@ public class Robot extends TimedRobot {
             arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
             break;
         }
-        if (operator.getRightStickButtonPressed()) {
-          arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
-        }
 
-        if (operator.getRightTriggerAxis() > 0) {
-          claw.setDesiredSpeed(operator.getRightTriggerAxis());
+        if (operator.getRightStickButtonPressed()) {
+
+          arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
+
+        }
+        
+        if (operator.getRightTriggerAxis() > 0 && operator.getLeftTriggerAxis() > 0) {
+          claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
+        }
+        else if (operator.getRightTriggerAxis() > 0) {
+          // Check if the arm has completed the path to place an object
+
+          if (arm.getAtPlacementPosition()) {
+
+            claw.outTakeforXSeconds(0.5);
+
+          }
+
         }
         else if (operator.getLeftTriggerAxis() > 0) {
+
           claw.setDesiredSpeed(-operator.getLeftTriggerAxis());
+
         }
         else {
-          claw.setDesiredSpeed(0);
+
+          if (claw.finishedOuttaking() && arm.getAtPlacementPosition()) {
+            arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
+          }
+        
         }
 
     }
