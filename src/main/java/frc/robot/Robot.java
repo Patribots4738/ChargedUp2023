@@ -155,6 +155,10 @@ public class Robot extends TimedRobot {
           if (driver.getRightBumper()) {
 
             autoAlignment.moveToTag();
+            
+            if (autoAlignment.getMoveArmToHumanTag()) {
+              arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+            }
 
           }
           else {
@@ -247,7 +251,9 @@ public class Robot extends TimedRobot {
         }
         
         if (operator.getRightTriggerAxis() > 0 && operator.getLeftTriggerAxis() > 0) {
+
           claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
+
         }
         else if (operator.getRightTriggerAxis() > 0) {
           // Check if the arm has completed the path to place an object
@@ -267,7 +273,9 @@ public class Robot extends TimedRobot {
         else {
 
           if (claw.finishedOuttaking() && arm.getAtPlacementPosition()) {
+            
             arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
+            
           }
         
         }

@@ -37,6 +37,7 @@ public class AutoAlignment {
 
     Swerve swerve;
     PhotonCameraPose photonCameraPose;
+
     private int tagID;
     private int coneOffset;
 
@@ -44,6 +45,8 @@ public class AutoAlignment {
     private double originalNorm = 1;
     // This variable is used to tell us how far away we currently are from an april tag
     private double currentNorm = 0;
+
+    private boolean moveArmToHumanTag = false;
 
     public AutoAlignment(Swerve swerve) {
         this.swerve = swerve;
@@ -63,14 +66,24 @@ public class AutoAlignment {
           EstimatedRobotPose camEstimatedPose = result.get();
 
           if (currentNorm < (originalNorm / 2) || SwerveTrajectory.trajectoryStatus == "setup") {
-            swerve.getPoseEstimator().addVisionMeasurement(
-              camEstimatedPose.estimatedPose.toPose2d(),
-              Timer.getFPGATimestamp());
+
+              swerve.getPoseEstimator().addVisionMeasurement(
+                  camEstimatedPose.estimatedPose.toPose2d(),
+                  Timer.getFPGATimestamp());
 
               System.out.println("Reset OG");
               
               setTagID(getNearestTag());
+
               originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
+
+              if (SwerveTrajectory.trajectoryStatus != "setup" && tagID == 4 || tagID == 5) {
+                moveArmToHumanTag = true;
+              }
+              else {
+                moveArmToHumanTag = false;
+              }
+
             }
             
           System.out.println(currentNorm + " " + originalNorm);
@@ -233,6 +246,10 @@ public class AutoAlignment {
         SwerveTrajectory.resetTrajectoryStatus();
       }
       
+    }
+
+    public boolean getMoveArmToHumanTag() {
+      return this.moveArmToHumanTag;
     }
 
 }
