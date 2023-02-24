@@ -272,9 +272,10 @@ public class Robot extends TimedRobot {
         }
         else {
 
-          if (claw.finishedOuttaking() && arm.getAtPlacementPosition()) {
+          if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
             
             arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
+            claw.setFinishedOuttaking(false);
             
           }
         

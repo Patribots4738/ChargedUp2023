@@ -76,8 +76,12 @@ public class Claw {
         this.startedOuttaking = Timer.getFPGATimestamp();
     }
 
-    public boolean finishedOuttaking() {
+    public boolean getFinishedOuttaking() {
         return this.finishedOuttaking;
+    }
+
+    public void setFinishedOuttaking(boolean finishedOuttaking) {
+        this.finishedOuttaking = finishedOuttaking;
     }
 
 }
