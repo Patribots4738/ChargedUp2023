@@ -89,10 +89,10 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public void loadAutoPaths() {
 
-    square1 = PathPlanner.loadPath("4", 4.0, 3.0);
-    square2 = PathPlanner.loadPath("5", 4.0, 3.0);
-    square3 = PathPlanner.loadPath("6", 2.0, 1.5);
-    square4 = PathPlanner.loadPath("7", 2.0, 1.5);
+    square1 = PathPlanner.loadPath("Square1", 4.0, 3.0);
+    square2 = PathPlanner.loadPath("Square2", 4.0, 3.0);
+    square3 = PathPlanner.loadPath("Square3", 2.0, 1.5);
+    square4 = PathPlanner.loadPath("Square", 2.0, 1.5);
 
     coneToCube1 = PathPlanner.loadPath("ConeToCube1", 2.0, 1.5);
     coneToCube2 = PathPlanner.loadPath("ConeToCube2", 2.0, 1.5);
