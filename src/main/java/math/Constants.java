@@ -357,17 +357,23 @@ public final class Constants {
 
     public static final class PlacementConstants {
 
-      public static final int STOWED_PLACEMENT_INDEX = 0;
-      public static final int HYBRID_PLACEMENT_INDEX = 1;
-      public static final int MID_CONE_PLACEMENT_INDEX = 2;
+      public static final int STOWED_INDEX = 0;
+
       public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
-      public static final int HUMAN_TAG_PICKUP_INDEX = 4;
-      public static final int MID_CUBE_LAUNCH_INDEX = 5;
+      public static final int MID_CONE_PLACEMENT_INDEX = 2;
+      
       public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
-      public static final int FLOOR_INTAKE_PLACEMENT_INDEX = 7;
+      public static final int MID_CUBE_LAUNCH_INDEX = 5;
+      
+      public static final int HYBRID_PLACEMENT_INDEX = 1;
+      
+      public static final int HUMAN_TAG_PICKUP_INDEX = 4;
+      public static final int FLOOR_INTAKE_INDEX = 7;
+      
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
 
+      
       public static final double CLAW_CONE_INTAKE_SPEED = -1;
       public static final double CLAW_CUBE_INTAKE_SPEED = -0.7;      
       public static final double CLAW_OUTTAKE_SPEED = 1;
@@ -398,7 +404,7 @@ public final class Constants {
       public static final Translation2d ARM_HIGH_CONE_POSITION_1 = new Translation2d(46.65, 31.34);
       public static final Translation2d ARM_HIGH_CONE_POSITION_2 = new Translation2d(49.09, 26.90);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
-      public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(0.22, 38.25);
+      public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(11, 43.25);
       public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
 
       public static final Translation2d[][] ARM_POSITIONS = {

@@ -34,7 +34,7 @@ public class Arm implements Loggable {
      */
 
     // ceil -- force round up
-    int armPosDimension1 = PlacementConstants.STOWED_PLACEMENT_INDEX;
+    int armPosDimension1 = PlacementConstants.STOWED_INDEX;
     int armPosDimension2 = 0;
 
     private boolean startedTransition = false;
@@ -42,7 +42,7 @@ public class Arm implements Loggable {
     private boolean operatorOverride = false;
     private boolean operatorOverrideBeforeFlip = false;
     private Translation2d armBeforeFlip = PlacementConstants.ARM_STOWED_POSITION;
-    private int indexBeforeFlip = PlacementConstants.STOWED_PLACEMENT_INDEX;
+    private int indexBeforeFlip = PlacementConstants.STOWED_INDEX;
 
     private double armXReference = 0;
     private double armYReference = 0;
