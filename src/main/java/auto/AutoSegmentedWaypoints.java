@@ -6,6 +6,8 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import hardware.Arm;
@@ -62,9 +64,13 @@ public class AutoSegmentedWaypoints implements Loggable {
   public void init() {
 
     if (m_autoChooser.getSelected() == null) {
+
       chosenPath = myAutoContainer[0];
+
     } else {
+
       chosenPath = m_autoChooser.getSelected();
+
     }
 
     chosenWaypoints = chosenPath.thisWPset;
@@ -73,7 +79,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     PathPlannerState initialPathPose = chosenWaypoints[0].pathPlannerSegment.getInitialState();
 
-    this.swerve.resetOdometry(initialPathPose.poseMeters);
+    swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
 
   }
 
@@ -83,10 +89,10 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public void loadAutoPaths() {
 
-    square1 = PathPlanner.loadPath("4", 2.0, 1.5);
-    square2 = PathPlanner.loadPath("5", 2.0, 1.5);
-    square3 = PathPlanner.loadPath("6", 2.0, 1.5);
-    square4 = PathPlanner.loadPath("7", 2.0, 1.5);
+    square1 = PathPlanner.loadPath("Square1", 4.0, 3.0);
+    square2 = PathPlanner.loadPath("Square2", 4.0, 3.0);
+    square3 = PathPlanner.loadPath("Square3", 2.0, 1.5);
+    square4 = PathPlanner.loadPath("Square", 2.0, 1.5);
 
     coneToCube1 = PathPlanner.loadPath("ConeToCube1", 2.0, 1.5);
     coneToCube2 = PathPlanner.loadPath("ConeToCube2", 2.0, 1.5);
@@ -109,13 +115,13 @@ public class AutoSegmentedWaypoints implements Loggable {
     SquareAutoWPs = new Waypoint[]{
       new Waypoint(
           square1,
-          PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-          PlacementConstants.CLAW_OUTTAKE_SPEED
+          PlacementConstants.STOWED_PLACEMENT_INDEX,
+          PlacementConstants.CLAW_STOPPED_SPEED
       ),
       new Waypoint(
           square2,
-          PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
-          PlacementConstants.CLAW_CONE_INTAKE_SPEED
+          PlacementConstants.STOWED_PLACEMENT_INDEX,
+          PlacementConstants.CLAW_STOPPED_SPEED
       )
       // ,
       // new Waypoint(

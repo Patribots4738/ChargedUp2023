@@ -7,9 +7,9 @@ import debug.Debug;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
@@ -101,12 +101,14 @@ public class SwerveTrajectory implements Loggable {
         // If the path has not completed time wise
         if (elapsedTime < _pathTraj.getEndState().timeSeconds + 1) {
 
+          PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
           ChassisSpeeds _speeds = HDC.calculate(
               swerve.getPose(),
-              _pathTraj.sample(elapsedTime),
+              // Pass in the alliance to flip on the Y if on red alliance
+              PathPlannerTrajectory.transformStateForAlliance(state, DriverStation.getAlliance()),
               ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
 
           // Set the states for the motor using calculated values above
