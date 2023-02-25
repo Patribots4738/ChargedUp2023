@@ -126,24 +126,24 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 4;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND/2;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4*Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 1;
+        public static final double X_CORRECTION_P = 6.1;
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 1;
+        public static final double Y_CORRECTION_P = 6.27;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
-        public static final double ROTATION_CORRECTION_P = .6;
+        public static final double ROTATION_CORRECTION_P = .63;
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -230,24 +230,25 @@ public final class Constants {
       public static final double UPPER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
 
       // The number of degrees that the upper arm can rotate from parallel to the front of the bot
-      public static final double LOWER_ARM_FREEDOM_DEGREES = 70;
+      // Add 90 to lower arm's upper limit b/c the zero is perpendicular to chassis
+      public static final double LOWER_ARM_LOWER_LIMIT = Math.toRadians(90);
+      public static final double LOWER_ARM_UPPER_LIMIT = Math.toRadians(240);
 
       // The number of degrees that the upper arm can rotate from the base of the lower arm
-      public static final double UPPER_ARM_FREEDOM_DEGREES = 145;
-
-      public static final double LOWER_ARM_HARDSTOP_OFFSET = Math.toRadians(160+90);
-      public static final double UPPER_ARM_HARDSTOP_OFFSET = Math.toRadians(13);
+      // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
+      public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(23);
+      public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(315);
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
       public static final double LOWER_ARM_DEADBAND = Math.toRadians(7);
-      public static final double UPPER_ARM_DEADBAND = Math.toRadians(7);
+      public static final double UPPER_ARM_DEADBAND = Math.toRadians(15);
 
       // The outputs used in the output range for the lower and upper arms
       public static final double LOWER_MAX_OUTPUT = 1;
       public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MAX_OUTPUT = 0.25;
+      public static final double UPPER_MAX_OUTPUT = 0.7;
       public static final double UPPER_MIN_OUTPUT = -UPPER_MAX_OUTPUT;
 
       /**
@@ -372,6 +373,7 @@ public final class Constants {
       public static final double CLAW_OUTTAKE_SPEED = 1;
       public static final double CLAW_STOPPED_SPEED = 0;
       
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,48);
       public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28,48);
       public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,48);
 
@@ -433,9 +435,11 @@ public final class Constants {
           ARM_FLOOR_INTAKE_POSITION
         },
         {
+          SOLUTION_FLIP_TRANSITION_POINT,
           SOLUTION_FLIP_POSIITON_POSITIVE
         },
         {
+          SOLUTION_FLIP_TRANSITION_POINT,
           SOLUTION_FLIP_POSIITON_NEGATIVE
         }
       };

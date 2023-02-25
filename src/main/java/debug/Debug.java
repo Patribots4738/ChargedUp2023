@@ -30,27 +30,27 @@ public class Debug {
     public Debug() {
 
         xP = Shuffleboard.getTab("Drive")
-                .add("xP", 1)
+                .add("xP", AutoConstants.X_CORRECTION_P)
                 .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+                .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
                 .getEntry();
 
         xD = Shuffleboard.getTab("Drive")
-                .add("xD", 0)
+                .add("xD", AutoConstants.X_CORRECTION_D)
                 .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
+                .withProperties(Map.of("min", -1, "max", 3)) // specify widget properties here
                 .getEntry();
 
         yP = Shuffleboard.getTab("Drive")
-                .add("yP", 1)
+                .add("yP", AutoConstants.Y_CORRECTION_P)
                 .withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", 0, "max", 10)) // specify widget properties here
                 .getEntry();
 
         yD = Shuffleboard.getTab("Drive")
-                .add("yD", 0)
+                .add("yD", AutoConstants.Y_CORRECTION_D)
                 .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", -1, "max", 1)) // specify widget properties here
+                .withProperties(Map.of("min", -1, "max", 3)) // specify widget properties here
                 .getEntry();
 
         rotP = Shuffleboard.getTab("Turn")

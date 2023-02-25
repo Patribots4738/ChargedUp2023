@@ -175,12 +175,6 @@ public class Arm implements Loggable {
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
         return;
       }
-
-      System.out.printf("Lower Pos %.3f; Upper Position %.3f, Lower Ref %.3f, Upper Ref %.3f%n",
-          Math.toDegrees(getLowerArmAngle()),
-          Math.toDegrees(getUpperArmAngle()),
-          Math.toDegrees(lowerReferenceAngle),
-          Math.toDegrees(upperReferenceAngle));
       
       // Notice that this code is getting the difference in angle between the arms.
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
@@ -337,12 +331,22 @@ public class Arm implements Loggable {
           System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
           return;
         }
-        
-        System.out.printf("Lower Angle: %.1f, Upper Angle: %.1f Arm References: %.1f, %.1f%n",
-            Units.radiansToDegrees(lowerArmAngle + (Math.PI/2)),
-            Units.radiansToDegrees(upperArmAngle + (Math.PI)),
-            armPosition.getX(),
-            armPosition.getY());
+
+        lowerArmAngle += (Math.PI/2);
+
+        upperArmAngle += Math.PI;
+
+        upperArmAngle = MathUtil.clamp(
+          upperArmAngle,
+          ArmConstants.UPPER_ARM_LOWER_LIMIT,
+          ArmConstants.UPPER_ARM_UPPER_LIMIT
+        );
+
+        lowerArmAngle = MathUtil.clamp(
+          lowerArmAngle,
+          ArmConstants.LOWER_ARM_LOWER_LIMIT,
+          ArmConstants.LOWER_ARM_UPPER_LIMIT
+        );
 
         // Set the reference values to the modified X and Y values
         // This is especially important for the operatorOverride going OOB
@@ -355,8 +359,8 @@ public class Arm implements Loggable {
         // And the zero for the encoder is the direction of gravity
         // Add PI to upperArmAngle...
         // because armCalculations gives us the angle relative to the upper arm
-        setLowerArmReference(lowerArmAngle + (Math.PI/2));
-        setUpperArmReference(upperArmAngle + (Math.PI));
+        setLowerArmReference(lowerArmAngle);
+        setUpperArmReference(upperArmAngle);
 
     }
 
@@ -372,14 +376,14 @@ public class Arm implements Loggable {
      * Set the position of an arm
      *
      * @param position the position to set the upper arm to
-     *                 This unit is in revolutions
+     *                 This unit is in rads
      */
     public void setUpperArmPosition(double position) {
 
         position = MathUtil.clamp(
           position,
-          Math.toRadians(20),
-          Math.toRadians(270)
+          ArmConstants.UPPER_ARM_LOWER_LIMIT,
+          ArmConstants.UPPER_ARM_UPPER_LIMIT
         );
 
         // Description of FF in Constants :D
@@ -406,14 +410,14 @@ public class Arm implements Loggable {
      * Set the position of the lower arm
      *
      * @param position the position to set the lower arm to
-     *                 This unit is in full rotations
+     *                 This unit is in rads
      */
     public void setLowerArmPosition(double position) {
 
         position = MathUtil.clamp(
                 position,
-                Math.toRadians(90),
-                Math.toRadians(270)
+                ArmConstants.LOWER_ARM_LOWER_LIMIT,
+                ArmConstants.LOWER_ARM_UPPER_LIMIT
         );
 
         ArmFeedforward feedForward = new ArmFeedforward(
@@ -509,7 +513,7 @@ public class Arm implements Loggable {
 
         double unadjustedAngle = (_lowerArmEncoder.getPosition() - _lowerArmEncoder.getZeroOffset());
 
-        double zeroAngle = (ArmConstants.LOWER_ARM_HARDSTOP_OFFSET) - unadjustedAngle;
+        double zeroAngle = (ArmConstants.LOWER_ARM_UPPER_LIMIT) - unadjustedAngle;
 
         Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
 
@@ -520,7 +524,7 @@ public class Arm implements Loggable {
 
           double unadjustedAngle = (_upperArmEncoder.getPosition() - _upperArmEncoder.getZeroOffset());
 
-          double zeroAngle = (ArmConstants.UPPER_ARM_HARDSTOP_OFFSET) - unadjustedAngle;
+          double zeroAngle = (ArmConstants.UPPER_ARM_LOWER_LIMIT) - unadjustedAngle;
 
           Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
 
