@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
       armCalcuations = new ArmCalculations();
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
-      autoPathStorage = new AutoPathStorage
+      autoPathStorage = new AutoPathStorage();
 
       autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
       Logger.configureLoggingAndConfig(this, false);
@@ -225,7 +225,7 @@ public class Robot extends TimedRobot {
 
       // Clicking down
       case 180:
-        arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX);
+        arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_INDEX);
         break;
 
       // Clicking left
