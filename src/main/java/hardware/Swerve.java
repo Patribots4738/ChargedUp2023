@@ -14,7 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.Timer;
 import math.Constants.DriveConstants;
 
 public class Swerve {
@@ -52,32 +51,38 @@ public class Swerve {
     };
 
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
-          DriveConstants.DRIVE_KINEMATICS,
-          getYaw(),
-          getModulePositions(),
-          new Pose2d(),
-          // Trust the information of the vision more
-          // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
-          // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
-          new MatBuilder<>(
-                  Nat.N3(),
-                  Nat.N1()).fill(1,1,1),// State measurement
-                  // standard deviations
-                  // X, Y, theta
-          new MatBuilder<>(
-                  Nat.N3(),
-                  Nat.N1()).fill(0,0,0)// Vision measurement
-                  // standard deviations
-                  // X, Y, theta
-      );
+        DriveConstants.DRIVE_KINEMATICS,
+        getYaw(),
+        getModulePositions(),
+        new Pose2d(),
+        // Trust the information of the vision more
+        // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
+        // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
+        // Notice that the theta on the vision is very large,
+        // and the state measurement is very small.
+        // This is because we assume that the IMU is very accurate.
+        // You can visualize these graphs working together here: https://www.desmos.com/calculator/a0kszyrwfe
+        new MatBuilder<>(
+            Nat.N3(),
+            Nat.N1()).fill(0.1, 0.1, 0.05),
+                // State measurement
+                // standard deviations
+                // X, Y, theta
+        new MatBuilder<>(
+                Nat.N3(),
+                Nat.N1()).fill(0.9, 0.9, 5)
+                // Vision measurement
+                // standard deviations
+                // X, Y, theta
+    );
 
     /**
      * Creates a new DriveSubsystem.
      */
     public Swerve() {
-      resetEncoders();
-      zeroHeading();
-      setBrakeMode();
+        resetEncoders();
+        zeroHeading();
+        setBrakeMode();
     }
 
     public void periodic() {
@@ -181,16 +186,6 @@ public class Swerve {
         gyro.reset();
     }
 
-    /**
-     * Returns the heading of the robot.
-     *
-     * @return the robot's total degrees traveled from the start
-     */
-    public double getTotalDegrees() {
-        return Rotation2d.fromDegrees(gyro.getAngle()).getDegrees()
-                * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
-    }
-
     public Rotation2d getYaw() {
         Rotation2d yaw = Rotation2d.fromDegrees(gyro.getAngle());
 
@@ -219,7 +214,7 @@ public class Swerve {
     }
 
     public void toggleSpeed() {
-      this.speedMultiplier = (this.speedMultiplier == 1) ? 0.1 : 1;
+        this.speedMultiplier = (this.speedMultiplier == 1) ? 0.1 : 1;
     }
 
     /**

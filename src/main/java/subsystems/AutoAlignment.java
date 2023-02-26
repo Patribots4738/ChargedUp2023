@@ -2,6 +2,7 @@ package subsystems;
 
 import auto.SwerveTrajectory;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -65,7 +66,7 @@ public class AutoAlignment {
 
           EstimatedRobotPose camEstimatedPose = result.get();
 
-          if (currentNorm < (originalNorm / 2) || SwerveTrajectory.trajectoryStatus == "setup") {
+          if (currentNorm < (originalNorm / 2) || Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
 
               swerve.getPoseEstimator().addVisionMeasurement(
                   camEstimatedPose.estimatedPose.toPose2d(),
@@ -75,13 +76,36 @@ public class AutoAlignment {
               
               setTagID(getNearestTag());
 
-              originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
+              if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+                originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
 
-              if (SwerveTrajectory.trajectoryStatus != "setup" && tagID == 4 || tagID == 5) {
-                moveArmToHumanTag = true;
-              }
-              else {
-                moveArmToHumanTag = false;
+                if (!Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && (tagID == 4 || tagID == 5)) {
+                  moveArmToHumanTag = true;
+                  double normToLeftOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
+                      new Translation2d(
+                          (AlignmentConstants.GRID_BARRIER),
+                          AlignmentConstants.CONE_OFFSET_METERS),
+                      new Rotation2d()))).getTranslation().getNorm();
+
+                  double normToRightOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
+                      new Translation2d(
+                          (AlignmentConstants.GRID_BARRIER),
+                          -AlignmentConstants.CONE_OFFSET_METERS),
+                      new Rotation2d()))).getTranslation().getNorm();
+
+                  /*
+                    If we are on red alliance, left of the tag is going to be the negative on the Y axis
+                    Due to moveToTag checking if we are on the blue alliance and flipping the sign,
+                    we need to flip the sign here
+                  */
+                  if (normToLeftOfHumanTag < normToRightOfHumanTag && DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+                    coneOffset = -1;
+                  } else {
+                    coneOffset = 1;
+                  }
+                } else {
+                  moveArmToHumanTag = false;
+                }
               }
 
             }
@@ -93,7 +117,7 @@ public class AutoAlignment {
 
     public void moveToTag() {
 
-      // If cannot see tag
+      // If we cannot see a tag
       if (tagID == 0) {
           return;
       }
@@ -102,7 +126,7 @@ public class AutoAlignment {
 
       currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
       
-      double coneOffsetLeft = VisionConstants.CONE_OFFSET_METERS;
+      double coneOffsetLeft = AlignmentConstants.CONE_OFFSET_METERS;
 
       if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
 

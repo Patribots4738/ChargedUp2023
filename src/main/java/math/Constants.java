@@ -325,11 +325,11 @@ public final class Constants {
                         0,
                         0));
 
-        public static final double CONE_OFFSET_METERS = 0.542615;
     }
 
     public static final class AlignmentConstants {
 
+        public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
         public static final double GRID_BARRIER = Units.inchesToMeters(15);
@@ -378,12 +378,13 @@ public final class Constants {
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
 
+
       public static final int HIGH_TO_STOWWED_INDEX = 10;
 
-      
-      public static final double CLAW_CONE_INTAKE_SPEED = -1;
-      public static final double CLAW_CUBE_INTAKE_SPEED = -0.7;      
-      public static final double CLAW_OUTTAKE_SPEED = 0.5;
+      public static final double CLAW_CONE_INTAKE_SPEED = 1;
+      public static final double CLAW_CUBE_INTAKE_SPEED = 1;
+      public static final double CLAW_OUTTAKE_SPEED = -1;
+
       public static final double CLAW_STOPPED_SPEED = 0;
       
       public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,48);
