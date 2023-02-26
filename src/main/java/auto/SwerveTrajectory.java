@@ -7,13 +7,17 @@ import debug.Debug;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import math.Constants;
+import math.Constants.AlignmentConstants;
 
 public class SwerveTrajectory implements Loggable {
 
@@ -99,17 +103,31 @@ public class SwerveTrajectory implements Loggable {
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < _pathTraj.getEndState().timeSeconds + 1) {
+        if (elapsedTime < _pathTraj.getEndState().timeSeconds + 2) {
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
+          PathPlannerState translationMirroredState = PathPlannerTrajectory.transformStateForAlliance(state, DriverStation.getAlliance());
+          // Create a new pathplannerstate based on the mirrored state's position, and taking the mirrored state's rotation and adding 180 degrees
+          State mirroredState = new State(
+              state.timeSeconds, 
+              state.velocityMetersPerSecond, 
+              state.accelerationMetersPerSecondSq, 
+              new Pose2d(
+                  (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (state.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
+                  state.poseMeters.getTranslation().getY(), 
+                  state.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0))),
+              state.curvatureRadPerMeter);
+
+          System.out.println(mirroredState.poseMeters);
+          
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
           ChassisSpeeds _speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              PathPlannerTrajectory.transformStateForAlliance(state, DriverStation.getAlliance()),
-              ((PathPlannerState) _pathTraj.sample(elapsedTime)).holonomicRotation);
+              mirroredState,
+              mirroredState.poseMeters.getRotation());
 
           // Set the states for the motor using calculated values above
           // It is important to note that fieldRelative is false,
