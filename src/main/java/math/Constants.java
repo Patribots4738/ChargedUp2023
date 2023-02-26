@@ -321,11 +321,11 @@ public final class Constants {
                         0,
                         0));
 
-        public static final double CONE_OFFSET_METERS = 0.542615;
     }
 
     public static final class AlignmentConstants {
 
+        public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
         public static final double GRID_BARRIER = Units.inchesToMeters(15);
