@@ -32,9 +32,10 @@ public class Robot extends TimedRobot {
 
   XboxController driver;
   XboxController operator;
-
+  
   AutoSegmentedWaypoints autoSegmentedWaypoints;
-
+  AutoPathStorage autoPathStorage;
+  
   Arm arm;
   Claw claw;
 
@@ -64,7 +65,7 @@ public class Robot extends TimedRobot {
       armCalcuations = new ArmCalculations();
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
-      autoSegmentedWaypoints.loadAutoPaths();
+      autoPathStorage = new AutoPathStorage
 
       autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
       Logger.configureLoggingAndConfig(this, false);
@@ -174,7 +175,7 @@ public class Robot extends TimedRobot {
       //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
       swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, !driver.getYButton());
     }
-
+    
     // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
     if (driver.getRightStickButtonPressed()) {
       swerve.toggleSpeed();
@@ -239,8 +240,8 @@ public class Robot extends TimedRobot {
     }
 
     if (operator.getRightStickButtonPressed()) {
-
-      arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
+    
+      arm.setArmIndex(PlacementConstants.STOWED_INDEX);
 
     }
 
@@ -248,10 +249,24 @@ public class Robot extends TimedRobot {
     // If the left bumper is pressed, e-stop the claw
     // If the right bumper is held, outtake an object when the arm is at placement position
     // If the left trigger is held, intake an object
-    // Keep the fastest intake speed until the claw is e-stopped/reversed
-    // This is to allow the trigger to be fully pressed intake an object,
+      // Keep the fastest intake speed until the claw is e-stopped/reversed
+      // This is to allow the trigger to be fully pressed intake an object,
     // and then let go to keep the claw at the same speed
     // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
+    
+    if (operator.getLeftBumper()) {
+
+      claw.stopClaw();
+
+    } else if (operator.getRightBumper()) {
+      // Check if the arm has completed the path to place an object
+      if (arm.getAtPlacementPosition()) {
+
+        claw.outTakeforXSeconds(0.5);
+
+      }
+    } else if (operator.getLeftTriggerAxis() > 0) {
+    
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
@@ -275,9 +290,17 @@ public class Robot extends TimedRobot {
 
       if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-        arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
-        claw.setFinishedOuttaking(false);
-
+        if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
+            arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
+          }
+          else {
+            arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+          }
+          
+          claw.setFinishedOuttaking(false);
+          claw.setStartedOuttakingBool(false);
+          
+        }
       }
     }
   }
