@@ -1,16 +1,22 @@
 // Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
 package auto;
 
+import java.sql.Driver;
+
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import auto.AutoPathStorage.AutoPose;
 import auto.AutoPathStorage.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Arm;
 import hardware.Claw;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import math.Constants.AlignmentConstants;
+import math.Constants.AutoConstants;
 import math.Constants.PlacementConstants;
 
 public class AutoSegmentedWaypoints implements Loggable {
@@ -55,8 +61,16 @@ public class AutoSegmentedWaypoints implements Loggable {
     currentWaypointNumber = 0;
 
     PathPlannerState initialPathPose = chosenWaypoints[0].pathPlannerSegment.getInitialState();
+    chosenWaypoints[0].pathPlannerSegment.getInitialHolonomicPose();
 
-    swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
+    Pose2d mirroredPose = new Pose2d(
+      (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
+        initialPathPose.poseMeters.getTranslation().getY(), 
+        initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
+    
+    System.out.println(mirroredPose);
+
+    swerve.resetOdometry(mirroredPose);
 
   }
 

@@ -157,8 +157,8 @@ public class AutoPathStorage implements Loggable {
     _1 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_1_A.getInitialState().poseMeters.getTranslation(), _1_A.getInitialState().poseMeters.getRotation(), _1_A.getInitialState().poseMeters.getRotation()),
-        new PathPoint(_1_A.getInitialState().poseMeters.getTranslation(), _1_A.getInitialState().poseMeters.getRotation(), _1_A.getInitialState().poseMeters.getRotation())
+        new PathPoint(_1_A.getInitialState().poseMeters.getTranslation(), _1_A.getInitialState().poseMeters.getRotation(), _1_A.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_1_A.getInitialState().poseMeters.getTranslation(), _1_A.getInitialState().poseMeters.getRotation(), _1_A.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _2_A as the starting point for _2
@@ -166,8 +166,8 @@ public class AutoPathStorage implements Loggable {
     _2 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(), _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialState().poseMeters.getRotation()),
-        new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(), _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialState().poseMeters.getRotation())
+        new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(), _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(), _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _3_A as the starting point for _3
@@ -175,8 +175,8 @@ public class AutoPathStorage implements Loggable {
     _3 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialState().poseMeters.getRotation()),
-        new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialState().poseMeters.getRotation())
+        new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _6_D as the starting point for _6
@@ -184,8 +184,8 @@ public class AutoPathStorage implements Loggable {
     _6 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_6_D.getInitialState().poseMeters.getTranslation(), _6_D.getInitialState().poseMeters.getRotation(), _6_D.getInitialState().poseMeters.getRotation()),
-        new PathPoint(_6_D.getInitialState().poseMeters.getTranslation(), _6_D.getInitialState().poseMeters.getRotation(), _6_D.getInitialState().poseMeters.getRotation())
+        new PathPoint(_6_D.getInitialState().poseMeters.getTranslation(), _6_D.getInitialState().poseMeters.getRotation(), _6_D.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_6_D.getInitialState().poseMeters.getTranslation(), _6_D.getInitialState().poseMeters.getRotation(), _6_D.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _7_D as the starting point for _7
@@ -193,8 +193,8 @@ public class AutoPathStorage implements Loggable {
     _7 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(), _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialState().poseMeters.getRotation()),
-        new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(), _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialState().poseMeters.getRotation())
+        new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(), _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(), _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _8_D as the starting point for _8
@@ -202,8 +202,8 @@ public class AutoPathStorage implements Loggable {
     _8 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(), _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialState().poseMeters.getRotation()),
-        new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(), _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialState().poseMeters.getRotation())
+        new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(), _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(), _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialHolonomicPose().getRotation())
     );
 
 
@@ -421,7 +421,6 @@ public class AutoPathStorage implements Loggable {
     };
 
     for (AutoPose AutoPose : myAutoContainer) {
-      System.out.println("Adding " + AutoPose.name + " to auto chooser");
       autoChooser.addOption(AutoPose.name, AutoPose);
     }
   }

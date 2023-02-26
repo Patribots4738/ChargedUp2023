@@ -250,20 +250,10 @@ public class Robot extends TimedRobot {
           arm.setArmIndex(PlacementConstants.STOWED_INDEX);
 
         }
-        
-        if (operator.getRightTriggerAxis() > 0 && operator.getLeftTriggerAxis() > 0) {
 
-          claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
-
-        }
-        else if (operator.getRightTriggerAxis() > 0) {
+        if (operator.getRightTriggerAxis() > 0) {
           // Check if the arm has completed the path to place an object
-
-          if (arm.getAtPlacementPosition()) {
-
-            claw.outTakeforXSeconds(0.5);
-
-          }
+          claw.setDesiredSpeed(operator.getRightTriggerAxis());      
 
         }
         else if (operator.getLeftTriggerAxis() > 0) {
@@ -271,15 +261,31 @@ public class Robot extends TimedRobot {
           claw.setDesiredSpeed(-operator.getLeftTriggerAxis());
 
         }
-        else {
+        else if (operator.getRightBumper()) {
+          // Check if the arm has completed the path to place an object
+          if (arm.getAtPlacementPosition() && !claw.getStartedOuttakingBool()) {
 
-          if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
-            
-            arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-            claw.setFinishedOuttaking(false);
-            
-          }
+            claw.outTakeforXSeconds(0.5);
+
+          }        
+
+        }
+        else if (!(arm.getAtPlacementPosition() && claw.getStartedOuttakingBool())) {
+
+          claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
+
+        } 
         
+        if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
+          if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
+            arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
+          }
+          else {
+            arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+          }
+          claw.setFinishedOuttaking(false);
+          claw.setStartedOuttakingBool(false);
+          
         }
 
     }

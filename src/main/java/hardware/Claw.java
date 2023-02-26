@@ -1,8 +1,10 @@
 package hardware;
 
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.revrobotics.RelativeEncoder;
@@ -16,7 +18,8 @@ public class Claw {
     private double desiredSpeed = 0;
 
     // Timer values to have the claw auto outtake for X seconds
-    private boolean finishedOuttaking = false;
+    private boolean startedOuttakingBool = false;
+    private boolean finishedOuttaking = true;
     private double outtakeSeconds = 0;
     private double startedOuttaking = 0;
 
@@ -40,10 +43,13 @@ public class Claw {
     }
 
     public void periodic() {
-        if ((Timer.getFPGATimestamp() - startedOuttaking) > outtakeSeconds) {
+
+      if (DriverStation.isTeleop()) {
+        if ((Timer.getFPGATimestamp() - startedOuttaking) > outtakeSeconds && startedOuttakingBool) {
             finishedOuttaking = true;
             setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
         }
+      }
         
         setSpeed(desiredSpeed);
     }
@@ -71,6 +77,7 @@ public class Claw {
 
     public void outTakeforXSeconds(double seconds) {
         setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
+        this.startedOuttakingBool = true;
         this.outtakeSeconds = seconds;
         this.finishedOuttaking = false;
         this.startedOuttaking = Timer.getFPGATimestamp();
@@ -78,6 +85,14 @@ public class Claw {
 
     public boolean getFinishedOuttaking() {
         return this.finishedOuttaking;
+    }
+
+    public void setStartedOuttakingBool(boolean startedOuttakingBool) {
+      this.startedOuttakingBool = startedOuttakingBool;
+    }
+
+    public boolean getStartedOuttakingBool() {
+      return this.startedOuttakingBool;
     }
 
     public void setFinishedOuttaking(boolean finishedOuttaking) {

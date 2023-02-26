@@ -41,7 +41,7 @@ public class Arm implements Loggable {
 
     private boolean operatorOverride = false;
     private boolean operatorOverrideBeforeFlip = false;
-    private Translation2d armBeforeFlip = PlacementConstants.ARM_STOWED_POSITION;
+    private Translation2d armBeforeFlip = PlacementConstants.STOWED_POSITION;
     private int indexBeforeFlip = PlacementConstants.STOWED_INDEX;
 
     private double armXReference = 0;
@@ -157,7 +157,7 @@ public class Arm implements Loggable {
     public void periodic() {
         if (!operatorOverride) { indexPeriodic();}
         setLowerArmPosition(lowerReferenceAngle);
-        setUpperArmPosition(upperReferenceAngle);
+        // setUpperArmPosition(upperReferenceAngle);
         upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // Use forward kinematics to get the x and y position of the end effector
@@ -167,6 +167,16 @@ public class Arm implements Loggable {
     }
 
     public void indexPeriodic() {
+
+      boolean atDesiredCoarse = (Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE);// && 
+                                // Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_COARSE);
+
+      boolean atDesiredFine = (Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE);// && 
+                              // Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
+
+      boolean finalDeadband = (armPosDimension2 < PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1) 
+                              ? atDesiredCoarse 
+                              : atDesiredFine;
 
       // Syntax example: PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]
       if (!startedTransition)
@@ -178,8 +188,7 @@ public class Arm implements Loggable {
       
       // Notice that this code is getting the difference in angle between the arms.
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
-      if (Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND
-          && Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND)
+      if (finalDeadband)
       {
         armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);

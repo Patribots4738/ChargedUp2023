@@ -236,19 +236,23 @@ public final class Constants {
 
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
-      public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(23);
+      public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(30);
       public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(315);
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
-      public static final double LOWER_ARM_DEADBAND = Math.toRadians(7);
-      public static final double UPPER_ARM_DEADBAND = Math.toRadians(15);
+      public static final double LOWER_ARM_DEADBAND_COARSE = Math.toRadians(15);
+      public static final double UPPER_ARM_DEADBAND_COARSE = Math.toRadians(20);
+
+      public static final double LOWER_ARM_DEADBAND_FINE = Math.toRadians(7);
+      public static final double UPPER_ARM_DEADBAND_FINE = Math.toRadians(15);
+
 
       // The outputs used in the output range for the lower and upper arms
-      public static final double LOWER_MAX_OUTPUT = 1;
+      public static final double LOWER_MAX_OUTPUT = 0.85;
       public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MAX_OUTPUT = 0.7;
+      public static final double UPPER_MAX_OUTPUT = 0.5;
       public static final double UPPER_MIN_OUTPUT = -UPPER_MAX_OUTPUT;
 
       /**
@@ -260,7 +264,7 @@ public final class Constants {
        * <p>
        */
       // PID values for the lower and upper arm
-      public static final double LOWER_P = 0.275;//0.25;
+      public static final double LOWER_P = 0.65;//0.25;
       public static final double LOWER_I = 0;
       public static final double LOWER_D = 0.075;
       public static final double LOWER_FF = 1;
@@ -268,9 +272,9 @@ public final class Constants {
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double UPPER_P = 0.225;//.25;
+      public static final double UPPER_P = 0.4;//.25;
       public static final double UPPER_I = 0.0001;
-      public static final double UPPER_D = 0;
+      public static final double UPPER_D = 0.125;
       public static final double UPPER_FF = 1;
 
       public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
@@ -331,6 +335,7 @@ public final class Constants {
         public static final double GRID_BARRIER = Units.inchesToMeters(15);
         public static final double HUMAN_TAG_OFFSET_X_INCHES = 30;
         public static final double ALLOWABLE_ERROR = Units.inchesToMeters(2);
+        public static final double FIELD_WIDTH_METERS = 16.53;
 
         public static final Pose3d TAG_0_POSE = null;
         public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
@@ -373,22 +378,24 @@ public final class Constants {
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
 
+      public static final int HIGH_TO_STOWWED_INDEX = 10;
+
       
       public static final double CLAW_CONE_INTAKE_SPEED = -1;
       public static final double CLAW_CUBE_INTAKE_SPEED = -0.7;      
-      public static final double CLAW_OUTTAKE_SPEED = 1;
+      public static final double CLAW_OUTTAKE_SPEED = 0.5;
       public static final double CLAW_STOPPED_SPEED = 0;
       
       public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,48);
       public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28,48);
       public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,48);
 
-      public static final Translation2d ARM_FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
-      public static final Translation2d ARM_FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
+      public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
+      public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
 
-      public static final Translation2d ARM_TRANSITION_POSITION = new Translation2d(10, 37);
-      public static final Translation2d ARM_STOWED_POSITION = new Translation2d(9, 18);
-      public static final Translation2d ARM_HYBRID_POSITION = new Translation2d(14, 13);
+      public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
+      public static final Translation2d STOWED_POSITION = new Translation2d(9, 18);
+      public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
       public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
       
@@ -398,34 +405,36 @@ public final class Constants {
       public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
         
       public static final Pose3d TAG_0_POSE = null;
-      public static final Translation2d ARM_MID_CONE_POSITION_0 = new Translation2d(30.75, 41.88);
-      public static final Translation2d ARM_MID_CONE_POSITION_1 = new Translation2d(32.34, 19.00);
-      public static final Translation2d ARM_HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
-      public static final Translation2d ARM_HIGH_CONE_POSITION_1 = new Translation2d(46.65, 31.34);
-      public static final Translation2d ARM_HIGH_CONE_POSITION_2 = new Translation2d(49.09, 26.90);
+      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(30.75, 41.88);
+      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(32.34, 19.00);
+      public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
+      public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
+      public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
       public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(11, 43.25);
       public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
 
+      public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
+
       public static final Translation2d[][] ARM_POSITIONS = {
         {
-          ARM_TRANSITION_POSITION,
-          ARM_STOWED_POSITION
+          TRANSITION_POSITION,
+          STOWED_POSITION
         },
         {
-          ARM_TRANSITION_POSITION,
-          ARM_HYBRID_POSITION
+          TRANSITION_POSITION,
+          HYBRID_POSITION
         },
         {
-          ARM_TRANSITION_POSITION,
-          ARM_MID_CONE_POSITION_0,
-          ARM_MID_CONE_POSITION_1
+          TRANSITION_POSITION,
+          MID_CONE_POSITION_0,
+          MID_CONE_POSITION_1
         },
         {
-          ARM_TRANSITION_POSITION,
-          ARM_HIGH_CONE_POSITION_0,
-          ARM_HIGH_CONE_POSITION_1,
-          ARM_HIGH_CONE_POSITION_2
+          TRANSITION_POSITION,
+          HIGH_CONE_POSITION_0,
+          // ARM_HIGH_CONE_POSITION_1,
+          HIGH_CONE_POSITION_2
         },
         {
           HUMAN_TAG_PICKUP
@@ -437,8 +446,8 @@ public final class Constants {
           CUBE_HIGH_LAUNCH
         },
         {
-          ARM_FLOOR_INTAKE_PREP_POSITION,
-          ARM_FLOOR_INTAKE_POSITION
+          FLOOR_INTAKE_PREP_POSITION,
+          FLOOR_INTAKE_POSITION
         },
         {
           SOLUTION_FLIP_TRANSITION_POINT,
@@ -447,6 +456,11 @@ public final class Constants {
         {
           SOLUTION_FLIP_TRANSITION_POINT,
           SOLUTION_FLIP_POSIITON_NEGATIVE
+        },
+        {
+          HIGH_CONE_TRANSITION_POINT,
+          TRANSITION_POSITION,
+          STOWED_POSITION
         }
       };
   }
