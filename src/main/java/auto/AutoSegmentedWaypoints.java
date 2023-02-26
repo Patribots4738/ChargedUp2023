@@ -185,11 +185,11 @@ public class AutoSegmentedWaypoints implements Loggable {
    */
   private void setArmIndex(int armIndex, double clawSpeed) {
 
-    // // Only move the claw before the arm
-    // // if it needs to hold a game piece
-    if (claw.getDesiredSpeed() != PlacementConstants.CLAW_CONE_INTAKE_SPEED && 
+    // Only move the claw before the arm
+    // if it needs to hold a game piece
+    if (claw.getDesiredSpeed() != PlacementConstants.CLAW_CONE_INTAKE_SPEED &&
         claw.getDesiredSpeed() != PlacementConstants.CLAW_CUBE_INTAKE_SPEED) {
-      claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
+      claw.stopClaw();
     }
 
     if (SwerveTrajectory.trajectoryStatus.equals("done")) {

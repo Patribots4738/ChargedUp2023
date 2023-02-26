@@ -368,9 +368,9 @@ public final class Constants {
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
 
-      public static final double CLAW_CONE_INTAKE_SPEED = -1;
-      public static final double CLAW_CUBE_INTAKE_SPEED = -0.7;      
-      public static final double CLAW_OUTTAKE_SPEED = 1;
+      public static final double CLAW_CONE_INTAKE_SPEED = 1;
+      public static final double CLAW_CUBE_INTAKE_SPEED = 1;
+      public static final double CLAW_OUTTAKE_SPEED = -1;
       public static final double CLAW_STOPPED_SPEED = 0;
       
       public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,48);

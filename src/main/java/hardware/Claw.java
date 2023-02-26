@@ -14,6 +14,7 @@ public class Claw {
     private final CANSparkMax _claw;
     private final RelativeEncoder _clawEncoder;
     private double desiredSpeed = 0;
+    private boolean intakeMode = false;
 
     // Timer values to have the claw auto outtake for X seconds
     private boolean finishedOuttaking = false;
@@ -23,13 +24,13 @@ public class Claw {
     public Claw() {
 
         _claw = new CANSparkMax(ClawConstants.CLAW_CAN_ID, MotorType.kBrushless);
-        _claw.setIdleMode(CANSparkMax.IdleMode.kBrake);
         _claw.restoreFactoryDefaults();
 
         _clawEncoder = _claw.getEncoder();
         _clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
         _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
+        _claw.setInverted(true);
         _claw.burnFlash();
         setBrakeMode();
 
@@ -42,7 +43,7 @@ public class Claw {
     public void periodic() {
         if ((Timer.getFPGATimestamp() - startedOuttaking) > outtakeSeconds) {
             finishedOuttaking = true;
-            setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
+            stopClaw();
         }
         
         setSpeed(desiredSpeed);
@@ -62,7 +63,23 @@ public class Claw {
 
     
     public void setDesiredSpeed(double speed) {
-        this.desiredSpeed = speed;
+
+        if (speed > 0) { intakeMode = true; }
+        else if (speed < 0) { intakeMode = false; }
+
+        if (intakeMode) {
+            if (speed > this.desiredSpeed) {
+                // To prevent damage to game elements, the claw will not intake at full speed
+                this.desiredSpeed = speed * 0.7;
+            }
+        }
+        else {
+            this.desiredSpeed = speed;
+        }
+    }
+
+    public void stopClaw() {
+        this.desiredSpeed = 0;
     }
 
     public double getDesiredSpeed() {
