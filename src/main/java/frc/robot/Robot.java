@@ -136,10 +136,10 @@ public class Robot extends TimedRobot {
     double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
     double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
-    double operatorLeftX = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.DRIVER_DEADBAND);
-    double operatorLeftY = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.DRIVER_DEADBAND);
-    double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
-    double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
+    double operatorLeftX = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.OPERATOR_DEADBAND);
+    double operatorLeftY = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.OPERATOR_DEADBAND);
+    double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.OPERATOR_DEADBAND);
+    double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.OPERATOR_DEADBAND);
 
     Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
