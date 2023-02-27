@@ -103,7 +103,7 @@ public class SwerveTrajectory implements Loggable {
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < _pathTraj.getEndState().timeSeconds + 2) {
+        if (elapsedTime < _pathTraj.getEndState().timeSeconds + 1.25) {
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState translationMirroredState = PathPlannerTrajectory.transformStateForAlliance(state, DriverStation.getAlliance());
@@ -118,16 +118,14 @@ public class SwerveTrajectory implements Loggable {
                   state.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0))),
               state.curvatureRadPerMeter);
 
-          System.out.println(mirroredState.poseMeters);
-          
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
           ChassisSpeeds _speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              mirroredState,
-              mirroredState.poseMeters.getRotation());
+              (DriverStation.isAutonomous()) ? mirroredState : state,
+              (DriverStation.isAutonomous()) ? mirroredState.poseMeters.getRotation() : state.holonomicRotation);
 
           // Set the states for the motor using calculated values above
           // It is important to note that fieldRelative is false,
