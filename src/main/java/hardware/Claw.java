@@ -1,6 +1,5 @@
 package hardware;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -52,7 +51,7 @@ public class Claw {
         }
       }
         
-        setSpeed(desiredSpeed);
+      setSpeed(desiredSpeed);
     }
 
     private void setSpeed(double speed) {
@@ -89,6 +88,7 @@ public class Claw {
     }
 
     public double getDesiredSpeed() {
+        if (this.desiredSpeed > 0) { return (this.desiredSpeed / 0.7); }
         return this.desiredSpeed;
     }
 
