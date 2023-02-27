@@ -110,7 +110,7 @@ public class AutoSegmentedWaypoints implements Loggable {
           arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
           break;
       }
-      // Do not change hasMovedArm becuase we are not done moving the arm
+      // Do not change hasMovedArm because we are not done moving the arm
     }
 
     // Once the robot is in position...
