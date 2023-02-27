@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import debug.*;
@@ -153,7 +149,7 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
-    autoAlignment.calibrateOdometry();
+    // autoAlignment.calibrateOdometry();
 
     if (driver.getAButton()) {
 
@@ -165,12 +161,16 @@ public class Robot extends TimedRobot {
           arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
         }
 
-      } else {
+    } else {
 
-        SwerveTrajectory.resetTrajectoryStatus();
+      SwerveTrajectory.resetTrajectoryStatus();
 
-      }
+    }
 
+    // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
+    if (driver.getRightStickButtonPressed()) {
+      swerve.toggleSpeed();
+    }
 
     } else if (driver.getLeftBumper()) {
       swerve.setWheelsX();
@@ -183,11 +183,6 @@ public class Robot extends TimedRobot {
         swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true);
       }
     }
-    
-    // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-    if (driver.getRightStickButtonPressed()) {
-      swerve.toggleSpeed();
-    }
 
     // Toggle the operator override when the operator's left stick is pressed
     if (operator.getLeftStickButtonPressed()) {
@@ -196,6 +191,14 @@ public class Robot extends TimedRobot {
     if (arm.getOperatorOverride()) {
       arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
     }
+
+    if (driver.getXButtonPressed()) {
+      autoAlignment.setConeMode(false);
+    }
+    else if (driver.getYButtonPressed()) {
+      autoAlignment.setConeMode(true);
+    }
+
     switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
       case -1:
@@ -228,7 +231,7 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.HIGH_CUBE_LAUNCH_INDEX : PlacementConstants.HIGH_CONE_PLACEMENT_INDEX);
+        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.HIGH_CONE_PLACEMENT_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking down
@@ -238,7 +241,7 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.MID_CUBE_LAUNCH_INDEX : PlacementConstants.MID_CONE_PLACEMENT_INDEX);
+        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.MID_CONE_PLACEMENT_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking right

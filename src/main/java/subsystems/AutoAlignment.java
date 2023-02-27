@@ -48,6 +48,7 @@ public class AutoAlignment {
     private double currentNorm = 0;
 
     private boolean moveArmToHumanTag = false;
+    private boolean coneMode = false;
 
     public AutoAlignment(Swerve swerve) {
         this.swerve = swerve;
@@ -237,48 +238,87 @@ public class AutoAlignment {
     }
 
     public void setConeOffset(int coneOffset) {
-
+      
       int previousConeOffset = this.coneOffset;
+
+      // If we are on cone mode, skip cone offsets of 0
+      // also, skip straight to the next cone if we are on the same cone
+      if (coneMode) {
+        if (previousConeOffset == -1) {
+          if (coneOffset == 0) {
+            coneOffset = 1;
+          }
+        }
+        else if (previousConeOffset == 1) {
+          if (coneOffset == 0) {
+            coneOffset = -1;
+          }
+        }
+      }
+      else {
+        this.coneOffset = 0;
+        if (coneOffset == -1) {
+          coneOffset = -2;
+        }
+        else if (coneOffset == 1) {
+          coneOffset = 2;
+        }
+      }
 
       // Pan the coneOffset to the next tag if it is able to do so
       // It cannot do so if there is no grid in the desired direction
       if (coneOffset < -1) {
         if (tagID == 2 || tagID == 3) {
           this.tagID--;
-          coneOffset = 1;
-          System.out.println("Tag--, coneOffset = 1");
+          coneOffset = (coneMode) ? 1 : 0; 
+          
+          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
         else if (tagID == 6 || tagID == 7) {
           this.tagID++;
-          coneOffset = 1;
-          System.out.println("Tag++, coneOffset = 1");
+          coneOffset = (coneMode) ? 1 : 0; 
+          
+          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
       }
       else if (coneOffset > 1) {
         if (tagID == 1 || tagID == 2) {
           this.tagID++;
-          coneOffset = -1;
-          System.out.println("Tag++, coneOffset = -1");
+          coneOffset = (coneMode) ? -1 : 0; 
+          
+          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
         else if (tagID == 7 || tagID == 8) {
           this.tagID--;
-          coneOffset = -1;
-          System.out.println("Tag--, coneOffset = -1");
+          coneOffset = (coneMode) ? -1 : 0; 
+          
+          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
       }
       System.out.println(this.coneOffset + " to " + coneOffset);
 
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
-      
+
+      if (!coneMode) {
+        this.coneOffset = 0;
+      }
+
       if (previousConeOffset != this.coneOffset) {
         SwerveTrajectory.resetTrajectoryStatus();
       }
-
-      
     }
 
     public boolean getMoveArmToHumanTag() {
       return this.moveArmToHumanTag;
+    }
+
+    public void setConeMode(boolean coneMode) {
+      this.coneMode = coneMode;
+      System.out.println("Cone Mode: " + coneMode);
+    }
+
+    public boolean getConeMode() {
+      return this.coneMode;
     }
 
     public void chargeAlign() {
