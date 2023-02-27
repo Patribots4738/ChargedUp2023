@@ -39,7 +39,8 @@ public class AutoAlignment {
     PhotonCameraPose photonCameraPose;
 
     private int tagID;
-    private int coneOffset;
+    private int coneOffset = 0;
+    private int substationOffset = -1;
     private double startedChargePad = 0;
 
     // This variable is used to allow us to calibrate using the tag more often but not every loop
@@ -78,7 +79,7 @@ public class AutoAlignment {
               swerve.getPoseEstimator().addVisionMeasurement(
                 camEstimatedPose.estimatedPose.toPose2d(),
                 Timer.getFPGATimestamp());
-                                
+
               setTagID(getNearestTag());
 
               if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
@@ -106,9 +107,9 @@ public class AutoAlignment {
                     we need to flip the sign here
                   */
                   if (normToLeftOfHumanTag < normToRightOfHumanTag) {
-                    coneOffset = 1;
+                    this.substationOffset = 1;
                   } else {
-                    coneOffset = -1;
+                    this.substationOffset = -1;
                   }
 
                 } else {
@@ -133,32 +134,34 @@ public class AutoAlignment {
       Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
 
       currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-      
-      double coneOffsetLeft = AlignmentConstants.CONE_OFFSET_METERS * coneOffset;
 
+      // If we are on the left side of the field, we need to add the grid offset + cone/substation offset
+      // If we are on the right side of the field, we need to subtract the grid offset + cone/substation offset
+      // If we are going to a substation, we need to add the substation offset instead of the cone offset
+      // We add the grid length to both because we still want to be a small bit away from the tag
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
                   (AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                  0),
+                  ((tagID == 4) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       } else {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
                   -(AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                  0),
+                  ((tagID == 5) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       }
 
-      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
-
+      // If we are close enough to the tag, stop moving
       if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR) {
           swerve.drive(0, 0, 0, false);
           SwerveTrajectory.trajectoryStatus = "done";
           return;
       }
 
-      Rotation2d heading = Rotation2d.fromRadians(Math.atan2(targetPose.getY() - swerve.getPose().getY(),targetPose.getX() - swerve.getPose().getX() ));
+      // Calculate the direct heading to our destination, so we can drive straight to it
+      Rotation2d heading = Rotation2d.fromRadians(Math.atan2(targetPose.getY() - swerve.getPose().getY(),targetPose.getX() - swerve.getPose().getX()));
 
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
@@ -312,9 +315,18 @@ public class AutoAlignment {
       return this.moveArmToHumanTag;
     }
 
+    public int getSubstationOffset() {
+      return this.substationOffset;
+    }
+
+    public void setSubstationOffset(int substationOffset) {
+      this.substationOffset = MathUtil.clamp(substationOffset, -1, 1);
+    }
+
     public void setConeMode(boolean coneMode) {
       this.coneMode = coneMode;
-      System.out.println("Cone Mode: " + coneMode);
+      // Set the current cone offset to the left of a tag if it is zero
+      this.coneOffset = (this.coneOffset == 0) ? ((coneMode) ? 0 : ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1)) : this.coneOffset;
     }
 
     public boolean getConeMode() {

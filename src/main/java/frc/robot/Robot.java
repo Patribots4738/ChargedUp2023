@@ -127,6 +127,7 @@ public class Robot extends TimedRobot {
 
     arm.periodic();
     claw.periodic();
+    autoAlignment.calibrateOdometry();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
@@ -149,37 +150,33 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
-    // autoAlignment.calibrateOdometry();
+
+    if (driver.getAButtonPressed()) {
+      SwerveTrajectory.resetTrajectoryStatus();
+    }
 
     if (driver.getAButton()) {
 
-      if (driver.getRightBumper()) {
+      autoAlignment.moveToTag();
 
-        autoAlignment.moveToTag();
-
-        if (autoAlignment.getMoveArmToHumanTag()) {
-          arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-        }
-
-    } else {
-
-      SwerveTrajectory.resetTrajectoryStatus();
-
-    }
-
-    // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-    if (driver.getRightStickButtonPressed()) {
-      swerve.toggleSpeed();
-    }
+      if (autoAlignment.getMoveArmToHumanTag()) {
+        arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+      }
+      // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
+      if (driver.getRightStickButtonPressed()) {
+        swerve.toggleSpeed();
+      }
 
     } else if (driver.getLeftBumper()) {
       swerve.setWheelsX();
     } else {
-      //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+      // If the driver holds the Y button, the robot will drive relative to itself
+      // This is useful for driving in a straight line (backwards to intake!)
       if (driver.getYButton()) {
         swerve.drive(driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false);
       }
       else {
+        // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick
         swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true);
       }
     }
@@ -192,13 +189,15 @@ public class Robot extends TimedRobot {
       arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
     }
 
-    if (driver.getXButtonPressed()) {
+    // The moment the robot takes in a cone/cube,
+    // The operator can set the robot into the desired mode
+    if (operator.getXButtonPressed()) {
       autoAlignment.setConeMode(false);
     }
-    else if (driver.getYButtonPressed()) {
+    else if (operator.getYButtonPressed()) {
       autoAlignment.setConeMode(true);
     }
-
+    // POV = D-Pad...
     switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
       case -1:
@@ -215,15 +214,27 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
         break;
 
       // Clicking right
       case 90:
-        autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
         break;
     }
-
+    // POV = D-Pad...
     switch (OICalc.getOperatorPOVPressed(operator.getPOV())) {
       // Not clicked
       case -1:
