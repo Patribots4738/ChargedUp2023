@@ -63,11 +63,11 @@ public class Robot extends TimedRobot {
       claw = new Claw();
 
       armCalcuations = new ArmCalculations();
+      autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
 
-      autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
+      autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();
 
-      autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
       Logger.configureLoggingAndConfig(this, false);
   }
 
@@ -90,7 +90,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    arm.setUpperArmCoastMode();
+    // arm.setUpperArmCoastMode();
     claw.stopClaw();
   }
 
@@ -115,12 +115,15 @@ public class Robot extends TimedRobot {
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
+    autoAlignment.calibrateOdometry();
 
   }
 
   @Override
   public void teleopInit() {
-      arm.setBrakeMode();
+    arm.setBrakeMode();
+    SwerveTrajectory.resetTrajectoryStatus();
+    autoAlignment.setConeOffset(0);
   }
 
   @Override
@@ -170,10 +173,15 @@ public class Robot extends TimedRobot {
 
 
     } else if (driver.getLeftBumper()) {
-      swerve.setX();
+      swerve.setWheelsX();
     } else {
       //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, !driver.getYButton());
+      if (driver.getYButton()) {
+        swerve.drive(driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false);
+      }
+      else {
+        swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true);
+      }
     }
     
     // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
@@ -188,14 +196,14 @@ public class Robot extends TimedRobot {
     if (arm.getOperatorOverride()) {
       arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
     }
-
-    switch (OICalc.getPOVPressed(driver.getPOV())) {
+    switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
       case -1:
         break;
 
       // Clicking up
       case 0:
+        arm.setArmIndex(PlacementConstants.LONG_ARM_REACH_INDEX);
         break;
 
       // Clicking down
@@ -204,16 +212,16 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+        autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
         break;
 
       // Clicking right
       case 90:
-        autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+        autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
         break;
     }
 
-    switch (OICalc.getPOVPressed(operator.getPOV())) {
+    switch (OICalc.getOperatorPOVPressed(operator.getPOV())) {
       // Not clicked
       case -1:
         break;
@@ -246,38 +254,29 @@ public class Robot extends TimedRobot {
     }
 
     // Claw speed controls
-    // If the left bumper is pressed, e-stop the claw
-    // If the right bumper is held, outtake an object when the arm is at placement position
-    // If the left trigger is held, intake an object
-      // Keep the fastest intake speed until the claw is e-stopped/reversed
-      // This is to allow the trigger to be fully pressed intake an object,
-    // and then let go to keep the claw at the same speed
-    // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
+      // If the left bumper is pressed, e-stop the claw
+      // If the right bumper is held, outtake an object when the arm is at placement position
+      // If the left trigger is held, intake an object
+        // Keep the fastest intake speed until the claw is e-stopped/reversed
+        // This is to allow the trigger to be fully pressed intake an object,
+      // and then let go to keep the claw at the same speed
+      // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
     
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
 
-    } else if (operator.getRightBumper()) {
+    } else if (operator.getRightBumper() && !claw.getStartedOuttakingBool()) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
 
         claw.outTakeforXSeconds(0.5);
 
       }
-    } else if (operator.getLeftTriggerAxis() > 0) {
-    
-    if (operator.getLeftBumper()) {
+    } else if (operator.getLeftBumper()) {
 
       claw.stopClaw();
 
-    } else if (operator.getRightBumper()) {
-      // Check if the arm has completed the path to place an object
-      if (arm.getAtPlacementPosition()) {
-
-        claw.outTakeforXSeconds(0.5);
-
-      }
     } else if (operator.getLeftTriggerAxis() > 0) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
@@ -292,26 +291,44 @@ public class Robot extends TimedRobot {
 
         if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
             arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
-          }
-          else {
-            arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-          }
-          
-          claw.setFinishedOuttaking(false);
-          claw.setStartedOuttakingBool(false);
-          
         }
+        else {
+          arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+        }
+          
+        claw.setFinishedOuttaking(false);
+        claw.setStartedOuttakingBool(false);
+          
       }
     }
   }
 
   @Override
   public void testInit() {
-    arm.setCoastMode();
   }
 
   @Override
   public void testPeriodic() {
     arm.periodic();
+    if (driver.getAButtonPressed()) {
+      autoAlignment.startChargePad();
+    }
+    if (driver.getAButton()) {
+      autoAlignment.chargeAlign();
+    }
+    else {
+      double driverLeftX = MathUtil.applyDeadband(-driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+      double driverLeftY = MathUtil.applyDeadband(-driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+      double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+      double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
+      Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+
+      // If we are on blue alliance, flip the driverLeftAxis
+      if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+        driverLeftAxis = driverLeftAxis.unaryMinus();
+      }
+      //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, !driver.getYButton());
+    }
   }
 }
