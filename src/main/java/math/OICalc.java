@@ -6,17 +6,15 @@ import math.Constants.OIConstants;
 
 public class OICalc {
 
-    private static boolean isClickingUp = false;
-    private static boolean isHoldingUp = false;
+    private static boolean driverUp = false;
+    private static boolean driverDown = false;
+    private static boolean driverLeft = false;
+    private static boolean driverRight = false;
 
-    private static boolean isClickingDown = false;
-    private static boolean isHoldingDown = false;
-
-    private static boolean isClickingLeft = false;
-    private static boolean isHoldingLeft = false;
-
-    private static boolean isClickingRight = false;
-    private static boolean isHoldingRight = false;
+    private static boolean operatorUp = false;
+    private static boolean operatorDown = false;
+    private static boolean operatorLeft = false;
+    private static boolean operatorRight = false;
 
     // All calculations can be refrenced here https://www.desmos.com/calculator/e07raajzh5
     public static Translation2d toCircle(double x, double y) {
@@ -81,68 +79,97 @@ public class OICalc {
                         (Math.pow(x2, 2) + Math.pow(y2, 2)));
     }
 
-    public static int getPOVPressed(int POV) {
+    public static int getDriverPOVPressed(int POV) {
+      
+      int pressedPOV = -1;
+      
       if (POV == 0) { 
-        if (!isHoldingUp) {
-          isClickingUp = true;
+        if (!driverUp) {
+          driverUp = true;
+          pressedPOV = 0;
         }
-        else {
-          isClickingUp = false;
-        }
-        isHoldingUp = true;
       }
       else {
-        isClickingUp = false;
-        isHoldingUp = false;
+        driverUp = false;
       }
 
       if (POV == 180) { 
-        if (!isHoldingDown) {
-          isClickingDown = true;
+        if (!driverDown) {
+          driverDown = true;
+          pressedPOV = 180;
         }
-        else {
-          isClickingDown = false;
-        }
-        isHoldingDown = true;
       }
       else {
-        isClickingDown = false;
-        isHoldingDown = false;
+        driverDown = false;
       }
 
       if (POV == 270) { 
-        if (!isHoldingLeft) {
-          isClickingLeft = true;
+        if (!driverLeft) {
+          driverLeft = true;
+          pressedPOV = 270;
         }
-        else {
-          isClickingLeft = false;
-        }
-        isHoldingLeft = true;
       }
       else {
-        isClickingLeft = false;
-        isHoldingLeft = false;
+        driverLeft = false;
       }
 
       if (POV == 90) { 
-        if (!isHoldingRight) {
-          isClickingRight = true;
+        if (!driverRight) {
+          driverRight = true;
+          pressedPOV = 90;
         }
-        else {
-          isClickingRight = false;
-        }
-        isHoldingRight = true;
       }
       else {
-        isClickingRight = false;
-        isHoldingRight = false;
+        driverRight = false;
       }
-      
-      if (isClickingUp) { return 0; }
-      else if (isClickingDown) { return 180; }
-      else if (isClickingLeft) { return 270; }
-      else if (isClickingRight) { return 90; }
-      else { return -1; }
+
+      return pressedPOV;
     }
 
+    public static int getOperatorPOVPressed(int POV) {
+
+      int pressedPOV = -1;
+      
+      if (POV == 0) { 
+        if (!operatorUp) {
+          operatorUp = true;
+          pressedPOV = 0;
+        }
+      }
+      else {
+        operatorUp = false;
+      }
+
+      if (POV == 180) { 
+        if (!operatorDown) {
+          operatorDown = true;
+          pressedPOV = 180;
+        }
+      }
+      else {
+        operatorDown = false;
+      }
+
+      if (POV == 270) { 
+        if (!operatorLeft) {
+          operatorLeft = true;
+          pressedPOV = 270;
+        }
+      }
+      else {
+        operatorLeft = false;
+      }
+
+      if (POV == 90) { 
+        if (!operatorRight) {
+          operatorRight = true;
+          pressedPOV = 90;
+        }
+      }
+      else {
+        operatorRight = false;
+      }
+
+      return pressedPOV;
+    }
   }

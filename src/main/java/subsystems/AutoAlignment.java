@@ -18,7 +18,6 @@ import hardware.Swerve;
 import math.Constants.AlignmentConstants;
 import math.Constants.DriveConstants;
 import math.Constants.PlacementConstants;
-import math.Constants.VisionConstants;
 
 public class AutoAlignment {
 
@@ -41,6 +40,7 @@ public class AutoAlignment {
 
     private int tagID;
     private int coneOffset;
+    private double startedChargePad = 0;
 
     // This variable is used to allow us to calibrate using the tag more often but not every loop
     private double originalNorm = 1;
@@ -66,21 +66,27 @@ public class AutoAlignment {
 
           EstimatedRobotPose camEstimatedPose = result.get();
 
-          if (currentNorm < (originalNorm / 2) || Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
+          swerve.getPoseEstimator().addVisionMeasurement(
+            camEstimatedPose.estimatedPose.toPose2d(),
+            Timer.getFPGATimestamp());
 
-              swerve.getPoseEstimator().addVisionMeasurement(
-                  camEstimatedPose.estimatedPose.toPose2d(),
-                  Timer.getFPGATimestamp());
-
-              System.out.println("Reset OG");
+            
+            
+            if (currentNorm < (originalNorm / 2) || Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
               
+              swerve.getPoseEstimator().addVisionMeasurement(
+                camEstimatedPose.estimatedPose.toPose2d(),
+                Timer.getFPGATimestamp());
+                                
               setTagID(getNearestTag());
 
               if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
                 originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
 
                 if (!Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && (tagID == 4 || tagID == 5)) {
+
                   moveArmToHumanTag = true;
+                  
                   double normToLeftOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
                       new Translation2d(
                           (AlignmentConstants.GRID_BARRIER),
@@ -98,11 +104,12 @@ public class AutoAlignment {
                     Due to moveToTag checking if we are on the blue alliance and flipping the sign,
                     we need to flip the sign here
                   */
-                  if (normToLeftOfHumanTag < normToRightOfHumanTag && DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                    coneOffset = -1;
-                  } else {
+                  if (normToLeftOfHumanTag < normToRightOfHumanTag) {
                     coneOffset = 1;
+                  } else {
+                    coneOffset = -1;
                   }
+
                 } else {
                   moveArmToHumanTag = false;
                 }
@@ -110,7 +117,7 @@ public class AutoAlignment {
 
             }
             
-          System.out.println(currentNorm + " " + originalNorm);
+          // System.out.println(currentNorm + " " + originalNorm);
 
       }
     }
@@ -126,13 +133,7 @@ public class AutoAlignment {
 
       currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
       
-      double coneOffsetLeft = AlignmentConstants.CONE_OFFSET_METERS;
-
-      if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-
-          coneOffsetLeft *= -1;
-
-      }
+      double coneOffsetLeft = AlignmentConstants.CONE_OFFSET_METERS * coneOffset;
 
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
@@ -148,11 +149,8 @@ public class AutoAlignment {
               Rotation2d.fromDegrees(180)));
       }
 
-      if (coneOffset == -1) {
-          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
-      } else if (coneOffset == 1) {
-          targetPose = targetPose.plus(new Transform2d(new Translation2d(0, -coneOffsetLeft), Rotation2d.fromDegrees(0)));
-      }
+      targetPose = targetPose.plus(new Transform2d(new Translation2d(0, coneOffsetLeft), Rotation2d.fromDegrees(0)));
+
       if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR) {
           swerve.drive(0, 0, 0, false);
           SwerveTrajectory.trajectoryStatus = "done";
@@ -163,7 +161,7 @@ public class AutoAlignment {
 
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
-          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, 1),
+          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, 2.5),
           new PathPoint(swerve.getPose().getTranslation(),
               heading,
               swerve.getPose().getRotation()),
@@ -241,34 +239,41 @@ public class AutoAlignment {
     public void setConeOffset(int coneOffset) {
 
       int previousConeOffset = this.coneOffset;
+
       // Pan the coneOffset to the next tag if it is able to do so
       // It cannot do so if there is no grid in the desired direction
       if (coneOffset < -1) {
         if (tagID == 2 || tagID == 3) {
           this.tagID--;
           coneOffset = 1;
+          System.out.println("Tag--, coneOffset = 1");
         }
         else if (tagID == 6 || tagID == 7) {
           this.tagID++;
           coneOffset = 1;
+          System.out.println("Tag++, coneOffset = 1");
         }
       }
       else if (coneOffset > 1) {
         if (tagID == 1 || tagID == 2) {
           this.tagID++;
           coneOffset = -1;
+          System.out.println("Tag++, coneOffset = -1");
         }
         else if (tagID == 7 || tagID == 8) {
           this.tagID--;
           coneOffset = -1;
+          System.out.println("Tag--, coneOffset = -1");
         }
       }
+      System.out.println(this.coneOffset + " to " + coneOffset);
 
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
       
       if (previousConeOffset != this.coneOffset) {
         SwerveTrajectory.resetTrajectoryStatus();
       }
+
       
     }
 
@@ -276,4 +281,33 @@ public class AutoAlignment {
       return this.moveArmToHumanTag;
     }
 
+    public void chargeAlign() {
+
+      double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
+      // boolean setWheelsUp = false;
+      double roll = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
+
+      if (roll > 7) {
+        swerve.drive(-
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * roll)/(elapsedTime * ((DriverStation.isAutonomous()) ? 3 : 1.5))), -0.5, 0.5), 
+            0, 
+            0, 
+            true);
+      }
+      else if (roll < -7) {
+        swerve.drive(-
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * roll)/(elapsedTime * ((DriverStation.isAutonomous()) ? 3 : 1.5))), -0.5, 0.5), 
+            0, 
+            0, 
+            true);
+      }
+      else {
+        swerve.setWheelsUp();
+      }
+    }
+
+    public void startChargePad() {
+      startedChargePad = Timer.getFPGATimestamp();
+    }
+  
 }

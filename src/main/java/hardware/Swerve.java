@@ -14,9 +14,27 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import math.Constants.DriveConstants;
 
-public class Swerve {
+public class Swerve implements Loggable{
+
+    @Log
+    private double yaw = 0;
+
+    @Log
+    public double pitch = 0;
+
+    @Log
+    public double roll = 0;
+
+    @Log
+    public double dotProduct = 0;
+
+    @Log
+    public double crossProduct = 0;
+
 
     private double speedMultiplier = 1;
 
@@ -88,6 +106,10 @@ public class Swerve {
     public void periodic() {
         // Update the odometry in the periodic block
         poseEstimator.update(getYaw(), getModulePositions());
+        getPitch();
+        getRoll();
+
+        dotProduct = (pitch + (pitch > 0 ? -180 : 180)) + (roll + ((roll > 0) ? -180 : 180));
     }
 
     /**
@@ -129,12 +151,19 @@ public class Swerve {
     /**
      * Sets the wheels into an X formation to prevent movement.
      */
-    public void setX() {
+    public void setWheelsX() {
         m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
         m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
         m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
         m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     }
+
+    public void setWheelsUp() {
+      m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+  }
 
     /**
      * Sets the swerve ModuleStates.
@@ -187,16 +216,36 @@ public class Swerve {
     }
 
     public Rotation2d getYaw() {
-        Rotation2d yaw = Rotation2d.fromDegrees(gyro.getAngle());
 
-        if (DriveConstants.GYRO_REVERSED) {
-            yaw = yaw.unaryMinus();
-        }
+      // gyro.setYawAxis(IMUAxis.kZ);
+      
+      Rotation2d yawRotation2d = Rotation2d.fromDegrees(gyro.getAngle());
+      
+      if (DriveConstants.GYRO_REVERSED) {
+          yawRotation2d = yawRotation2d.unaryMinus();
+      }
 
-        return yaw;
+      this.yaw = yawRotation2d.getDegrees();
+
+      return yawRotation2d;
     }
 
+    public void getPitch() {
+      // gyro.setYawAxis(IMUAxis.kY);
 
+      Rotation2d pitchRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle());
+
+      this.pitch = pitchRotation2d.getDegrees();
+      
+    }
+
+    public void getRoll() {
+      // gyro.setYawAxis(IMUAxis.kX);
+
+      Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getXComplementaryAngle());
+
+      this.roll = rollRotation2d.getDegrees();
+    }
 
     public void resetEncoders() {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
