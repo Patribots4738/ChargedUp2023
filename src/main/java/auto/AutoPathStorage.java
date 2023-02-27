@@ -82,7 +82,7 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _8H_D_7H_CHARGE;
   public static Waypoint[] _8H_D_7H;
 
-
+  public static Waypoint[] _8H_D_6H_REACH;
 
   public static PathPlannerTrajectory square1;
   public static PathPlannerTrajectory square2;
@@ -121,6 +121,9 @@ public class AutoPathStorage implements Loggable {
   public static PathPlannerTrajectory _6_CH;
   public static PathPlannerTrajectory _7_CH;
   public static PathPlannerTrajectory _8_CH;
+
+  public static PathPlannerTrajectory _8_D_REACH;
+  public static PathPlannerTrajectory _D_REACH_6;
   
   /**
    * Create all the waypoints needed for each path
@@ -151,6 +154,9 @@ public class AutoPathStorage implements Loggable {
     _6_CH = PathPlanner.loadPath("_6_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _7_CH = PathPlanner.loadPath("_7_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _8_CH = PathPlanner.loadPath("_8_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+
+    _8_D_REACH = PathPlanner.loadPath("_8_D_REACH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _D_REACH_6 = PathPlanner.loadPath("_D_REACH_6", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     // Use the initial state of _1_A as the starting point for _1
     // This is so we can move our arm before we move the robot.
@@ -391,6 +397,13 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_D_7, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
     };
 
+    _8H_D_6H_REACH = new Waypoint[] {
+        new Waypoint(_8, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_8_D_REACH, PlacementConstants.LONG_ARM_REACH_INDEX, PlacementConstants.CLAW_CONE_INTAKE_SPEED),
+        new Waypoint(_D_REACH_6, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_6_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
     myAutoContainer = new AutoPose[] {
       // AutoPoses for the bottom of the field:
       new AutoPose("1H_A_2H_CHARGE", _1H_A_2H_CHARGE),
@@ -418,6 +431,7 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("8H_D_6H", _8H_D_6H),
       new AutoPose("8H_D_7H_CHARGE", _8H_D_7H_CHARGE),
       new AutoPose("8H_D_7H", _8H_D_7H),
+      new AutoPose("8H_D_6H_REACH", _8H_D_6H_REACH)
     };
 
     for (AutoPose AutoPose : myAutoContainer) {
