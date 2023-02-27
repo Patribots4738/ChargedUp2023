@@ -157,7 +157,7 @@ public class Arm implements Loggable {
     public void periodic() {
         if (!operatorOverride) { indexPeriodic();}
         setLowerArmPosition(lowerReferenceAngle);
-        // setUpperArmPosition(upperReferenceAngle);
+        setUpperArmPosition(upperReferenceAngle);
         upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // Use forward kinematics to get the x and y position of the end effector
@@ -168,11 +168,11 @@ public class Arm implements Loggable {
 
     public void indexPeriodic() {
 
-      boolean atDesiredCoarse = (Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE);// && 
-                                // Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_COARSE);
+      boolean atDesiredCoarse = (Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE && 
+                                Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_COARSE);
 
-      boolean atDesiredFine = (Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE);// && 
-                              // Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
+      boolean atDesiredFine = (Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE && 
+                              Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
 
       boolean finalDeadband = (armPosDimension2 < PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1) 
                               ? atDesiredCoarse 
@@ -194,8 +194,6 @@ public class Arm implements Loggable {
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
         if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
-          armsAtDesiredPosition = true;
-          
           if (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
               armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE)
           {
@@ -210,6 +208,7 @@ public class Arm implements Loggable {
               setArmIndex(indexBeforeFlip);
             }
           }
+          armsAtDesiredPosition = true;
           return;
         }
         // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
@@ -249,6 +248,8 @@ public class Arm implements Loggable {
         
         armPosDimension1 = index;
         this.operatorOverride = false;
+
+        System.out.println("Changed index to " + armPosDimension1);
 
     }
 
@@ -486,6 +487,11 @@ public class Arm implements Loggable {
       return (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
               armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) &&
               armsAtDesiredPosition;
+    }
+
+    public boolean getAtPrepIndex() {
+      return (armPosDimension1 == PlacementConstants.FLOOR_INTAKE_PREP_INDEX ||
+              armPosDimension1 == PlacementConstants.HIGH_CONE_PREP_INDEX);
     }
 
     public void toggleOperatorOverride() {
