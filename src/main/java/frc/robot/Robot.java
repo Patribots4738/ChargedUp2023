@@ -11,7 +11,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
 import subsystems.AutoAlignment;
 
 /**
@@ -40,7 +42,6 @@ public class Robot extends TimedRobot {
   ArmCalculations armCalcuations;
 
   AutoAlignment autoAlignment;
-
 
   @Override
   public void robotInit() {
@@ -162,6 +163,7 @@ public class Robot extends TimedRobot {
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
       }
+      
       // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
       if (driver.getRightStickButtonPressed()) {
         swerve.toggleSpeed();
@@ -318,6 +320,16 @@ public class Robot extends TimedRobot {
         claw.setStartedOuttakingBool(false);
           
       }
+    }
+
+    // Controller rumble settings:
+    if (arm.getAtPlacementPosition()) {
+      operator.setRumble(RumbleType.kLeftRumble, 0.5);
+      operator.setRumble(RumbleType.kRightRumble, 0.5);
+    }
+    else {
+      operator.setRumble(RumbleType.kLeftRumble, 0);
+      operator.setRumble(RumbleType.kRightRumble, 0);
     }
   }
 

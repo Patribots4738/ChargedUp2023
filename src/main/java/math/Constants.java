@@ -381,8 +381,7 @@ public final class Constants {
       public static final int HIGH_PLACE_INDEX_AUTO = 14;
       
 
-      public static final double CLAW_CONE_INTAKE_SPEED = 1;
-      public static final double CLAW_CUBE_INTAKE_SPEED = 1;
+      public static final double CLAW_INTAKE_SPEED = 1;
       public static final double CLAW_OUTTAKE_SPEED = -1;
 
       public static final double CLAW_STOPPED_SPEED = 0;
