@@ -18,9 +18,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import math.ArmCalculations;
-import math.Constants.ArmConstants;
-import math.Constants.PlacementConstants;
+import calc.ArmCalculations;
+import calc.Constants.ArmConstants;
+import calc.Constants.PlacementConstants;
 
 public class Arm implements Loggable {
 

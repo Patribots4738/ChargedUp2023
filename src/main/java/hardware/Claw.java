@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.revrobotics.RelativeEncoder;
-import math.Constants.ClawConstants;
-import math.Constants.PlacementConstants;
+import calc.Constants.ClawConstants;
+import calc.Constants.PlacementConstants;
 
 public class Claw {
 

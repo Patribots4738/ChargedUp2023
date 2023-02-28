@@ -8,8 +8,8 @@ import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import math.Constants.AutoConstants;
-import math.Constants.PlacementConstants;
+import calc.Constants.AutoConstants;
+import calc.Constants.PlacementConstants;
 
 public class AutoPathStorage implements Loggable {
 
@@ -143,7 +143,7 @@ public class AutoPathStorage implements Loggable {
 
   public static PathPlannerTrajectory _7_CH;
   public static PathPlannerTrajectory _8_CH;
-  public static PathPlannerTrajectory _9_CH;;
+  public static PathPlannerTrajectory _9_CH;
 
   public static PathPlannerTrajectory _9_D_REACH;
   public static PathPlannerTrajectory _D_REACH_7;
@@ -592,11 +592,11 @@ public class AutoPathStorage implements Loggable {
 
       // Every third index, add a spacer option for simplicity
       if (((i + 1) % 3 == 0) && (i != myAutoContainer.length - 1)) {
-        String spacer = " ";
+        StringBuilder spacer = new StringBuilder(" ");
         for (int j = 0; j < i; j++) {
-          spacer += " ";
+          spacer.append(" ");
         }
-        autoChooser.addOption(spacer, AutoPose);
+        autoChooser.addOption(spacer.toString(), AutoPose);
       }
     }
   }

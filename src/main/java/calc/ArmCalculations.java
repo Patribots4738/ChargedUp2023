@@ -1,7 +1,7 @@
 // Kudos to https://youtu.be/IKOGwoJ2HLk for the theory!
-package math;
+package calc;
 
-import math.Constants.*;
+import calc.Constants.*;
 
 public class ArmCalculations {
 

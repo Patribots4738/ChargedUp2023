@@ -1,6 +1,4 @@
-package subsystems;
-
-import auto.SwerveTrajectory;
+package auto;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -15,9 +13,10 @@ import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
-import math.Constants.AlignmentConstants;
-import math.Constants.DriveConstants;
-import math.Constants.PlacementConstants;
+import calc.Constants.AlignmentConstants;
+import calc.Constants.DriveConstants;
+import calc.Constants.PlacementConstants;
+import calc.PhotonCameraPose;
 
 public class AutoAlignment {
 

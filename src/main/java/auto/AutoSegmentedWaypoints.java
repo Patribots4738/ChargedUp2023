@@ -1,8 +1,6 @@
 // Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
 package auto;
 
-import java.sql.Driver;
-
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import auto.AutoPathStorage.AutoPose;
 import auto.AutoPathStorage.Waypoint;
@@ -15,9 +13,8 @@ import hardware.Claw;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import math.Constants.AlignmentConstants;
-import math.Constants.PlacementConstants;
-import subsystems.AutoAlignment;
+import calc.Constants.AlignmentConstants;
+import calc.Constants.PlacementConstants;
 
 public class AutoSegmentedWaypoints implements Loggable {
 

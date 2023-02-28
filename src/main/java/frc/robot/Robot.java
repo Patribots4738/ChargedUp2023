@@ -3,9 +3,9 @@ package frc.robot;
 import debug.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import hardware.*;
-import math.ArmCalculations;
-import math.OICalc;
-import math.Constants.*;
+import calc.ArmCalculations;
+import calc.OICalc;
+import calc.Constants.*;
 import auto.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -13,8 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
-import io.github.oblarg.oblog.annotations.Log;
-import subsystems.AutoAlignment;
+import auto.AutoAlignment;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to

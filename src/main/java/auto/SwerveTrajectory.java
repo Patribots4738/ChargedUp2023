@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
-import math.Constants;
-import math.Constants.AlignmentConstants;
+import calc.Constants;
+import calc.Constants.AlignmentConstants;
 
 public class SwerveTrajectory implements Loggable {
 
@@ -94,7 +94,7 @@ public class SwerveTrajectory implements Loggable {
    * You only need to tune the Holonomic Drive Controller, which is explained above...
    *
    * @param _pathTraj   run Pathplanner.loadpath("name of file without an extension") pass it here
-   * @param _odometry   SwerveDrive.java's odometry
+   * @param swerve the current instance of swerve
    */
   public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve) {
 

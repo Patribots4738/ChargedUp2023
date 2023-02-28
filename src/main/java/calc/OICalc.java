@@ -1,8 +1,8 @@
-package math;
+package calc;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import math.Constants.OIConstants;
+import calc.Constants.OIConstants;
 
 public class OICalc {
 
