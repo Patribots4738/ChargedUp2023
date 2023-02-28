@@ -415,69 +415,84 @@ public final class Constants {
       public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(11, 43.25);
       public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
 
-      public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X,30);
-      public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X,15);
-      public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X,5);
+      public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
+      public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
+      public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
       public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
 
       public static final Translation2d[][] ARM_POSITIONS = {
+        // Index 0
         {
           TRANSITION_POSITION,
           STOWED_POSITION
         },
+        // Index 1
         {
           TRANSITION_POSITION,
           HYBRID_POSITION
         },
+        // Index 2
         {
           TRANSITION_POSITION,
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
+        // Index 3
         {
           TRANSITION_POSITION,
           HIGH_CONE_POSITION_0,
           // ARM_HIGH_CONE_POSITION_1,
           HIGH_CONE_POSITION_2
         },
+        // Index 4
         {
           HUMAN_TAG_PICKUP
         },
+        // Index 5
         {
           CUBE_MID_LAUNCH
         },
+        // Index 6
         {
           CUBE_HIGH_LAUNCH
         },
+        // Index 7
         {
           FLOOR_INTAKE_PREP_POSITION,
           FLOOR_INTAKE_POSITION
         },
+        // Index 8
         {
           SOLUTION_FLIP_TRANSITION_POINT,
           SOLUTION_FLIP_POSIITON_POSITIVE
         },
+        // Index 9
         {
           SOLUTION_FLIP_TRANSITION_POINT,
           SOLUTION_FLIP_POSIITON_NEGATIVE
         },
+        // Index 10
         {
           HIGH_CONE_TRANSITION_POINT,
           TRANSITION_POSITION,
           STOWED_POSITION
         },
+        // Index 11
         {
           LONG_ARM_REACH_0,
           LONG_ARM_REACH_1,
           LONG_ARM_REACH_2
         },
+        // Index 12
         {
           FLOOR_INTAKE_PREP_POSITION
         },
+        // Index 13
         {
           HIGH_CONE_TRANSITION_POINT
         },
+        // Index 14
         {
           HIGH_CONE_POSITION_0,
           HIGH_CONE_POSITION_2
