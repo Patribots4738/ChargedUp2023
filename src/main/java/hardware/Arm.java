@@ -79,6 +79,8 @@ public class Arm implements Loggable {
     @Log
     private double armYPos = 0;
 
+    private boolean wentOverHeightLimit = false;
+
     private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _lowerArmLeft;
     private final CANSparkMax _upperArm;
@@ -163,6 +165,12 @@ public class Arm implements Loggable {
         // Use forward kinematics to get the x and y position of the end effector
         armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+        if (armYPos > ArmConstants.MAX_REACH_Y) {
+            wentOverHeightLimit = true;
+        }
+        if (wentOverHeightLimit) {
+          System.out.println("WENT OVER HEIGHT LIMIT!!");
+        }
         // System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
