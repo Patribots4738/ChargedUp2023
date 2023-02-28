@@ -157,6 +157,10 @@ public class Arm implements Loggable {
     }
 
     public void periodic() {
+        if (wentOverHeightLimit) {
+          System.out.println("WENT OVER HEIGHT LIMIT!!");
+          setArmIndex(PlacementConstants.STOWED_INDEX);
+        }
         if (!operatorOverride) { indexPeriodic();}
         setLowerArmPosition(lowerReferenceAngle);
         setUpperArmPosition(upperReferenceAngle);
@@ -167,9 +171,6 @@ public class Arm implements Loggable {
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
         if (armYPos > ArmConstants.MAX_REACH_Y) {
             wentOverHeightLimit = true;
-        }
-        if (wentOverHeightLimit) {
-          System.out.println("WENT OVER HEIGHT LIMIT!!");
         }
         // System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
