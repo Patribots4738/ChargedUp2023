@@ -98,9 +98,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-      autoSegmentedWaypoints.init();
-      arm.setBrakeMode();
-      SwerveTrajectory.resetTrajectoryStatus();
+    autoSegmentedWaypoints.init();
+    arm.setBrakeMode();
+    SwerveTrajectory.resetTrajectoryStatus();
 
   }
 
@@ -168,7 +168,9 @@ public class Robot extends TimedRobot {
       }
 
     } else if (driver.getLeftBumper()) {
+
       swerve.setWheelsX();
+
     } else {
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
@@ -197,6 +199,7 @@ public class Robot extends TimedRobot {
     else if (operator.getYButtonPressed()) {
       autoAlignment.setConeMode(true);
     }
+
     // POV = D-Pad...
     switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
@@ -234,6 +237,7 @@ public class Robot extends TimedRobot {
         }
         break;
     }
+    
     // POV = D-Pad...
     switch (OICalc.getOperatorPOVPressed(operator.getPOV())) {
       // Not clicked
