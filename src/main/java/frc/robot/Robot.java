@@ -2,6 +2,7 @@ package frc.robot;
 
 import debug.*;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import hardware.*;
 import calc.ArmCalculations;
 import calc.OICalc;
@@ -107,6 +108,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
+    // If we are in the last 100 ms of the match, set the wheels up
+    // This is to prevent any charge pad sliding
+    if (Timer.getMatchTime() < 0.1) {
+      swerve.setWheelsUp();
+      return;
+    }
+
     swerve.periodic();
     arm.periodic();
     claw.periodic();
@@ -124,6 +132,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
+    // If we are in the last 100 ms of the match, set the wheels up
+    // This is to prevent any charge pad sliding
+    if (Timer.getMatchTime() < 0.1) {
+      swerve.setWheelsUp();
+      return;
+    }
 
     arm.periodic();
     claw.periodic();
