@@ -21,7 +21,7 @@ public class Claw {
     private boolean startedOuttakingBool = false;
     private boolean finishedOuttaking = true;
     private double outtakeSeconds = 0;
-    private double startedOuttaking = 0;
+    private double startedOuttakingTimestamp = 0;
 
     public Claw() {
 
@@ -45,7 +45,7 @@ public class Claw {
     public void periodic() {
 
       if (DriverStation.isTeleop()) {
-        if ((Timer.getFPGATimestamp() - startedOuttaking) > outtakeSeconds && startedOuttakingBool) {
+        if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
             finishedOuttaking = true;
             stopClaw();
         }
@@ -92,12 +92,12 @@ public class Claw {
         return this.desiredSpeed;
     }
 
-    public void outTakeforXSeconds(double seconds) {
+    public void outTakeforXSeconds(double X) {
         setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
         this.startedOuttakingBool = true;
-        this.outtakeSeconds = seconds;
+        this.outtakeSeconds = X;
         this.finishedOuttaking = false;
-        this.startedOuttaking = Timer.getFPGATimestamp();
+        this.startedOuttakingTimestamp = Timer.getFPGATimestamp();
     }
 
     public boolean getFinishedOuttaking() {
