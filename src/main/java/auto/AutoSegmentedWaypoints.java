@@ -175,7 +175,8 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     if (stateHasFinished) {
 
-      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) { arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); }
+      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
+          arm.getArmIndex() == PlacementConstants.HIGH_PLACE_INDEX_AUTO) { arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); }
       else { arm.setArmIndex(PlacementConstants.STOWED_INDEX); }
 
       // Only move the claw before the arm
