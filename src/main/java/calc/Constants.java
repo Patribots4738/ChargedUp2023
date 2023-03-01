@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package math;
+package calc;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -126,9 +126,9 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4*Math.PI;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2; // 2.5;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 6 * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
         public static final double PX_CONTROLLER = 1;
@@ -185,10 +185,10 @@ public final class Constants {
       public static final int UPPER_ARM_MOTOR_CAN_ID = 11;
 
       // The gear ratio of the lower arm is 84:1
-      public static final double LOWER_ARM_GEAR_RATIO = (84 / 1);
+      public static final double LOWER_ARM_GEAR_RATIO = (84);
 
       // The gear ratio of the upper arm is 115:1
-      public static final double UPPER_ARM_GEAR_RATIO = (115 / 1);
+      public static final double UPPER_ARM_GEAR_RATIO = (115);
 
       // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
       public static final int LOWER_FREE_LIMIT = 80;
@@ -333,9 +333,11 @@ public final class Constants {
         private static final double GRID_TAG_HEIGHT = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
         public static final double GRID_BARRIER = Units.inchesToMeters(15);
-        public static final double HUMAN_TAG_OFFSET_X_INCHES = 30;
+        public static final double SUBSTATION_OFFSET_METERS = 0.7;
         public static final double ALLOWABLE_ERROR = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.53;
+
+        public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
         public static final Pose3d TAG_0_POSE = null;
         public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
@@ -363,26 +365,23 @@ public final class Constants {
     public static final class PlacementConstants {
 
       public static final int STOWED_INDEX = 0;
-
       public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
       public static final int MID_CONE_PLACEMENT_INDEX = 2;
-      
       public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
       public static final int MID_CUBE_LAUNCH_INDEX = 5;
-      
       public static final int HYBRID_PLACEMENT_INDEX = 1;
-      
       public static final int HUMAN_TAG_PICKUP_INDEX = 4;
       public static final int FLOOR_INTAKE_INDEX = 7;
-      
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
-
-
       public static final int HIGH_TO_STOWWED_INDEX = 10;
+      public static final int LONG_ARM_REACH_INDEX = 11;
+      public static final int FLOOR_INTAKE_PREP_INDEX = 12;
+      public static final int HIGH_CONE_PREP_INDEX = 13;
+      public static final int HIGH_PLACE_INDEX_AUTO = 14;
+      
 
-      public static final double CLAW_CONE_INTAKE_SPEED = 1;
-      public static final double CLAW_CUBE_INTAKE_SPEED = 1;
+      public static final double CLAW_INTAKE_SPEED = 1;
       public static final double CLAW_OUTTAKE_SPEED = -1;
 
       public static final double CLAW_STOPPED_SPEED = 0;
@@ -406,8 +405,8 @@ public final class Constants {
       public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
         
       public static final Pose3d TAG_0_POSE = null;
-      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(30.75, 41.88);
-      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(32.34, 19.00);
+      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(30.75, 32.88);
+      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(32.1, 23.00);
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
@@ -415,53 +414,87 @@ public final class Constants {
       public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(11, 43.25);
       public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
 
+      public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
+      public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
+      public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
+
       public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
 
       public static final Translation2d[][] ARM_POSITIONS = {
+        // Index 0
         {
           TRANSITION_POSITION,
           STOWED_POSITION
         },
+        // Index 1
         {
           TRANSITION_POSITION,
           HYBRID_POSITION
         },
+        // Index 2
         {
           TRANSITION_POSITION,
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
+        // Index 3
         {
           TRANSITION_POSITION,
           HIGH_CONE_POSITION_0,
           // ARM_HIGH_CONE_POSITION_1,
           HIGH_CONE_POSITION_2
         },
+        // Index 4
         {
           HUMAN_TAG_PICKUP
         },
+        // Index 5
         {
           CUBE_MID_LAUNCH
         },
+        // Index 6
         {
           CUBE_HIGH_LAUNCH
         },
+        // Index 7
         {
           FLOOR_INTAKE_PREP_POSITION,
           FLOOR_INTAKE_POSITION
         },
+        // Index 8
         {
           SOLUTION_FLIP_TRANSITION_POINT,
           SOLUTION_FLIP_POSIITON_POSITIVE
         },
+        // Index 9
         {
           SOLUTION_FLIP_TRANSITION_POINT,
           SOLUTION_FLIP_POSIITON_NEGATIVE
         },
+        // Index 10
         {
           HIGH_CONE_TRANSITION_POINT,
           TRANSITION_POSITION,
           STOWED_POSITION
+        },
+        // Index 11
+        {
+          LONG_ARM_REACH_0,
+          LONG_ARM_REACH_1,
+          LONG_ARM_REACH_2
+        },
+        // Index 12
+        {
+          FLOOR_INTAKE_PREP_POSITION
+        },
+        // Index 13
+        {
+          HIGH_CONE_TRANSITION_POINT
+        },
+        // Index 14
+        {
+          HIGH_CONE_POSITION_0,
+          HIGH_CONE_POSITION_2
         }
       };
   }

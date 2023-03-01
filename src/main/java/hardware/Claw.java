@@ -1,6 +1,5 @@
 package hardware;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -8,8 +7,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.revrobotics.RelativeEncoder;
-import math.Constants.ClawConstants;
-import math.Constants.PlacementConstants;
+import calc.Constants.ClawConstants;
+import calc.Constants.PlacementConstants;
 
 public class Claw {
 
@@ -22,7 +21,7 @@ public class Claw {
     private boolean startedOuttakingBool = false;
     private boolean finishedOuttaking = true;
     private double outtakeSeconds = 0;
-    private double startedOuttaking = 0;
+    private double startedOuttakingTimestamp = 0;
 
     public Claw() {
 
@@ -46,13 +45,13 @@ public class Claw {
     public void periodic() {
 
       if (DriverStation.isTeleop()) {
-        if ((Timer.getFPGATimestamp() - startedOuttaking) > outtakeSeconds && startedOuttakingBool) {
+        if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
             finishedOuttaking = true;
             stopClaw();
         }
       }
         
-        setSpeed(desiredSpeed);
+      setSpeed(desiredSpeed);
     }
 
     private void setSpeed(double speed) {
@@ -89,15 +88,16 @@ public class Claw {
     }
 
     public double getDesiredSpeed() {
+        if (this.desiredSpeed > 0) { return (this.desiredSpeed / 0.7); }
         return this.desiredSpeed;
     }
 
-    public void outTakeforXSeconds(double seconds) {
+    public void outTakeforXSeconds(double X) {
         setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
         this.startedOuttakingBool = true;
-        this.outtakeSeconds = seconds;
+        this.outtakeSeconds = X;
         this.finishedOuttaking = false;
-        this.startedOuttaking = Timer.getFPGATimestamp();
+        this.startedOuttakingTimestamp = Timer.getFPGATimestamp();
     }
 
     public boolean getFinishedOuttaking() {

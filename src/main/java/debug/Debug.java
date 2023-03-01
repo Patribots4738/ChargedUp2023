@@ -7,8 +7,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import math.Constants.ArmConstants;
-import math.Constants.AutoConstants;
+import calc.Constants.ArmConstants;
+import calc.Constants.AutoConstants;
 
 public class Debug {
 
@@ -129,5 +129,4 @@ public class Debug {
                         " Q1: " + String.format("%.3f", Units.radiansToDegrees(lowerAngle)) +
                         " Q2: " + String.format("%.3f", Units.radiansToDegrees(upperAngle) - 90));
     }
-
 }

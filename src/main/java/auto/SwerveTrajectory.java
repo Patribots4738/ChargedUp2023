@@ -16,15 +16,23 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
-import math.Constants;
-import math.Constants.AlignmentConstants;
+import calc.Constants;
+import calc.Constants.AlignmentConstants;
 
 public class SwerveTrajectory implements Loggable {
 
   // Create config for trajectory
   public static double timetrajectoryStarted;
+  // The trajectoryStatus represents what stage of auto we are on
+  // i.e. setting up ("setup"), executing ("execute"), or finished ("done")
   public static String trajectoryStatus = "";
 
+  // The amount of time that has elapsed in the path...
+  // This variable is used like a timer slider so we progress with the path
+  // at the same time as the path...
+  // A rough example of this is seen in the pathplanner's "play" functionality, 
+  // where the robot does a little movement
+  // we try to replicate that using this and Trajectory.sample(elapsedTime);
   public static double elapsedTime;
 
   /**
@@ -37,6 +45,11 @@ public class SwerveTrajectory implements Loggable {
    * <p>
    * The ProfiledPIDController for the rotation of the robot,
    * utilizing a Trapezoidprofile for smooth locomotion in terms of max velocity and acceleration
+   * To tune: <p>
+   * If you overshoot on the X, add less P for X. If you undershoot, add more P for X.
+   * As of 2/27/23 I have found little use for D.
+   * If you rotate too much, then reduce the P for theta.
+   * D can be seen as beneficial here as the rotation is allowed more speed than position.
    */
   public static HolonomicDriveController HDC = new HolonomicDriveController(
       new PIDController(
@@ -78,11 +91,10 @@ public class SwerveTrajectory implements Loggable {
    * It will autosave.
    * If everything is characterized correctly and your odometry reflects reality,
    * i.e. when the robot goes 1 meter, it says it went one meter--
-   * it will work like a charm.
+   * You only need to tune the Holonomic Drive Controller, which is explained above...
    *
-   * @param _pathTraj   run Pathplanner.loadpath("name of file without an extension") pass it here
-   * @param _odometry   SwerveDrive.java's odometry
-   * @param _rotation2d Pass in the current angle of the robot
+   * @param _pathTraj run Pathplanner.loadpath("name of file without an extension") pass it here
+   * @param swerve the current instance of swerve
    */
   public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve) {
 
@@ -96,18 +108,21 @@ public class SwerveTrajectory implements Loggable {
         break;
 
       case "execute":
-
+        
+        // If you want to see the difference in X and Y vs their desired position on a graph... uncomment below.
         // Debug.debugPeriodic(
         //     _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getX(),
         //     _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getY(),
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < _pathTraj.getEndState().timeSeconds + 2) {
+        if (elapsedTime < _pathTraj.getEndState().timeSeconds + 1.25) {
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState translationMirroredState = PathPlannerTrajectory.transformStateForAlliance(state, DriverStation.getAlliance());
-          // Create a new pathplannerstate based on the mirrored state's position, and taking the mirrored state's rotation and adding 180 degrees
+          // Create a new pathplannerstate based on the mirrored state's position
+          // and taking the mirrored state's rotation and adding 180 degrees
+          // If my PR on pathplanner gets accepted, we will only need to use translationMirroredState instead of mirroredState
           State mirroredState = new State(
               state.timeSeconds, 
               state.velocityMetersPerSecond, 
@@ -118,16 +133,14 @@ public class SwerveTrajectory implements Loggable {
                   state.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0))),
               state.curvatureRadPerMeter);
 
-          System.out.println(mirroredState.poseMeters);
-          
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
           ChassisSpeeds _speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              mirroredState,
-              mirroredState.poseMeters.getRotation());
+              (DriverStation.isAutonomous()) ? mirroredState : state,
+              (DriverStation.isAutonomous()) ? mirroredState.poseMeters.getRotation() : state.holonomicRotation);
 
           // Set the states for the motor using calculated values above
           // It is important to note that fieldRelative is false,
@@ -161,6 +174,10 @@ public class SwerveTrajectory implements Loggable {
 
   }
 
+  /**
+   * This method is only needed if you want to use sliders from ShuffleBoard to tune the HDC without re-enabling.
+   * If you want it, add it to the disabledPeriodic() in Robot.java
+   */
   public static void resetHDC() {
     HDC = new HolonomicDriveController(
     new PIDController(Debug.xP.getDouble(Constants.AutoConstants.X_CORRECTION_P),

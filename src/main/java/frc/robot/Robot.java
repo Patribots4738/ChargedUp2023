@@ -1,22 +1,21 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import debug.*;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import hardware.*;
-import math.ArmCalculations;
-import math.OICalc;
-import math.Constants.*;
+import calc.ArmCalculations;
+import calc.OICalc;
+import calc.Constants.*;
 import auto.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
-import subsystems.AutoAlignment;
+import auto.AutoAlignment;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -45,7 +44,6 @@ public class Robot extends TimedRobot {
 
   AutoAlignment autoAlignment;
 
-
   @Override
   public void robotInit() {
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
@@ -63,11 +61,11 @@ public class Robot extends TimedRobot {
       claw = new Claw();
 
       armCalcuations = new ArmCalculations();
-
-      autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw);
-      autoPathStorage = new AutoPathStorage
-
       autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
+
+      autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
+      autoPathStorage = new AutoPathStorage();
+
       Logger.configureLoggingAndConfig(this, false);
   }
 
@@ -90,7 +88,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    arm.setUpperArmCoastMode();
+    // arm.setUpperArmCoastMode();
     claw.stopClaw();
   }
 
@@ -102,32 +100,50 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-      autoSegmentedWaypoints.init();
-      arm.setBrakeMode();
-      SwerveTrajectory.resetTrajectoryStatus();
+    autoSegmentedWaypoints.init();
+    arm.setBrakeMode();
+    SwerveTrajectory.resetTrajectoryStatus();
 
   }
 
   @Override
   public void autonomousPeriodic() {
 
+    // If we are in the last 100 ms of the match, set the wheels up
+    // This is to prevent any charge pad sliding
+    if (Timer.getMatchTime() < 0.1) {
+      swerve.setWheelsUp();
+      return;
+    }
+
     swerve.periodic();
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
+    autoAlignment.calibrateOdometry();
 
   }
 
   @Override
   public void teleopInit() {
-      arm.setBrakeMode();
+    arm.setBrakeMode();
+    SwerveTrajectory.resetTrajectoryStatus();
+    autoAlignment.setConeOffset(0);
   }
 
   @Override
   public void teleopPeriodic() {
 
+    // If we are in the last 100 ms of the match, set the wheels up
+    // This is to prevent any charge pad sliding
+    if (Timer.getMatchTime() < 0.1) {
+      swerve.setWheelsUp();
+      return;
+    }
+
     arm.periodic();
     claw.periodic();
+    autoAlignment.calibrateOdometry();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
@@ -136,10 +152,10 @@ public class Robot extends TimedRobot {
     double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
     double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
-    double operatorLeftX = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.DRIVER_DEADBAND);
-    double operatorLeftY = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.DRIVER_DEADBAND);
-    double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.DRIVER_DEADBAND);
-    double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.DRIVER_DEADBAND);
+    double operatorLeftX = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.OPERATOR_DEADBAND);
+    double operatorLeftY = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.OPERATOR_DEADBAND);
+    double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.OPERATOR_DEADBAND);
+    double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.OPERATOR_DEADBAND);
 
     Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
@@ -150,35 +166,45 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
-    autoAlignment.calibrateOdometry();
-
     if (driver.getAButton()) {
 
-      if (driver.getRightBumper()) {
-
-        autoAlignment.moveToTag();
-
-        if (autoAlignment.getMoveArmToHumanTag()) {
-          arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-        }
-
-      } else {
-
+      if (driver.getAButtonPressed()) {
         SwerveTrajectory.resetTrajectoryStatus();
-
       }
 
+      autoAlignment.moveToTag();
+
+      if (autoAlignment.getMoveArmToHumanTag()) {
+        arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+      }
+      
+      // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
+      if (driver.getRightStickButtonPressed()) {
+        swerve.toggleSpeed();
+      }
+
+    } else if (driver.getRightBumper()) {
+
+      if (driver.getRightBumperPressed()) {
+        autoAlignment.startChargePad();
+      }
+
+      autoAlignment.chargeAlign();
 
     } else if (driver.getLeftBumper()) {
-      swerve.setX();
+
+      swerve.setWheelsX();
+
     } else {
-      //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, !driver.getYButton());
-    }
-    
-    // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-    if (driver.getRightStickButtonPressed()) {
-      swerve.toggleSpeed();
+      // If the driver holds the Y button, the robot will drive relative to itself
+      // This is useful for driving in a straight line (backwards to intake!)
+      if (driver.getYButton()) {
+        swerve.drive(driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false);
+      }
+      else {
+        // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick
+        swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true);
+      }
     }
 
     // Toggle the operator override when the operator's left stick is pressed
@@ -186,16 +212,47 @@ public class Robot extends TimedRobot {
       arm.toggleOperatorOverride();
     }
     if (arm.getOperatorOverride()) {
-      arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+
+      // If the holonomic rotation is either positive, plus or minus 10 degrees on either side of 0 degrees (180/0)
+      // Then set the operator X input to be negative
+      if (swerve.getYaw().getDegrees() > 0 || 
+         (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
+          swerve.getYaw().getDegrees() < -170 && swerve.getYaw().getDegrees() > 170) 
+      {
+        arm.drive(new Translation2d(
+          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
+              ? operatorLeftAxis.getX() 
+              : -operatorLeftAxis.getX()), 
+          -operatorLeftAxis.getY()));
+      }
+      else {
+        arm.drive(new Translation2d(
+          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
+              ? -operatorLeftAxis.getX() 
+              : operatorLeftAxis.getX()), 
+          operatorLeftAxis.getY()));
+      }
+
     }
 
-    switch (OICalc.getPOVPressed(driver.getPOV())) {
+    // The moment the robot takes in a cone/cube,
+    // The operator can set the robot into the desired mode
+    if (operator.getXButtonPressed()) {
+      autoAlignment.setConeMode(false);
+    }
+    else if (operator.getYButtonPressed()) {
+      autoAlignment.setConeMode(true);
+    }
+
+    // POV = D-Pad...
+    switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
       case -1:
         break;
 
       // Clicking up
       case 0:
+        arm.setArmIndex(PlacementConstants.LONG_ARM_REACH_INDEX);
         break;
 
       // Clicking down
@@ -204,33 +261,46 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        autoAlignment.setConeOffset(autoAlignment.getConeOffset() + 1);
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
         break;
 
       // Clicking right
       case 90:
-        autoAlignment.setConeOffset(autoAlignment.getConeOffset() - 1);
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
         break;
     }
-
-    switch (OICalc.getPOVPressed(operator.getPOV())) {
+    
+    // POV = D-Pad...
+    switch (operator.getPOV()) {
       // Not clicked
       case -1:
         break;
 
       // Clicking up
       case 0:
-        arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.HIGH_CUBE_LAUNCH_INDEX : PlacementConstants.HIGH_CONE_PLACEMENT_INDEX);
+        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.HIGH_CONE_PLACEMENT_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking down
       case 180:
-        arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX);
+        arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_INDEX);
         break;
 
       // Clicking left
       case 270:
-        arm.setArmIndex(autoAlignment.getConeOffset() == 0 ? PlacementConstants.MID_CUBE_LAUNCH_INDEX : PlacementConstants.MID_CONE_PLACEMENT_INDEX);
+        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.MID_CONE_PLACEMENT_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking right
@@ -245,39 +315,37 @@ public class Robot extends TimedRobot {
 
     }
 
+    if (operator.getStartButtonPressed()) {
+      arm.setArmMirrored(true);
+    }
+    else if (operator.getBackButtonPressed()) {
+      arm.setArmMirrored(false);
+    }
+
     // Claw speed controls
-    // If the left bumper is pressed, e-stop the claw
-    // If the right bumper is held, outtake an object when the arm is at placement position
-    // If the left trigger is held, intake an object
-      // Keep the fastest intake speed until the claw is e-stopped/reversed
-      // This is to allow the trigger to be fully pressed intake an object,
-    // and then let go to keep the claw at the same speed
-    // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
+      // If the left bumper is pressed, e-stop the claw
+      // If the right bumper is held, outtake an object when the arm is at placement position
+      // If the left trigger is held, intake an object
+        // Keep the fastest intake speed until the claw is e-stopped/reversed
+        // This is to allow the trigger to be fully pressed intake an object,
+      // and then let go to keep the claw at the same speed
+      // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
     
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
 
-    } else if (operator.getRightBumper()) {
+    } else if (operator.getRightBumper() && !claw.getStartedOuttakingBool()) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
 
         claw.outTakeforXSeconds(0.5);
 
       }
-    } else if (operator.getLeftTriggerAxis() > 0) {
-    
-    if (operator.getLeftBumper()) {
+    } else if (operator.getLeftBumper()) {
 
       claw.stopClaw();
 
-    } else if (operator.getRightBumper()) {
-      // Check if the arm has completed the path to place an object
-      if (arm.getAtPlacementPosition()) {
-
-        claw.outTakeforXSeconds(0.5);
-
-      }
     } else if (operator.getLeftTriggerAxis() > 0) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
@@ -292,26 +360,43 @@ public class Robot extends TimedRobot {
 
         if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
             arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
-          }
-          else {
-            arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-          }
-          
-          claw.setFinishedOuttaking(false);
-          claw.setStartedOuttakingBool(false);
-          
         }
+        else {
+          arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+        }
+          
+        claw.setFinishedOuttaking(false);
+        claw.setStartedOuttakingBool(false);
+          
       }
+    }
+
+    // Controller rumble settings:
+    if (arm.getAtPlacementPosition()) {
+      operator.setRumble(RumbleType.kLeftRumble, 0.5);
+      operator.setRumble(RumbleType.kRightRumble, 0.5);
+    }
+    else {
+      operator.setRumble(RumbleType.kLeftRumble, 0);
+      operator.setRumble(RumbleType.kRightRumble, 0);
     }
   }
 
   @Override
   public void testInit() {
-    arm.setCoastMode();
   }
 
   @Override
   public void testPeriodic() {
-    arm.periodic();
+    if (driver.getRightBumper()) {
+
+      if (driver.getRightBumperPressed()) {
+        autoAlignment.startChargePad();
+      }
+
+      autoAlignment.chargeAlign();
+    }
+
+    System.out.println(driver.getBackButton() + " " + driver.getStartButton());
   }
 }

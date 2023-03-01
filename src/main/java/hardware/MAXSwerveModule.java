@@ -13,7 +13,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import math.Constants.ModuleConstants;
+import calc.Constants.ModuleConstants;
 
 public class MAXSwerveModule {
     private final CANSparkMax _drivingSparkMax;
