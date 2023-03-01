@@ -129,5 +129,4 @@ public class Debug {
                         " Q1: " + String.format("%.3f", Units.radiansToDegrees(lowerAngle)) +
                         " Q2: " + String.format("%.3f", Units.radiansToDegrees(upperAngle) - 90));
     }
-
 }

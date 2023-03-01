@@ -1,3 +1,8 @@
+// Be warned, dragons ahead!
+// For teams in the future trying to create this kind of complexity in autonomous
+// Do not do it this way! 
+// Instead, use a hashmap that has a key of the trajectory and the value of the arm and claw movement for the key
+// T
 package auto;
 
 import com.pathplanner.lib.PathConstraints;
@@ -583,12 +588,12 @@ public class AutoPathStorage implements Loggable {
       
       if (i == 0) {
         AutoPose MobilityAutoPose = new AutoPose("MOBILITY ONLY!!!!!!", _MOBILITY_ONLY);
-        autoChooser.addOption(MobilityAutoPose.name, MobilityAutoPose);
+        autoChooser.addOption(MobilityAutoPose.getName(), MobilityAutoPose);
       }
       
       AutoPose AutoPose = myAutoContainer[i];
       
-      autoChooser.addOption(AutoPose.name, AutoPose);
+      autoChooser.addOption(AutoPose.getName(), AutoPose);
 
       // Every third index, add a spacer option for simplicity
       if (((i + 1) % 3 == 0) && (i != myAutoContainer.length - 1)) {
@@ -605,14 +610,26 @@ public class AutoPathStorage implements Loggable {
   // This is so we can create a larget path using multiple waypoints
   public static class Waypoint {
 
-    public PathPlannerTrajectory pathPlannerSegment;
-    public int armPosIndex;
-    public double clawDirection;
+    private PathPlannerTrajectory pathPlannerSegment;
+    private int armPosIndex;
+    private double clawDirection;
 
     public Waypoint(PathPlannerTrajectory _PPS, int _index, double _clawDirection) {
       armPosIndex = _index;
       clawDirection = _clawDirection;
       pathPlannerSegment = _PPS;
+    }
+
+    public PathPlannerTrajectory getPathPlannerSegment() {
+      return pathPlannerSegment;
+    }
+
+    public int getArmPosIndex() {
+      return armPosIndex;
+    }
+
+    public double getClawDirection() {
+      return clawDirection;
     }
   }
 
@@ -621,12 +638,20 @@ public class AutoPathStorage implements Loggable {
   @SuppressWarnings({"CanBeFinal", "SameParameterValue"})
   public static class AutoPose {
     
-    public String name;
-    public Waypoint[] thisWPset;
+    private String name;
+    private Waypoint[] thisWPset;
 
     AutoPose(String _S, Waypoint[] _WP) {
       thisWPset = _WP;
       name = _S;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public Waypoint[] getWaypointSet() {
+      return thisWPset;
     }
   }
 }

@@ -70,7 +70,7 @@ public class Swerve implements Loggable{
 
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.DRIVE_KINEMATICS,
-        getYaw(),
+        getGyroAngle(),
         getModulePositions(),
         new Pose2d(),
         // Trust the information of the vision more
@@ -214,8 +214,8 @@ public class Swerve implements Loggable{
     public void zeroHeading() {
         gyro.reset();
     }
-
-    public Rotation2d getYaw() {
+    
+    public Rotation2d getGyroAngle() {
 
       // gyro.setYawAxis(IMUAxis.kZ);
       
@@ -230,21 +230,26 @@ public class Swerve implements Loggable{
       return yawRotation2d;
     }
 
-    public void getPitch() {
-      // gyro.setYawAxis(IMUAxis.kY);
+    public Rotation2d getYaw() { return this.getPose().getRotation(); }
+
+    public Rotation2d getPitch() {
 
       Rotation2d pitchRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle());
 
       this.pitch = pitchRotation2d.getDegrees();
       
+      return pitchRotation2d;
+      
     }
 
-    public void getRoll() {
-      // gyro.setYawAxis(IMUAxis.kX);
+    public Rotation2d getRoll() {
 
       Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getXComplementaryAngle());
 
       this.roll = rollRotation2d.getDegrees();
+
+      return rollRotation2d;
+      
     }
 
     public void resetEncoders() {

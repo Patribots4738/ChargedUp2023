@@ -72,6 +72,7 @@ public class Arm implements Loggable {
     // The blue arm solution found in desmos here:
     // https://www.desmos.com/calculator/fqyyldertp
     private boolean blueArmSolution = false;
+    private boolean armMirrored = false;
 
     @Log
     private double armXPos = 0;
@@ -163,7 +164,7 @@ public class Arm implements Loggable {
         }
         if (!operatorOverride) { indexPeriodic();}
         setLowerArmPosition(lowerReferenceAngle);
-        setUpperArmPosition(upperReferenceAngle);
+        setUpperArmAngle(upperReferenceAngle);
         upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // Use forward kinematics to get the x and y position of the end effector
@@ -279,10 +280,13 @@ public class Arm implements Loggable {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-          this.armXReference += (position.getX()/5);
-          this.armYReference += (position.getY()/5);
+          // If the robot is facing left, have left joystick be positive
+          // If the robot is facing right, have left joystick be negative
+          this.armXReference += (position.getX()/2);
+          this.armYReference += (position.getY()/2);
         } else {
-          this.armXReference = position.getX();
+          // If the arm is mirrored, invert all incoming X values
+          this.armXReference = ((this.armMirrored) ? -(position.getX()) : (position.getX()));
           this.armYReference = position.getY();
         }
 
@@ -299,6 +303,7 @@ public class Arm implements Loggable {
         if (armPosition.getNorm() > ArmConstants.MAX_REACH) {
           armPosition = armPosition.times((ArmConstants.MAX_REACH - 0.1) / armPosition.getNorm());
         }
+
         // If the distance from zero is less than the min reach, cap it at the min reach
         // This min reach is the lower arm length - the upper arm length
         else if (armPosition.getNorm() < ArmConstants.MIN_REACH) {
@@ -394,13 +399,13 @@ public class Arm implements Loggable {
     /**
      * Set the position of an arm
      *
-     * @param position the position to set the upper arm to
+     * @param angle the position to set the upper arm to
      *                 This unit is in rads
      */
-    public void setUpperArmPosition(double position) {
+    public void setUpperArmAngle(double angle) {
 
-        position = MathUtil.clamp(
-          position,
+        angle = MathUtil.clamp(
+          angle,
           ArmConstants.UPPER_ARM_LOWER_LIMIT,
           ArmConstants.UPPER_ARM_UPPER_LIMIT
         );
@@ -414,11 +419,11 @@ public class Arm implements Loggable {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((position), 0);
+        double FF = feedForward.calculate((angle), 0);
         _upperArmPIDController.setFF(FF);
 
         // Set the position of the neo controlling the upper arm to
-        _upperArmPIDController.setReference((position), ControlType.kPosition);
+        _upperArmPIDController.setReference((angle), ControlType.kPosition);
 
         upperRotation = _upperArmEncoder.getPosition();
 
@@ -511,7 +516,15 @@ public class Arm implements Loggable {
       return this.operatorOverride;
     }
 
-  /**
+    public void setArmMirrored(boolean armMirrored) {
+      this.armMirrored = armMirrored;
+    }
+
+    public boolean getArmMirrored() {
+      return this.armMirrored;
+    }
+
+    /**
      * Set the motor to coast mode
      */
     public void setCoastMode() {

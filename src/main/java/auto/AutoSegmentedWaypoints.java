@@ -57,12 +57,12 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     }
 
-    chosenWaypoints = chosenAutoPath.thisWPset;
+    chosenWaypoints = chosenAutoPath.getWaypointSet();
 
     currentWaypointNumber = 0;
 
-    PathPlannerState initialPathPose = chosenWaypoints[0].pathPlannerSegment.getInitialState();
-    chosenWaypoints[0].pathPlannerSegment.getInitialHolonomicPose();
+    PathPlannerState initialPathPose = chosenWaypoints[0].getPathPlannerSegment().getInitialState();
+    chosenWaypoints[0].getPathPlannerSegment().getInitialHolonomicPose();
 
     Pose2d mirroredPose = new Pose2d(
       (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
@@ -111,7 +111,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     // Once the robot is in position...
-    if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+    else if (SwerveTrajectory.trajectoryStatus.equals("done")) {
       // If the arm is not in the desired position, move it
       if (!hasMovedArm) {
         // If the arm is at a prep index, change the desired index to be the other half of that prep index...
@@ -119,10 +119,12 @@ public class AutoSegmentedWaypoints implements Loggable {
         // this is because the first transition point is the prep index's end point
         if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_INDEX)
         {
+          System.out.println("Moving arm to index HIGH_PLACE_AUTO (" + PlacementConstants.HIGH_PLACE_INDEX_AUTO + ") at waypoint: " + currentWaypointNumber);
           arm.setArmIndex(PlacementConstants.HIGH_PLACE_INDEX_AUTO);
         }
         // The arm is not at a prep index...
         else {
+          System.out.println("Moving arm to index: " + armIndex + " at waypoint: " + currentWaypointNumber);
           arm.setArmIndex(armIndex);
         }
         // Prevent the arm from setting the index again
@@ -169,20 +171,25 @@ public class AutoSegmentedWaypoints implements Loggable {
       stateHasInitialized = true;
     }
 
-    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve);
+    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
 
-    this.setArmIndex(thisWaypointSet[currentWaypointNumber].armPosIndex, thisWaypointSet[currentWaypointNumber].clawDirection);
+    this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
 
     if (stateHasFinished) {
 
       if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
-          arm.getArmIndex() == PlacementConstants.HIGH_PLACE_INDEX_AUTO) { arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); }
-      else { arm.setArmIndex(PlacementConstants.STOWED_INDEX); }
+          arm.getArmIndex() == PlacementConstants.HIGH_PLACE_INDEX_AUTO) 
+      { 
+        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
+      }
+      else { 
+        arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
+      }
 
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if ((claw.getDesiredSpeed() != PlacementConstants.CLAW_INTAKE_SPEED &&
-      claw.getDesiredSpeed() != PlacementConstants.CLAW_INTAKE_SPEED)) {
+      if (claw.getDesiredSpeed() != PlacementConstants.CLAW_INTAKE_SPEED) 
+      {
         claw.stopClaw();
       }
       

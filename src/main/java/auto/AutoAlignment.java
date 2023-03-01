@@ -13,12 +13,14 @@ import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.PlacementConstants;
 import calc.PhotonCameraPose;
 
-public class AutoAlignment {
+public class AutoAlignment implements Loggable{
 
     /**
      * A visual representation of the apriltag positions
@@ -48,6 +50,8 @@ public class AutoAlignment {
     private double currentNorm = 0;
 
     private boolean moveArmToHumanTag = false;
+  
+    @Log
     private boolean coneMode = false;
 
     public AutoAlignment(Swerve swerve) {
@@ -336,18 +340,21 @@ public class AutoAlignment {
 
       double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
       // boolean setWheelsUp = false;
-      double roll = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
-
-      if (roll > 7) {
-        swerve.drive(-
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * roll)/(elapsedTime * ((DriverStation.isAutonomous()) ? 3 : 1.5))), -0.5, 0.5), 
+      double tilt = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
+      tilt = (swerve.getPitch().getRadians() * Math.sin(swerve.getYaw().getRadians()) + swerve.getRoll().getRadians() * Math.sin(swerve.getYaw().getRadians()));
+      
+      System.out.println("Tilt: " + Math.toDegrees(tilt));
+      
+      if (tilt > Math.toRadians(7)) {
+        swerve.drive(
+            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * ((DriverStation.isAutonomous()) ? 1.5 : 1.5))), -0.5, -0.05), 
             0, 
             0, 
             true);
       }
-      else if (roll < -7) {
-        swerve.drive(-
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * roll)/(elapsedTime * ((DriverStation.isAutonomous()) ? 3 : 1.5))), -0.5, 0.5), 
+      else if (tilt < -Math.toRadians(7)) {
+        swerve.drive(
+            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * ((DriverStation.isAutonomous()) ? 1.5 : 1.5))), 0.05, 0.5), 
             0, 
             0, 
             true);

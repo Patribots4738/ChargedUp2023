@@ -93,7 +93,7 @@ public class SwerveTrajectory implements Loggable {
    * i.e. when the robot goes 1 meter, it says it went one meter--
    * You only need to tune the Holonomic Drive Controller, which is explained above...
    *
-   * @param _pathTraj   run Pathplanner.loadpath("name of file without an extension") pass it here
+   * @param _pathTraj run Pathplanner.loadpath("name of file without an extension") pass it here
    * @param swerve the current instance of swerve
    */
   public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve) {
