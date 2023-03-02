@@ -17,6 +17,7 @@ import calc.Constants.AutoConstants;
 import calc.Constants.PlacementConstants;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class AutoPathStorage implements Loggable {
 
@@ -37,6 +38,8 @@ public class AutoPathStorage implements Loggable {
    * M after 1-9 represents the mid placement index for the arm
    * L after 1-9 represents the hybrid placement index for the arm
    */
+
+  HashMap<String, Waypoint> waypoints;
 
   public static Waypoint[] _MOBILITY_ONLY;
 
@@ -279,7 +282,7 @@ public class AutoPathStorage implements Loggable {
      * Create waypoint arrays in order as defined from the top of the file
      */
 
-    HashMap<String, Waypoint> waypoints = new HashMap<>();
+    waypoints = new HashMap<>();
 
     // Placement High
     waypoints.put("_1H", new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
@@ -728,5 +731,35 @@ public class AutoPathStorage implements Loggable {
     public Waypoint[] getWaypointSet() {
       return thisWPset;
     }
+  }
+
+  private Waypoint[] getWaypointFromString(String s)
+  {
+    StringBuilder sb = new StringBuilder(s); // Create a string builder from any string
+    sb.deleteCharAt(0); // Delete the first character of the string because it has a "_"
+
+    String[] splitString = sb.toString().split("_"); // Split the string into an array of strings ["7H", "D", "9H", "Charge"]
+
+    Waypoint[] waypointSet = new Waypoint[splitString.length];
+
+    // Loop through the split string array and create a waypoint for each string using the waypoint hashmap, already predefined
+    for (int i = 0; i < splitString.length; i++)
+    {
+        // (i == 0)   if the first waypoint, get the "_{splitString}" waypoint
+        // (i==3)     if the last waypoint, get the "_{splitString[i-1]}_{splitString[i]}" waypoint
+        // otherwise  get the "_{splitString[i-1]}_{splitString[i]}" waypoint
+      if (i == 0)
+      {
+        waypointSet[i] = waypoints.get("_" + splitString[i]);
+      } else if (i == 3)
+      {
+        waypointSet[i] = waypoints.get("_" + splitString[0] + "_" + splitString[i]);
+      } else
+      {
+        waypointSet[i] = waypoints.get("_" + splitString[i-1] + "_" + splitString[i]);
+      }
+    }
+
+    return waypointSet;
   }
 }
