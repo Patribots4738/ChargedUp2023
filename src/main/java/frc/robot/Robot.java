@@ -2,7 +2,6 @@ package frc.robot;
 
 import debug.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import hardware.*;
 import calc.ArmCalculations;
 import calc.OICalc;
@@ -12,7 +11,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
 import auto.AutoAlignment;
@@ -109,13 +107,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    // If we are in the last 100 ms of the match, set the wheels up
-    // This is to prevent any charge pad sliding
-    if (Timer.getMatchTime() < 0.1) {
-      swerve.setWheelsUp();
-      return;
-    }
-
     swerve.periodic();
     arm.periodic();
     claw.periodic();
@@ -133,13 +124,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
-    // If we are in the last 100 ms of the match, set the wheels up
-    // This is to prevent any charge pad sliding
-    if (Timer.getMatchTime() < 0.1) {
-      swerve.setWheelsUp();
-      return;
-    }
 
     arm.periodic();
     claw.periodic();
@@ -166,11 +150,12 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
-    if (driver.getAButton()) {
 
-      if (driver.getAButtonPressed()) {
-        SwerveTrajectory.resetTrajectoryStatus();
-      }
+    if (driver.getAButtonPressed()) {
+      SwerveTrajectory.resetTrajectoryStatus();
+    }
+
+    if (driver.getAButton()) {
 
       autoAlignment.moveToTag();
 
@@ -182,14 +167,6 @@ public class Robot extends TimedRobot {
       if (driver.getRightStickButtonPressed()) {
         swerve.toggleSpeed();
       }
-
-    } else if (driver.getRightBumper()) {
-
-      if (driver.getRightBumperPressed()) {
-        autoAlignment.startChargePad();
-      }
-
-      autoAlignment.chargeAlign();
 
     } else if (driver.getLeftBumper()) {
 
@@ -212,27 +189,7 @@ public class Robot extends TimedRobot {
       arm.toggleOperatorOverride();
     }
     if (arm.getOperatorOverride()) {
-
-      // If the holonomic rotation is either positive, plus or minus 10 degrees on either side of 0 degrees (180/0)
-      // Then set the operator X input to be negative
-      if (swerve.getYaw().getDegrees() > 0 || 
-         (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
-          swerve.getYaw().getDegrees() < -170 && swerve.getYaw().getDegrees() > 170) 
-      {
-        arm.drive(new Translation2d(
-          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? operatorLeftAxis.getX() 
-              : -operatorLeftAxis.getX()), 
-          -operatorLeftAxis.getY()));
-      }
-      else {
-        arm.drive(new Translation2d(
-          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? -operatorLeftAxis.getX() 
-              : operatorLeftAxis.getX()), 
-          operatorLeftAxis.getY()));
-      }
-
+      arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
     }
 
     // The moment the robot takes in a cone/cube,
@@ -283,7 +240,7 @@ public class Robot extends TimedRobot {
     }
     
     // POV = D-Pad...
-    switch (operator.getPOV()) {
+    switch (OICalc.getOperatorPOVPressed(operator.getPOV())) {
       // Not clicked
       case -1:
         break;
@@ -313,13 +270,6 @@ public class Robot extends TimedRobot {
     
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
 
-    }
-
-    if (operator.getStartButtonPressed()) {
-      arm.setArmMirrored(true);
-    }
-    else if (operator.getBackButtonPressed()) {
-      arm.setArmMirrored(false);
     }
 
     // Claw speed controls
@@ -388,15 +338,26 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    if (driver.getRightBumper()) {
-
-      if (driver.getRightBumperPressed()) {
-        autoAlignment.startChargePad();
-      }
-
+    arm.periodic();
+    if (driver.getAButtonPressed()) {
+      autoAlignment.startChargePad();
+    }
+    if (driver.getAButton()) {
       autoAlignment.chargeAlign();
     }
+    else {
+      double driverLeftX = MathUtil.applyDeadband(-driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+      double driverLeftY = MathUtil.applyDeadband(-driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+      double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+      double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
+      Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
 
-    System.out.println(driver.getBackButton() + " " + driver.getStartButton());
+      // If we are on blue alliance, flip the driverLeftAxis
+      if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+        driverLeftAxis = driverLeftAxis.unaryMinus();
+      }
+      //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
+      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, !driver.getYButton());
+    }
   }
 }

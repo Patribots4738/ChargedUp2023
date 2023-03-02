@@ -252,6 +252,10 @@ public class Swerve implements Loggable{
       
     }
 
+    public Rotation2d getTilt() {
+      return Rotation2d.fromRadians(getPitch().getRadians() * Math.sin(getYaw().getRadians()) + getRoll().getRadians() * Math.sin(getYaw().getRadians()));
+    }
+
     public void resetEncoders() {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
             mSwerveMod.resetEncoders();
