@@ -252,7 +252,7 @@ public final class Constants {
       public static final double LOWER_MAX_OUTPUT = 0.85;
       public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MAX_OUTPUT = 0.5;
+      public static final double UPPER_MAX_OUTPUT = 0.75;
       public static final double UPPER_MIN_OUTPUT = -UPPER_MAX_OUTPUT;
 
       /**
