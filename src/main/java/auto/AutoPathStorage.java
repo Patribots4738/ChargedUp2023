@@ -16,6 +16,8 @@ import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AutoConstants;
 import calc.Constants.PlacementConstants;
 
+import java.util.HashMap;
+
 public class AutoPathStorage implements Loggable {
 
   @Log(tabName = "AutoPicker", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
@@ -277,312 +279,360 @@ public class AutoPathStorage implements Loggable {
      * Create waypoint arrays in order as defined from the top of the file
      */
 
-    _MOBILITY_ONLY = new Waypoint[] {
-        new Waypoint(_MOBILITY, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+    HashMap<String, Waypoint> waypoints = new HashMap<>();
 
-    // WPs for the bottom of the field:
-    _1H_A_2H_CHARGE = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+    // Placement High
+    waypoints.put("_1H", new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
+    waypoints.put("_2H", new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX));
+    waypoints.put("_3H", new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
+    waypoints.put("_7H", new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
+    waypoints.put("_8H", new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX));
+    waypoints.put("_9H", new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
 
-    _1H_A_2H = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+    // Placement High to Ball
+    waypoints.put("_1H_A", new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_2H_A", new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_3H_A", new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_7H_C", new Waypoint(_7_C, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_8H_C", new Waypoint(_8_C, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_9H_C", new Waypoint(_9_C, PlacementConstants.FLOOR_INTAKE_INDEX));
 
-    _1H_A_2H_B = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+    // Placement High to Ball
+    waypoints.put("_1H_B", new Waypoint(_1_B, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_2H_B", new Waypoint(_2_B, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_3H_B", new Waypoint(_3_B, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_7H_D", new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_8H_D", new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_9H_D", new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX));
+    waypoints.put("_9H_D_REACH", new Waypoint(_9_D, PlacementConstants.LONG_ARM_REACH_INDEX));
 
-    _1H_A_3H_CHARGE = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+    // Placement Ball to High
+    waypoints.put("_A_1H", new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
+    waypoints.put("_A_2H", new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX));
+    waypoints.put("_A_3H", new Waypoint(_A_3, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX));
+    waypoints.put("_D_7H", new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
+    waypoints.put("_D_8H", new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX));
+    waypoints.put("_D_9H", new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
+    waypoints.put("_D_9H_REACH", new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX));
 
-    _1H_A_3H = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+    // Placement High to Charge
+    waypoints.put("_1H_CHARGE", new Waypoint(_1_CH, PlacementConstants.STOWED_INDEX));
+    waypoints.put("_2H_CHARGE", new Waypoint(_2_CH, PlacementConstants.STOWED_INDEX));
+    waypoints.put("_3H_CHARGE", new Waypoint(_3_CH, PlacementConstants.STOWED_INDEX));
+    waypoints.put("_7H_CHARGE", new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX));
+    waypoints.put("_8H_CHARGE", new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX));
+    waypoints.put("_9H_CHARGE", new Waypoint(_9_CH, PlacementConstants.STOWED_INDEX));
 
-    _1H_A_3H_B = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+    waypoints.put("_MOBILITY_ONLY", new Waypoint(_MOBILITY, PlacementConstants.STOWED_INDEX));
 
-    _2H_A_1H_CHARGE = new Waypoint[] {
-        new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+    {
+      _MOBILITY_ONLY = new Waypoint[]{
+              new Waypoint(_MOBILITY, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _2H_A_1H = new Waypoint[] {
-        new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      // WPs for the bottom of the field:
+      _1H_A_2H_CHARGE = new Waypoint[]{
+              new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _2H_A_1H_B = new Waypoint[] {
-        new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _1H_A_2H = new Waypoint[]{
+              new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _2H_A_3H_CHARGE = new Waypoint[] {
-        new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _1H_A_2H_B = new Waypoint[]{
+              new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _2H_A_3H = new Waypoint[] {
-        new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _1H_A_3H_CHARGE = new Waypoint[]{
+              new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _2H_A_3H_B = new Waypoint[] {
-        new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _1H_A_3H = new Waypoint[]{
+              new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _3H_A_1H_CHARGE = new Waypoint[] {
-        new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _1H_A_3H_B = new Waypoint[]{
+              new Waypoint(_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _3H_A_1H = new Waypoint[] {
-        new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _2H_A_1H_CHARGE = new Waypoint[]{
+              new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _3H_A_1H_B = new Waypoint[] {
-        new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_1_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _2H_A_1H = new Waypoint[]{
+              new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _3H_A_2H_CHARGE = new Waypoint[] {
-        new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _2H_A_1H_B = new Waypoint[]{
+              new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _3H_A_2H = new Waypoint[] {
-        new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _2H_A_3H_CHARGE = new Waypoint[]{
+              new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _3H_A_2H_B = new Waypoint[] {
-        new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_2_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _2H_A_3H = new Waypoint[]{
+              new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    // WPs for the top of the field:
-    _7H_D_8H_CHARGE = new Waypoint[] {
-      new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-      new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-      new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-      new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _2H_A_3H_B = new Waypoint[]{
+              new Waypoint(_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _7H_D_8H = new Waypoint[] {
-        new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _3H_A_1H_CHARGE = new Waypoint[]{
+              new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _7H_D_8H_C = new Waypoint[] {
-        new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _3H_A_1H = new Waypoint[]{
+              new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _7H_D_9H_CHARGE = new Waypoint[] {
-        new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _3H_A_1H_B = new Waypoint[]{
+              new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_1, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_1_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _7H_D_9H = new Waypoint[] {
-        new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _3H_A_2H_CHARGE = new Waypoint[]{
+              new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _7H_D_9H_C = new Waypoint[] {
-        new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _3H_A_2H = new Waypoint[]{
+              new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _8H_D_7H_CHARGE = new Waypoint[] {
-        new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _3H_A_2H_B = new Waypoint[]{
+              new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_3_A, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_2_B, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _8H_D_7H = new Waypoint[] {
-        new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      // WPs for the top of the field:
+      _7H_D_8H_CHARGE = new Waypoint[]{
+              new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _8H_D_7H_C = new Waypoint[] {
-        new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _7H_D_8H = new Waypoint[]{
+              new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _8H_D_9H_CHARGE = new Waypoint[] {
-        new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _7H_D_8H_C = new Waypoint[]{
+              new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _8H_D_9H = new Waypoint[] {
-        new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _7H_D_9H_CHARGE = new Waypoint[]{
+              new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _8H_D_9H_C = new Waypoint[] {
-        new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _7H_D_9H = new Waypoint[]{
+              new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _9H_D_7H_CHARGE = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _7H_D_9H_C = new Waypoint[]{
+              new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _9H_D_7H = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _8H_D_7H_CHARGE = new Waypoint[]{
+              new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _9H_D_7H_C = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _8H_D_7H = new Waypoint[]{
+              new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _9H_D_8H_CHARGE = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _8H_D_7H_C = new Waypoint[]{
+              new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    _9H_D_8H = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-    };
+      _8H_D_9H_CHARGE = new Waypoint[]{
+              new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-    _9H_D_8H_C = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_8_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
-    };
+      _8H_D_9H = new Waypoint[]{
+              new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-    _9H_D_7H_REACH = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D_REACH, PlacementConstants.LONG_ARM_REACH_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_REACH_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
+      _8H_D_9H_C = new Waypoint[]{
+              new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-    myAutoContainer = new AutoPose[] {
-      // AutoPoses for the bottom of the field:
-      new AutoPose("1H_A_2H_CHARGE", _1H_A_2H_CHARGE),
-      new AutoPose("1H_A_2H", _1H_A_2H),
-      new AutoPose("1H_A_2H_B", _1H_A_2H_B),
+      _9H_D_7H_CHARGE = new Waypoint[]{
+              new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-      new AutoPose("1H_A_3H_CHARGE", _1H_A_3H_CHARGE),
-      new AutoPose("1H_A_3H", _1H_A_3H),
-      new AutoPose("1H_A_3H_B", _1H_A_3H_B),
+      _9H_D_7H = new Waypoint[]{
+              new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-      new AutoPose("2H_A_1H_CHARGE", _2H_A_1H_CHARGE),
-      new AutoPose("2H_A_1H", _2H_A_1H),
-      new AutoPose("2H_A_1H_B", _2H_A_1H_B),
+      _9H_D_7H_C = new Waypoint[]{
+              new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-      new AutoPose("2H_A_3H_CHARGE", _2H_A_3H_CHARGE),
-      new AutoPose("2H_A_3H", _2H_A_3H),
-      new AutoPose("2H_A_3H_B", _2H_A_3H_B),
+      _9H_D_8H_CHARGE = new Waypoint[]{
+              new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-      new AutoPose("3H_A_1H_CHARGE", _3H_A_1H_CHARGE),
-      new AutoPose("3H_A_1H", _3H_A_1H),
-      new AutoPose("3H_A_1H_B", _3H_A_1H_B),
+      _9H_D_8H = new Waypoint[]{
+              new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+      };
 
-      new AutoPose("3H_A_2H_CHARGE", _3H_A_2H_CHARGE),
-      new AutoPose("3H_A_2H", _3H_A_2H),
-      new AutoPose("3H_A_2H_B", _3H_A_2H_B),
+      _9H_D_8H_C = new Waypoint[]{
+              new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_8_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+      };
 
-      // AutoPoses for the top of the field:
-      new AutoPose("7H_D_8H_CHARGE", _7H_D_8H_CHARGE),
-      new AutoPose("7H_D_8H", _7H_D_8H),
-      new AutoPose("7H_D_8H_C", _7H_D_8H_C),
+      _9H_D_7H_REACH = new Waypoint[]{
+              new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_9_D_REACH, PlacementConstants.LONG_ARM_REACH_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
+              new Waypoint(_D_REACH_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+              new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+      };
 
-      new AutoPose("7H_D_9H_CHARGE", _7H_D_9H_CHARGE),
-      new AutoPose("7H_D_9H", _7H_D_9H),
-      new AutoPose("7H_D_9H_C", _7H_D_9H_C),
+      myAutoContainer = new AutoPose[]{
+              // AutoPoses for the bottom of the field:
+              new AutoPose("1H_A_2H_CHARGE", _1H_A_2H_CHARGE),
+              new AutoPose("1H_A_2H", _1H_A_2H),
+              new AutoPose("1H_A_2H_B", _1H_A_2H_B),
 
-      new AutoPose("8H_D_7H_CHARGE", _8H_D_7H_CHARGE),
-      new AutoPose("8H_D_7H", _8H_D_7H),
-      new AutoPose("8H_D_7H_C", _8H_D_7H_C),
+              new AutoPose("1H_A_3H_CHARGE", _1H_A_3H_CHARGE),
+              new AutoPose("1H_A_3H", _1H_A_3H),
+              new AutoPose("1H_A_3H_B", _1H_A_3H_B),
 
-      new AutoPose("8H_D_9H_CHARGE", _8H_D_9H_CHARGE),
-      new AutoPose("8H_D_9H", _8H_D_9H),
-      new AutoPose("8H_D_9H_C", _8H_D_9H_C),
+              new AutoPose("2H_A_1H_CHARGE", _2H_A_1H_CHARGE),
+              new AutoPose("2H_A_1H", _2H_A_1H),
+              new AutoPose("2H_A_1H_B", _2H_A_1H_B),
 
-      new AutoPose("9H_D_7H_CHARGE", _9H_D_7H_CHARGE),
-      new AutoPose("9H_D_7H", _9H_D_7H),
-      new AutoPose("9H_D_7H_C", _9H_D_7H_C),
+              new AutoPose("2H_A_3H_CHARGE", _2H_A_3H_CHARGE),
+              new AutoPose("2H_A_3H", _2H_A_3H),
+              new AutoPose("2H_A_3H_B", _2H_A_3H_B),
 
-      new AutoPose("9H_D_8H_CHARGE", _9H_D_8H_CHARGE),
-      new AutoPose("9H_D_8H", _9H_D_8H),
-      new AutoPose("9H_D_8H_C", _9H_D_8H_C),
+              new AutoPose("3H_A_1H_CHARGE", _3H_A_1H_CHARGE),
+              new AutoPose("3H_A_1H", _3H_A_1H),
+              new AutoPose("3H_A_1H_B", _3H_A_1H_B),
 
-      new AutoPose("9H_D_7H_REACH", _9H_D_7H_REACH)
-    };
+              new AutoPose("3H_A_2H_CHARGE", _3H_A_2H_CHARGE),
+              new AutoPose("3H_A_2H", _3H_A_2H),
+              new AutoPose("3H_A_2H_B", _3H_A_2H_B),
+
+              // AutoPoses for the top of the field:
+              new AutoPose("7H_D_8H_CHARGE", _7H_D_8H_CHARGE),
+              new AutoPose("7H_D_8H", _7H_D_8H),
+              new AutoPose("7H_D_8H_C", _7H_D_8H_C),
+
+              new AutoPose("7H_D_9H_CHARGE", _7H_D_9H_CHARGE),
+              new AutoPose("7H_D_9H", _7H_D_9H),
+              new AutoPose("7H_D_9H_C", _7H_D_9H_C),
+
+              new AutoPose("8H_D_7H_CHARGE", _8H_D_7H_CHARGE),
+              new AutoPose("8H_D_7H", _8H_D_7H),
+              new AutoPose("8H_D_7H_C", _8H_D_7H_C),
+
+              new AutoPose("8H_D_9H_CHARGE", _8H_D_9H_CHARGE),
+              new AutoPose("8H_D_9H", _8H_D_9H),
+              new AutoPose("8H_D_9H_C", _8H_D_9H_C),
+
+              new AutoPose("9H_D_7H_CHARGE", _9H_D_7H_CHARGE),
+              new AutoPose("9H_D_7H", _9H_D_7H),
+              new AutoPose("9H_D_7H_C", _9H_D_7H_C),
+
+              new AutoPose("9H_D_8H_CHARGE", _9H_D_8H_CHARGE),
+              new AutoPose("9H_D_8H", _9H_D_8H),
+              new AutoPose("9H_D_8H_C", _9H_D_8H_C),
+
+              new AutoPose("9H_D_7H_REACH", _9H_D_7H_REACH)
+      };
+    }
 
     for (int i = 0; i < myAutoContainer.length; i++) {
       
@@ -617,6 +667,31 @@ public class AutoPathStorage implements Loggable {
     public Waypoint(PathPlannerTrajectory _PPS, int _index, double _clawDirection) {
       armPosIndex = _index;
       clawDirection = _clawDirection;
+      pathPlannerSegment = _PPS;
+    }
+
+    public Waypoint(PathPlannerTrajectory _PPS, int _index) {
+      armPosIndex = PlacementConstants.FLOOR_INTAKE_INDEX;
+      switch (_index) {
+        case PlacementConstants.STOWED_INDEX:
+          clawDirection = PlacementConstants.CLAW_STOPPED_SPEED;
+          break;
+
+        case PlacementConstants.FLOOR_INTAKE_INDEX:
+        case PlacementConstants.LONG_ARM_REACH_INDEX:
+          clawDirection = PlacementConstants.CLAW_INTAKE_SPEED;
+          break;
+
+        // INTELLIJ OR STATEMENT ON DA SWITCH CASE??
+        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
+        case PlacementConstants.MID_CONE_PLACEMENT_INDEX:
+        case PlacementConstants.HYBRID_PLACEMENT_INDEX:
+        case PlacementConstants.MID_CUBE_LAUNCH_INDEX:
+        case PlacementConstants.HIGH_CUBE_LAUNCH_INDEX:
+          clawDirection = PlacementConstants.CLAW_OUTTAKE_SPEED;
+          break;
+
+      }
       pathPlannerSegment = _PPS;
     }
 
