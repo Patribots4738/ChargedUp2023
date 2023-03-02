@@ -209,14 +209,15 @@ public final class Constants {
       public static final double UPPER_ARM_LENGTH = 23;
 
       // The max reach of the bot horizontally, in inches
+      // This is not taking into account the claw length, and is only for IK
       public static final double MAX_REACH = LOWER_ARM_LENGTH + UPPER_ARM_LENGTH;
 
       public static final double MIN_REACH = LOWER_ARM_LENGTH - UPPER_ARM_LENGTH;
 
       // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
-      // 78 inches is the rule, 11 inches is the base of the arm to the ground
+      // 78 inches is the rule, 11 inches is the base of the pivot of the arm to the ground
       public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
-      public static final double MAX_REACH_X = 48 + 12.5 - ClawConstants.CLAW_LENGTH_X_INCHES;
+      public static final double MAX_REACH_X = 48 + (PlacementConstants.ROBOT_LENGTH / 2.0) - ClawConstants.CLAW_LENGTH_X_INCHES;
 
       // When the arm is near the top of the limit, the arm will flip to the other solution
       // This is to prevent the upper arm from going above the limit when that happens.
