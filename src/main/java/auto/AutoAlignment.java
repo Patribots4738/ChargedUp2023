@@ -203,7 +203,7 @@ public class AutoAlignment implements Loggable{
       // A reminder that tag 0 sets this.moveToTag() to return;
       int nearestTag = 0;
       double nearestDistance = 1000;
-      double currentDistance = 0;
+      double currentDistance;
 
       Translation2d currentPosition = swerve.getPose().getTranslation();
 
@@ -350,20 +350,20 @@ public class AutoAlignment implements Loggable{
       double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
       // boolean setWheelsUp = false;
       double tilt = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
-      tilt = (swerve.getPitch().getRadians() * Math.sin(swerve.getYaw().getRadians()) + swerve.getRoll().getRadians() * Math.sin(swerve.getYaw().getRadians()));
+      tilt = (swerve.getPitch().getRadians() * Math.cos(swerve.getYaw().getRadians()) + swerve.getRoll().getRadians() * Math.sin(swerve.getYaw().getRadians()));
       
       System.out.println("Tilt: " + Math.toDegrees(tilt));
       
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * ((DriverStation.isAutonomous()) ? 1.5 : 1.5))), -0.5, -0.05), 
+            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * (1.5))), -0.5, -0.05),
             0, 
             0, 
             true);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * ((DriverStation.isAutonomous()) ? 1.5 : 1.5))), 0.05, 0.5), 
+            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * (1.5))), 0.05, 0.5),
             0, 
             0, 
             true);
