@@ -165,7 +165,7 @@ public final class Constants {
         public static final double CLAW_MIN_OUTPUT = -1;
         public static final double CLAW_MAX_OUTPUT = 1;
 
-        public static final int CLAW_STALL_LIMIT = 20;
+        public static final int CLAW_STALL_LIMIT = 25;
         public static final int CLAW_FREE_LIMIT = 30;
 
 
@@ -393,7 +393,7 @@ public final class Constants {
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
-      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,45);
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,35);
       public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28,45);
       public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,45);
 
