@@ -3,6 +3,7 @@ package auto;
 import java.util.Objects;
 import java.util.Optional;
 
+import calc.Constants;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
@@ -145,14 +146,22 @@ public class AutoAlignment implements Loggable{
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) * ((tagID == 4) ? -1 : 1),
-                  ((tagID == 4) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
+                  (tagID == 4) ?
+                      -(PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
+                      (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  (tagID == 4) ?
+                      (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
               Rotation2d.fromDegrees(180)));
       } else {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) * ((tagID == 5) ? -1 : 1),
-                  ((tagID == 5) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
+                  (tagID == 5) ?
+                      (PlacementConstants.HUMAN_TAG_PICKUP.getX() - Constants.ClawConstants.CLAW_LENGTH_INCHES) :
+                      -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  ((tagID == 5) ?
+                      (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       }
 
