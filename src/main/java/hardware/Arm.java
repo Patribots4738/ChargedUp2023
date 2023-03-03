@@ -41,6 +41,7 @@ public class Arm implements Loggable {
 
     private boolean operatorOverride = false;
     private boolean operatorOverrideBeforeFlip = false;
+    private boolean armMirroredBeforeFlip = false;
     private Translation2d armBeforeFlip = PlacementConstants.STOWED_POSITION;
     private int indexBeforeFlip = PlacementConstants.STOWED_INDEX;
 
@@ -160,7 +161,7 @@ public class Arm implements Loggable {
     public void periodic() {
         if (wentOverHeightLimit) {
           System.out.println("WENT OVER HEIGHT LIMIT!!");
-          setArmIndex(PlacementConstants.STOWED_INDEX);
+          // setArmIndex(PlacementConstants.STOWED_INDEX);
         }
         if (!operatorOverride) { indexPeriodic();}
         setLowerArmPosition(lowerReferenceAngle);
@@ -209,7 +210,8 @@ public class Arm implements Loggable {
           {
             // Flip the arm solution and go back to where we were
             blueArmSolution = !blueArmSolution;
-            drive(this.armBeforeFlip);
+            this.armMirrored = this.armMirroredBeforeFlip;
+            drive(new Translation2d((armMirrored) ? -armBeforeFlip.getX() : armBeforeFlip.getX(), armBeforeFlip.getY()));
             // Restore the operator override
             this.operatorOverride = this.operatorOverrideBeforeFlip;
             // If we were using index to flip solution...
@@ -254,6 +256,7 @@ public class Arm implements Loggable {
           this.armBeforeFlip = new Translation2d(armXReference, armYReference);
           this.operatorOverrideBeforeFlip = this.operatorOverride;
           this.indexBeforeFlip = armPosDimension1;
+          this.armMirroredBeforeFlip = armMirrored;
         }
         
         armPosDimension1 = index;
@@ -517,7 +520,12 @@ public class Arm implements Loggable {
     }
 
     public void setArmMirrored(boolean armMirrored) {
+      boolean changedState = (this.armMirrored != armMirrored);
       this.armMirrored = armMirrored;
+
+      if (changedState) {
+        drive(new Translation2d((armMirrored) ? armXReference : -armXReference, armYReference));
+      }
     }
 
     public boolean getArmMirrored() {

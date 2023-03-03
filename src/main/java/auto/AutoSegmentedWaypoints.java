@@ -67,14 +67,15 @@ public class AutoSegmentedWaypoints implements Loggable {
     Pose2d mirroredPose = new Pose2d(
       (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
         initialPathPose.poseMeters.getTranslation().getY(), 
-        initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
+        initialPathPose.holonomicRotation.minus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
     
-        
     stateHasFinished = false;
     stateHasInitialized = false;
     clawHasStarted = false;
     hasMovedArm = false;
     startedChargePad = false;
+
+    System.out.println(mirroredPose);
     
     swerve.resetOdometry(mirroredPose);
 
@@ -98,7 +99,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       // Prepare the arm for the next waypoint before the path is done
       switch (armIndex) {
         // If the next waypoint is a floor pickup, prepare the arm for a floor pickup
-        case PlacementConstants.FLOOR_INTAKE_INDEX:
+        case PlacementConstants.CUBE_INTAKE_INDEX:
           arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_PREP_INDEX);
           break;
 
@@ -152,14 +153,14 @@ public class AutoSegmentedWaypoints implements Loggable {
       // We can do this if we want to go on chargepad or not
       // becuase if we did not want to then the robot is already leveled.
       else {
-        if (!startedChargePad) {
-          // Set the timer for the charge pad leveing PID loop
-          autoAlignment.startChargePad(); 
-          // Prevent startChargePad from being called again
-          startedChargePad = true;
-        }
-        // Run the charge pad leveling PID loop
-        autoAlignment.chargeAlign();
+        // if (!startedChargePad) {
+        //   // Set the timer for the charge pad leveing PID loop
+        //   autoAlignment.startChargePad(); 
+        //   // Prevent startChargePad from being called again
+        //   startedChargePad = true;
+        // }
+        // // Run the charge pad leveling PID loop
+        // autoAlignment.chargeAlign();
       }
     }
   }

@@ -19,7 +19,7 @@ public class Claw {
 
     // Timer values to have the claw auto outtake for X seconds
     private boolean startedOuttakingBool = false;
-    private boolean finishedOuttaking = true;
+    private boolean finishedOuttaking = false;
     private double outtakeSeconds = 0;
     private double startedOuttakingTimestamp = 0;
 
@@ -32,7 +32,7 @@ public class Claw {
         _clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
         _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-        _claw.setInverted(true);
+        _claw.setInverted(false);
         _claw.burnFlash();
         setBrakeMode();
 
@@ -75,7 +75,7 @@ public class Claw {
         if (intakeMode) {
             if (speed > this.desiredSpeed) {
                 // To prevent damage to game elements, the claw will not intake at full speed
-                this.desiredSpeed = speed * 0.7;
+                this.desiredSpeed = speed * 0.8;
             }
         }
         else {

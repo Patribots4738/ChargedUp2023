@@ -90,6 +90,9 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // arm.setUpperArmCoastMode();
     claw.stopClaw();
+    operator.setRumble(RumbleType.kLeftRumble, 0);
+    operator.setRumble(RumbleType.kRightRumble, 0);
+
   }
 
   @Override
@@ -111,7 +114,7 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (Timer.getMatchTime() < 0.1) {
+    if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
       swerve.setWheelsUp();
       return;
     }
@@ -136,7 +139,7 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (Timer.getMatchTime() < 0.1) {
+    if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
       swerve.setWheelsUp();
       return;
     }
@@ -170,17 +173,13 @@ public class Robot extends TimedRobot {
 
       if (driver.getAButtonPressed()) {
         SwerveTrajectory.resetTrajectoryStatus();
+        autoAlignment.setTagID(autoAlignment.getNearestTag());
       }
 
       autoAlignment.moveToTag();
 
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-      }
-      
-      // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-      if (driver.getRightStickButtonPressed()) {
-        swerve.toggleSpeed();
       }
 
     } else if (driver.getRightBumper()) {
@@ -207,10 +206,16 @@ public class Robot extends TimedRobot {
       }
     }
 
+    // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
+    if (driver.getRightStickButtonPressed()) {
+      swerve.toggleSpeed();
+    }
+
     // Toggle the operator override when the operator's left stick is pressed
     if (operator.getLeftStickButtonPressed()) {
       arm.toggleOperatorOverride();
     }
+    
     if (arm.getOperatorOverride()) {
 
       // If the holonomic rotation is either positive, plus or minus 10 degrees on either side of 0 degrees (180/0)
@@ -244,6 +249,13 @@ public class Robot extends TimedRobot {
       autoAlignment.setConeMode(true);
     }
 
+    if (operator.getStartButtonPressed()) {
+      arm.setArmMirrored(true);
+    }
+    else if (operator.getBackButtonPressed()) {
+      arm.setArmMirrored(false);
+    }
+
     // POV = D-Pad...
     switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
@@ -263,7 +275,7 @@ public class Robot extends TimedRobot {
       case 270:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
         if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
         }
         else {
           autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
@@ -295,7 +307,7 @@ public class Robot extends TimedRobot {
 
       // Clicking down
       case 180:
-        arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_INDEX);
+        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.CONE_INTAKE_INDEX : PlacementConstants.CUBE_INTAKE_INDEX);
         break;
 
       // Clicking left
@@ -342,10 +354,6 @@ public class Robot extends TimedRobot {
         claw.outTakeforXSeconds(0.5);
 
       }
-    } else if (operator.getLeftBumper()) {
-
-      claw.stopClaw();
-
     } else if (operator.getLeftTriggerAxis() > 0) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
@@ -384,6 +392,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    autoAlignment.setTagID(3);
   }
 
   @Override
@@ -397,6 +406,50 @@ public class Robot extends TimedRobot {
       autoAlignment.chargeAlign();
     }
 
-    System.out.println(driver.getBackButton() + " " + driver.getStartButton());
+    // System.out.println(driver.getBackButton() + " " + driver.getStartButton());
+
+    if (driver.getXButtonPressed()) {
+      autoAlignment.setConeMode(false);
+    }
+    else if (driver.getYButtonPressed()) {
+      autoAlignment.setConeMode(true);
+    }
+
+    switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
+      // Not clicked
+      case -1:
+        break;
+
+      // Clicking up
+      case 0:
+        arm.setArmIndex(PlacementConstants.LONG_ARM_REACH_INDEX);
+        break;
+
+      // Clicking down
+      case 180:
+        break;
+
+      // Clicking left
+      case 270:
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
+        break;
+
+      // Clicking right
+      case 90:
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
+        break;
+    }
   }
 }

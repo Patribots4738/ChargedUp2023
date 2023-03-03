@@ -94,13 +94,13 @@ public class AutoAlignment implements Loggable{
                   
                   double normToLeftOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
                       new Translation2d(
-                          (AlignmentConstants.GRID_BARRIER),
+                          (AlignmentConstants.GRID_BARRIER_METERS),
                           AlignmentConstants.CONE_OFFSET_METERS),
                       new Rotation2d()))).getTranslation().getNorm();
 
                   double normToRightOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
                       new Translation2d(
-                          (AlignmentConstants.GRID_BARRIER),
+                          (AlignmentConstants.GRID_BARRIER_METERS),
                           -AlignmentConstants.CONE_OFFSET_METERS),
                       new Rotation2d()))).getTranslation().getNorm();
 
@@ -145,19 +145,19 @@ public class AutoAlignment implements Loggable{
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  (AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) * ((tagID == 4) ? -1 : 1),
                   ((tagID == 4) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       } else {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  -(AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) * ((tagID == 5) ? -1 : 1),
                   ((tagID == 5) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       }
 
       // If we are close enough to the tag, stop moving
-      if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR) {
+      if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR_METERS) {
           swerve.drive(0, 0, 0, false);
           SwerveTrajectory.trajectoryStatus = "done";
           return;
@@ -329,7 +329,7 @@ public class AutoAlignment implements Loggable{
     public void setConeMode(boolean coneMode) {
       this.coneMode = coneMode;
       // Set the current cone offset to the left of a tag if it is zero
-      this.coneOffset = (this.coneOffset == 0) ? ((coneMode) ? 0 : ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1)) : this.coneOffset;
+      this.coneOffset = (this.coneOffset == 0) ? ((coneMode) ? ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1) : this.coneOffset) : this.coneOffset;
     }
 
     public boolean getConeMode() {
