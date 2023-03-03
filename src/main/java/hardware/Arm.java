@@ -199,12 +199,13 @@ public class Arm implements Loggable {
       
       // Notice that this code is getting the difference in angle between the arms.
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
-      if (finalDeadband)
+      if (finalDeadband && ! armsAtDesiredPosition)
       {
         armPosDimension2++;
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
         if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
+          System.out.println(armPosDimension2);
           if (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
               armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE)
           {
@@ -257,6 +258,7 @@ public class Arm implements Loggable {
           this.operatorOverrideBeforeFlip = this.operatorOverride;
           this.indexBeforeFlip = armPosDimension1;
           this.armMirroredBeforeFlip = armMirrored;
+          armMirrored = false;
         }
         
         armPosDimension1 = index;
@@ -289,9 +291,11 @@ public class Arm implements Loggable {
           this.armYReference += (position.getY()/2);
         } else {
           // If the arm is mirrored, invert all incoming X values
-          this.armXReference = ((this.armMirrored) ? -(position.getX()) : (position.getX()));
+          this.armXReference = position.getX() * (this.armMirrored ? -1 : 1);
           this.armYReference = position.getY();
         }
+
+        System.out.println("Mirr: " + armMirrored + " PosX " + armXReference);
 
         // Make sure armX and armY are within the range of 0 to infinity
         // Because we cannot reach below the ground.
@@ -331,18 +335,18 @@ public class Arm implements Loggable {
         // Check if the arm is in the flip zone for black (but using the blue solution)
         // aka the positive solution
         if (blueArmSolution) {
-          if (armPosition.getX() > ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE) {
+          if (armPosition.getX() > ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) {
             // Set the arm to go to the nearest flip position
             // in this case it is positive, because armPosition.getX() > 0
-            setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE);
+            setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE);
             return;
           }
         }
         // Or... if the arm is in the flip zone for blue (but using the black solution)
-        else if (armPosition.getX() < -ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) {
+        else if (armPosition.getX() < -ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE) {
           // Set the arm to go to the nearest flip position
           // in this case it is negative, because armPosition.getX() < ARM_FLIP_X
-          setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE);
+          setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE);
           return;
         }
 

@@ -394,7 +394,7 @@ public final class Constants {
       public static final double CLAW_STOPPED_SPEED = 0;
       
       public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,35);
-      public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28,45);
+      public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28, 45);
       public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,45);
 
       // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);

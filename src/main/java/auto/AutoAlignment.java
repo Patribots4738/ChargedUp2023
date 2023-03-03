@@ -146,7 +146,7 @@ public class AutoAlignment implements Loggable{
       currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
 
       // If we are on the left side of the field, we need to add the grid offset + cone/substation offset
-      // If we are on the right side of the field, we need to subtract the grid offset + cone/substation offset
+      // If we are  on the right side of the field, we need to subtract the grid offset + cone/substation offset
       // If we are going to a substation, we need to add the substation offset instead of the cone offset
       // We add the grid length to both because we still want to be a small bit away from the tag
       if (0 < tagID && tagID < 5) {
