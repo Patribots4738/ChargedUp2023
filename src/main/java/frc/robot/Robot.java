@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
       claw = new Claw();
 
       armCalcuations = new ArmCalculations();
-      autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
+      autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();

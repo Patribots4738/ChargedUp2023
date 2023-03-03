@@ -14,6 +14,7 @@ import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
+import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
@@ -38,6 +39,7 @@ public class AutoAlignment implements Loggable{
      */
 
     Swerve swerve;
+    Claw claw;
     PhotonCameraPose photonCameraPose;
 
     private int tagID;
@@ -55,7 +57,7 @@ public class AutoAlignment implements Loggable{
     @Log
     private boolean coneMode = false;
 
-    public AutoAlignment(Swerve swerve) {
+    public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
         photonCameraPose = new PhotonCameraPose();
     }
@@ -75,8 +77,6 @@ public class AutoAlignment implements Loggable{
           swerve.getPoseEstimator().addVisionMeasurement(
             camEstimatedPose.estimatedPose.toPose2d(),
             Timer.getFPGATimestamp());
-
-            
             
             if (currentNorm < (originalNorm / 2) || Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
               
@@ -112,8 +112,16 @@ public class AutoAlignment implements Loggable{
                   */
                   if (normToLeftOfHumanTag < normToRightOfHumanTag) {
                     this.substationOffset = 1;
+                    // Start intaking the claw when we get close to the tag
+                    if (normToLeftOfHumanTag < 2) {
+                      claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+                    }
                   } else {
                     this.substationOffset = -1;
+                    // Start intaking the claw when we get close to the tag
+                    if (normToRightOfHumanTag < 2) {
+                      claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+                    }
                   }
 
                 } else {
