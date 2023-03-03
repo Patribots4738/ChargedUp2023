@@ -22,8 +22,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   Arm arm;
   Claw claw;
   AutoAlignment autoAlignment;
-  AutoPathStorage autoPathStorage;
-  
+
   public Waypoint[] chosenWaypoints;
   public AutoPose chosenAutoPath;
 
@@ -146,21 +145,21 @@ public class AutoSegmentedWaypoints implements Loggable {
         clawHasStarted = true;
       }
       // 0.3 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.3) && (currentWaypointNumber < chosenWaypoints.length - 1)) {
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.3)) {
         stateHasFinished = true;
       }
       // If there are not more waypoints, tell the robot to level itself
       // We can do this if we want to go on chargepad or not
       // becuase if we did not want to then the robot is already leveled.
-      else {
-        // if (!startedChargePad) {
-        //   // Set the timer for the charge pad leveing PID loop
-        //   autoAlignment.startChargePad(); 
-        //   // Prevent startChargePad from being called again
-        //   startedChargePad = true;
-        // }
-        // // Run the charge pad leveling PID loop
-        // autoAlignment.chargeAlign();
+      if (currentWaypointNumber == chosenWaypoints.length - 1) {
+        if (!startedChargePad) {
+          // Set the timer for the charge pad leveing PID loop
+          autoAlignment.startChargePad();
+          // Prevent startChargePad from being called again
+          startedChargePad = true;
+        }
+        // Run the charge pad leveling PID loop
+        autoAlignment.chargeAlign();
       }
     }
   }
@@ -189,7 +188,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if (claw.getDesiredSpeed() != PlacementConstants.CLAW_INTAKE_SPEED) 
+      if (claw.getDesiredSpeed() != PlacementConstants.CLAW_OUTTAKE_SPEED)
       {
         claw.stopClaw();
       }
