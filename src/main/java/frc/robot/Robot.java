@@ -97,7 +97,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    // SwerveTrajectory.resetHDC();
+    SwerveTrajectory.resetHDC();
   }
 
   @Override

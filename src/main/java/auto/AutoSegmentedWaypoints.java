@@ -143,11 +143,12 @@ public class AutoSegmentedWaypoints implements Loggable {
         claw.setDesiredSpeed(clawSpeed);
         // Prevent the autoDelay from being reset
         clawHasStarted = true;
+        // 0.3 seconds since the claw has moved (and if there are more waypoints)
+        if ((Timer.getFPGATimestamp() - autoDelay > 0.3)) {
+          stateHasFinished = true;
+        }
       }
-      // 0.3 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.3)) {
-        stateHasFinished = true;
-      }
+      
       // If there are not more waypoints, tell the robot to level itself
       // We can do this if we want to go on chargepad or not
       // becuase if we did not want to then the robot is already leveled.
@@ -159,7 +160,7 @@ public class AutoSegmentedWaypoints implements Loggable {
           startedChargePad = true;
         }
         // Run the charge pad leveling PID loop
-        autoAlignment.chargeAlign();
+        // autoAlignment.chargeAlign();
       }
     }
   }
