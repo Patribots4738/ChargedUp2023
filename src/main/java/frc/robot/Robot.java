@@ -40,6 +40,9 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
+  public ArduinoController arduinoController;
+  public LEDConstants ledStrip;
+
   ArmCalculations armCalcuations;
 
   AutoAlignment autoAlignment;
@@ -65,6 +68,9 @@ public class Robot extends TimedRobot {
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();
+
+      arduinoController = new ArduinoController();
+      ledStrip = new LEDConstants();
 
       Logger.configureLoggingAndConfig(this, false);
   }
@@ -244,9 +250,11 @@ public class Robot extends TimedRobot {
     // The operator can set the robot into the desired mode
     if (operator.getXButtonPressed()) {
       autoAlignment.setConeMode(false);
+      arduinoController.sendByte(LEDConstants.CLAW_PURPLE);
     }
     else if (operator.getYButtonPressed()) {
       autoAlignment.setConeMode(true);
+      arduinoController.sendByte(LEDConstants.CLAW_YELLOW);
     }
 
     if (operator.getStartButtonPressed()) {
