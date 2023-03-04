@@ -5,18 +5,24 @@
 package hardware;
 
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.DriveConstants;
+import org.ejml.simple.SimpleMatrix;
 
 public class Swerve implements Loggable{
 
@@ -95,7 +101,7 @@ public class Swerve implements Loggable{
     );
 
     /**
-     * Creates a new DriveSubsystem.
+     * Creates a new DriveSu1stem.
      */
     public Swerve() {
         resetEncoders();
@@ -244,12 +250,48 @@ public class Swerve implements Loggable{
 
     public Rotation2d getRoll() {
 
-      Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getXComplementaryAngle());
+      Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle());
 
       this.roll = rollRotation2d.getDegrees();
 
       return rollRotation2d;
       
+    }
+
+    public double getTilt() {
+
+      Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians());
+
+      Quaternion gyroQuaternion = gyroRotation3d.getQuaternion();
+      // Multiply the quaternion by the UP direction as a vector to normalize it to UP
+      // In english: this basically converts the angles to be relative to the charging station
+      double num = gyroQuaternion.getX() + gyroQuaternion.getX();
+      double num2 = gyroQuaternion.getY() + gyroQuaternion.getY();
+      double num3 = gyroQuaternion.getZ() + gyroQuaternion.getZ();
+      double num4 = gyroQuaternion.getW() * num;
+      double num5 = gyroQuaternion.getW() * num2;
+      double num6 = gyroQuaternion.getW() * num3;
+      double num7 = gyroQuaternion.getX() * num;
+      double num8 = gyroQuaternion.getX() * num2;
+      double num9 = gyroQuaternion.getX() * num3;
+      double num10 = gyroQuaternion.getY() * num2;
+      double num11 = gyroQuaternion.getY() * num3;
+      double num12 = gyroQuaternion.getZ() * num3;
+      double num13 = 1.0 - num10 - num12;
+      double num14 = num8 - num6;
+      double num15 = num9 + num5;
+      double num16 = num8 + num6;
+      double num17 = 1.0 - num7 - num12;
+      double num18 = num11 - num4;
+      double num19 = num9 - num5;
+      double num20 = num11 + num4;
+      double num21 = 1.0 - num7 - num10;
+
+      Vector multiplyOutput = new Vector(new SimpleMatrix(new double[][] {{0 * num13 + 1 * num14 + 0 * num15}, {0 * num16 + 1 * num17 + 0 * num18}, {0 * num19 + 1 * num20 + 0 * num21}}));
+
+      double dotProduct = multiplyOutput.dot(new Vector(new SimpleMatrix(new double[][] {{0}, {1}, {0}})));
+
+      return (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
     }
 
     public void resetEncoders() {

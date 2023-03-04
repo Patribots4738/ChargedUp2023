@@ -356,7 +356,8 @@ public class AutoAlignment implements Loggable{
       double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
       // boolean setWheelsUp = false;
       double tilt = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
-      tilt = ((swerve.getPitch().getRadians() * Math.cos(swerve.getYaw().getRadians())) + (swerve.getRoll().getRadians() * Math.sin(swerve.getYaw().getRadians())));
+      // tilt = ((swerve.getPitch().getRadians() * Math.cos(swerve.getYaw().getRadians())) + (swerve.getRoll().getRadians() * Math.sin(swerve.getYaw().getRadians())));
+      tilt = swerve.getTilt();
       tilt += (tilt < 0 ? Math.PI : -Math.PI);
       System.out.println("Tilt: " + Math.toDegrees(tilt));
       
