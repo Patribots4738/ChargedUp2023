@@ -183,11 +183,14 @@ public class AutoSegmentedWaypoints implements Loggable {
     if (!startedChargePad) {
       SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
     }
-    this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
+
+    if (!stateHasFinished && !stateHasInitialized) {
+      this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
+    }
 
     // If there are not more waypoints, tell the robot to level itself
-    // We can do this if we want to go on chargepad or not
-    // becuase if we did not want to then the robot is already leveled.
+    // We can do this if we want to go on chargepad or not,
+    // because if we did not want, to then the robot is already leveled.
     if ((currentWaypointNumber == chosenWaypoints.length - 1) && 
         Math.abs(swerve.getPitch().getDegrees()) > 7 || Math.abs(swerve.getRoll().getDegrees()) > 7)
     {
