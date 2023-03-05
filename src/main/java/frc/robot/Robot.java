@@ -12,7 +12,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
 import auto.AutoAlignment;
@@ -101,7 +100,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    SwerveTrajectory.resetHDC();
+    // SwerveTrajectory.resetHDC();
   }
 
   @Override
@@ -180,9 +179,11 @@ public class Robot extends TimedRobot {
     if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
+
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         autoAlignment.setTagID(autoAlignment.getNearestTag());
+
       }
 
       autoAlignment.moveToTag();
@@ -192,11 +193,15 @@ public class Robot extends TimedRobot {
       }
 
     } else if (driver.getAButtonReleased()) {
+
       DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+
     } else if (driver.getRightBumper()) {
 
       if (driver.getRightBumperPressed()) {
+
         autoAlignment.startChargePad();
+
       }
 
       autoAlignment.chargeAlign();
