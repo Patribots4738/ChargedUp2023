@@ -178,8 +178,11 @@ public class AutoSegmentedWaypoints implements Loggable {
       stateHasInitialized = true;
     }
 
-    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
-
+    // Only run the path if the robot isn't trying to align
+    // This will give priority to the alignment
+    if (!startedChargePad) {
+      SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
+    }
     this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
 
     // If there are not more waypoints, tell the robot to level itself
