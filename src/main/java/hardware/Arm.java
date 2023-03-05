@@ -287,8 +287,8 @@ public class Arm implements Loggable {
         if (operatorOverride) {
           // If the robot is facing left, have left joystick be positive
           // If the robot is facing right, have left joystick be negative
-          this.armXReference += (position.getX()/2);
-          this.armYReference += (position.getY()/2);
+          this.armXReference += (position.getX());
+          this.armYReference += (position.getY());
         } else {
           // If the arm is mirrored, invert all incoming X values
           this.armXReference = position.getX() * (this.armMirrored ? -1 : 1);

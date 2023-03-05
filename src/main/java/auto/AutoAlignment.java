@@ -78,11 +78,11 @@ public class AutoAlignment implements Loggable{
             camEstimatedPose.estimatedPose.toPose2d(),
             Timer.getFPGATimestamp());
             
-            if (currentNorm < (originalNorm / 2) || Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
+            if (currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && DriverStation.isTeleop())) {
               
-              swerve.getPoseEstimator().addVisionMeasurement(
-                camEstimatedPose.estimatedPose.toPose2d(),
-                Timer.getFPGATimestamp());
+              // swerve.getPoseEstimator().addVisionMeasurement(
+              //   camEstimatedPose.estimatedPose.toPose2d(),
+              //   Timer.getFPGATimestamp());
 
               setTagID(getNearestTag());
 
@@ -355,22 +355,38 @@ public class AutoAlignment implements Loggable{
 
       double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
       // boolean setWheelsUp = false;
-      double tilt = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
-      // tilt = ((swerve.getPitch().getRadians() * Math.cos(swerve.getYaw().getRadians())) + (swerve.getRoll().getRadians() * Math.sin(swerve.getYaw().getRadians())));
-      tilt = swerve.getTilt();
-      tilt += (tilt < 0 ? Math.PI : -Math.PI);
-      System.out.println("Tilt: " + Math.toDegrees(tilt));
-      
+      double tilt = 0;
+
+      // If our heading is within -45 to 45 degrees or within -135 and -180 or within 135 to 180, use the pitch
+      // Otherwise, use the roll
+      if (-45 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 45) {
+        tilt = -swerve.getPitch().getRadians();
+      }
+      else if (-180 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < -135 ||
+          135 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 180) 
+      {
+        tilt = swerve.getPitch().getRadians();
+      }
+      else if (-135 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < -45) {
+        tilt = swerve.getRoll().getRadians();
+      }
+      else if (45 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 135) 
+      {
+        tilt = -swerve.getRoll().getRadians();
+      }
+
+      // System.out.println(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)));
+
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * (1.5))), -0.5, -0.05),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)), 0.05, 0.20),
             0, 
             0, 
             true);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * (1.5))), 0.05, 0.5),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)), -0.20, -0.05),
             0, 
             0, 
             true);

@@ -7,6 +7,7 @@ package hardware;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.Timer;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.DriveConstants;
@@ -111,7 +113,7 @@ public class Swerve implements Loggable{
 
     public void periodic() {
         // Update the odometry in the periodic block
-        poseEstimator.update(getGyroAngle(), getModulePositions());
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
         getPitch();
         getRoll();
 
@@ -240,9 +242,9 @@ public class Swerve implements Loggable{
 
     public Rotation2d getPitch() {
 
-      Rotation2d pitchRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle());
+      Rotation2d pitchRotation2d = Rotation2d.fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
 
-      this.pitch = pitchRotation2d.getDegrees();
+      this.pitch = pitchRotation2d.unaryMinus().getDegrees();
       
       return pitchRotation2d;
       
@@ -250,9 +252,9 @@ public class Swerve implements Loggable{
 
     public Rotation2d getRoll() {
 
-      Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle());
+      Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));
 
-      this.roll = rollRotation2d.getDegrees();
+      this.roll = rollRotation2d.unaryMinus().getDegrees();
 
       return rollRotation2d;
       
@@ -260,8 +262,10 @@ public class Swerve implements Loggable{
 
     public double getTilt() {
 
-      Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians());
-
+      Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getYaw().getRadians(), getPitch().getRadians());
+      
+      // System.out.println(getRoll().getDegrees() + " " + getYaw().getDegrees() + " " + getPitch().getDegrees());
+      
       Quaternion gyroQuaternion = gyroRotation3d.getQuaternion();
       // Multiply the quaternion by the UP direction as a vector to normalize it to UP
       // In english: this basically converts the angles to be relative to the charging station
@@ -287,11 +291,13 @@ public class Swerve implements Loggable{
       double num20 = num11 + num4;
       double num21 = 1.0 - num7 - num10;
 
-      Vector multiplyOutput = new Vector(new SimpleMatrix(new double[][] {{0 * num13 + 1 * num14 + 0 * num15}, {0 * num16 + 1 * num17 + 0 * num18}, {0 * num19 + 1 * num20 + 0 * num21}}));
+      var multiplyOutput = VecBuilder.fill(0 * num13 + 1 * num14 + 0 * num15, 0 * num16 + 1 * num17 + 0 * num18, 0 * num19 + 1 * num20 + 0 * num21);
 
-      double dotProduct = multiplyOutput.dot(new Vector(new SimpleMatrix(new double[][] {{0}, {1}, {0}})));
+      double dotProduct = multiplyOutput.dot(VecBuilder.fill(0, 1, 0));
 
-      return (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
+      double result = (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
+
+      return (result);
     }
 
     public void resetEncoders() {

@@ -90,6 +90,10 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // arm.setUpperArmCoastMode();
     claw.stopClaw();
+
+    driver.setRumble(RumbleType.kLeftRumble, 0);
+    driver.setRumble(RumbleType.kRightRumble, 0);
+
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
 
@@ -103,6 +107,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
     autoSegmentedWaypoints.init();
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -111,7 +116,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-
+    // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
     if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
@@ -129,9 +134,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
     autoAlignment.setConeOffset(0);
+
   }
 
   @Override
@@ -172,6 +180,7 @@ public class Robot extends TimedRobot {
     if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
+        DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         autoAlignment.setTagID(autoAlignment.getNearestTag());
       }
@@ -182,6 +191,8 @@ public class Robot extends TimedRobot {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
       }
 
+    } else if (driver.getAButtonReleased()) {
+      DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     } else if (driver.getRightBumper()) {
 
       if (driver.getRightBumperPressed()) {
@@ -226,15 +237,15 @@ public class Robot extends TimedRobot {
       {
         arm.drive(new Translation2d(
           ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? operatorLeftAxis.getX() 
-              : -operatorLeftAxis.getX()), 
+              ? -operatorLeftAxis.getX() 
+              : operatorLeftAxis.getX()), 
           -operatorLeftAxis.getY()));
       }
       else {
         arm.drive(new Translation2d(
           ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? -operatorLeftAxis.getX() 
-              : operatorLeftAxis.getX()), 
+              ? operatorLeftAxis.getX() 
+              : -operatorLeftAxis.getX()), 
           -operatorLeftAxis.getY()));
       }
 

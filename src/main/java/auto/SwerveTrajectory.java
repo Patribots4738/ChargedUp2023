@@ -22,7 +22,7 @@ import calc.Constants.AlignmentConstants;
 public class SwerveTrajectory implements Loggable {
 
   // Create config for trajectory
-  public static double timetrajectoryStarted;
+  public static double timeTrajectoryStarted;
   // The trajectoryStatus represents what stage of auto we are on
   // i.e. setting up ("setup"), executing ("execute"), or finished ("done")
   public static String trajectoryStatus = "";
@@ -98,12 +98,12 @@ public class SwerveTrajectory implements Loggable {
    */
   public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve) {
 
-    elapsedTime = Timer.getFPGATimestamp() - timetrajectoryStarted;
+    elapsedTime = Timer.getFPGATimestamp() - timeTrajectoryStarted;
 
     switch (trajectoryStatus) {
 
       case "setup":
-        timetrajectoryStarted = Timer.getFPGATimestamp();
+        timeTrajectoryStarted = Timer.getFPGATimestamp();
         trajectoryStatus = "execute";
         break;
 
@@ -116,25 +116,40 @@ public class SwerveTrajectory implements Loggable {
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < _pathTraj.getEndState().timeSeconds) {
+        if (elapsedTime < _pathTraj.getTotalTimeSeconds() + 1)
+        {
+          System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
-          PathPlannerState translationMirroredState = PathPlannerTrajectory.transformStateForAlliance(state, DriverStation.getAlliance());
+          state = (PathPlannerState) _pathTraj.sample(elapsedTime);
+          state = (PathPlannerState) _pathTraj.sample(elapsedTime);
+          
+          System.out.print("Changed from " + state.poseMeters.getTranslation());
 
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
-          // If my PR on pathplanner gets accepted, we will only need to use translationMirroredState instead of mirroredState
-          State mirroredState = new State(
-              state.timeSeconds, 
-              state.velocityMetersPerSecond, 
-              state.accelerationMetersPerSecondSq, 
-              new Pose2d(
-                  (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (state.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
-                  state.poseMeters.getTranslation().getY(), 
-                  state.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)).unaryMinus()),
-              state.curvatureRadPerMeter);
+          if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
+            
+            state.poseMeters = new Pose2d(
+              (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()), 
+              state.poseMeters.getTranslation().getY(), 
+              state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
 
-          System.out.println(swerve.getPose().minus(new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation)));
+            state.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+
+            System.out.println(" To " + state.poseMeters.getTranslation());
+
+          }
+
+          // if ((swerve.getPose().minus(_pathTraj.sample(elapsedTime).poseMeters)).getTranslation().getNorm() < 0.1 && 
+          //     (Math.abs(swerve.getYaw().minus((state.holonomicRotation)).getDegrees()) < 3) && DriverStation.isAutonomous())
+          // {
+          //   swerve.drive(0, 0, 0, false);
+          //   trajectoryStatus = "done";
+          //   break;
+          // }
+
+          System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation)).getTranslation() + "\n");
 
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,

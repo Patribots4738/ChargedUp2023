@@ -25,8 +25,10 @@ public final class Constants {
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4;
-        public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // radians per second
+        public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        public static double MAX_ANGULAR_SPEED = 4 * Math.PI; // radians per second
+
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -126,9 +128,9 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3.5; // 2.5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 6 * Math.PI;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.75; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
         public static final double PX_CONTROLLER = 1;
@@ -400,9 +402,9 @@ public final class Constants {
       // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
       // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
 
-      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH)) + 1), 15);
+      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(25, 2);
-      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH)) + 1), 2);
+      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 2);
 
 
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
