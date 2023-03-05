@@ -18,6 +18,7 @@ import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
+import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.PlacementConstants;
 import calc.PhotonCameraPose;
@@ -183,10 +184,13 @@ public class AutoAlignment implements Loggable{
 
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
-          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, 2.5),
+          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED),
           new PathPoint(swerve.getPose().getTranslation(),
               heading,
-              swerve.getPose().getRotation()),
+              swerve.getPose().getRotation(), 
+              // start the path at the current speed of the robot
+              swerve.getSpeedMetersPerSecond()),
+
           new PathPoint(targetPose.getTranslation(),
               heading,
               targetPose.getRotation())
