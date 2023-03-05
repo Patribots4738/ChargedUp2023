@@ -329,7 +329,7 @@ public class Swerve implements Loggable{
     }
 
     public void toggleSpeed() {
-        this.speedMultiplier = (this.speedMultiplier == 1) ? 0.1 : 1;
+        this.speedMultiplier = (this.speedMultiplier == 1) ? 0.25 : 1;
     }
 
     /**
