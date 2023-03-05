@@ -21,6 +21,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.DriveConstants;
@@ -31,6 +33,7 @@ public class Swerve implements Loggable{
     @Log
     private double yaw = 0;
 
+    private final Field2d field = new Field2d();
     @Log
     public double pitch = 0;
 
@@ -109,6 +112,8 @@ public class Swerve implements Loggable{
         resetEncoders();
         zeroHeading();
         setBrakeMode();
+        SmartDashboard.putData("Field", field);
+
     }
 
     public void periodic() {
@@ -116,8 +121,7 @@ public class Swerve implements Loggable{
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
         getPitch();
         getRoll();
-
-        dotProduct = (pitch + (pitch > 0 ? -180 : 180)) + (roll + ((roll > 0) ? -180 : 180));
+        this.field.setRobotPose(getPose());
     }
 
     /**
