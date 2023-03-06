@@ -2,6 +2,7 @@ package frc.robot;
 
 import debug.*;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import hardware.*;
 import calc.ArmCalculations;
 import calc.OICalc;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import io.github.oblarg.oblog.Logger;
 import auto.AutoAlignment;
@@ -38,6 +40,9 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
+  public ArduinoController arduinoController;
+  public LEDConstants ledStrip;
+
   ArmCalculations armCalcuations;
 
   AutoAlignment autoAlignment;
@@ -59,10 +64,13 @@ public class Robot extends TimedRobot {
       claw = new Claw();
 
       armCalcuations = new ArmCalculations();
-      autoAlignment = new AutoAlignment(swerve);// Configure the logger for shuffleboard
+      autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();
+
+      arduinoController = new ArduinoController();
+      ledStrip = new LEDConstants();
 
       Logger.configureLoggingAndConfig(this, false);
   }
@@ -88,6 +96,9 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // arm.setUpperArmCoastMode();
     claw.stopClaw();
+    operator.setRumble(RumbleType.kLeftRumble, 0);
+    operator.setRumble(RumbleType.kRightRumble, 0);
+
   }
 
   @Override
@@ -107,6 +118,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
+    // If we are in the last 100 ms of the match, set the wheels up
+    // This is to prevent any charge pad sliding
+    if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
+      swerve.setWheelsUp();
+      return;
+    }
+
     swerve.periodic();
     arm.periodic();
     claw.periodic();
@@ -124,6 +142,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
+    // If we are in the last 100 ms of the match, set the wheels up
+    // This is to prevent any charge pad sliding
+    if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
+      swerve.setWheelsUp();
+      return;
+    }
 
     arm.periodic();
     claw.periodic();
@@ -150,23 +175,26 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
-
-    if (driver.getAButtonPressed()) {
-      SwerveTrajectory.resetTrajectoryStatus();
-    }
-
     if (driver.getAButton()) {
+
+      if (driver.getAButtonPressed()) {
+        SwerveTrajectory.resetTrajectoryStatus();
+        autoAlignment.setTagID(autoAlignment.getNearestTag());
+      }
 
       autoAlignment.moveToTag();
 
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
       }
-      
-      // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-      if (driver.getRightStickButtonPressed()) {
-        swerve.toggleSpeed();
+
+    } else if (driver.getRightBumper()) {
+
+      if (driver.getRightBumperPressed()) {
+        autoAlignment.startChargePad();
       }
+
+      autoAlignment.chargeAlign();
 
     } else if (driver.getLeftBumper()) {
 
@@ -176,7 +204,7 @@ public class Robot extends TimedRobot {
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
       if (driver.getYButton()) {
-        swerve.drive(driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false);
+        swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false);
       }
       else {
         // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick
@@ -184,21 +212,56 @@ public class Robot extends TimedRobot {
       }
     }
 
+    // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
+    if (driver.getRightStickButtonPressed()) {
+      swerve.toggleSpeed();
+    }
+
     // Toggle the operator override when the operator's left stick is pressed
     if (operator.getLeftStickButtonPressed()) {
       arm.toggleOperatorOverride();
     }
+    
     if (arm.getOperatorOverride()) {
-      arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+
+      // If the holonomic rotation is either positive, plus or minus 10 degrees on either side of 0 degrees (180/0)
+      // Then set the operator X input to be negative
+      if (swerve.getYaw().getDegrees() > 0 || 
+         (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
+          swerve.getYaw().getDegrees() < -170 && swerve.getYaw().getDegrees() > 170) 
+      {
+        arm.drive(new Translation2d(
+          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
+              ? operatorLeftAxis.getX() 
+              : -operatorLeftAxis.getX()), 
+          -operatorLeftAxis.getY()));
+      }
+      else {
+        arm.drive(new Translation2d(
+          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
+              ? -operatorLeftAxis.getX() 
+              : operatorLeftAxis.getX()), 
+          -operatorLeftAxis.getY()));
+      }
+
     }
 
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
     if (operator.getXButtonPressed()) {
       autoAlignment.setConeMode(false);
+      arduinoController.sendByte(LEDConstants.CLAW_PURPLE);
     }
     else if (operator.getYButtonPressed()) {
       autoAlignment.setConeMode(true);
+      arduinoController.sendByte(LEDConstants.CLAW_YELLOW);
+    }
+
+    if (operator.getStartButtonPressed()) {
+      arm.setArmMirrored(true);
+    }
+    else if (operator.getBackButtonPressed()) {
+      arm.setArmMirrored(false);
     }
 
     // POV = D-Pad...
@@ -220,7 +283,7 @@ public class Robot extends TimedRobot {
       case 270:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
         if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
         }
         else {
           autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
@@ -240,7 +303,7 @@ public class Robot extends TimedRobot {
     }
     
     // POV = D-Pad...
-    switch (OICalc.getOperatorPOVPressed(operator.getPOV())) {
+    switch (operator.getPOV()) {
       // Not clicked
       case -1:
         break;
@@ -252,7 +315,7 @@ public class Robot extends TimedRobot {
 
       // Clicking down
       case 180:
-        arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_INDEX);
+        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.CONE_INTAKE_INDEX : PlacementConstants.CUBE_INTAKE_INDEX);
         break;
 
       // Clicking left
@@ -270,6 +333,13 @@ public class Robot extends TimedRobot {
     
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
 
+    }
+
+    if (operator.getStartButtonPressed()) {
+      arm.setArmMirrored(true);
+    }
+    else if (operator.getBackButtonPressed()) {
+      arm.setArmMirrored(false);
     }
 
     // Claw speed controls
@@ -292,10 +362,6 @@ public class Robot extends TimedRobot {
         claw.outTakeforXSeconds(0.5);
 
       }
-    } else if (operator.getLeftBumper()) {
-
-      claw.stopClaw();
-
     } else if (operator.getLeftTriggerAxis() > 0) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
@@ -334,30 +400,64 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    autoAlignment.setTagID(3);
   }
 
   @Override
   public void testPeriodic() {
-    arm.periodic();
-    if (driver.getAButtonPressed()) {
-      autoAlignment.startChargePad();
-    }
-    if (driver.getAButton()) {
+    if (driver.getRightBumper()) {
+
+      if (driver.getRightBumperPressed()) {
+        autoAlignment.startChargePad();
+      }
+
       autoAlignment.chargeAlign();
     }
-    else {
-      double driverLeftX = MathUtil.applyDeadband(-driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
-      double driverLeftY = MathUtil.applyDeadband(-driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
-      double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
-      double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
-      Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
 
-      // If we are on blue alliance, flip the driverLeftAxis
-      if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-        driverLeftAxis = driverLeftAxis.unaryMinus();
-      }
-      //              SpeedX,               SpeedY,              Rotation,    Field_Oriented
-      swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, !driver.getYButton());
+    // System.out.println(driver.getBackButton() + " " + driver.getStartButton());
+
+    if (driver.getXButtonPressed()) {
+      autoAlignment.setConeMode(false);
+    }
+    else if (driver.getYButtonPressed()) {
+      autoAlignment.setConeMode(true);
+    }
+
+    switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
+      // Not clicked
+      case -1:
+        break;
+
+      // Clicking up
+      case 0:
+        arm.setArmIndex(PlacementConstants.LONG_ARM_REACH_INDEX);
+        break;
+
+      // Clicking down
+      case 180:
+        break;
+
+      // Clicking left
+      case 270:
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
+        break;
+
+      // Clicking right
+      case 90:
+        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+        }
+        else {
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+        }
+        break;
     }
   }
 }

@@ -105,7 +105,7 @@ public class Swerve implements Loggable{
 
     public void periodic() {
         // Update the odometry in the periodic block
-        poseEstimator.update(getYaw(), getModulePositions());
+        poseEstimator.update(getGyroAngle(), getModulePositions());
         getPitch();
         getRoll();
 

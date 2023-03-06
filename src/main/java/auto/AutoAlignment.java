@@ -3,6 +3,7 @@ package auto;
 import java.util.Objects;
 import java.util.Optional;
 
+import calc.Constants;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
@@ -13,12 +14,15 @@ import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
+import hardware.Claw;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.PlacementConstants;
 import calc.PhotonCameraPose;
 
-public class AutoAlignment {
+public class AutoAlignment implements Loggable{
 
     /**
      * A visual representation of the apriltag positions
@@ -35,6 +39,7 @@ public class AutoAlignment {
      */
 
     Swerve swerve;
+    Claw claw;
     PhotonCameraPose photonCameraPose;
 
     private int tagID;
@@ -48,9 +53,11 @@ public class AutoAlignment {
     private double currentNorm = 0;
 
     private boolean moveArmToHumanTag = false;
+  
+    @Log
     private boolean coneMode = false;
 
-    public AutoAlignment(Swerve swerve) {
+    public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
         photonCameraPose = new PhotonCameraPose();
     }
@@ -70,8 +77,6 @@ public class AutoAlignment {
           swerve.getPoseEstimator().addVisionMeasurement(
             camEstimatedPose.estimatedPose.toPose2d(),
             Timer.getFPGATimestamp());
-
-            
             
             if (currentNorm < (originalNorm / 2) || Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
               
@@ -90,13 +95,13 @@ public class AutoAlignment {
                   
                   double normToLeftOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
                       new Translation2d(
-                          (AlignmentConstants.GRID_BARRIER),
+                          (AlignmentConstants.GRID_BARRIER_METERS),
                           AlignmentConstants.CONE_OFFSET_METERS),
                       new Rotation2d()))).getTranslation().getNorm();
 
                   double normToRightOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
                       new Translation2d(
-                          (AlignmentConstants.GRID_BARRIER),
+                          (AlignmentConstants.GRID_BARRIER_METERS),
                           -AlignmentConstants.CONE_OFFSET_METERS),
                       new Rotation2d()))).getTranslation().getNorm();
 
@@ -107,8 +112,16 @@ public class AutoAlignment {
                   */
                   if (normToLeftOfHumanTag < normToRightOfHumanTag) {
                     this.substationOffset = 1;
+                    // Start intaking the claw when we get close to the tag
+                    if (normToLeftOfHumanTag < 2) {
+                      claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+                    }
                   } else {
                     this.substationOffset = -1;
+                    // Start intaking the claw when we get close to the tag
+                    if (normToRightOfHumanTag < 2) {
+                      claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+                    }
                   }
 
                 } else {
@@ -117,9 +130,7 @@ public class AutoAlignment {
               }
 
             }
-            
           // System.out.println(currentNorm + " " + originalNorm);
-
       }
     }
 
@@ -135,25 +146,33 @@ public class AutoAlignment {
       currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
 
       // If we are on the left side of the field, we need to add the grid offset + cone/substation offset
-      // If we are on the right side of the field, we need to subtract the grid offset + cone/substation offset
+      // If we are  on the right side of the field, we need to subtract the grid offset + cone/substation offset
       // If we are going to a substation, we need to add the substation offset instead of the cone offset
       // We add the grid length to both because we still want to be a small bit away from the tag
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  (AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                  ((tagID == 4) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
+                  (tagID == 4) ?
+                      -(PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
+                      (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  (tagID == 4) ?
+                      (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
               Rotation2d.fromDegrees(180)));
       } else {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
-                  -(AlignmentConstants.GRID_BARRIER + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                  ((tagID == 5) ? (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) : (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
+                  (tagID == 5) ?
+                      (PlacementConstants.HUMAN_TAG_PICKUP.getX() - Constants.ClawConstants.CLAW_LENGTH_INCHES) :
+                      -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  ((tagID == 5) ?
+                      (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       }
 
       // If we are close enough to the tag, stop moving
-      if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR) {
+      if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR_METERS) {
           swerve.drive(0, 0, 0, false);
           SwerveTrajectory.trajectoryStatus = "done";
           return;
@@ -190,7 +209,7 @@ public class AutoAlignment {
       // A reminder that tag 0 sets this.moveToTag() to return;
       int nearestTag = 0;
       double nearestDistance = 1000;
-      double currentDistance = 0;
+      double currentDistance;
 
       Translation2d currentPosition = swerve.getPose().getTranslation();
 
@@ -325,7 +344,7 @@ public class AutoAlignment {
     public void setConeMode(boolean coneMode) {
       this.coneMode = coneMode;
       // Set the current cone offset to the left of a tag if it is zero
-      this.coneOffset = (this.coneOffset == 0) ? ((coneMode) ? 0 : ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1)) : this.coneOffset;
+      this.coneOffset = (this.coneOffset == 0) ? ((coneMode) ? ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1) : this.coneOffset) : this.coneOffset;
     }
 
     public boolean getConeMode() {
@@ -336,18 +355,21 @@ public class AutoAlignment {
 
       double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
       // boolean setWheelsUp = false;
-      double roll = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
-
-      if (roll > 7) {
-        swerve.drive(-
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * roll)/(elapsedTime * ((DriverStation.isAutonomous()) ? 3 : 1.5))), -0.5, 0.5), 
+      double tilt = swerve.roll + ((swerve.roll < 0) ? 180 : -180);
+      tilt = (swerve.getPitch().getRadians() * Math.cos(swerve.getYaw().getRadians()) + swerve.getRoll().getRadians() * Math.sin(swerve.getYaw().getRadians()));
+      
+      System.out.println("Tilt: " + Math.toDegrees(tilt));
+      
+      if (tilt > Math.toRadians(7)) {
+        swerve.drive(
+            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * (1.5))), -0.5, -0.05),
             0, 
             0, 
             true);
       }
-      else if (roll < -7) {
-        swerve.drive(-
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * roll)/(elapsedTime * ((DriverStation.isAutonomous()) ? 3 : 1.5))), -0.5, 0.5), 
+      else if (tilt < -Math.toRadians(7)) {
+        swerve.drive(
+            -MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime * (1.5))), 0.05, 0.5),
             0, 
             0, 
             true);

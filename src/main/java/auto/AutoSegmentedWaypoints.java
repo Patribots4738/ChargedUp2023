@@ -22,8 +22,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   Arm arm;
   Claw claw;
   AutoAlignment autoAlignment;
-  AutoPathStorage autoPathStorage;
-  
+
   public Waypoint[] chosenWaypoints;
   public AutoPose chosenAutoPath;
 
@@ -67,14 +66,15 @@ public class AutoSegmentedWaypoints implements Loggable {
     Pose2d mirroredPose = new Pose2d(
       (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
         initialPathPose.poseMeters.getTranslation().getY(), 
-        initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
+        initialPathPose.holonomicRotation.minus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
     
-        
     stateHasFinished = false;
     stateHasInitialized = false;
     clawHasStarted = false;
     hasMovedArm = false;
     startedChargePad = false;
+
+    System.out.println(mirroredPose);
     
     swerve.resetOdometry(mirroredPose);
 
@@ -98,7 +98,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       // Prepare the arm for the next waypoint before the path is done
       switch (armIndex) {
         // If the next waypoint is a floor pickup, prepare the arm for a floor pickup
-        case PlacementConstants.FLOOR_INTAKE_INDEX:
+        case PlacementConstants.CUBE_INTAKE_INDEX:
           arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_PREP_INDEX);
           break;
 
@@ -111,7 +111,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     // Once the robot is in position...
-    if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+    else if (SwerveTrajectory.trajectoryStatus.equals("done")) {
       // If the arm is not in the desired position, move it
       if (!hasMovedArm) {
         // If the arm is at a prep index, change the desired index to be the other half of that prep index...
@@ -119,10 +119,12 @@ public class AutoSegmentedWaypoints implements Loggable {
         // this is because the first transition point is the prep index's end point
         if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_INDEX)
         {
+          System.out.println("Moving arm to index HIGH_PLACE_AUTO (" + PlacementConstants.HIGH_PLACE_INDEX_AUTO + ") at waypoint: " + currentWaypointNumber);
           arm.setArmIndex(PlacementConstants.HIGH_PLACE_INDEX_AUTO);
         }
         // The arm is not at a prep index...
         else {
+          System.out.println("Moving arm to index: " + armIndex + " at waypoint: " + currentWaypointNumber);
           arm.setArmIndex(armIndex);
         }
         // Prevent the arm from setting the index again
@@ -143,16 +145,16 @@ public class AutoSegmentedWaypoints implements Loggable {
         clawHasStarted = true;
       }
       // 0.3 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.3) && (currentWaypointNumber < chosenWaypoints.length - 1)) {
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.3)) {
         stateHasFinished = true;
       }
       // If there are not more waypoints, tell the robot to level itself
       // We can do this if we want to go on chargepad or not
       // becuase if we did not want to then the robot is already leveled.
-      else {
+      if (currentWaypointNumber == chosenWaypoints.length - 1) {
         if (!startedChargePad) {
           // Set the timer for the charge pad leveing PID loop
-          autoAlignment.startChargePad(); 
+          autoAlignment.startChargePad();
           // Prevent startChargePad from being called again
           startedChargePad = true;
         }
@@ -175,13 +177,19 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     if (stateHasFinished) {
 
-      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) { arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); }
-      else { arm.setArmIndex(PlacementConstants.STOWED_INDEX); }
+      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
+          arm.getArmIndex() == PlacementConstants.HIGH_PLACE_INDEX_AUTO) 
+      { 
+        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
+      }
+      else { 
+        arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
+      }
 
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if ((claw.getDesiredSpeed() != PlacementConstants.CLAW_INTAKE_SPEED &&
-      claw.getDesiredSpeed() != PlacementConstants.CLAW_INTAKE_SPEED)) {
+      if (claw.getDesiredSpeed() != PlacementConstants.CLAW_OUTTAKE_SPEED)
+      {
         claw.stopClaw();
       }
       

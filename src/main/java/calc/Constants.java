@@ -139,7 +139,7 @@ public final class Constants {
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 6.27;
+        public static final double Y_CORRECTION_P = 3;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
@@ -165,13 +165,13 @@ public final class Constants {
         public static final double CLAW_MIN_OUTPUT = -1;
         public static final double CLAW_MAX_OUTPUT = 1;
 
-        public static final int CLAW_STALL_LIMIT = 20;
+        public static final int CLAW_STALL_LIMIT = 25;
         public static final int CLAW_FREE_LIMIT = 30;
 
 
         // from the edge of the upper arm, straight out,
         // and stop at the end of the 3d-printed "grabber"
-        public static final double CLAW_LENGTH_X_INCHES = 13;
+        public static final double CLAW_LENGTH_INCHES = 13;
     }
 
     public static final class NeoMotorConstants {
@@ -216,8 +216,8 @@ public final class Constants {
 
       // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
       // 78 inches is the rule, 11 inches is the base of the pivot of the arm to the ground
-      public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_X_INCHES;
-      public static final double MAX_REACH_X = 48 + (PlacementConstants.ROBOT_LENGTH / 2.0) - ClawConstants.CLAW_LENGTH_X_INCHES;
+      public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_INCHES;
+      public static final double MAX_REACH_X = 48 + (Units.metersToInches(PlacementConstants.ROBOT_LENGTH) / 2.0) - ClawConstants.CLAW_LENGTH_INCHES;
 
       // When the arm is near the top of the limit, the arm will flip to the other solution
       // This is to prevent the upper arm from going above the limit when that happens.
@@ -266,14 +266,14 @@ public final class Constants {
        */
       // PID values for the lower and upper arm
       public static final double LOWER_P = 0.65;//0.25;
-      public static final double LOWER_I = 0;
+      public static final double LOWER_I = 0.0001;
       public static final double LOWER_D = 0.075;
       public static final double LOWER_FF = 1;
 
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double UPPER_P = 0.4;//.25;
+      public static final double UPPER_P = 0.8;//.25;
       public static final double UPPER_I = 0.0001;
       public static final double UPPER_D = 0.125;
       public static final double UPPER_FF = 1;
@@ -301,10 +301,10 @@ public final class Constants {
       public static final double V_LOWER = 10.914;
       public static final double A_LOWER = 1.7823;
 
-      public static final double S_UPPER = 0.57642;
+      public static final double S_UPPER = 0.1382;
       public static final double G_UPPER = 0; //1.0051; // (We don't like gravity)
-      public static final double V_UPPER = 5.7601;
-      public static final double A_UPPER = 3.0187;
+      public static final double V_UPPER = 1.7457;
+      public static final double A_UPPER = 0.6718;
     }
 
     public static final class VisionConstants {
@@ -331,24 +331,24 @@ public final class Constants {
     public static final class AlignmentConstants {
 
         public static final double CONE_OFFSET_METERS = 0.542615;
-        private static final double GRID_TAG_HEIGHT = Units.inchesToMeters(18.22);
-        private static final double HUMAN_TAG_HEIGHT = Units.inchesToMeters(27.38);
-        public static final double GRID_BARRIER = Units.inchesToMeters(15);
+        private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
+        private static final double HUMAN_TAG_HEIGHT_METERS = Units.inchesToMeters(27.38);
+        public static final double GRID_BARRIER_METERS = Units.inchesToMeters(15);
         public static final double SUBSTATION_OFFSET_METERS = 0.7;
-        public static final double ALLOWABLE_ERROR = Units.inchesToMeters(2);
+        public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.53;
 
         public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
         public static final Pose3d TAG_0_POSE = null;
-        public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        public static final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        public static final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        public static final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        public static final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        public static final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
         public static final Pose3d[] TAG_POSES = new Pose3d[] {
             TAG_0_POSE,
@@ -365,6 +365,11 @@ public final class Constants {
 
     public static final class PlacementConstants {
 
+      // The length of the robot
+      public static final double ROBOT_LENGTH = Units.inchesToMeters(25);
+      // Length of the bumpers on the robot
+      public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
+
       public static final int STOWED_INDEX = 0;
       public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
       public static final int MID_CONE_PLACEMENT_INDEX = 2;
@@ -380,32 +385,32 @@ public final class Constants {
       public static final int FLOOR_INTAKE_PREP_INDEX = 12;
       public static final int HIGH_CONE_PREP_INDEX = 13;
       public static final int HIGH_PLACE_INDEX_AUTO = 14;
+      public static final int CONE_INTAKE_INDEX = 15;
+      public static final int CUBE_INTAKE_INDEX = 16;
       
-
       public static final double CLAW_INTAKE_SPEED = 1;
       public static final double CLAW_OUTTAKE_SPEED = -1;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
-      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,48);
-      public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28,48);
-      public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,48);
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,35);
+      public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28, 45);
+      public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,45);
 
-      public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
-      public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
+      // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
+      // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
+
+      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH)) + 1), 15);
+      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(25, 2);
+      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH)) + 1), 2);
+
 
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
       public static final Translation2d STOWED_POSITION = new Translation2d(9, 18);
       public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
       public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
-      
-      // The length of the robot
-      public static final double ROBOT_LENGTH = Units.inchesToMeters(25);
-      // Length of the bumpers on the robot
-      public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
         
-      public static final Pose3d TAG_0_POSE = null;
       public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(30.75, 32.88);
       public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(32.1, 23.00);
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
@@ -459,8 +464,8 @@ public final class Constants {
         },
         // Index 7
         {
-          FLOOR_INTAKE_PREP_POSITION,
-          FLOOR_INTAKE_POSITION
+          CUBE_INTAKE_POSITION_PREP,
+          BUMPER_INTAKE_POSITION
         },
         // Index 8
         {
@@ -486,7 +491,7 @@ public final class Constants {
         },
         // Index 12
         {
-          FLOOR_INTAKE_PREP_POSITION
+          CUBE_INTAKE_POSITION_PREP
         },
         // Index 13
         {
@@ -496,6 +501,16 @@ public final class Constants {
         {
           HIGH_CONE_POSITION_0,
           HIGH_CONE_POSITION_2
+        },
+        // Index 15
+        {
+          CONE_INTAKE_POSITION_PREP,
+          BUMPER_INTAKE_POSITION
+        },
+        // Index 16
+        {
+          CUBE_INTAKE_POSITION_PREP,
+          BUMPER_INTAKE_POSITION
         }
       };
   }

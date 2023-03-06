@@ -120,6 +120,7 @@ public class SwerveTrajectory implements Loggable {
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState translationMirroredState = PathPlannerTrajectory.transformStateForAlliance(state, DriverStation.getAlliance());
+
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
           // If my PR on pathplanner gets accepted, we will only need to use translationMirroredState instead of mirroredState
@@ -130,8 +131,10 @@ public class SwerveTrajectory implements Loggable {
               new Pose2d(
                   (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (state.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
                   state.poseMeters.getTranslation().getY(), 
-                  state.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0))),
+                  state.holonomicRotation.plus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)).unaryMinus()),
               state.curvatureRadPerMeter);
+
+          System.out.println(mirroredState.poseMeters.getRotation());
 
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
@@ -140,7 +143,7 @@ public class SwerveTrajectory implements Loggable {
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
               (DriverStation.isAutonomous()) ? mirroredState : state,
-              (DriverStation.isAutonomous()) ? mirroredState.poseMeters.getRotation() : state.holonomicRotation);
+              (DriverStation.isAutonomous()) ? (mirroredState.poseMeters.getRotation()) : state.holonomicRotation);
 
           // Set the states for the motor using calculated values above
           // It is important to note that fieldRelative is false,
