@@ -187,7 +187,7 @@ public class Robot extends TimedRobot {
 
       if (driver.getAButtonPressed()) {
 
-        DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        // DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         autoAlignment.setTagID(autoAlignment.getNearestTag());
 
@@ -201,7 +201,7 @@ public class Robot extends TimedRobot {
 
     } else if (driver.getAButtonReleased()) {
 
-      DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+      // DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
 
     } else if (driver.getRightBumper()) {
 

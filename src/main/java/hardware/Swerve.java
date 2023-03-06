@@ -8,17 +8,16 @@ import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -26,7 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.DriveConstants;
-import org.ejml.simple.SimpleMatrix;
 
 public class Swerve implements Loggable{
 
@@ -39,13 +37,6 @@ public class Swerve implements Loggable{
 
     @Log
     public double roll = 0;
-
-    @Log
-    public double dotProduct = 0;
-
-    @Log
-    public double crossProduct = 0;
-
 
     private double speedMultiplier = 1;
 
@@ -118,6 +109,7 @@ public class Swerve implements Loggable{
 
     public void periodic() {
         // Update the odometry in the periodic block
+        this.field.setRobotPose(getPose());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
         getPitch();
         getRoll();
@@ -125,7 +117,6 @@ public class Swerve implements Loggable{
             System.out.println("Robot is not level");
             System.out.printf("Time: %.2f Pitch: %.2f Roll: %.2f", Timer.getFPGATimestamp(), getPitch().getDegrees(), getRoll().getDegrees());
         }
-        this.field.setRobotPose(getPose());
     }
 
     /**
@@ -214,11 +205,13 @@ public class Swerve implements Loggable{
     }
 
     public double getSpeedMetersPerSecond() {
-        double velocity = 0;  
-        for (int modNum = 0; modNum < swerveModules.length; modNum++) {
-              velocity += swerveModules[modNum].getState().speedMetersPerSecond;
-        }
-        return (velocity / swerveModules.length);
+        // double velocity = 0;  
+        // for (int modNum = 0; modNum < swerveModules.length; modNum++) {
+        //   velocity += swerveModules[modNum].getState().speedMetersPerSecond;
+        // }
+        // return (velocity / swerveModules.length);
+
+        return ((field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm())/0.02);
 
     }
 
