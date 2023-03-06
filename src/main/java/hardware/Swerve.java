@@ -218,7 +218,7 @@ public class Swerve implements Loggable{
         for (int modNum = 0; modNum < swerveModules.length; modNum++) {
               velocity += swerveModules[modNum].getState().speedMetersPerSecond;
         }
-        return (velocity / 4);
+        return (velocity / swerveModules.length);
 
     }
 
