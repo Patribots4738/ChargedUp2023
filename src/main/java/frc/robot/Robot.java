@@ -41,8 +41,6 @@ public class Robot extends TimedRobot {
   Debug debug;
 
   public ArduinoController arduinoController;
-  public LEDConstants ledStrip;
-
   ArmCalculations armCalcuations;
 
   AutoAlignment autoAlignment;
@@ -70,7 +68,6 @@ public class Robot extends TimedRobot {
       autoPathStorage = new AutoPathStorage();
 
       arduinoController = new ArduinoController();
-      ledStrip = new LEDConstants();
 
       Logger.configureLoggingAndConfig(this, false);
   }
