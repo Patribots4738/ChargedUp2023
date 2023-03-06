@@ -121,8 +121,7 @@ public class SwerveTrajectory implements Loggable {
           System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
-          state = (PathPlannerState) _pathTraj.sample(elapsedTime);
-          state = (PathPlannerState) _pathTraj.sample(elapsedTime);
+          PathPlannerState mirroredState = new PathPlannerState();
           
           System.out.print("Changed from " + state.poseMeters.getTranslation());
 
@@ -130,14 +129,26 @@ public class SwerveTrajectory implements Loggable {
           // and taking the mirrored state's rotation and adding 180 degrees
           if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
             
-            state.poseMeters = new Pose2d(
-              (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()), 
-              state.poseMeters.getTranslation().getY(), 
-              state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
+            // state.poseMeters = new Pose2d(
+            //   (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()), 
+            //   state.poseMeters.getTranslation().getY(), 
+            //   state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
 
-            state.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+            // state.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
 
-            System.out.println(" To " + state.poseMeters.getTranslation());
+            mirroredState.timeSeconds = state.timeSeconds;
+            mirroredState.velocityMetersPerSecond = state.velocityMetersPerSecond;
+            mirroredState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
+            mirroredState.poseMeters = new Pose2d(
+                (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()), 
+                state.poseMeters.getTranslation().getY(), 
+                state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
+            mirroredState.curvatureRadPerMeter = state.curvatureRadPerMeter;
+            mirroredState.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+            mirroredState.angularVelocityRadPerSec = state.angularVelocityRadPerSec;
+            mirroredState.holonomicAngularVelocityRadPerSec = state.holonomicAngularVelocityRadPerSec;
+
+            System.out.println(" To " + mirroredState.poseMeters.getTranslation());
 
           }
 
@@ -149,7 +160,7 @@ public class SwerveTrajectory implements Loggable {
           //   break;
           // }
 
-          System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation)).getTranslation() + "\n");
+          System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(mirroredState.poseMeters.getTranslation(), mirroredState.holonomicRotation)).getTranslation() + "\n");
 
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
@@ -157,8 +168,8 @@ public class SwerveTrajectory implements Loggable {
           ChassisSpeeds _speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              state,//(DriverStation.isAutonomous()) ? mirroredState : state,
-              state.holonomicRotation);//(DriverStation.isAutonomous()) ? (mirroredState.poseMeters.getRotation()) : state.holonomicRotation);
+              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) ? mirroredState : state,//(DriverStation.isAutonomous()) ? mirroredState : state,
+              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) ? mirroredState.holonomicRotation : state.holonomicRotation);//(DriverStation.isAutonomous()) ? (mirroredState.poseMeters.getRotation()) : state.holonomicRotation);
 
           // Set the states for the motor using calculated values above
           // It is important to note that fieldRelative is false,

@@ -1,20 +1,27 @@
 package frc.robot;
 
-import debug.*;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import hardware.*;
+import auto.AutoAlignment;
+import auto.AutoPathStorage;
+import auto.AutoSegmentedWaypoints;
+import auto.SwerveTrajectory;
 import calc.ArmCalculations;
+import calc.Constants.AutoConstants;
+import calc.Constants.DriveConstants;
+import calc.Constants.OIConstants;
+import calc.Constants.PlacementConstants;
 import calc.OICalc;
-import calc.Constants.*;
-import auto.*;
+import debug.Debug;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import hardware.Arm;
+import hardware.Claw;
+import hardware.Swerve;
 import io.github.oblarg.oblog.Logger;
-import auto.AutoAlignment;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -407,65 +414,8 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
-    autoAlignment.setTagID(3);
-  }
+  public void testInit() {}
 
   @Override
-  public void testPeriodic() {
-    if (driver.getRightBumper()) {
-
-      if (driver.getRightBumperPressed()) {
-        autoAlignment.startChargePad();
-      }
-
-      autoAlignment.chargeAlign();
-    }
-
-    // System.out.println(driver.getBackButton() + " " + driver.getStartButton());
-
-    if (driver.getXButtonPressed()) {
-      autoAlignment.setConeMode(false);
-    }
-    else if (driver.getYButtonPressed()) {
-      autoAlignment.setConeMode(true);
-    }
-
-    switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
-      // Not clicked
-      case -1:
-        break;
-
-      // Clicking up
-      case 0:
-        arm.setArmIndex(PlacementConstants.LONG_ARM_REACH_INDEX);
-        break;
-
-      // Clicking down
-      case 180:
-        break;
-
-      // Clicking left
-      case 270:
-        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
-        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
-        }
-        else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
-        }
-        break;
-
-      // Clicking right
-      case 90:
-        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
-        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
-        }
-        else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
-        }
-        break;
-    }
-  }
+  public void testPeriodic() {}
 }

@@ -403,8 +403,8 @@ public final class Constants {
       // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
 
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 15);
-      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(25, 2);
-      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 2);
+      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(25, 5);
+      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 5);
 
 
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);

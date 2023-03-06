@@ -13,7 +13,6 @@ import hardware.Claw;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Log.Logs;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.PlacementConstants;
 
@@ -184,17 +183,17 @@ public class AutoSegmentedWaypoints implements Loggable {
       SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
     }
 
-    if (!stateHasFinished && !stateHasInitialized) {
+    if (!stateHasFinished) {
       this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
     }
 
     // If there are not more waypoints, tell the robot to level itself
     // We can do this if we want to go on chargepad or not,
     // because if we did not want, to then the robot is already leveled.
-    if ((currentWaypointNumber == chosenWaypoints.length - 1) && 
-        Math.abs(swerve.getPitch().getDegrees()) > 7 || Math.abs(swerve.getRoll().getDegrees()) > 7)
+    if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
+        (Math.abs(swerve.getPitch().getDegrees()) > 10 || Math.abs(swerve.getRoll().getDegrees()) > 10)))
     {
-      System.out.println("Charging!");
+      System.out.println("Charging! " + swerve.getPitch().getDegrees() + " " + swerve.getRoll().getDegrees());
       if (!startedChargePad) {
         // Set the timer for the charge pad leveing PID loop
         autoAlignment.startChargePad();

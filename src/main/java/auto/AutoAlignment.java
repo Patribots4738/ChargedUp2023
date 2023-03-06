@@ -158,7 +158,7 @@ public class AutoAlignment implements Loggable{
                       (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
                   (tagID == 4) ?
                       (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
+                      -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
               Rotation2d.fromDegrees(180)));
       } else {
           targetPose = targetPose.plus(new Transform2d(
@@ -168,7 +168,7 @@ public class AutoAlignment implements Loggable{
                       -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
                   ((tagID == 5) ?
                       (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
+                      -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       }
 
@@ -297,13 +297,13 @@ public class AutoAlignment implements Loggable{
           this.tagID--;
           coneOffset = (coneMode) ? 1 : 0; 
           
-          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
+          System.out.println("Case 1: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
         else if (tagID == 6 || tagID == 7) {
           this.tagID++;
           coneOffset = (coneMode) ? 1 : 0; 
           
-          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
+          System.out.println("Case 2: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
       }
       else if (coneOffset > 1) {
@@ -311,13 +311,13 @@ public class AutoAlignment implements Loggable{
           this.tagID++;
           coneOffset = (coneMode) ? -1 : 0; 
           
-          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
+          System.out.println("Case 3: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
         else if (tagID == 7 || tagID == 8) {
           this.tagID--;
           coneOffset = (coneMode) ? -1 : 0; 
           
-          System.out.println("Tag = " + tagID + ", coneOffset = " + coneOffset);
+          System.out.println("Case 4: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
       }
       System.out.println(this.coneOffset + " to " + coneOffset);
@@ -348,7 +348,7 @@ public class AutoAlignment implements Loggable{
     public void setConeMode(boolean coneMode) {
       this.coneMode = coneMode;
       // Set the current cone offset to the left of a tag if it is zero
-      this.coneOffset = (this.coneOffset == 0) ? ((coneMode) ? ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1) : this.coneOffset) : this.coneOffset;
+      this.coneOffset = ((this.coneOffset == 0 && coneMode) ? ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1) : 0);
     }
 
     public boolean getConeMode() {
