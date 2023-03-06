@@ -234,13 +234,13 @@ public final class Constants {
 
       // The number of degrees that the upper arm can rotate from parallel to the front of the bot
       // Add 90 to lower arm's upper limit b/c the zero is perpendicular to chassis
-      public static final double LOWER_ARM_LOWER_LIMIT = Math.toRadians(90);
-      public static final double LOWER_ARM_UPPER_LIMIT = Math.toRadians(240);
+      public static final double LOWER_ARM_LOWER_LIMIT = 1.6;
+      public static final double LOWER_ARM_UPPER_LIMIT = 4.3;
 
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
-      public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(30);
-      public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(315);
+      public static final double UPPER_ARM_LOWER_LIMIT = 0.3;
+      public static final double UPPER_ARM_UPPER_LIMIT = 5.7;
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
@@ -389,13 +389,15 @@ public final class Constants {
       public static final int HIGH_PLACE_INDEX_AUTO = 14;
       public static final int CONE_INTAKE_INDEX = 15;
       public static final int CUBE_INTAKE_INDEX = 16;
+      public static final int CONE_FLIP_INDEX = 17;
       
       public static final double CLAW_INTAKE_SPEED = 1;
       public static final double CLAW_OUTTAKE_SPEED = -1;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
-      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,35);
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT_START = new Translation2d(0,35);
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT_FINISH = new Translation2d(0,30);
       public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28, 45);
       public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,45);
 
@@ -403,8 +405,12 @@ public final class Constants {
       // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
 
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 15);
-      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(25, 5);
+      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 5);
+
+      public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
+      // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
+
 
 
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
@@ -413,8 +419,8 @@ public final class Constants {
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
       public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
         
-      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(30.75, 32.88);
-      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(32.1, 23.00);
+      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(29, 32.88);
+      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(30.5, 23.00);
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
@@ -471,13 +477,15 @@ public final class Constants {
         },
         // Index 8
         {
-          SOLUTION_FLIP_TRANSITION_POINT,
-          SOLUTION_FLIP_POSIITON_POSITIVE
+          SOLUTION_FLIP_TRANSITION_POINT_START,
+          SOLUTION_FLIP_POSIITON_POSITIVE,
+          SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
         // Index 9
         {
-          SOLUTION_FLIP_TRANSITION_POINT,
-          SOLUTION_FLIP_POSIITON_NEGATIVE
+          SOLUTION_FLIP_TRANSITION_POINT_START,
+          SOLUTION_FLIP_POSIITON_NEGATIVE,
+          SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
         // Index 10
         {
@@ -512,6 +520,12 @@ public final class Constants {
         // Index 16
         {
           CUBE_INTAKE_POSITION_PREP,
+          BUMPER_INTAKE_POSITION
+        },
+        // Index 17
+        {
+          CONE_FLIP_POSITION_0,
+          CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         }
       };

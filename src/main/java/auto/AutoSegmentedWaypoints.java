@@ -191,7 +191,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     // We can do this if we want to go on chargepad or not,
     // because if we did not want, to then the robot is already leveled.
     if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
-        (Math.abs(swerve.getPitch().getDegrees()) > 10 || Math.abs(swerve.getRoll().getDegrees()) > 10)))
+        (Math.abs(swerve.getPitch().getDegrees()) > 10)))
     {
       System.out.println("Charging! " + swerve.getPitch().getDegrees() + " " + swerve.getRoll().getDegrees());
       if (!startedChargePad) {
@@ -204,7 +204,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       autoAlignment.chargeAlign();
     }
   
-    if (stateHasFinished) {
+    else if (stateHasFinished) {
 
       if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
           arm.getArmIndex() == PlacementConstants.HIGH_PLACE_INDEX_AUTO) 

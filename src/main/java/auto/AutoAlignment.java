@@ -60,6 +60,7 @@ public class AutoAlignment implements Loggable{
 
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
+        this.claw = claw;
         photonCameraPose = new PhotonCameraPose();
     }
 
@@ -154,10 +155,10 @@ public class AutoAlignment implements Loggable{
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
                   (tagID == 4) ?
-                      -(PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
+                      (PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
                       (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
                   (tagID == 4) ?
-                      (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                      -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
                       -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
               Rotation2d.fromDegrees(180)));
       } else {
@@ -165,10 +166,10 @@ public class AutoAlignment implements Loggable{
               new Translation2d(
                   (tagID == 5) ?
                       (PlacementConstants.HUMAN_TAG_PICKUP.getX() - Constants.ClawConstants.CLAW_LENGTH_INCHES) :
-                      -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                      (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
                   ((tagID == 5) ?
                       (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                      -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
+                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
       }
 
@@ -347,6 +348,11 @@ public class AutoAlignment implements Loggable{
 
     public void setConeMode(boolean coneMode) {
       this.coneMode = coneMode;
+
+      if (coneMode && this.coneOffset == 0) {
+        // If the cone offset is 
+        this.coneOffset = (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1;
+      }
       // Set the current cone offset to the left of a tag if it is zero
       this.coneOffset = ((this.coneOffset == 0 && coneMode) ? ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1) : 0);
     }
@@ -383,14 +389,14 @@ public class AutoAlignment implements Loggable{
 
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)), 0.05, 0.20),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/32)), 0.05, 0.20),
             0, 
             0, 
             true);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)), -0.20, -0.05),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/32)), -0.20, -0.05),
             0, 
             0, 
             true);

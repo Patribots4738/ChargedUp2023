@@ -344,6 +344,10 @@ public class Robot extends TimedRobot {
         break;
     }
 
+    if (operator.getBButtonPressed()){
+      arm.setArmIndex(PlacementConstants.CONE_FLIP_INDEX);
+    }
+
     if (operator.getRightStickButtonPressed()) {
     
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
@@ -414,8 +418,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {}
+  public void testInit() {
+    arm.setCoastMode();
+  }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    arm.periodic();
+  }
 }

@@ -199,18 +199,25 @@ public class Arm implements Loggable {
       
       // Notice that this code is getting the difference in angle between the arms.
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
-      if (finalDeadband && ! armsAtDesiredPosition)
+      if (finalDeadband && !armsAtDesiredPosition)
       {
         armPosDimension2++;
+
+        if ((armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
+            armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) && 
+            (armPosDimension2 == PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1))
+        {
+          // Flip the arm solution and go back to where we were
+          blueArmSolution = !blueArmSolution;
+        }
+        
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1);
+        
         if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
-          System.out.println(armPosDimension2);
           if (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
               armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE)
           {
-            // Flip the arm solution and go back to where we were
-            blueArmSolution = !blueArmSolution;
             this.armMirrored = this.armMirroredBeforeFlip;
             drive(new Translation2d((armMirrored) ? -armBeforeFlip.getX() : armBeforeFlip.getX(), armBeforeFlip.getY()));
             // Restore the operator override
