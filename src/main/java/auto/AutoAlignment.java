@@ -385,7 +385,7 @@ public class AutoAlignment implements Loggable{
         tilt = -swerve.getRoll().getRadians();
       }
 
-      // System.out.println(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)));
+      System.out.printf("Elapsed Time: %.1f, Full output: %.2f\n", elapsedTime, ((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)));
 
       if (tilt > Math.toRadians(7)) {
         swerve.drive(

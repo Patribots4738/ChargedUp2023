@@ -193,7 +193,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
         (Math.abs(swerve.getPitch().getDegrees()) > 10)))
     {
-      System.out.println("Charging! " + swerve.getPitch().getDegrees() + " " + swerve.getRoll().getDegrees());
+      System.out.println("Charging! " + swerve.getPitch().getDegrees());
       if (!startedChargePad) {
         // Set the timer for the charge pad leveing PID loop
         autoAlignment.startChargePad();
@@ -202,6 +202,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
       // Run the charge pad leveling PID loop
       autoAlignment.chargeAlign();
+      return;
     }
   
     else if (stateHasFinished) {
