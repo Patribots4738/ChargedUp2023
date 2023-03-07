@@ -51,12 +51,10 @@ public class Arm implements Loggable {
     // The current rotation of the upper arm
     @Log
     private double upperRotation = 0;
-    private final ArrayList<Double> upperRotationList = new ArrayList<>();
 
     // The current rotation of the lower arm
     @Log
     private double lowerRotation = 0;
-    private final ArrayList<Double> lowerRotationList = new ArrayList<>();
 
     // The DESIRED rotation of the upper and lower arm(s)
     private double upperReferenceAngle = 0;
@@ -446,8 +444,6 @@ public class Arm implements Loggable {
         _upperArmPIDController.setReference((angle), ControlType.kPosition);
 
         upperRotation = _upperArmEncoder.getPosition();
-
-        upperRotationList.add(upperRotation);
     }
 
     /**
@@ -479,8 +475,6 @@ public class Arm implements Loggable {
         _lowerArmPIDController.setReference((position), ControlType.kPosition);
 
         lowerRotation = _lowerArmEncoder.getPosition();
-
-        lowerRotationList.add(lowerRotation);
     }
 
     /**
@@ -600,9 +594,4 @@ public class Arm implements Loggable {
       _upperArmPIDController.setI(Debug.armI.getDouble(ArmConstants.UPPER_I));
       _upperArmPIDController.setD(Debug.armD.getDouble(ArmConstants.UPPER_D));
     }
-
-    public void printList() {
-      System.out.println(upperRotationList);
-    }
-
 }
