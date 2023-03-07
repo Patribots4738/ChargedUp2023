@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import calc.Constants;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
@@ -69,24 +70,23 @@ public class AutoAlignment implements Loggable{
      */
     public void calibrateOdometry() {
 
+      // Create an "Optional" object that contains the estimated pose of the robot
+      // This can be present (see's tag) or not present (does not see tag)
       Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPose());
 
-      // I do not believe this if statement gets what we want it to get...
+      // I do not believe this if a statement gets what we want it to get...
       if (result.isPresent()) {
 
           EstimatedRobotPose camEstimatedPose = result.get();
 
+          // Add the vision measurement to the pose estimator to update the odometry
           swerve.getPoseEstimator().addVisionMeasurement(
             camEstimatedPose.estimatedPose.toPose2d(),
             Timer.getFPGATimestamp());
-            
-            if (currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && DriverStation.isTeleop())) {
-              
-              // swerve.getPoseEstimator().addVisionMeasurement(
-              //   camEstimatedPose.estimatedPose.toPose2d(),
-              //   Timer.getFPGATimestamp());
 
-              setTagID(getNearestTag());
+            // If we are half the distance from the last "originalNorm" we were at, reset originalNorm
+            // This is primarily used to tell the arm to move halfway through the path
+            if (currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && DriverStation.isTeleop())) {
 
               if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
                 originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
@@ -94,17 +94,32 @@ public class AutoAlignment implements Loggable{
                 if (!Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && (tagID == 4 || tagID == 5)) {
 
                   moveArmToHumanTag = true;
-                  
-                  double normToLeftOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
+
+                  // Find which side of the human tag we are closest to based on the tag ID's location and the robot's location
+                  double negativeOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
                       new Translation2d(
-                          (AlignmentConstants.GRID_BARRIER_METERS),
-                          AlignmentConstants.CONE_OFFSET_METERS),
+                          // We know that the tag is going to be either 4 or 5, due to the if statement above ^^
+                          (tagID == 4) ?
+                              // Tag 4 means we need to subtract the grid barrier
+                              // since it is on the right side of the field
+                              // (red alliance)
+                              -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) :
+                              // Tag 5 means we need to add the grid barrier
+                              (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                          -AlignmentConstants.CONE_OFFSET_METERS),
                       new Rotation2d()))).getTranslation().getNorm();
 
-                  double normToRightOfHumanTag = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
+                  double positiveOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
                       new Translation2d(
-                          (AlignmentConstants.GRID_BARRIER_METERS),
-                          -AlignmentConstants.CONE_OFFSET_METERS),
+                          // See comment 9ish lines above ^^
+                          (tagID == 4) ?
+                              // Tag 4 means we need to subtract the grid barrier
+                              // since it is on the right side of the field
+                              // (red alliance)
+                              -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) :
+                              // Tag 5 means we need to add the grid barrier
+                              (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                          AlignmentConstants.CONE_OFFSET_METERS),
                       new Rotation2d()))).getTranslation().getNorm();
 
                   /*
@@ -112,16 +127,16 @@ public class AutoAlignment implements Loggable{
                     Due to moveToTag checking if we are on the blue alliance and flipping the sign,
                     we need to flip the sign here
                   */
-                  if (normToLeftOfHumanTag < normToRightOfHumanTag) {
-                    this.substationOffset = 1;
+                  if (negativeOffsetNorm < positiveOffsetNorm) {
+                    this.substationOffset = -1;
                     // Start intaking the claw when we get close to the tag
-                    if (normToLeftOfHumanTag < 2) {
+                    if (negativeOffsetNorm < 2) {
                       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
                     }
                   } else {
-                    this.substationOffset = -1;
+                    this.substationOffset = 1;
                     // Start intaking the claw when we get close to the tag
-                    if (normToRightOfHumanTag < 2) {
+                    if (positiveOffsetNorm < 2) {
                       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
                     }
                   }
@@ -130,7 +145,6 @@ public class AutoAlignment implements Loggable{
                   moveArmToHumanTag = false;
                 }
               }
-
             }
           // System.out.println(currentNorm + " " + originalNorm);
       }
@@ -142,13 +156,20 @@ public class AutoAlignment implements Loggable{
       if (tagID == 0) {
           return;
       }
+      Pose2d targetPose = swerve.getPose();
 
-      Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+      // Check if our tagID is valid... (assume it is for logic purposes)
+      if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+          // Get the target pose (the pose of the tag we want to go to
+          targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+      }
 
-      // If we are on the left side of the field, we need to add the grid offset + cone/substation offset
-      // If we are  on the right side of the field, we need to subtract the grid offset + cone/substation offset
-      // If we are going to a substation, we need to add the substation offset instead of the cone offset
+      // If we are on the left side of the field: we need to add the grid offset + cone/substation offset
+      // If we are on the right side of the field: we need to subtract the grid offset + cone/substation offset
+      // If we are going to a substation: we need to add the substation offset instead of the cone offset
       // We add the grid length to both because we still want to be a small bit away from the tag
+      // There is a bit of a logic issue that the else statement "should" be subtracting but it doesn't work when you do that...
+      // oh well.
       if (0 < tagID && tagID < 5) {
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
@@ -218,38 +239,44 @@ public class AutoAlignment implements Loggable{
 
       Translation2d currentPosition = swerve.getPose().getTranslation();
 
+      // If we are on the blue alliance, only look at positions of tags 8,7,6 and 4
       if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
         for (int i = 8; i > 4; i--) {
-          // Tag 4 is for the red alliance
+          // Tag 4 is for the red alliance's substation, not ours
+          // Skip over to our substation
           if (i == 5) { i = 4; }
+
+          // This if statement prevents the robot from crashing if we input an absurd tag ID,
+          // but it should be assumed that the tag location is present.
           if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
             currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
           }
           if (currentDistance < nearestDistance) {
-
             nearestDistance = currentDistance;
             nearestTag = i;
-
           }
         }
       }
+      // We are on the red alliance, only look at positions of tags 1,2,3 and 5
       else {
         for (int i = 1; i < 5; i++) {
-          // Tag 4 is for the blue alliance
+          // Tag 4 is for the blue alliance's substation, not ours
+          // Skip over to our substation
           if (i == 4) { i = 5; }
 
+          // This if statement prevents the robot from crashing if we input an absurd tag ID,
+          // but it should be assumed that the tag location is present.
           if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
             currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
           }
-
           if (currentDistance < nearestDistance) {
-
             nearestDistance = currentDistance;
             nearestTag = i;
-
           }
         }
       }
+
+      System.out.println("Current nearest tag " + nearestTag + " at distance " + Units.metersToInches(nearestDistance) + " Inches");
 
       return nearestTag;
     }
@@ -272,6 +299,11 @@ public class AutoAlignment implements Loggable{
 
       // If we are on cone mode, skip cone offsets of 0
       // also, skip straight to the next cone if we are on the same cone
+      // in other words,
+      // if we are on cone mode, at cone index 1, and we want to go to cone index 2, skip cone index 0
+      // or,
+      // if we are *not* on cone mode, (at cone index 0) and we want to go to cone index 1, skip cone index 1 and go to 2
+      // This is because the call from robot.java will run as (setConeOffset(getConeOffset +/- 1))
       if (coneMode) {
         if (previousConeOffset == -1) {
           if (coneOffset == 0) {
@@ -299,39 +331,40 @@ public class AutoAlignment implements Loggable{
       if (coneOffset < -1) {
         if (tagID == 2 || tagID == 3) {
           this.tagID--;
-          coneOffset = (coneMode) ? 1 : 0; 
-          
-          System.out.println("Case 1: Tag = " + tagID + ", coneOffset = " + coneOffset);
+          coneOffset = (coneMode) ? 1 : 0;
+          // System.out.println("Case 1: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
         else if (tagID == 6 || tagID == 7) {
           this.tagID++;
-          coneOffset = (coneMode) ? 1 : 0; 
-          
-          System.out.println("Case 2: Tag = " + tagID + ", coneOffset = " + coneOffset);
+          coneOffset = (coneMode) ? 1 : 0;
+          // System.out.println("Case 2: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
       }
       else if (coneOffset > 1) {
         if (tagID == 1 || tagID == 2) {
           this.tagID++;
-          coneOffset = (coneMode) ? -1 : 0; 
-          
-          System.out.println("Case 3: Tag = " + tagID + ", coneOffset = " + coneOffset);
+          coneOffset = (coneMode) ? -1 : 0;
+          // System.out.println("Case 3: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
         else if (tagID == 7 || tagID == 8) {
           this.tagID--;
-          coneOffset = (coneMode) ? -1 : 0; 
-          
-          System.out.println("Case 4: Tag = " + tagID + ", coneOffset = " + coneOffset);
+          coneOffset = (coneMode) ? -1 : 0;
+          // System.out.println("Case 4: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
       }
+
       System.out.println(this.coneOffset + " to " + coneOffset);
 
+      // Clamp the cone offset to -1, 0, or 1
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
 
+      // If we are not on cone mode, ensure the cone offset is zero
       if (!coneMode) {
         this.coneOffset = 0;
       }
 
+      // If we actually changed indexes, reset the auto alignment status,
+      // so we can re-align to the new index
       if (previousConeOffset != this.coneOffset) {
         SwerveTrajectory.resetTrajectoryStatus();
       }
@@ -352,9 +385,10 @@ public class AutoAlignment implements Loggable{
     public void setConeMode(boolean coneMode) {
       this.coneMode = coneMode;
 
+      // If the cone offset is 0, and we are switching to cone mode,
+      // set the cone offset to 1 (closest to human tag)
       if (coneMode && this.coneOffset == 0) {
-        // If the cone offset is 
-        this.coneOffset = (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1;
+        this.coneOffset = 1;
       }
       else if (!coneMode) {
         this.coneOffset = 0;

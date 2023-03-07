@@ -14,7 +14,6 @@ import calc.OICalc;
 import debug.Debug;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -185,7 +184,11 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
-    if (driver.getAButton()) {
+    // When not aligning, reset the max speed to the teleop speed
+    if (driver.getAButtonReleased()) {
+      DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+    }
+    else if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
 
@@ -201,10 +204,6 @@ public class Robot extends TimedRobot {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
       }
 
-    } else if (driver.getAButtonReleased()) {
-
-      DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
-
     } else if (driver.getRightBumper()) {
 
       if (driver.getRightBumperPressed()) {
@@ -215,6 +214,7 @@ public class Robot extends TimedRobot {
 
       autoAlignment.chargeAlign();
 
+    // Use the left bumper as a sort of e-stop for the swerve
     } else if (driver.getLeftBumper()) {
 
       swerve.setWheelsX();
@@ -243,8 +243,9 @@ public class Robot extends TimedRobot {
     
     if (arm.getOperatorOverride()) {
 
-      // If the holonomic rotation is either positive, plus or minus 10 degrees on either side of 0 degrees (180/0)
-      // Then set the operator X input to be negative
+      // If the holonomic rotation is positive, (plus or minus 10 degrees around 180 or 0)
+      // Then set the operator X input to be negative.
+      // This aims to preserve the operator's input direction when translating to the arm
       if (swerve.getYaw().getDegrees() > 0 || 
           (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
           swerve.getYaw().getDegrees() < -170 && swerve.getYaw().getDegrees() > 170) 
@@ -272,13 +273,6 @@ public class Robot extends TimedRobot {
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
-    }
-
-    if (operator.getBackButtonPressed()) {
-      arm.setArmMirrored(true);
-    }
-    else if (operator.getStartButtonPressed()) {
-      arm.setArmMirrored(false);
     }
 
     // POV = D-Pad...
@@ -318,7 +312,7 @@ public class Robot extends TimedRobot {
         }
         break;
     }
-    
+
     // POV = D-Pad...
     switch (operator.getPOV()) {
       // Not clicked
@@ -345,21 +339,19 @@ public class Robot extends TimedRobot {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
         break;
     }
-
     if (operator.getBButtonPressed()){
       arm.setArmIndex(PlacementConstants.CONE_FLIP_INDEX);
     }
-
     if (operator.getRightStickButtonPressed()) {
-    
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-
     }
 
-    if (operator.getStartButtonPressed()) {
+    // These buttons are right below the Xbox logo, aimed to be a bit out of reach
+    // (after all we don't want to accidentally press them)
+    if (operator.getBackButtonPressed()) {
       arm.setArmMirrored(true);
     }
-    else if (operator.getBackButtonPressed()) {
+    else if (operator.getStartButtonPressed()) {
       arm.setArmMirrored(false);
     }
 
@@ -406,6 +398,8 @@ public class Robot extends TimedRobot {
     }
 
     // Controller rumble settings:
+
+    // If the arm is at placement position, rumble the operator controller
     if (arm.getAtPlacementPosition()) {
       operator.setRumble(RumbleType.kLeftRumble, 0.5);
     }
@@ -413,6 +407,9 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kLeftRumble, 0);
     }
 
+    // If the robot is close to the desired grid index, rumble both controllers
+    // This is to help the driver know when to stop moving the robot if manually aligning
+    // Or as a confirmation for auto alignment
     if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5)) {
       driver.setRumble(RumbleType.kLeftRumble, 0.5);
       driver.setRumble(RumbleType.kRightRumble, 0.5);

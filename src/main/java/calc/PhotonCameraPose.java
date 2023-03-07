@@ -6,9 +6,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-
 import java.io.IOException;
 import java.util.Optional;
+import calc.Constants.VisionConstants;
 
 public class PhotonCameraPose {
 
@@ -18,6 +18,7 @@ public class PhotonCameraPose {
 
     public PhotonCameraPose() {
 
+        // Load the AprilTag field layout from the "resource file" at edu.wpi.first.apriltag.AprilTagFieldLayout
         try {
             aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
                     AprilTagFields.k2023ChargedUp.m_resourceFile);
@@ -25,13 +26,13 @@ public class PhotonCameraPose {
             throw new RuntimeException(e);
         }
 
-        photonCamera = new PhotonCamera(Constants.VisionConstants.CAMERA_NAME);
+        photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
 
         photonPoseEstimator = new PhotonPoseEstimator(
                 aprilTagFieldLayout,
                 PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
                 photonCamera,
-                Constants.VisionConstants.CAMERA_POSITION);
+                VisionConstants.CAMERA_POSITION);
 
     }
 
