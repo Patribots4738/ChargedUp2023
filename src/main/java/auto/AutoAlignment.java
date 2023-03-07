@@ -145,8 +145,6 @@ public class AutoAlignment implements Loggable{
 
       Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
 
-      currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-
       // If we are on the left side of the field, we need to add the grid offset + cone/substation offset
       // If we are  on the right side of the field, we need to subtract the grid offset + cone/substation offset
       // If we are going to a substation, we need to add the substation offset instead of the cone offset
@@ -179,6 +177,8 @@ public class AutoAlignment implements Loggable{
           SwerveTrajectory.trajectoryStatus = "done";
           return;
       }
+
+      currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
 
       // Calculate the direct heading to our destination, so we can drive straight to it
       Rotation2d heading = Rotation2d.fromRadians(Math.atan2(targetPose.getY() - swerve.getPose().getY(),targetPose.getX() - swerve.getPose().getX()));
@@ -214,7 +214,7 @@ public class AutoAlignment implements Loggable{
       // A reminder that tag 0 sets this.moveToTag() to return;
       int nearestTag = 0;
       double nearestDistance = 1000;
-      double currentDistance;
+      double currentDistance = 1000;
 
       Translation2d currentPosition = swerve.getPose().getTranslation();
 
@@ -222,9 +222,9 @@ public class AutoAlignment implements Loggable{
         for (int i = 8; i > 4; i--) {
           // Tag 4 is for the red alliance
           if (i == 5) { i = 4; }
-
-          currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
-
+          if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
+            currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
+          }
           if (currentDistance < nearestDistance) {
 
             nearestDistance = currentDistance;
@@ -238,7 +238,9 @@ public class AutoAlignment implements Loggable{
           // Tag 4 is for the blue alliance
           if (i == 4) { i = 5; }
 
-          currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
+          if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
+            currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
+          }
 
           if (currentDistance < nearestDistance) {
 
@@ -248,6 +250,7 @@ public class AutoAlignment implements Loggable{
           }
         }
       }
+
       return nearestTag;
     }
 
@@ -353,12 +356,17 @@ public class AutoAlignment implements Loggable{
         // If the cone offset is 
         this.coneOffset = (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1;
       }
-      // Set the current cone offset to the left of a tag if it is zero
-      this.coneOffset = ((this.coneOffset == 0 && coneMode) ? ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1) : 0);
+      else if (!coneMode) {
+        this.coneOffset = 0;
+      }
     }
 
     public boolean getConeMode() {
       return this.coneMode;
+    }
+
+    public double getCurrentNorm() {
+      return this.currentNorm;
     }
 
     public void chargeAlign() {
