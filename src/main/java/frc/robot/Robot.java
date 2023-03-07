@@ -407,10 +407,19 @@ public class Robot extends TimedRobot {
     // Controller rumble settings:
     if (arm.getAtPlacementPosition()) {
       operator.setRumble(RumbleType.kLeftRumble, 0.5);
-      operator.setRumble(RumbleType.kRightRumble, 0.5);
     }
     else {
       operator.setRumble(RumbleType.kLeftRumble, 0);
+    }
+
+    if (autoAlignment.getCurrentNorm() < 0.1) {
+      driver.setRumble(RumbleType.kLeftRumble, 0.5);
+      driver.setRumble(RumbleType.kRightRumble, 0.5);
+      operator.setRumble(RumbleType.kRightRumble, 0.5);
+    }
+    else {
+      driver.setRumble(RumbleType.kLeftRumble, 0);
+      driver.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kRightRumble, 0);
     }
 
