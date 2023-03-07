@@ -128,6 +128,7 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
+
         public static final double MAX_SPEED_METERS_PER_SECOND = 1.75; // previously 1.75
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
@@ -331,6 +332,9 @@ public final class Constants {
     }
 
     public static final class AlignmentConstants {
+
+
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2.25;
 
         public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);

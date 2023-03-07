@@ -5,6 +5,7 @@ import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
+import calc.Constants.AlignmentConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.OIConstants;
@@ -187,7 +188,7 @@ public class Robot extends TimedRobot {
 
       if (driver.getAButtonPressed()) {
 
-        // DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         autoAlignment.setTagID(autoAlignment.getNearestTag());
 
@@ -201,7 +202,7 @@ public class Robot extends TimedRobot {
 
     } else if (driver.getAButtonReleased()) {
 
-      // DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+      DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
 
     } else if (driver.getRightBumper()) {
 
@@ -244,7 +245,7 @@ public class Robot extends TimedRobot {
       // If the holonomic rotation is either positive, plus or minus 10 degrees on either side of 0 degrees (180/0)
       // Then set the operator X input to be negative
       if (swerve.getYaw().getDegrees() > 0 || 
-         (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
+          (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
           swerve.getYaw().getDegrees() < -170 && swerve.getYaw().getDegrees() > 170) 
       {
         arm.drive(new Translation2d(
@@ -369,7 +370,6 @@ public class Robot extends TimedRobot {
         // This is to allow the trigger to be fully pressed intake an object,
       // and then let go to keep the claw at the same speed
       // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
-    
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
@@ -395,7 +395,7 @@ public class Robot extends TimedRobot {
           arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
       }
       else {
-        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+          arm.setArmIndex(PlacementConstants.STOWED_INDEX);
       }
 
       claw.setStartedOuttakingBool(false);
@@ -413,6 +413,8 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kLeftRumble, 0);
       operator.setRumble(RumbleType.kRightRumble, 0);
     }
+
+
   }
 
   @Override
