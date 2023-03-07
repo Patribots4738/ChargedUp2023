@@ -265,10 +265,10 @@ public class Robot extends TimedRobot {
 
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
-    if (operator.getXButtonPressed()) {
+    if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
     }
-    else if (operator.getYButtonPressed()) {
+    else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
     }
 
