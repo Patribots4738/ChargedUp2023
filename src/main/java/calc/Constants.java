@@ -376,6 +376,8 @@ public final class Constants {
       // Length of the bumpers on the robot
       public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
 
+      public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
+
       public static final int STOWED_INDEX = 0;
       public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
       public static final int MID_CONE_PLACEMENT_INDEX = 2;
