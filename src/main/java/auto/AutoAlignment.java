@@ -171,6 +171,7 @@ public class AutoAlignment implements Loggable{
       // There is a bit of a logic issue that the else statement "should" be subtracting but it doesn't work when you do that...
       // oh well.
       if (0 < tagID && tagID < 5) {
+
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
                   (tagID == 4) ?
@@ -180,7 +181,9 @@ public class AutoAlignment implements Loggable{
                       -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
                       -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
               Rotation2d.fromDegrees(180)));
+
       } else {
+
           targetPose = targetPose.plus(new Transform2d(
               new Translation2d(
                   (tagID == 5) ?
@@ -190,6 +193,7 @@ public class AutoAlignment implements Loggable{
                       (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
                       (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
               Rotation2d.fromDegrees(180)));
+
       }
 
       // If we are close enough to the tag, stop moving
