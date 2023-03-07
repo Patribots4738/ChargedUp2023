@@ -272,10 +272,10 @@ public class Robot extends TimedRobot {
       autoAlignment.setConeMode(true);
     }
 
-    if (operator.getStartButtonPressed()) {
+    if (operator.getBackButtonPressed()) {
       arm.setArmMirrored(true);
     }
-    else if (operator.getBackButtonPressed()) {
+    else if (operator.getStartButtonPressed()) {
       arm.setArmMirrored(false);
     }
 
@@ -400,9 +400,9 @@ public class Robot extends TimedRobot {
           arm.setArmIndex(PlacementConstants.STOWED_INDEX);
         }
           
-        claw.setFinishedOuttaking(false);
         claw.setStartedOuttakingBool(false);
-          
+        claw.setFinishedOuttaking(false);
+
       }
     }
 
