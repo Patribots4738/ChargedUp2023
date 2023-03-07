@@ -38,6 +38,8 @@ public class AutoPathStorage implements Loggable {
 
   public static Waypoint[] _MOBILITY_ONLY;
 
+  public static Waypoint[] _SQUARE_HALF;
+
   // Paths for the bottom of the field:
   // Start at grid index 1, place high, then go to field element A, intake, then go to grid index 2, and place high
   public static Waypoint[] _1H_A_2H_CHARGE;
@@ -101,6 +103,10 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _9H_D_8H;
   public static Waypoint[] _9H_D_8H_C;
 
+  public static Waypoint[] _4H_MOBILITY_CHARGE;
+  public static Waypoint[] _5H_MOBILITY_CHARGE;
+  public static Waypoint[] _6H_MOBILITY_CHARGE;
+
   public static Waypoint[] _9H_D_7H_REACH;
 
   public static PathPlannerTrajectory square1;
@@ -113,42 +119,62 @@ public class AutoPathStorage implements Loggable {
   public static PathPlannerTrajectory _1;
   public static PathPlannerTrajectory _2;
   public static PathPlannerTrajectory _3;
-
-  public static PathPlannerTrajectory _1_A;
-  public static PathPlannerTrajectory _2_A;
-  public static PathPlannerTrajectory _3_A;
-
-  public static PathPlannerTrajectory _1_B;
-  public static PathPlannerTrajectory _2_B;
-  public static PathPlannerTrajectory _3_B;
-
-  public static PathPlannerTrajectory _A_1;
-  public static PathPlannerTrajectory _A_2;
-  public static PathPlannerTrajectory _A_3;
-
-  public static PathPlannerTrajectory _1_CH;
-  public static PathPlannerTrajectory _2_CH;
-  public static PathPlannerTrajectory _3_CH;
-
+  public static PathPlannerTrajectory _4;
+  public static PathPlannerTrajectory _5;
+  public static PathPlannerTrajectory _6;
   public static PathPlannerTrajectory _7;
   public static PathPlannerTrajectory _8;
   public static PathPlannerTrajectory _9;
 
-  public static PathPlannerTrajectory _7_D;
-  public static PathPlannerTrajectory _8_D;
-  public static PathPlannerTrajectory _9_D;
+  public static PathPlannerTrajectory _1_A;
+  public static PathPlannerTrajectory _1_B;
+  public static PathPlannerTrajectory _2_A;
+  public static PathPlannerTrajectory _2_B;
+  public static PathPlannerTrajectory _3_A;
+  public static PathPlannerTrajectory _3_B;
+  public static PathPlannerTrajectory _4_B;
+  public static PathPlannerTrajectory _5_B;
+  public static PathPlannerTrajectory _5_C;
+  public static PathPlannerTrajectory _6_C;
+
+  public static PathPlannerTrajectory _A_1;
+  public static PathPlannerTrajectory _A_2;
+  public static PathPlannerTrajectory _A_3;
+  public static PathPlannerTrajectory _A_4;
+
+  public static PathPlannerTrajectory _B_4;
+  public static PathPlannerTrajectory _B_5;
+
+  public static PathPlannerTrajectory _C_5;
+  public static PathPlannerTrajectory _C_6;
+
+  public static PathPlannerTrajectory _1_CH;
+  public static PathPlannerTrajectory _2_CH;
+  public static PathPlannerTrajectory _3_CH;
+  public static PathPlannerTrajectory _4_CH;
+  public static PathPlannerTrajectory _5_CH;
+  public static PathPlannerTrajectory _6_CH;
+  public static PathPlannerTrajectory _7_CH;
+  public static PathPlannerTrajectory _8_CH;
+  public static PathPlannerTrajectory _9_CH;
+
+  public static PathPlannerTrajectory _4_M;
+  public static PathPlannerTrajectory _5_M;
+  public static PathPlannerTrajectory _6_M;
+  public static PathPlannerTrajectory _M_CH;
 
   public static PathPlannerTrajectory _7_C;
+  public static PathPlannerTrajectory _7_D;
   public static PathPlannerTrajectory _8_C;
+  public static PathPlannerTrajectory _8_D;
   public static PathPlannerTrajectory _9_C;
+  public static PathPlannerTrajectory _9_D;
 
+  public static PathPlannerTrajectory _D_6;
   public static PathPlannerTrajectory _D_7;
   public static PathPlannerTrajectory _D_8;
   public static PathPlannerTrajectory _D_9;
 
-  public static PathPlannerTrajectory _7_CH;
-  public static PathPlannerTrajectory _8_CH;
-  public static PathPlannerTrajectory _9_CH;
 
   public static PathPlannerTrajectory _9_D_REACH;
   public static PathPlannerTrajectory _D_REACH_7;
@@ -159,39 +185,59 @@ public class AutoPathStorage implements Loggable {
    */
   public AutoPathStorage() {
 
-    _MOBILITY = PathPlanner.loadPath("_MOBILITY", AutoConstants.MAX_SPEED_METERS_PER_SECOND/2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/2);
+    square1 = PathPlanner.loadPath("Square1", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    square2 = PathPlanner.loadPath("Square2", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    square3 = PathPlanner.loadPath("Square3", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    square4 = PathPlanner.loadPath("Square4", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+
+    _MOBILITY = PathPlanner.loadPath("_MOBILITY", AutoConstants.MAX_SPEED_METERS_PER_SECOND/2.0, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/2.0);
 
     _1_A = PathPlanner.loadPath("_1_A", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _1_B = PathPlanner.loadPath("_1_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _2_B = PathPlanner.loadPath("_2_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _2_A = PathPlanner.loadPath("_2_A", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _3_A = PathPlanner.loadPath("_3_A", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _3_B = PathPlanner.loadPath("_3_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _4_B = PathPlanner.loadPath("_4_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _4_M = PathPlanner.loadPath("_4_M", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _5_B = PathPlanner.loadPath("_5_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _5_C = PathPlanner.loadPath("_5_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _5_M = PathPlanner.loadPath("_5_M", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _6_C = PathPlanner.loadPath("_6_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _6_M = PathPlanner.loadPath("_6_M", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _7_C = PathPlanner.loadPath("_7_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _7_D = PathPlanner.loadPath("_7_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _8_C = PathPlanner.loadPath("_8_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _8_D = PathPlanner.loadPath("_8_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _9_C = PathPlanner.loadPath("_9_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _9_D = PathPlanner.loadPath("_9_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     _A_1 = PathPlanner.loadPath("_A_1", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _A_2 = PathPlanner.loadPath("_A_2", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _A_3 = PathPlanner.loadPath("_A_3", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    
-    _1_B = PathPlanner.loadPath("_1_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _2_B = PathPlanner.loadPath("_2_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _3_B = PathPlanner.loadPath("_3_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _A_4 = PathPlanner.loadPath("_A_4", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+
+    _B_4 = PathPlanner.loadPath("_B_4", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _B_5 = PathPlanner.loadPath("_B_5", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+
+    _C_5 = PathPlanner.loadPath("_C_5", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _C_6 = PathPlanner.loadPath("_C_6", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+
+    _D_6 = PathPlanner.loadPath("_D_6", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _D_7 = PathPlanner.loadPath("_D_7", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _D_8 = PathPlanner.loadPath("_D_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _D_9 = PathPlanner.loadPath("_D_9", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     _1_CH = PathPlanner.loadPath("_1_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _2_CH = PathPlanner.loadPath("_2_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _3_CH = PathPlanner.loadPath("_3_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
-    _7_D = PathPlanner.loadPath("_7_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND/2.0, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/2.0);
-    _8_D = PathPlanner.loadPath("_8_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _9_D = PathPlanner.loadPath("_9_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
-    _7_C = PathPlanner.loadPath("_7_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_C = PathPlanner.loadPath("_8_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _9_C = PathPlanner.loadPath("_9_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
-    _D_7 = PathPlanner.loadPath("_D_7", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _D_8 = PathPlanner.loadPath("_D_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND/2.0, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/2.0);
-    _D_9 = PathPlanner.loadPath("_D_9", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
+    _4_CH = PathPlanner.loadPath("_4_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _5_CH = PathPlanner.loadPath("_5_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _6_CH = PathPlanner.loadPath("_6_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _7_CH = PathPlanner.loadPath("_7_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _8_CH = PathPlanner.loadPath("_8_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _9_CH = PathPlanner.loadPath("_9_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _M_CH = PathPlanner.loadPath("_M_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     _9_D_REACH = PathPlanner.loadPath("_9_D_REACH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _D_REACH_7 = PathPlanner.loadPath("_D_REACH_7", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -221,6 +267,33 @@ public class AutoPathStorage implements Loggable {
         new PathConstraints(0.1, 0.1),
         new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation()),
         new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation())
+    );
+
+    // Use the initial state of _4_B as the starting point for _4
+    // This is so we can move our arm before we move the robot.
+    _4 = PathPlanner.generatePath
+    (
+        new PathConstraints(0.1, 0.1),
+        new PathPoint(_4_B.getInitialState().poseMeters.getTranslation(), _4_B.getInitialState().poseMeters.getRotation(), _4_B.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_4_B.getInitialState().poseMeters.getTranslation(), _4_B.getInitialState().poseMeters.getRotation(), _4_B.getInitialHolonomicPose().getRotation())
+    );
+
+    // Use the initial state of _5_B as the starting point for _5
+    // This is so we can move our arm before we move the robot.
+    _5 = PathPlanner.generatePath
+    (
+        new PathConstraints(0.1, 0.1),
+        new PathPoint(_5_B.getInitialState().poseMeters.getTranslation(), _5_B.getInitialState().poseMeters.getRotation(), _5_B.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_5_B.getInitialState().poseMeters.getTranslation(), _5_B.getInitialState().poseMeters.getRotation(), _5_B.getInitialHolonomicPose().getRotation())
+    );
+
+    // Use the initial state of _6_C as the starting point for _6
+    // This is so we can move our arm before we move the robot.
+    _6 = PathPlanner.generatePath
+    (
+        new PathConstraints(0.1, 0.1),
+        new PathPoint(_6_C.getInitialState().poseMeters.getTranslation(), _6_C.getInitialState().poseMeters.getRotation(), _6_C.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_6_C.getInitialState().poseMeters.getTranslation(), _6_C.getInitialState().poseMeters.getRotation(), _6_C.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _7_D as the starting point for _7
@@ -276,6 +349,11 @@ public class AutoPathStorage implements Loggable {
      * 
      * Create waypoint arrays in order as defined from the top of the file
      */
+
+    _SQUARE_HALF = new Waypoint[] {
+        new Waypoint(square1, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
+        new Waypoint(square2, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
 
     _MOBILITY_ONLY = new Waypoint[] {
         new Waypoint(_MOBILITY, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
@@ -392,7 +470,7 @@ public class AutoPathStorage implements Loggable {
     _3H_A_2H = new Waypoint[] {
         new Waypoint(_3, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_3_A, PlacementConstants.CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_A_2, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED)
     };
 
     _3H_A_2H_B = new Waypoint[] {
@@ -413,7 +491,7 @@ public class AutoPathStorage implements Loggable {
     _7H_D_8H = new Waypoint[] {
         new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_7_D, PlacementConstants.CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED)
     };
 
     _7H_D_8H_C = new Waypoint[] {
@@ -433,7 +511,7 @@ public class AutoPathStorage implements Loggable {
     _7H_D_9H = new Waypoint[] {
         new Waypoint(_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_7_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED)
     };
 
     _7H_D_9H_C = new Waypoint[] {
@@ -453,7 +531,7 @@ public class AutoPathStorage implements Loggable {
     _8H_D_7H = new Waypoint[] {
         new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED)
     };
 
     _8H_D_7H_C = new Waypoint[] {
@@ -473,7 +551,7 @@ public class AutoPathStorage implements Loggable {
     _8H_D_9H = new Waypoint[] {
         new Waypoint(_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_8_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_D_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED)
     };
 
     _8H_D_9H_C = new Waypoint[] {
@@ -493,7 +571,7 @@ public class AutoPathStorage implements Loggable {
     _9H_D_7H = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_D_7, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED)
     };
 
     _9H_D_7H_C = new Waypoint[] {
@@ -513,7 +591,7 @@ public class AutoPathStorage implements Loggable {
     _9H_D_8H = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED)
     };
 
     _9H_D_8H_C = new Waypoint[] {
@@ -521,6 +599,24 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_9_D, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED),
         new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_8_C, PlacementConstants.FLOOR_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED)
+    };
+
+    _4H_MOBILITY_CHARGE = new Waypoint[] {
+        new Waypoint(_4, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_4_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
+        new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
+    _5H_MOBILITY_CHARGE = new Waypoint[] {
+        new Waypoint(_5, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_5_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
+        new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
+    _6H_MOBILITY_CHARGE = new Waypoint[] {
+        new Waypoint(_6, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_6_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
+        new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _9H_D_7H_REACH = new Waypoint[] {
@@ -581,7 +677,12 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("9H_D_8H", _9H_D_8H),
       new AutoPose("9H_D_8H_C", _9H_D_8H_C),
 
+      new AutoPose("4H_MOBILITY_CHARGE", _4H_MOBILITY_CHARGE),
+      new AutoPose("5H_MOBILITY_CHARGE", _5H_MOBILITY_CHARGE),
+      new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
+
       new AutoPose("9H_D_7H_REACH", _9H_D_7H_REACH),
+      new AutoPose("SQUARE_HALF", _SQUARE_HALF),
 
     };
 

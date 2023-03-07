@@ -26,15 +26,21 @@ public class AutoSegmentedWaypoints implements Loggable {
   public Waypoint[] chosenWaypoints;
   public AutoPose chosenAutoPath;
 
+  @Log
   public int currentWaypointNumber = 0;
 
   @Log
   public double autoDelay;
 
+  @Log
   public boolean stateHasFinished = false;
+  @Log
   public boolean stateHasInitialized = false;
+  @Log
   public boolean clawHasStarted = false;
+  @Log
   public boolean hasMovedArm = false;
+  @Log
   public boolean startedChargePad = false;
 
   public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
@@ -61,22 +67,30 @@ public class AutoSegmentedWaypoints implements Loggable {
     currentWaypointNumber = 0;
 
     PathPlannerState initialPathPose = chosenWaypoints[0].getPathPlannerSegment().getInitialState();
-    chosenWaypoints[0].getPathPlannerSegment().getInitialHolonomicPose();
 
-    Pose2d mirroredPose = new Pose2d(
-      (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
-        initialPathPose.poseMeters.getTranslation().getY(), 
-        initialPathPose.holonomicRotation.minus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
+    // Pose2d mirroredPose = new Pose2d(
+    //   (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
+    //     initialPathPose.poseMeters.getTranslation().getY(), 
+    //     initialPathPose.holonomicRotation.minus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
     
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous()) {
+
+      initialPathPose.poseMeters = new Pose2d(
+        (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()), 
+        initialPathPose.poseMeters.getTranslation().getY(), 
+        initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
+
+      initialPathPose.holonomicRotation = initialPathPose.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+
+    }
+
     stateHasFinished = false;
     stateHasInitialized = false;
     clawHasStarted = false;
     hasMovedArm = false;
     startedChargePad = false;
 
-    System.out.println(mirroredPose);
-    
-    swerve.resetOdometry(mirroredPose);
+    swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
 
   }
 
@@ -91,6 +105,10 @@ public class AutoSegmentedWaypoints implements Loggable {
    * stop the auto path and move on to the next waypoint
    */
   private void setArmIndex(int armIndex, double clawSpeed) {
+
+    if (clawSpeed == PlacementConstants.CLAW_OUTTAKE_SPEED && !clawHasStarted) {
+      claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+    }
 
     // Check if the arm is ready to move to the next waypoint mid-path
     if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions()) {
@@ -144,22 +162,10 @@ public class AutoSegmentedWaypoints implements Loggable {
         // Prevent the autoDelay from being reset
         clawHasStarted = true;
       }
+
       // 0.3 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.3)) {
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.3) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
         stateHasFinished = true;
-      }
-      // If there are not more waypoints, tell the robot to level itself
-      // We can do this if we want to go on chargepad or not
-      // becuase if we did not want to then the robot is already leveled.
-      if (currentWaypointNumber == chosenWaypoints.length - 1) {
-        if (!startedChargePad) {
-          // Set the timer for the charge pad leveing PID loop
-          autoAlignment.startChargePad();
-          // Prevent startChargePad from being called again
-          startedChargePad = true;
-        }
-        // Run the charge pad leveling PID loop
-        autoAlignment.chargeAlign();
       }
     }
   }
@@ -171,11 +177,35 @@ public class AutoSegmentedWaypoints implements Loggable {
       stateHasInitialized = true;
     }
 
-    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
+    // Only run the path if the robot isn't trying to align
+    // This will give priority to the alignment
+    if (!startedChargePad) {
+      SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
+    }
 
-    this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
+    if (!stateHasFinished) {
+      this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
+    }
 
-    if (stateHasFinished) {
+    // If there are not more waypoints, tell the robot to level itself
+    // We can do this if we want to go on chargepad or not,
+    // because if we did not want, to then the robot is already leveled.
+    if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
+        (stateHasFinished)))
+    {
+      System.out.println("Charging! " + swerve.getPitch().getDegrees());
+      if (!startedChargePad) {
+        // Set the timer for the charge pad leveing PID loop
+        autoAlignment.startChargePad();
+        // Prevent startChargePad from being called again
+        startedChargePad = true;
+      }
+      // Run the charge pad leveling PID loop
+      autoAlignment.chargeAlign();
+      return;
+    }
+  
+    else if (stateHasFinished) {
 
       if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
           arm.getArmIndex() == PlacementConstants.HIGH_PLACE_INDEX_AUTO) 
@@ -186,17 +216,19 @@ public class AutoSegmentedWaypoints implements Loggable {
         arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
       }
 
+      if (currentWaypointNumber < chosenWaypoints.length - 1) {
+        currentWaypointNumber++;
+        stateHasInitialized = false;
+      }
+      
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if (claw.getDesiredSpeed() != PlacementConstants.CLAW_OUTTAKE_SPEED)
+      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED)
       {
         claw.stopClaw();
       }
-      
-      currentWaypointNumber++;
 
       stateHasFinished = false;
-      stateHasInitialized = false;
       clawHasStarted = false;
       hasMovedArm = false;
     }

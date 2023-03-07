@@ -16,7 +16,7 @@ public class OICalc {
     private static boolean operatorLeft = false;
     private static boolean operatorRight = false;
 
-    // All calculations can be refrenced here https://www.desmos.com/calculator/e07raajzh5
+    // All calculations can be referenced here https://www.desmos.com/calculator/e07raajzh5
     public static Translation2d toCircle(double x, double y) {
 
         Translation2d intercept;

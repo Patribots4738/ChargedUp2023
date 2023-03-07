@@ -25,8 +25,10 @@ public final class Constants {
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
-        public static final double MAX_SPEED_METERS_PER_SECOND = 2;
-        public static final double MAX_ANGULAR_SPEED = 6 * Math.PI; // radians per second
+        public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        public static double MAX_ANGULAR_SPEED = 4 * Math.PI; // radians per second
+
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -126,20 +128,21 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double MAX_SPEED_METERS_PER_SECOND = 2; // 2.5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 6 * Math.PI;
+
+        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75; // previously 1.75
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 6.1;
+        public static final double X_CORRECTION_P = 6.88;
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 3;
+        public static final double Y_CORRECTION_P = 6.03;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
@@ -232,13 +235,13 @@ public final class Constants {
 
       // The number of degrees that the upper arm can rotate from parallel to the front of the bot
       // Add 90 to lower arm's upper limit b/c the zero is perpendicular to chassis
-      public static final double LOWER_ARM_LOWER_LIMIT = Math.toRadians(90);
-      public static final double LOWER_ARM_UPPER_LIMIT = Math.toRadians(240);
+      public static final double LOWER_ARM_LOWER_LIMIT = 1.6;
+      public static final double LOWER_ARM_UPPER_LIMIT = 4.3;
 
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
-      public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(30);
-      public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(315);
+      public static final double UPPER_ARM_LOWER_LIMIT = 0.3;
+      public static final double UPPER_ARM_UPPER_LIMIT = 5.7;
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
@@ -379,6 +382,9 @@ public final class Constants {
 
     public static final class AlignmentConstants {
 
+
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2.25;
+
         public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT_METERS = Units.inchesToMeters(27.38);
@@ -419,6 +425,8 @@ public final class Constants {
       // Length of the bumpers on the robot
       public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
 
+      public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
+
       public static final int STOWED_INDEX = 0;
       public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
       public static final int MID_CONE_PLACEMENT_INDEX = 2;
@@ -436,22 +444,28 @@ public final class Constants {
       public static final int HIGH_PLACE_INDEX_AUTO = 14;
       public static final int CONE_INTAKE_INDEX = 15;
       public static final int CUBE_INTAKE_INDEX = 16;
+      public static final int CONE_FLIP_INDEX = 17;
       
       public static final double CLAW_INTAKE_SPEED = 1;
       public static final double CLAW_OUTTAKE_SPEED = -1;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
-      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,35);
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT_START = new Translation2d(0,35);
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT_FINISH = new Translation2d(0,30);
       public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28, 45);
       public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,45);
 
       // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
       // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
 
-      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH)) + 1), 15);
-      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(25, 2);
-      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH)) + 1), 2);
+      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 15);
+      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
+      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 5);
+
+      public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
+      // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
+
 
 
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
@@ -460,8 +474,8 @@ public final class Constants {
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
       public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
         
-      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(30.75, 32.88);
-      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(32.1, 23.00);
+      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(29, 32.88);
+      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(30.5, 23.00);
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
@@ -518,13 +532,15 @@ public final class Constants {
         },
         // Index 8
         {
-          SOLUTION_FLIP_TRANSITION_POINT,
-          SOLUTION_FLIP_POSIITON_POSITIVE
+          SOLUTION_FLIP_TRANSITION_POINT_START,
+          SOLUTION_FLIP_POSIITON_POSITIVE,
+          SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
         // Index 9
         {
-          SOLUTION_FLIP_TRANSITION_POINT,
-          SOLUTION_FLIP_POSIITON_NEGATIVE
+          SOLUTION_FLIP_TRANSITION_POINT_START,
+          SOLUTION_FLIP_POSIITON_NEGATIVE,
+          SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
         // Index 10
         {
@@ -559,6 +575,12 @@ public final class Constants {
         // Index 16
         {
           CUBE_INTAKE_POSITION_PREP,
+          BUMPER_INTAKE_POSITION
+        },
+        // Index 17
+        {
+          CONE_FLIP_POSITION_0,
+          CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         }
       };

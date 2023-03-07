@@ -32,7 +32,7 @@ public class Claw {
         _clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
         _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-        _claw.setInverted(false);
+        _claw.setInverted(true);
         _claw.burnFlash();
         setBrakeMode();
 
@@ -47,7 +47,7 @@ public class Claw {
       if (DriverStation.isTeleop()) {
         if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
             finishedOuttaking = true;
-            stopClaw();
+
         }
       }
         

@@ -1,21 +1,28 @@
 package frc.robot;
 
-import debug.*;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import hardware.*;
+import auto.AutoAlignment;
+import auto.AutoPathStorage;
+import auto.AutoSegmentedWaypoints;
+import auto.SwerveTrajectory;
 import calc.ArmCalculations;
+import calc.Constants.AlignmentConstants;
+import calc.Constants.AutoConstants;
+import calc.Constants.DriveConstants;
+import calc.Constants.OIConstants;
+import calc.Constants.PlacementConstants;
 import calc.OICalc;
-import calc.Constants.*;
-import auto.*;
+import debug.Debug;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import hardware.Arm;
+import hardware.Claw;
+import hardware.Swerve;
 import io.github.oblarg.oblog.Logger;
-import auto.AutoAlignment;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -93,6 +100,10 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // arm.setUpperArmCoastMode();
     claw.stopClaw();
+
+    driver.setRumble(RumbleType.kLeftRumble, 0);
+    driver.setRumble(RumbleType.kRightRumble, 0);
+
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
 
@@ -106,6 +117,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
     autoSegmentedWaypoints.init();
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -114,7 +126,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-
+    // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
     if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
@@ -132,9 +144,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
     autoAlignment.setConeOffset(0);
+
   }
 
   @Override
@@ -172,11 +187,18 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
-    if (driver.getAButton()) {
+    // When not aligning, reset the max speed to the teleop speed
+    if (driver.getAButtonReleased()) {
+      DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+    }
+    else if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
+
+        DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         autoAlignment.setTagID(autoAlignment.getNearestTag());
+
       }
 
       autoAlignment.moveToTag();
@@ -188,11 +210,14 @@ public class Robot extends TimedRobot {
     } else if (driver.getRightBumper()) {
 
       if (driver.getRightBumperPressed()) {
+
         autoAlignment.startChargePad();
+
       }
 
       autoAlignment.chargeAlign();
 
+    // Use the left bumper as a sort of e-stop for the swerve
     } else if (driver.getLeftBumper()) {
 
       swerve.setWheelsX();
@@ -221,23 +246,24 @@ public class Robot extends TimedRobot {
     
     if (arm.getOperatorOverride()) {
 
-      // If the holonomic rotation is either positive, plus or minus 10 degrees on either side of 0 degrees (180/0)
-      // Then set the operator X input to be negative
+      // If the holonomic rotation is positive, (plus or minus 10 degrees around 180 or 0)
+      // Then set the operator X input to be negative.
+      // This aims to preserve the operator's input direction when translating to the arm
       if (swerve.getYaw().getDegrees() > 0 || 
-         (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
+          (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
           swerve.getYaw().getDegrees() < -170 && swerve.getYaw().getDegrees() > 170) 
       {
         arm.drive(new Translation2d(
           ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? operatorLeftAxis.getX() 
-              : -operatorLeftAxis.getX()), 
+              ? -operatorLeftAxis.getX() 
+              : operatorLeftAxis.getX()), 
           -operatorLeftAxis.getY()));
       }
       else {
         arm.drive(new Translation2d(
           ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? -operatorLeftAxis.getX() 
-              : operatorLeftAxis.getX()), 
+              ? operatorLeftAxis.getX() 
+              : -operatorLeftAxis.getX()), 
           -operatorLeftAxis.getY()));
       }
 
@@ -245,20 +271,13 @@ public class Robot extends TimedRobot {
 
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
-    if (operator.getXButtonPressed()) {
+    if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
       arduinoController.sendByte(LEDConstants.CLAW_PURPLE);
     }
-    else if (operator.getYButtonPressed()) {
+    else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
       arduinoController.sendByte(LEDConstants.CLAW_YELLOW);
-    }
-
-    if (operator.getStartButtonPressed()) {
-      arm.setArmMirrored(true);
-    }
-    else if (operator.getBackButtonPressed()) {
-      arm.setArmMirrored(false);
     }
 
     // POV = D-Pad...
@@ -280,7 +299,7 @@ public class Robot extends TimedRobot {
       case 270:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
         if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
         }
         else {
           autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
@@ -291,14 +310,14 @@ public class Robot extends TimedRobot {
       case 90:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
         if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
+          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
         }
         else {
           autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
         }
         break;
     }
-    
+
     // POV = D-Pad...
     switch (operator.getPOV()) {
       // Not clicked
@@ -325,17 +344,19 @@ public class Robot extends TimedRobot {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
         break;
     }
-
+    if (operator.getBButtonPressed()){
+      arm.setArmIndex(PlacementConstants.CONE_FLIP_INDEX);
+    }
     if (operator.getRightStickButtonPressed()) {
-    
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-
     }
 
-    if (operator.getStartButtonPressed()) {
+    // These buttons are right below the Xbox logo, aimed to be a bit out of reach
+    // (after all we don't want to accidentally press them)
+    if (operator.getBackButtonPressed()) {
       arm.setArmMirrored(true);
     }
-    else if (operator.getBackButtonPressed()) {
+    else if (operator.getStartButtonPressed()) {
       arm.setArmMirrored(false);
     }
 
@@ -347,7 +368,6 @@ public class Robot extends TimedRobot {
         // This is to allow the trigger to be fully pressed intake an object,
       // and then let go to keep the claw at the same speed
       // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
-    
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
@@ -367,94 +387,55 @@ public class Robot extends TimedRobot {
 
       claw.setDesiredSpeed(-operator.getRightTriggerAxis());
 
-    } else {
+    } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-      if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
-
-        if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
-            arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
-        }
-        else {
-          arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-        }
-          
-        claw.setFinishedOuttaking(false);
-        claw.setStartedOuttakingBool(false);
-          
+      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
+          arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
       }
+      else {
+          arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+      }
+
+      claw.setStartedOuttakingBool(false);
+      claw.setFinishedOuttaking(false);
+      claw.stopClaw();
+
     }
 
     // Controller rumble settings:
+
+    // If the arm is at placement position, rumble the operator controller
     if (arm.getAtPlacementPosition()) {
       operator.setRumble(RumbleType.kLeftRumble, 0.5);
-      operator.setRumble(RumbleType.kRightRumble, 0.5);
     }
     else {
       operator.setRumble(RumbleType.kLeftRumble, 0);
+    }
+
+    // If the robot is close to the desired grid index, rumble both controllers
+    // This is to help the driver know when to stop moving the robot if manually aligning
+    // Or as a confirmation for auto alignment
+    if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5)) {
+      driver.setRumble(RumbleType.kLeftRumble, 0.5);
+      driver.setRumble(RumbleType.kRightRumble, 0.5);
+      operator.setRumble(RumbleType.kRightRumble, 0.5);
+    }
+    else {
+      driver.setRumble(RumbleType.kLeftRumble, 0);
+      driver.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kRightRumble, 0);
     }
+
+
   }
 
   @Override
   public void testInit() {
-    autoAlignment.setTagID(3);
+    arm.setCoastMode();
   }
 
   @Override
   public void testPeriodic() {
-    if (driver.getRightBumper()) {
-
-      if (driver.getRightBumperPressed()) {
-        autoAlignment.startChargePad();
-      }
-
-      autoAlignment.chargeAlign();
-    }
-
-    // System.out.println(driver.getBackButton() + " " + driver.getStartButton());
-
-    if (driver.getXButtonPressed()) {
-      autoAlignment.setConeMode(false);
-    }
-    else if (driver.getYButtonPressed()) {
-      autoAlignment.setConeMode(true);
-    }
-
-    switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
-      // Not clicked
-      case -1:
-        break;
-
-      // Clicking up
-      case 0:
-        arm.setArmIndex(PlacementConstants.LONG_ARM_REACH_INDEX);
-        break;
-
-      // Clicking down
-      case 180:
-        break;
-
-      // Clicking left
-      case 270:
-        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
-        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
-        }
-        else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
-        }
-        break;
-
-      // Clicking right
-      case 90:
-        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
-        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? -1 : 1);
-        }
-        else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
-        }
-        break;
-    }
+    arm.periodic();
   }
 }
