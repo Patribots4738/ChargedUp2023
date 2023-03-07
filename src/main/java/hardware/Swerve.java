@@ -113,10 +113,10 @@ public class Swerve implements Loggable{
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
         getPitch();
         getRoll();
-        if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
-            System.out.println("Robot is not level");
-            System.out.printf("Time: %.2f Pitch: %.2f Roll: %.2f", Timer.getFPGATimestamp(), getPitch().getDegrees(), getRoll().getDegrees());
-        }
+        // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
+        //     System.out.println("Robot is not level");
+        //     System.out.printf("Time: %.2f Pitch: %.2f Roll: %.2f", Timer.getFPGATimestamp(), getPitch().getDegrees(), getRoll().getDegrees());
+        // }
     }
 
     /**
