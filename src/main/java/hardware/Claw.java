@@ -47,7 +47,7 @@ public class Claw {
       if (DriverStation.isTeleop()) {
         if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
             finishedOuttaking = true;
-            stopClaw();
+
         }
       }
         

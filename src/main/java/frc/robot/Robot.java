@@ -389,21 +389,19 @@ public class Robot extends TimedRobot {
 
       claw.setDesiredSpeed(-operator.getRightTriggerAxis());
 
-    } else {
+    } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-      if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
-
-        if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
-            arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
-        }
-        else {
-          arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-        }
-          
-        claw.setStartedOuttakingBool(false);
-        claw.setFinishedOuttaking(false);
-
+      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
+          arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
       }
+      else {
+        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+      }
+
+      claw.setStartedOuttakingBool(false);
+      claw.setFinishedOuttaking(false);
+      claw.stopClaw();
+
     }
 
     // Controller rumble settings:
