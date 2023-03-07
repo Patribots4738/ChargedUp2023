@@ -30,7 +30,7 @@ public class SwerveTrajectory implements Loggable {
   // The amount of time that has elapsed in the path...
   // This variable is used like a timer slider so we progress with the path
   // at the same time as the path...
-  // A rough example of this is seen in the pathplanner's "play" functionality, 
+  // A rough example of this is seen in the pathplanner's "play" functionality,
   // where the robot does a little movement
   // we try to replicate that using this and Trajectory.sample(elapsedTime);
   public static double elapsedTime;
@@ -53,19 +53,19 @@ public class SwerveTrajectory implements Loggable {
    */
   public static HolonomicDriveController HDC = new HolonomicDriveController(
       new PIDController(
-        Constants.AutoConstants.X_CORRECTION_P, 
-        Constants.AutoConstants.X_CORRECTION_I, 
+        Constants.AutoConstants.X_CORRECTION_P,
+        Constants.AutoConstants.X_CORRECTION_I,
         Constants.AutoConstants.X_CORRECTION_D),
       new PIDController(
-        Constants.AutoConstants.Y_CORRECTION_P, 
-        Constants.AutoConstants.Y_CORRECTION_I, 
+        Constants.AutoConstants.Y_CORRECTION_P,
+        Constants.AutoConstants.Y_CORRECTION_I,
         Constants.AutoConstants.Y_CORRECTION_D),
       new ProfiledPIDController(
-        Constants.AutoConstants.ROTATION_CORRECTION_P, 
-        Constants.AutoConstants.ROTATION_CORRECTION_I, 
+        Constants.AutoConstants.ROTATION_CORRECTION_P,
+        Constants.AutoConstants.ROTATION_CORRECTION_I,
         Constants.AutoConstants.ROTATION_CORRECTION_D,
           new TrapezoidProfile.Constraints(
-            Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 
+            Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
             Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
 
   // public static HolonomicDriveController HDC = new HolonomicDriveController(
@@ -108,7 +108,7 @@ public class SwerveTrajectory implements Loggable {
         break;
 
       case "execute":
-        
+
         // If you want to see the difference in X and Y vs their desired position on a graph... uncomment below.
         // Debug.debugPeriodic(
         //     _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getX(),
@@ -122,16 +122,16 @@ public class SwerveTrajectory implements Loggable {
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState mirroredState = new PathPlannerState();
-          
+
           System.out.print("Changed from " + state.poseMeters.getTranslation());
 
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
           if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
-            
+
             // state.poseMeters = new Pose2d(
-            //   (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()), 
-            //   state.poseMeters.getTranslation().getY(), 
+            //   (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
+            //   state.poseMeters.getTranslation().getY(),
             //   state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
 
             // state.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
@@ -140,8 +140,8 @@ public class SwerveTrajectory implements Loggable {
             mirroredState.velocityMetersPerSecond = state.velocityMetersPerSecond;
             mirroredState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
             mirroredState.poseMeters = new Pose2d(
-                (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()), 
-                state.poseMeters.getTranslation().getY(), 
+                (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
+                state.poseMeters.getTranslation().getY(),
                 state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
             mirroredState.curvatureRadPerMeter = state.curvatureRadPerMeter;
             mirroredState.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
@@ -152,7 +152,7 @@ public class SwerveTrajectory implements Loggable {
 
           }
 
-          // if ((swerve.getPose().minus(_pathTraj.sample(elapsedTime).poseMeters)).getTranslation().getNorm() < 0.1 && 
+          // if ((swerve.getPose().minus(_pathTraj.sample(elapsedTime).poseMeters)).getTranslation().getNorm() < 0.1 &&
           //     (Math.abs(swerve.getYaw().minus((state.holonomicRotation)).getDegrees()) < 3) && DriverStation.isAutonomous())
           // {
           //   swerve.drive(0, 0, 0, false);
@@ -160,7 +160,12 @@ public class SwerveTrajectory implements Loggable {
           //   break;
           // }
 
-          System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(mirroredState.poseMeters.getTranslation(), mirroredState.holonomicRotation)).getTranslation() + "\n");
+          System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(
+            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
+              ? mirroredState.poseMeters.getTranslation() : state.poseMeters.getTranslation(),
+            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
+              ? mirroredState.holonomicRotation
+              : state.holonomicRotation)).getTranslation() + "\n");
 
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,

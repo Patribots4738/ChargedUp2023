@@ -246,7 +246,7 @@ public class AutoAlignment implements Loggable{
       // If we are on the blue alliance, only look at positions of tags 8,7,6 and 4
       if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
         for (int i = 8; i > 4; i--) {
-          // Tag 4 is for the red alliance's substation, not ours
+          // Tag 5 is for the red alliance's substation, not ours
           // Skip over to our substation
           if (i == 5) { i = 4; }
 
