@@ -30,6 +30,9 @@ jobs:
         distribution: 'temurin'
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
-      
+        
     - name: Execute Gradle build
       run: ./gradlew build
+
+    - name: Gradle Dependency Submission
+      uses: mikepenz/gradle-dependency-submission@v0.8.5
