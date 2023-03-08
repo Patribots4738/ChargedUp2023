@@ -1,177 +1,101 @@
 // Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
 package auto;
 
-import java.sql.Driver;
-
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-
+import auto.AutoPathStorage.AutoPose;
+import auto.AutoPathStorage.Waypoint;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import hardware.Arm;
 import hardware.Claw;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import math.Constants.PlacementConstants;
+import calc.Constants.AlignmentConstants;
+import calc.Constants.PlacementConstants;
 
 public class AutoSegmentedWaypoints implements Loggable {
 
   Swerve swerve;
   Arm arm;
   Claw claw;
-
-  public Waypoint[] HighFiveBallAutoWPs;
-  public Waypoint[] SquareAutoWPs;
-  public Waypoint[] ConeToCubeWPs;
+  AutoAlignment autoAlignment;
 
   public Waypoint[] chosenWaypoints;
+  public AutoPose chosenAutoPath;
 
+  @Log
   public int currentWaypointNumber = 0;
-
-  public AutoPose chosenPath;
-  public AutoPose[] myAutoContainer;
-
-  public PathPlannerTrajectory square1;
-  public PathPlannerTrajectory square2;
-  public PathPlannerTrajectory square3;
-  public PathPlannerTrajectory square4;
-
-  public PathPlannerTrajectory coneToCube0;
-  public PathPlannerTrajectory coneToCube1;
-  public PathPlannerTrajectory coneToCube2;
-  public PathPlannerTrajectory coneToCube3;
 
   @Log
   public double autoDelay;
 
+  @Log
   public boolean stateHasFinished = false;
+  @Log
   public boolean stateHasInitialized = false;
+  @Log
+  public boolean clawHasStarted = false;
+  @Log
+  public boolean hasMovedArm = false;
+  @Log
+  public boolean startedChargePad = false;
 
-  @Log(tabName = "CompetitionLogger", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
-  public SendableChooser<AutoPose> m_autoChooser = new SendableChooser<>();
-
-
-  public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw) {
+  public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
     this.swerve = swerve;
     this.arm = arm;
     this.claw = claw;
+    this.autoAlignment = autoAlignment;
   }
 
   public void init() {
 
-    if (m_autoChooser.getSelected() == null) {
-      chosenPath = myAutoContainer[0];
+    if (AutoPathStorage.autoChooser.getSelected() == null) {
+
+      chosenAutoPath = AutoPathStorage.myAutoContainer[0];
+
     } else {
-      chosenPath = m_autoChooser.getSelected();
+
+      chosenAutoPath = AutoPathStorage.autoChooser.getSelected();
+
     }
 
-    chosenWaypoints = chosenPath.thisWPset;
+    chosenWaypoints = chosenAutoPath.getWaypointSet();
 
     currentWaypointNumber = 0;
 
-    PathPlannerState initialPathPose = chosenWaypoints[0].pathPlannerSegment.getInitialState();
+    PathPlannerState initialPathPose = chosenWaypoints[0].getPathPlannerSegment().getInitialState();
 
-    this.swerve.resetOdometry(initialPathPose.poseMeters);
+    // Pose2d mirroredPose = new Pose2d(
+    //   (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
+    //     initialPathPose.poseMeters.getTranslation().getY(), 
+    //     initialPathPose.holonomicRotation.minus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
+    
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous()) {
+
+      initialPathPose.poseMeters = new Pose2d(
+        (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()), 
+        initialPathPose.poseMeters.getTranslation().getY(), 
+        initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
+
+      initialPathPose.holonomicRotation = initialPathPose.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+
+    }
+
+    stateHasFinished = false;
+    stateHasInitialized = false;
+    clawHasStarted = false;
+    hasMovedArm = false;
+    startedChargePad = false;
+
+    swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
 
   }
 
   public void periodic() {
     waypointRunner(chosenWaypoints);
-  }
-
-  public void loadAutoPaths() {
-
-    square1 = PathPlanner.loadPath("4", 2.0, 1.5);
-    square2 = PathPlanner.loadPath("5", 2.0, 1.5);
-    square3 = PathPlanner.loadPath("6", 2.0, 1.5);
-    square4 = PathPlanner.loadPath("7", 2.0, 1.5);
-
-    coneToCube1 = PathPlanner.loadPath("ConeToCube1", 2.0, 1.5);
-    coneToCube2 = PathPlanner.loadPath("ConeToCube2", 2.0, 1.5);
-    coneToCube3 = PathPlanner.loadPath("ConeToCube3", 2.0, 1.5);
-    // create a new path just using the initial state of coneToCube1
-    coneToCube0 =  PathPlanner.generatePath
-    (
-        new PathConstraints(0.1, 0.1),
-
-        new PathPoint(coneToCube1.getInitialState().poseMeters.getTranslation(),
-            coneToCube1.getInitialState().poseMeters.getRotation(),
-            coneToCube1.getInitialState().poseMeters.getRotation()),
-
-        new PathPoint(coneToCube1.getInitialState().poseMeters.getTranslation(),
-            coneToCube1.getInitialState().poseMeters.getRotation(),
-            coneToCube1.getInitialState().poseMeters.getRotation())
-        
-    );
-    
-    SquareAutoWPs = new Waypoint[]{
-      new Waypoint(
-              PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_OUTTAKE_SPEED,
-              square1
-      ),
-      new Waypoint(
-              PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_INTAKE_SPEED,
-              square2
-      )
-      // ,
-      // new Waypoint(
-      //         PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-      //         PlacementConstants.CLAW_INTAKE_SPEED,
-      //         square3
-      // ),
-      // new Waypoint(
-      //         PlacementConstants.STOWED_PLACEMENT_INDEX,
-      //         PlacementConstants.CLAW_STOPPED_SPEED,
-      //         square4
-      // )
-    };
-
-    ConeToCubeWPs = new Waypoint[] {
-      new Waypoint(
-              PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_OUTTAKE_SPEED,
-              coneToCube0
-      ),
-      new Waypoint(
-              PlacementConstants.FLOOR_INTAKE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_INTAKE_SPEED,
-              coneToCube1
-      ),
-      new Waypoint(
-              PlacementConstants.HIGH_CONE_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_OUTTAKE_SPEED,
-              coneToCube2
-      ),
-      new Waypoint(
-              PlacementConstants.STOWED_PLACEMENT_INDEX,
-              PlacementConstants.CLAW_STOPPED_SPEED,
-              coneToCube3
-      )
-    };
-
-    myAutoContainer = new AutoPose[]{
-      new AutoPose("SquareAuto", square1.getInitialState().poseMeters.getX(),
-              square1.getInitialState().poseMeters.getY(),
-              square1.getInitialState().poseMeters.getRotation().getDegrees(),
-              SquareAutoWPs
-      ),
-      new AutoPose("ConeToCube", coneToCube0.getInitialState().poseMeters.getX(),
-              coneToCube0.getInitialState().poseMeters.getY(),
-              coneToCube0.getInitialState().poseMeters.getRotation().getDegrees(),
-              ConeToCubeWPs
-      )
-    };
-
-    for (AutoPose myAutoPose : myAutoContainer) {
-      m_autoChooser.addOption(myAutoPose.name, myAutoPose);
-    }
   }
 
   /**
@@ -180,69 +104,79 @@ public class AutoSegmentedWaypoints implements Loggable {
    * If both arms are in the set position, then
    * stop the auto path and move on to the next waypoint
    */
-  private void setArmIndex(int armIndex, int clawSpeed) {
+  private void setArmIndex(int armIndex, double clawSpeed) {
 
-    // Only move the claw before the arm
-    // if it needs to hold a game piece
-    if (clawSpeed == PlacementConstants.CLAW_INTAKE_SPEED) {
-      claw.setDesiredSpeed(clawSpeed);
-    }
-
-    if (SwerveTrajectory.trajectoryStatus.equals("done")) {
-
-      arm.setArmIndex(armIndex);
-
-    } else {
-
-      autoDelay = Timer.getFPGATimestamp();
-
-    }
-    
-    if (SwerveTrajectory.trajectoryStatus.equals("done") && arm.getAtDesiredPositions()) {
-
-      claw.setDesiredSpeed(clawSpeed);
-      // autoDelay = DriverStation.getMatchTime();
-      // 1.5 seconds since the path has completed
-      if (Timer.getFPGATimestamp() - autoDelay > 1.5) {
-
-        claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
-
-        if (currentWaypointNumber < chosenWaypoints.length - 1) {
-          stateHasFinished = true;
-        }
-
+    // Limit the claw speed based on what object we plan on placing
+    // This will reduce the possibility of popping a cube, for example.
+    if (clawSpeed == PlacementConstants.CLAW_OUTTAKE_SPEED && !clawHasStarted) {
+      switch (armIndex) {
+        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
+        case PlacementConstants.MID_CONE_PLACEMENT_INDEX:
+          claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+          break;
+        default:
+          claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
+          break;
       }
     }
-  }
 
-  public static class Waypoint {
-    public int armPosIndex;
-    public int clawDirection;
-    public PathPlannerTrajectory pathPlannerSegment;
+    // Check if the arm is ready to move to the next waypoint mid-path
+    if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions()) {
 
-    public Waypoint(int _index, int _direction, PathPlannerTrajectory _PPS) {
-      armPosIndex = _index;
-      clawDirection = _direction;
-      pathPlannerSegment = _PPS;
+      // Prepare the arm for the next waypoint before the path is done
+      switch (armIndex) {
+        // If the next waypoint is a floor pickup, prepare the arm for a floor pickup
+        case PlacementConstants.CUBE_INTAKE_INDEX:
+          arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_PREP_INDEX);
+          break;
+
+        // If the next waypoint is a high cone placement, prepare the arm for a high cone placement
+        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
+          arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
+          break;
+      }
+      // Do not change hasMovedArm because we are not done moving the arm
     }
-  }
 
+    // Once the robot is in position...
+    else if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+      // If the arm is not in the desired position, move it
+      if (!hasMovedArm) {
+        // If the arm is at a prep index, change the desired index to be the other half of that prep index...
+        // Notice that the floor intake does not have a second half, 
+        // this is because the first transition point is the prep index's end point
+        if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_INDEX)
+        {
+          System.out.println("Moving arm to index HIGH_PLACE_AUTO (" + PlacementConstants.HIGH_PLACE_INDEX_AUTO + ") at waypoint: " + currentWaypointNumber);
+          arm.setArmIndex(PlacementConstants.HIGH_PLACE_INDEX_AUTO);
+        }
+        // The arm is not at a prep index...
+        else {
+          System.out.println("Moving arm to index: " + armIndex + " at waypoint: " + currentWaypointNumber);
+          arm.setArmIndex(armIndex);
+        }
+        // Prevent the arm from setting the index again
+        hasMovedArm = true;
+      }
+    }
 
-  @SuppressWarnings({"CanBeFinal", "SameParameterValue"})
-  public static class AutoPose {
+    // Once the arm and robot are in position...
+    if ((SwerveTrajectory.trajectoryStatus.equals("done") && arm.getAtDesiredPositions())) {
 
-    public double thisX;
-    public double thisY;
-    public double thisRot;
-    public Waypoint[] thisWPset;
-    public String name;
+      // Move the claw to the desired speed
+      if (!clawHasStarted && (clawSpeed != PlacementConstants.CLAW_STOPPED_SPEED)) { 
+        // Set autoDelay to the current time,
+        // This is to allow the claw to move for a bit before moving on.
+        autoDelay = Timer.getFPGATimestamp();
+        claw.setDesiredSpeed(clawSpeed);
+        // Prevent the autoDelay from being reset
+        clawHasStarted = true;
+      }
 
-    AutoPose(String _S, double _x, double _y, double _rot, Waypoint[] _WP) {
-      thisX = _x;
-      thisY = _y;
-      thisRot = _rot;
-      thisWPset = _WP;
-      name = _S;
+      // 0.3 seconds since the claw has moved (and if there are more waypoints)
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.3) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
+        stateHasFinished = true;
+      }
     }
   }
 
@@ -253,16 +187,59 @@ public class AutoSegmentedWaypoints implements Loggable {
       stateHasInitialized = true;
     }
 
-    SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].pathPlannerSegment, swerve, swerve.getPose());
+    // Only run the path if the robot isn't trying to align
+    // This will give priority to the alignment
+    if (!startedChargePad) {
+      SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
+    }
 
-    this.setArmIndex(thisWaypointSet[currentWaypointNumber].armPosIndex, thisWaypointSet[currentWaypointNumber].clawDirection);
+    if (!stateHasFinished) {
+      this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
+    }
 
-    if (stateHasFinished) {
-      arm.setArmIndex(PlacementConstants.STOWED_PLACEMENT_INDEX);
-      currentWaypointNumber++;
+    // If there are not more waypoints, tell the robot to level itself
+    // We can do this if we want to go on chargepad or not,
+    // because if we did not want, to then the robot is already leveled.
+    if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
+        (stateHasFinished)))
+    {
+      System.out.println("Charging! " + swerve.getPitch().getDegrees());
+      if (!startedChargePad) {
+        // Set the timer for the charge pad leveing PID loop
+        autoAlignment.startChargePad();
+        // Prevent startChargePad from being called again
+        startedChargePad = true;
+      }
+      // Run the charge pad leveling PID loop
+      autoAlignment.chargeAlign();
+    }
+  
+    else if (stateHasFinished) {
+
+      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
+          arm.getArmIndex() == PlacementConstants.HIGH_PLACE_INDEX_AUTO) 
+      { 
+        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
+      }
+      else { 
+        arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
+      }
+
+      if (currentWaypointNumber < chosenWaypoints.length - 1) {
+        currentWaypointNumber++;
+        stateHasInitialized = false;
+      }
+      
+      // Only move the claw before the arm
+      // if it needs to hold a game piece
+      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED)
+      {
+        claw.stopClaw();
+      }
 
       stateHasFinished = false;
-      stateHasInitialized = false;
+      clawHasStarted = false;
+      hasMovedArm = false;
     }
   }
 }

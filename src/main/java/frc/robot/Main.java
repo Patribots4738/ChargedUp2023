@@ -21,7 +21,7 @@ public final class Main {
      * <p>If you change your main robot class, change the parameter type.
      */
     public static void main(String... args) {
-        System.out.println("    ____            __             _     __            __         ");
+        System.out.println("\n\n    ____            __             _     __            __         ");
         System.out.println("   / __ \\  ____ _  / /_   _____   (_)   / /_   ____   / /_   _____");
         System.out.println("  / /_/ / / __ `/ / __/  / ___/  / /   / __ \\ / __ \\ / __/  / ___/");
         System.out.println(" / ____/ / /_/ / / /_   / /     / /   / /_/ // /_/ // /_   (__  ) ");
@@ -30,7 +30,7 @@ public final class Main {
         System.out.println("   / // //__  /  |__  /  ( __ )");
         System.out.println("  / // /_  / /    /_ <  / __  |");
         System.out.println(" /__  __/ / /   ___/ / / /_/ /");
-        System.out.println("   /_/   /_/   /____/  \\____/");
+        System.out.println("   /_/   /_/   /____/  \\____/\n");
         RobotBase.startRobot(Robot::new);
     }
 }
