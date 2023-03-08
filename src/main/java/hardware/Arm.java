@@ -248,7 +248,12 @@ public class Arm implements Loggable {
 
         // Check if we are already at the desired index, and if we are not operator overriding,
         // This is because, if we are operator overriding, we want to be able to go to any index
-        if (index == armPosDimension1 && !operatorOverride) {
+        // If we are trying to go to a floor index, allow it to restart itself
+        if (index == armPosDimension1 && 
+            index != PlacementConstants.CONE_FLIP_INDEX && 
+            index != PlacementConstants.CONE_INTAKE_INDEX && 
+            index != PlacementConstants.CUBE_INTAKE_INDEX &&
+            !operatorOverride) {
           startedTransition = true;
           return;
         }

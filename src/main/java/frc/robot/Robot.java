@@ -1,13 +1,17 @@
 package frc.robot;
 
+import javax.security.sasl.AuthorizeCallback;
+
 import auto.AutoAlignment;
 import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
+import calc.Constants;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
+import calc.Constants.LEDConstants;
 import calc.Constants.OIConstants;
 import calc.Constants.PlacementConstants;
 import calc.OICalc;
@@ -19,6 +23,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import hardware.ArduinoController;
 import hardware.Arm;
 import hardware.Claw;
 import hardware.Swerve;
@@ -47,7 +52,7 @@ public class Robot extends TimedRobot {
 
   Debug debug;
 
-  public ArduinoController arduinoController;
+  ArduinoController arduinoController;
   ArmCalculations armCalcuations;
 
   AutoAlignment autoAlignment;
@@ -112,6 +117,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     // SwerveTrajectory.resetHDC();
+    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
   }
 
   @Override
@@ -191,6 +197,7 @@ public class Robot extends TimedRobot {
     if (driver.getAButtonReleased()) {
       DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     }
+
     else if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
@@ -200,7 +207,7 @@ public class Robot extends TimedRobot {
         autoAlignment.setTagID(autoAlignment.getNearestTag());
 
       }
-
+      
       autoAlignment.moveToTag();
 
       if (autoAlignment.getMoveArmToHumanTag()) {
@@ -273,11 +280,11 @@ public class Robot extends TimedRobot {
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
-      arduinoController.sendByte(LEDConstants.CLAW_PURPLE);
+      arduinoController.sendByte(LEDConstants.BELLY_PAN_PURPLE);
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
-      arduinoController.sendByte(LEDConstants.CLAW_YELLOW);
+      arduinoController.sendByte(LEDConstants.BELLY_PAN_YELLOW);
     }
 
     // POV = D-Pad...
@@ -319,7 +326,7 @@ public class Robot extends TimedRobot {
     }
 
     // POV = D-Pad...
-    switch (operator.getPOV()) {
+    switch (OICalc.getOperatorPOVPressed(operator.getPOV())) {
       // Not clicked
       case -1:
         break;
@@ -406,7 +413,7 @@ public class Robot extends TimedRobot {
 
     // If the arm is at placement position, rumble the operator controller
     if (arm.getAtPlacementPosition()) {
-      operator.setRumble(RumbleType.kLeftRumble, 0.5);
+      operator.setRumble(RumbleType.kLeftRumble, 1);
     }
     else {
       operator.setRumble(RumbleType.kLeftRumble, 0);
@@ -415,19 +422,27 @@ public class Robot extends TimedRobot {
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5)) {
+    if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5) && (autoAlignment.getCurrentNorm() != -1)) {
       driver.setRumble(RumbleType.kLeftRumble, 0.5);
       driver.setRumble(RumbleType.kRightRumble, 0.5);
       operator.setRumble(RumbleType.kRightRumble, 0.5);
+      arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
     }
     else {
+      if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
+        arduinoController.sendByte(LEDConstants.BELLY_PAN_RED);
+      }
+      else {
+        arduinoController.sendByte(autoAlignment.getConeMode() ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+      }
       driver.setRumble(RumbleType.kLeftRumble, 0);
       driver.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kRightRumble, 0);
     }
+    
 
 
-  }
+  }  
 
   @Override
   public void testInit() {
