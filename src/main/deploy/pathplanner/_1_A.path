@@ -24,11 +24,11 @@
     },
     {
       "anchorPoint": {
-        "x": 6.64,
+        "x": 6.55,
         "y": 0.92
       },
       "prevControl": {
-        "x": 5.64,
+        "x": 5.55,
         "y": 0.92
       },
       "nextControl": null,
