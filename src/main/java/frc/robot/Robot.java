@@ -1,13 +1,10 @@
 package frc.robot;
 
-import javax.security.sasl.AuthorizeCallback;
-
 import auto.AutoAlignment;
 import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
-import calc.Constants;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
@@ -124,6 +121,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+    AutoAlignment.coneMode = true;
     autoSegmentedWaypoints.init();
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -333,17 +331,17 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.HIGH_CONE_PLACEMENT_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_PLACEMENT_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking down
       case 180:
-        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.CONE_INTAKE_INDEX : PlacementConstants.CUBE_INTAKE_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_INTAKE_INDEX : PlacementConstants.CUBE_INTAKE_INDEX);
         break;
 
       // Clicking left
       case 270:
-        arm.setArmIndex((autoAlignment.getConeMode()) ? PlacementConstants.MID_CONE_PLACEMENT_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.MID_CONE_PLACEMENT_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking right
@@ -410,22 +408,17 @@ public class Robot extends TimedRobot {
     }
 
     // Controller rumble settings:
-
-    // If the arm is at placement position, rumble the operator controller
-    if (arm.getAtPlacementPosition()) {
-      operator.setRumble(RumbleType.kLeftRumble, 1);
-    }
-    else {
-      operator.setRumble(RumbleType.kLeftRumble, 0);
-    }
-
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5) && (autoAlignment.getCurrentNorm() != -1)) {
+    if (Math.abs(swerve.getPitch().getDegrees()) > 60) {
+      arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
+    }
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5) && (autoAlignment.getCurrentNorm() != -1)) {
       driver.setRumble(RumbleType.kLeftRumble, 0.5);
       driver.setRumble(RumbleType.kRightRumble, 0.5);
       operator.setRumble(RumbleType.kRightRumble, 0.5);
+      operator.setRumble(RumbleType.kLeftRumble, 0.5);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
     }
     else {
@@ -433,15 +426,13 @@ public class Robot extends TimedRobot {
         arduinoController.sendByte(LEDConstants.BELLY_PAN_RED);
       }
       else {
-        arduinoController.sendByte(autoAlignment.getConeMode() ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+        arduinoController.sendByte(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
       driver.setRumble(RumbleType.kLeftRumble, 0);
       driver.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kRightRumble, 0);
+      operator.setRumble(RumbleType.kLeftRumble, 0);
     }
-    
-
-
   }  
 
   @Override

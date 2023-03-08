@@ -1,8 +1,10 @@
 package hardware;
 
+import auto.AutoAlignment;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -44,14 +46,18 @@ public class Claw {
 
     public void periodic() {
 
-      if (DriverStation.isTeleop()) {
-        if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
-            finishedOuttaking = true;
-
+        if (DriverStation.isTeleop()) {
+            if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
+                finishedOuttaking = true;
+            }
+            if (AutoAlignment.coneMode) {
+                desiredSpeed = MathUtil.clamp(desiredSpeed, -1, 0.8);
+            }
+            else if (desiredSpeed > 0.7) {
+                desiredSpeed = 1;
+            }
         }
-      }
-        
-      setSpeed(desiredSpeed);
+        setSpeed(desiredSpeed);
     }
 
     private void setSpeed(double speed) {
@@ -75,7 +81,7 @@ public class Claw {
         if (intakeMode) {
             if (speed > this.desiredSpeed) {
                 // To prevent damage to game elements, the claw will not intake at full speed
-                this.desiredSpeed = speed * 0.8;
+                this.desiredSpeed = speed;
             }
         }
         else {

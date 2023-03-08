@@ -106,8 +106,18 @@ public class AutoSegmentedWaypoints implements Loggable {
    */
   private void setArmIndex(int armIndex, double clawSpeed) {
 
+    // Limit the claw speed based on what object we plan on placing
+    // This will reduce the possibility of popping a cube, for example.
     if (clawSpeed == PlacementConstants.CLAW_OUTTAKE_SPEED && !clawHasStarted) {
-      claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+      switch (armIndex) {
+        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
+        case PlacementConstants.MID_CONE_PLACEMENT_INDEX:
+          claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+          break;
+        default:
+          claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
+          break;
+      }
     }
 
     // Check if the arm is ready to move to the next waypoint mid-path
@@ -202,7 +212,6 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
       // Run the charge pad leveling PID loop
       autoAlignment.chargeAlign();
-      return;
     }
   
     else if (stateHasFinished) {

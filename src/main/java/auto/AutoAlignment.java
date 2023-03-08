@@ -57,7 +57,7 @@ public class AutoAlignment implements Loggable{
     private boolean moveArmToHumanTag = false;
   
     @Log
-    private boolean coneMode = false;
+    public static boolean coneMode = false;
 
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
@@ -131,13 +131,13 @@ public class AutoAlignment implements Loggable{
                   this.substationOffset = -1;
                   // Start intaking the claw when we get close to the tag
                   if (negativeOffsetNorm < 2) {
-                    claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+                    claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
                   }
                 } else {
                   this.substationOffset = 1;
                   // Start intaking the claw when we get close to the tag
                   if (positiveOffsetNorm < 2) {
-                    claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED);
+                    claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
                   }
                 }
 
@@ -151,32 +151,8 @@ public class AutoAlignment implements Loggable{
           if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
             // Get the target pose (the pose of the tag we want to go to)
             Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
-            if (0 < tagID && tagID < 5) {
-
-              targetPose = targetPose.plus(new Transform2d(
-                  new Translation2d(
-                      (tagID == 4) ?
-                          (PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
-                          (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                      (tagID == 4) ?
-                          -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                          -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
-                  Rotation2d.fromDegrees(180)));
-    
-          } else {
-    
-              targetPose = targetPose.plus(new Transform2d(
-                  new Translation2d(
-                      (tagID == 5) ?
-                          (PlacementConstants.HUMAN_TAG_PICKUP.getX() - Constants.ClawConstants.CLAW_LENGTH_INCHES) :
-                          (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                      ((tagID == 5) ?
-                          (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                          (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
-                  Rotation2d.fromDegrees(180)));
-    
-          }  
-          currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
+            targetPose = getModifiedTargetPose(targetPose);
+            currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
         }
       }
     }
@@ -201,38 +177,7 @@ public class AutoAlignment implements Loggable{
       // We add the grid length to both because we still want to be a small bit away from the tag
       // There is a bit of a logic issue that the else statement "should" be subtracting but it doesn't work when you do that...
       // oh well.
-      if (0 < tagID && tagID < 5) {
-
-          targetPose = targetPose.plus(new Transform2d(
-              new Translation2d(
-                  (tagID == 4) ?
-                      (PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
-                      (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                  (tagID == 4) ?
-                      -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                      -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
-              Rotation2d.fromDegrees(180)));
-
-      } else {
-
-          targetPose = targetPose.plus(new Transform2d(
-              new Translation2d(
-                  (tagID == 5) ?
-                      (PlacementConstants.HUMAN_TAG_PICKUP.getX() - Constants.ClawConstants.CLAW_LENGTH_INCHES) :
-                      (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
-                  ((tagID == 5) ?
-                      (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                      (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
-              Rotation2d.fromDegrees(180)));
-
-      }
-
-      // If we are close enough to the tag, stop moving
-      if (currentNorm < AlignmentConstants.ALLOWABLE_ERROR_METERS && currentNorm != -1) {
-          swerve.drive(0, 0, 0, false);
-          SwerveTrajectory.trajectoryStatus = "done";
-          return;
-      }
+      targetPose = getModifiedTargetPose(targetPose);
 
       currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
 
@@ -259,13 +204,14 @@ public class AutoAlignment implements Loggable{
       
       SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve);
     }
-    
-  /**
-   * Get the tag nearest to the robot using its position
-   * while using the alliance color to factor out tags
-   * @return the nearest tag to the bot that is for the same alliance
-   */
-  public int getNearestTag() {
+
+
+    /**
+     * Get the tag nearest to the robot using its position
+     * while using the alliance color to factor out tags
+     * @return the nearest tag to the bot that is for the same alliance
+     */
+    public int getNearestTag() {
 
       // A reminder that tag 0 sets this.moveToTag() to return;
       int nearestTag = 0;
@@ -315,6 +261,40 @@ public class AutoAlignment implements Loggable{
 
       return nearestTag;
     }
+
+    /**
+     * Get the modified target pose based on the alliance color
+     * @param targetPose the target pose of the tag we want to go to
+     * @return the modified target pose using constants for grid/substation
+     */
+    private Pose2d getModifiedTargetPose(Pose2d targetPose) {
+    if (0 < tagID && tagID < 5) {
+
+      targetPose = targetPose.plus(new Transform2d(
+          new Translation2d(
+              (tagID == 4) ?
+                  (PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
+                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+              (tagID == 4) ?
+                  -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                  -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
+          Rotation2d.fromDegrees(180)));
+
+    } else {
+
+      targetPose = targetPose.plus(new Transform2d(
+          new Translation2d(
+              (tagID == 5) ?
+                  (PlacementConstants.HUMAN_TAG_PICKUP.getX() - Constants.ClawConstants.CLAW_LENGTH_INCHES) :
+                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+              ((tagID == 5) ?
+                  (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                  (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
+          Rotation2d.fromDegrees(180)));
+
+    }
+    return targetPose;
+  }
 
     public int getTagID() {
         return tagID;
@@ -418,7 +398,7 @@ public class AutoAlignment implements Loggable{
     }
 
     public void setConeMode(boolean coneMode) {
-      this.coneMode = coneMode;
+      AutoAlignment.coneMode = coneMode;
 
       // If the cone offset is 0, and we are switching to cone mode,
       // set the cone offset to 1 (closest to human tag)
@@ -428,10 +408,6 @@ public class AutoAlignment implements Loggable{
       else if (!coneMode) {
         this.coneOffset = 0;
       }
-    }
-
-    public boolean getConeMode() {
-      return this.coneMode;
     }
 
     public double getCurrentNorm() {

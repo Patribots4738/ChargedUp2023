@@ -312,7 +312,13 @@ public final class Constants {
 
     public static final class LEDConstants {
       public static final int BELLY_PAN_RAINBOW = 0;
+      // The "theater chase" could possibly induce seizures,
+      // Please refrain from using these.
+      @Deprecated
       public static final int BELLY_PAN_THEATER_CHASE_RAINBOW = 1;
+      // The "theater chase" could possibly induce seizures,
+      // Please refrain from using these.
+      @Deprecated
       public static final int BELLY_PAN_THEATER_CHASE = 2;
       public static final int BELLY_PAN_FLASH_RED = 3;
       public static final int BELLY_PAN_RED = 4;
@@ -445,8 +451,9 @@ public final class Constants {
       public static final int CONE_INTAKE_INDEX = 15;
       public static final int CUBE_INTAKE_INDEX = 16;
       public static final int CONE_FLIP_INDEX = 17;
-      
-      public static final double CLAW_INTAKE_SPEED = 1;
+
+      public static final double CLAW_INTAKE_SPEED_CONE = 1;
+      public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
       public static final double CLAW_OUTTAKE_SPEED = -1;
 
       public static final double CLAW_STOPPED_SPEED = 0;
