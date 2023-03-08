@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
   Debug debug;
 
   ArduinoController arduinoController;
-  ArmCalculations armCalcuations;
+  ArmCalculations armCalculations;
 
   AutoAlignment autoAlignment;
 
@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
       arm = new Arm();
       claw = new Claw();
 
-      armCalcuations = new ArmCalculations();
+      armCalculations = new ArmCalculations();
       autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
