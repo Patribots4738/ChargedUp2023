@@ -168,7 +168,7 @@ public final class Constants {
         public static final double CLAW_MIN_OUTPUT = -1;
         public static final double CLAW_MAX_OUTPUT = 1;
 
-        public static final int CLAW_STALL_LIMIT = 30;
+        public static final int CLAW_STALL_LIMIT = 25;
         public static final int CLAW_FREE_LIMIT = 30;
 
 
@@ -220,7 +220,7 @@ public final class Constants {
       // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
       // 78 inches is the rule, 11 inches is the base of the pivot of the arm to the ground
       public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_INCHES;
-      public static final double MAX_REACH_X = 48 + (Units.metersToInches(PlacementConstants.ROBOT_LENGTH) / 2.0) - ClawConstants.CLAW_LENGTH_INCHES;
+      public static final double MAX_REACH_X = 48 + (Units.metersToInches(PlacementConstants.ROBOT_LENGTH_METERS) / 2.0) - ClawConstants.CLAW_LENGTH_INCHES;
 
       // When the arm is near the top of the limit, the arm will flip to the other solution
       // This is to prevent the upper arm from going above the limit when that happens.
@@ -427,9 +427,9 @@ public final class Constants {
     public static final class PlacementConstants {
 
       // The length of the robot
-      public static final double ROBOT_LENGTH = Units.inchesToMeters(25);
+      public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
       // Length of the bumpers on the robot
-      public static final double BUMPER_LENGTH = Units.inchesToMeters(4);
+      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(4);
 
       public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
 
@@ -466,9 +466,9 @@ public final class Constants {
       // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
       // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
 
-      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 15);
+      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
-      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH)/2.0) + Units.metersToInches(BUMPER_LENGTH))), 5);
+      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
