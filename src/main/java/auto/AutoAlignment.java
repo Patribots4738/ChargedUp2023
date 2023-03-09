@@ -22,6 +22,7 @@ import calc.Constants.AlignmentConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.PlacementConstants;
+import calc.Constants.ClawConstants;
 import calc.PhotonCameraPose;
 
 public class AutoAlignment implements Loggable{
@@ -103,9 +104,9 @@ public class AutoAlignment implements Loggable{
                             // Tag 4 means we need to subtract the grid barrier
                             // since it is on the right side of the field
                             // (red alliance)
-                            -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) :
+                            -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS) :
                             // Tag 5 means we need to add the grid barrier
-                            (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                            (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
                         -AlignmentConstants.CONE_OFFSET_METERS),
                     new Rotation2d()))).getTranslation().getNorm();
 
@@ -116,9 +117,9 @@ public class AutoAlignment implements Loggable{
                             // Tag 4 means we need to subtract the grid barrier
                             // since it is on the right side of the field
                             // (red alliance)
-                            -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH) :
+                            -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS) :
                             // Tag 5 means we need to add the grid barrier
-                            (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                            (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
                         AlignmentConstants.CONE_OFFSET_METERS),
                     new Rotation2d()))).getTranslation().getNorm();
 
@@ -273,8 +274,8 @@ public class AutoAlignment implements Loggable{
       targetPose = targetPose.plus(new Transform2d(
           new Translation2d(
               (tagID == 4) ?
-                  (PlacementConstants.HUMAN_TAG_PICKUP.getX() + Constants.ClawConstants.CLAW_LENGTH_INCHES) :
-                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() + ClawConstants.CLAW_LENGTH_INCHES) :
+                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
               (tagID == 4) ?
                   -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
                   -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
@@ -285,8 +286,8 @@ public class AutoAlignment implements Loggable{
       targetPose = targetPose.plus(new Transform2d(
           new Translation2d(
               (tagID == 5) ?
-                  (PlacementConstants.HUMAN_TAG_PICKUP.getX() - Constants.ClawConstants.CLAW_LENGTH_INCHES) :
-                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH/2) + PlacementConstants.BUMPER_LENGTH),
+                  Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES) :
+                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
               ((tagID == 5) ?
                   (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
                   (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
