@@ -479,7 +479,7 @@ public final class Constants {
 
 
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
-      public static final Translation2d STOWED_POSITION = new Translation2d(9, 18);
+      public static final Translation2d STOWED_POSITION = new Translation2d(3.5, 14);
       public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
       public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
