@@ -293,7 +293,6 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        arm.setArmIndex(PlacementConstants.LONG_ARM_REACH_INDEX);
         break;
 
       // Clicking down
