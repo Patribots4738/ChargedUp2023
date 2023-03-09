@@ -380,7 +380,7 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if (operator.getRightBumper() && !claw.getStartedOuttakingBool()) {
+    } else if ((operator.getRightBumper() || operator.getAButtonReleased()) && !claw.getStartedOuttakingBool()) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(0.5);
