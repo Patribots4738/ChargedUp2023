@@ -447,10 +447,13 @@ public final class Constants {
       public static final int LONG_ARM_REACH_INDEX = 11;
       public static final int FLOOR_INTAKE_PREP_INDEX = 12;
       public static final int HIGH_CONE_PREP_INDEX = 13;
-      public static final int HIGH_PLACE_INDEX_AUTO = 14;
+      public static final int HIGH_CONE_PREP_TO_PLACE_INDEX = 14;
       public static final int CONE_INTAKE_INDEX = 15;
       public static final int CUBE_INTAKE_INDEX = 16;
       public static final int CONE_FLIP_INDEX = 17;
+      public static final int MID_CONE_PREP_INDEX = 18;
+      public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
+
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
@@ -495,6 +498,7 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
       public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
+      public static final Translation2d MID_CONE_TRANSITION_POINT = new Translation2d(24,35);
 
       public static final Translation2d[][] ARM_POSITIONS = {
         // Index 0
@@ -589,6 +593,15 @@ public final class Constants {
           CONE_FLIP_POSITION_0,
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
+        },
+        // Index 18
+        {
+          MID_CONE_TRANSITION_POINT
+        },
+        // Index 19
+        {
+          MID_CONE_POSITION_0,
+          MID_CONE_POSITION_1
         }
       };
   }

@@ -511,8 +511,10 @@ public class Arm implements Loggable {
     public boolean getAtPlacementPosition() {
       return (armPosDimension1 == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX ||
               armPosDimension1 == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX ||
+              armPosDimension1 == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX ||
               armPosDimension1 == PlacementConstants.MID_CUBE_LAUNCH_INDEX ||
               armPosDimension1 == PlacementConstants.MID_CONE_PLACEMENT_INDEX ||
+              armPosDimension1 == PlacementConstants.MID_CONE_PREP_TO_PLACE_INDEX ||
               armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
               armsAtDesiredPosition;
     }
@@ -525,7 +527,21 @@ public class Arm implements Loggable {
 
     public boolean getAtPrepIndex() {
       return (armPosDimension1 == PlacementConstants.FLOOR_INTAKE_PREP_INDEX ||
-              armPosDimension1 == PlacementConstants.HIGH_CONE_PREP_INDEX);
+              armPosDimension1 == PlacementConstants.HIGH_CONE_PREP_INDEX ||
+              armPosDimension1 == PlacementConstants.MID_CONE_PREP_INDEX);
+    }
+
+    public void finishPlacement() {
+      if (getAtPrepIndex()) {
+        switch (armPosDimension1) {
+          case PlacementConstants.HIGH_CONE_PREP_INDEX:
+            setArmIndex(PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX);
+            break;
+          case PlacementConstants.MID_CONE_PREP_INDEX:
+            setArmIndex(PlacementConstants.MID_CONE_PREP_TO_PLACE_INDEX);
+            break;
+        }
+      }
     }
 
     public void toggleOperatorOverride() {
