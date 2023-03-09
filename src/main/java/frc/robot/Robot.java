@@ -331,7 +331,7 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_PLACEMENT_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_PREP_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking down
@@ -341,7 +341,7 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.MID_CONE_PLACEMENT_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.MID_CONE_PREP_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
         break;
 
       // Clicking right
@@ -354,6 +354,9 @@ public class Robot extends TimedRobot {
     }
     if (operator.getRightStickButtonPressed()) {
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+    }
+    if (operator.getAButtonPressed()) {
+      arm.finishPlacement();
     }
 
     // These buttons are right below the Xbox logo, aimed to be a bit out of reach
@@ -377,13 +380,12 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if (operator.getRightBumper() && !claw.getStartedOuttakingBool()) {
+    } else if ((operator.getRightBumper() || operator.getAButtonReleased()) && !claw.getStartedOuttakingBool()) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
-
         claw.outTakeforXSeconds(0.5);
-
       }
+
     } else if (operator.getLeftTriggerAxis() > 0) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
@@ -394,7 +396,8 @@ public class Robot extends TimedRobot {
 
     } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX) {
+      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX ||
+          arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX) {
           arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
       }
       else {
