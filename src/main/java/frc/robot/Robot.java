@@ -231,11 +231,11 @@ public class Robot extends TimedRobot {
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
       if (driver.getYButton()) {
-        swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false);
+        swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false, true);
       }
       else {
         // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick
-        swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true);
+        swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true, true);
       }
     }
 
