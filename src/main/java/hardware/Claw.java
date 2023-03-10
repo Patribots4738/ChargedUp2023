@@ -50,10 +50,10 @@ public class Claw {
             if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
                 finishedOuttaking = true;
             }
-            if (!AutoAlignment.coneMode) {
-                desiredSpeed = MathUtil.clamp(desiredSpeed, -1, 0.8);
-            }
-            else if (desiredSpeed > 0.7) {
+            // if (!AutoAlignment.coneMode) {
+            //     desiredSpeed = MathUtil.clamp(desiredSpeed, -1, 0.8);
+            // }
+            if (desiredSpeed > 0.7) {
                 desiredSpeed = 1;
             }
         }

@@ -63,7 +63,7 @@ public class AutoAlignment implements Loggable{
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
         this.claw = claw;
-        photonCameraPose = new PhotonCameraPose();
+        // photonCameraPose = new PhotonCameraPose();
     }
 
     /**
@@ -73,17 +73,17 @@ public class AutoAlignment implements Loggable{
 
       // Create an "Optional" object that contains the estimated pose of the robot
       // This can be present (see's tag) or not present (does not see tag)
-      Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPose());
+      // Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPose());
 
       // I do not believe this if a statement gets what we want it to get...
-      if (result.isPresent()) {
+      // if (result.isPresent()) {
 
-        EstimatedRobotPose camEstimatedPose = result.get();
+      //   EstimatedRobotPose camEstimatedPose = result.get();
 
-        // Add the vision measurement to the pose estimator to update the odometry
-        swerve.getPoseEstimator().addVisionMeasurement(
-          camEstimatedPose.estimatedPose.toPose2d(),
-          Timer.getFPGATimestamp());
+      //   // Add the vision measurement to the pose estimator to update the odometry
+      //   swerve.getPoseEstimator().addVisionMeasurement(
+      //     camEstimatedPose.estimatedPose.toPose2d(),
+      //     Timer.getFPGATimestamp());
 
           // If we are half the distance from the last "originalNorm" we were at, reset originalNorm
           // This is primarily used to tell the arm to move halfway through the path
@@ -156,7 +156,7 @@ public class AutoAlignment implements Loggable{
             currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
         }
       }
-    }
+    // }
 
     public void moveToTag() {
 

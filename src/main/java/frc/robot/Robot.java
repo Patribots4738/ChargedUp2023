@@ -71,9 +71,9 @@ public class Robot extends TimedRobot {
       claw = new Claw();
 
       armCalculations = new ArmCalculations();
-      autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
+      // autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
 
-      autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
+      // autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();
 
       arduinoController = new ArduinoController();
@@ -121,9 +121,9 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-    AutoAlignment.coneMode = true;
+    //autoalignment.coneMode = true;
     arm.setBrakeMode();
-    autoSegmentedWaypoints.init();
+    // autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
 
   }
@@ -141,8 +141,8 @@ public class Robot extends TimedRobot {
     swerve.periodic();
     arm.periodic();
     claw.periodic();
-    autoSegmentedWaypoints.periodic();
-    autoAlignment.calibrateOdometry();
+    // autoSegmentedWaypoints.periodic();
+    // //autoalignment.calibrateOdometry();
 
   }
 
@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
-    autoAlignment.setConeOffset(0);
+    // //autoalignment.setConeOffset(0);
 
   }
 
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 
     arm.periodic();
     claw.periodic();
-    autoAlignment.calibrateOdometry();
+    // //autoalignment.calibrateOdometry();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
@@ -202,25 +202,26 @@ public class Robot extends TimedRobot {
 
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
-        autoAlignment.setTagID(autoAlignment.getNearestTag());
+        //autoalignment.setTagID(//autoalignment.getNearestTag());
 
       }
       
-      autoAlignment.moveToTag();
+      //autoalignment.moveToTag();
 
-      if (autoAlignment.getMoveArmToHumanTag()) {
-        arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-      }
+      // if (//autoalignment.getMoveArmToHumanTag()) {
+      //   arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+      // }
 
-    } else if (driver.getRightBumper()) {
+    } 
+    if (driver.getRightBumper()) {
 
       if (driver.getRightBumperPressed()) {
 
-        autoAlignment.startChargePad();
+        //autoalignment.startChargePad();
 
       }
 
-      autoAlignment.chargeAlign();
+      //autoalignment.chargeAlign();
 
     // Use the left bumper as a sort of e-stop for the swerve
     } else if (driver.getLeftBumper()) {
@@ -277,50 +278,50 @@ public class Robot extends TimedRobot {
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
-      autoAlignment.setConeMode(false);
+      //autoalignment.setConeMode(false);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_PURPLE);
     }
     else if (operator.getYButton()) {
-      autoAlignment.setConeMode(true);
+      //autoalignment.setConeMode(true);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_YELLOW);
     }
 
     // POV = D-Pad...
-    switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
-      // Not clicked
-      case -1:
-        break;
+    // switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
+    //   // Not clicked
+    //   case -1:
+    //     break;
 
-      // Clicking up
-      case 0:
-        break;
+    //   // Clicking up
+    //   case 0:
+    //     break;
 
-      // Clicking down
-      case 180:
-        break;
+    //   // Clicking down
+    //   case 180:
+    //     break;
 
-      // Clicking left
-      case 270:
-        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
-        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
-        }
-        else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
-        }
-        break;
+    //   // Clicking left
+    //   case 270:
+    //     // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+    //     if (//autoalignment.getTagID() == 4 || //autoalignment.getTagID() == 5) {
+    //       //autoalignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+    //     }
+    //     else {
+    //       //autoalignment.setConeOffset(//autoalignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+    //     }
+    //     break;
 
-      // Clicking right
-      case 90:
-        // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
-        if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
-        }
-        else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
-        }
-        break;
-    }
+    //   // Clicking right
+    //   case 90:
+    //     // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
+    //     if (//autoalignment.getTagID() == 4 || //autoalignment.getTagID() == 5) {
+    //       //autoalignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+    //     }
+    //     else {
+    //       //autoalignment.setConeOffset(//autoalignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+    //     }
+    //     break;
+    // }
 
     // POV = D-Pad...
     switch (OICalc.getOperatorPOVPressed(operator.getPOV())) {
@@ -330,17 +331,17 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_PREP_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
         break;
 
       // Clicking down
       case 180:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_INTAKE_INDEX : PlacementConstants.CUBE_INTAKE_INDEX);
+        arm.setArmIndex(PlacementConstants.CONE_INTAKE_INDEX);
         break;
 
       // Clicking left
       case 270:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.MID_CONE_PREP_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex(PlacementConstants.MID_CONE_PREP_INDEX);
         break;
 
       // Clicking right
@@ -416,25 +417,25 @@ public class Robot extends TimedRobot {
     if (Math.abs(swerve.getPitch().getDegrees()) > 60) {
       arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
     }
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5) && (autoAlignment.getCurrentNorm() != -1)) {
-      driver.setRumble(RumbleType.kLeftRumble, 0.5);
-      driver.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kLeftRumble, 0.5);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
-    }
-    else {
-      if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
-        arduinoController.sendByte(LEDConstants.BELLY_PAN_RED);
-      }
-      else {
-        arduinoController.sendByte(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
-      }
-      driver.setRumble(RumbleType.kLeftRumble, 0);
-      driver.setRumble(RumbleType.kRightRumble, 0);
-      operator.setRumble(RumbleType.kRightRumble, 0);
-      operator.setRumble(RumbleType.kLeftRumble, 0);
-    }
+    // else if (//autoalignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/1.5) && (//autoalignment.getCurrentNorm() != -1)) {
+    //   driver.setRumble(RumbleType.kLeftRumble, 0.5);
+    //   driver.setRumble(RumbleType.kRightRumble, 0.5);
+    //   operator.setRumble(RumbleType.kRightRumble, 0.5);
+    //   operator.setRumble(RumbleType.kLeftRumble, 0.5);
+    //   arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
+    // }
+    // else {
+    //   if (//autoalignment.getCurrentNorm() < 1 && (//autoalignment.getCurrentNorm() != -1)) {
+    //     arduinoController.sendByte(LEDConstants.BELLY_PAN_RED);
+    //   }
+    //   else {
+    //     arduinoController.sendByte(//autoalignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+    //   }
+    //   driver.setRumble(RumbleType.kLeftRumble, 0);
+    //   driver.setRumble(RumbleType.kRightRumble, 0);
+    //   operator.setRumble(RumbleType.kRightRumble, 0);
+    //   operator.setRumble(RumbleType.kLeftRumble, 0);
+    // }
   }  
 
   @Override
