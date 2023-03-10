@@ -91,6 +91,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     clawHasStarted = false;
     hasMovedArm = false;
     startedChargePad = false;
+    armInit = false;
 
     swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
 

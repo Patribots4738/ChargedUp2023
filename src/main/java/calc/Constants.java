@@ -478,7 +478,7 @@ public final class Constants {
       
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
       public static final Translation2d STOWED_POSITION = new Translation2d(3.5, 14);
-      public static final Translation2d AUTO_INIT_PICKUP = new Translation2d((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0), 8);
+      public static final Translation2d AUTO_INIT_PICKUP = new Translation2d(12.43, 8);
 
       public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
