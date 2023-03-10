@@ -457,7 +457,7 @@ public final class Constants {
       public static final int CONE_FLIP_INDEX = 17;
       public static final int MID_CONE_PREP_INDEX = 18;
       public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
-
+      public static final int AUTO_INIT_INDEX = 20;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
@@ -479,11 +479,11 @@ public final class Constants {
 
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
-
-
-
+      
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
       public static final Translation2d STOWED_POSITION = new Translation2d(3.5, 14);
+      public static final Translation2d AUTO_INIT_PICKUP = new Translation2d(12.43, 8);
+
       public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
       public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
       public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
@@ -606,6 +606,10 @@ public final class Constants {
         {
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
+        },
+        // Index 20
+        {
+          AUTO_INIT_PICKUP
         }
       };
   }
