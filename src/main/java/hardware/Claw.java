@@ -50,10 +50,11 @@ public class Claw {
             if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
                 finishedOuttaking = true;
             }
-            // if (!AutoAlignment.coneMode) {
-            //     desiredSpeed = MathUtil.clamp(desiredSpeed, -1, 0.8);
-            // }
-            if (desiredSpeed > 0.7) {
+            if (!AutoAlignment.coneMode) {
+                // To prevent damage to game elements, the claw will not intake at full speed
+                desiredSpeed = MathUtil.clamp(desiredSpeed, -1, 0.8);
+            }
+            else if (desiredSpeed > 0.7) {
                 desiredSpeed = 1;
             }
         }
@@ -80,7 +81,6 @@ public class Claw {
 
         if (intakeMode) {
             if (speed > this.desiredSpeed) {
-                // To prevent damage to game elements, the claw will not intake at full speed
                 this.desiredSpeed = speed;
             }
         }

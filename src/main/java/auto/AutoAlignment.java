@@ -63,7 +63,7 @@ public class AutoAlignment implements Loggable{
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
         this.claw = claw;
-        // photonCameraPose = new PhotonCameraPose();
+        photonCameraPose = new PhotonCameraPose();
     }
 
     /**

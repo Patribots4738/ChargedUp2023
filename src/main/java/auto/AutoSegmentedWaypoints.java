@@ -78,8 +78,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     if (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous()) {
 
       initialPathPose.poseMeters = new Pose2d(
-        (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()), 
-        initialPathPose.poseMeters.getTranslation().getY(), 
+        (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()),
+        initialPathPose.poseMeters.getTranslation().getY(),
         initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
 
       initialPathPose.holonomicRotation = initialPathPose.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();

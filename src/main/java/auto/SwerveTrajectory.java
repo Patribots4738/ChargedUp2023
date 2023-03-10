@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
@@ -161,9 +160,9 @@ public class SwerveTrajectory implements Loggable {
           // }
 
           System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
+            (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous())
               ? mirroredState.poseMeters.getTranslation() : state.poseMeters.getTranslation(),
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
+            (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous())
               ? mirroredState.holonomicRotation
               : state.holonomicRotation)).getTranslation() + "\n");
 

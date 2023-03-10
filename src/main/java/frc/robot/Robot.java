@@ -71,9 +71,9 @@ public class Robot extends TimedRobot {
       claw = new Claw();
 
       armCalculations = new ArmCalculations();
-      // autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
+      autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
 
-      // autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
+      autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();
 
       arduinoController = new ArduinoController();
@@ -121,9 +121,9 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-    //autoalignment.coneMode = true;
+    AutoAlignment.coneMode = true;
     arm.setBrakeMode();
-    // autoSegmentedWaypoints.init();
+    autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
 
   }
@@ -141,8 +141,8 @@ public class Robot extends TimedRobot {
     swerve.periodic();
     arm.periodic();
     claw.periodic();
-    // autoSegmentedWaypoints.periodic();
-    // //autoalignment.calibrateOdometry();
+    autoSegmentedWaypoints.periodic();
+    autoAlignment.calibrateOdometry();
 
   }
 
@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
-    // //autoalignment.setConeOffset(0);
+    //autoalignment.setConeOffset(0);
 
   }
 
@@ -217,11 +217,11 @@ public class Robot extends TimedRobot {
 
       if (driver.getRightBumperPressed()) {
 
-        //autoalignment.startChargePad();
+        autoAlignment.startChargePad();
 
       }
 
-      //autoalignment.chargeAlign();
+      autoAlignment.chargeAlign();
 
     // Use the left bumper as a sort of e-stop for the swerve
     } else if (driver.getLeftBumper()) {
@@ -278,11 +278,11 @@ public class Robot extends TimedRobot {
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
-      //autoalignment.setConeMode(false);
+      autoAlignment.setConeMode(false);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_PURPLE);
     }
     else if (operator.getYButton()) {
-      //autoalignment.setConeMode(true);
+      autoAlignment.setConeMode(true);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_YELLOW);
     }
 
