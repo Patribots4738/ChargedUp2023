@@ -22,11 +22,16 @@ public class PhotonCameraPose {
         try {
             aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
                     AprilTagFields.k2023ChargedUp.m_resourceFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println("April tag field layout not found!");
         }
 
-        photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+        try {
+          photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+        } catch (Exception e) {
+            System.out.println("Camera not found!");
+            return;
+        }
 
         photonPoseEstimator = new PhotonPoseEstimator(
                 aprilTagFieldLayout,
