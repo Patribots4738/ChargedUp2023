@@ -122,8 +122,8 @@ public class Robot extends TimedRobot {
 
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
     AutoAlignment.coneMode = true;
-    autoSegmentedWaypoints.init();
     arm.setBrakeMode();
+    autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
 
   }

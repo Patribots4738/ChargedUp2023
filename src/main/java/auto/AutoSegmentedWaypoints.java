@@ -42,6 +42,8 @@ public class AutoSegmentedWaypoints implements Loggable {
   public boolean hasMovedArm = false;
   @Log
   public boolean startedChargePad = false;
+  @Log
+  public boolean armInit = false;
 
   public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
     this.swerve = swerve;
@@ -99,7 +101,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   }
 
   /**
-   * This method moves both arms to a position
+   * This method moves subsystems around during auto
    * <p>
    * If both arms are in the set position, then
    * stop the auto path and move on to the next waypoint
@@ -193,7 +195,28 @@ public class AutoSegmentedWaypoints implements Loggable {
       SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
     }
 
-    if (!stateHasFinished) {
+    // If auto is about to start, tell the arm to go near the bumper to intake the game peice 
+    if (currentWaypointNumber == 0 && !armInit) {
+      // Check what kind of game peice we need to intake by looking at the arm place index that we are going to
+      switch (thisWaypointSet[currentWaypointNumber].getArmPosIndex()) {
+        // We only really need to check and see if we are placing on the cone mode, and assume that the rest are for cubes
+        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
+        case PlacementConstants.MID_CONE_PLACEMENT_INDEX:
+          claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+          break;
+        default:
+          claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
+          break;
+      }
+      // Now, tell the arm to go to the "indexer" index for the element
+      arm.setArmIndex(PlacementConstants.AUTO_INIT_INDEX);
+      
+      if (arm.getAtDesiredPositions()) {
+        // Yet another one time boolean to make sure that this only runs at the first index of the auto path
+        armInit = true;
+      }
+    }
+    else if (!stateHasFinished) {
       this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
     }
 
