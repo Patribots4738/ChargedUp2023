@@ -30,13 +30,9 @@ public final class Constants {
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4;
 
-        public static final double kDirectionSlewRate = 3.14; // radians per second
-        public static final double kMagnitudeSlewRate = 80.0; // percent per second (1 = 100%)
-        public static final double kRotationalSlewRate = 80.0; // percent per second (1 = 100%)
-
-        public static final double kDirectionSlewRate = 1.2; // radians per second
-        public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
-        public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
+        public static final double DIRECTION_SLEW_RATE = 6.28; // radians per second
+        public static final double MAGNITUDE_SLEW_RATE = 80.0; // percent per second (1 = 100%)
+        public static final double ROTATIONAL_SLEW_RATE = 80.0; // percent per second (1 = 100%)
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
