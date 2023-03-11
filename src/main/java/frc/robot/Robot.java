@@ -142,7 +142,7 @@ public class Robot extends TimedRobot {
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
-    // autoAlignment.calibrateOdometry();
+    autoAlignment.calibrateOdometry();
 
   }
 
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 
     arm.periodic();
     claw.periodic();
-    // autoAlignment.calibrateOdometry();
+    autoAlignment.calibrateOdometry();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
@@ -231,7 +231,7 @@ public class Robot extends TimedRobot {
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
       if (driver.getYButton()) {
-        swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false, true);
+        swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, true);
       }
       else {
         // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick

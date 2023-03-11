@@ -26,18 +26,18 @@ public class PhotonCameraPose {
             throw new RuntimeException(e);
         }
 
-        // photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+        photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
 
-        // photonPoseEstimator = new PhotonPoseEstimator(
-        //         aprilTagFieldLayout,
-        //         PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
-        //         photonCamera,
-        //         VisionConstants.CAMERA_POSITION);
+        photonPoseEstimator = new PhotonPoseEstimator(
+                aprilTagFieldLayout,
+                PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
+                photonCamera,
+                VisionConstants.CAMERA_POSITION);
 
     }
 
-    // public Optional<EstimatedRobotPose> getEstimatedRobotPose(Pose2d pevEstimatedRobotPose) {
-    //     photonPoseEstimator.setReferencePose(pevEstimatedRobotPose);
-    //     return photonPoseEstimator.update();
-    // }
+    public Optional<EstimatedRobotPose> getEstimatedRobotPose(Pose2d pevEstimatedRobotPose) {
+        photonPoseEstimator.setReferencePose(pevEstimatedRobotPose);
+        return photonPoseEstimator.update();
+    }
 }

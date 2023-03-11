@@ -196,7 +196,7 @@ public class SwerveTrajectory implements Loggable {
 
       default:
 
-        swerve.drive(0, 0, 0, false);
+        swerve.drive(0, 0, 0, false, false);
         break;
 
     }
