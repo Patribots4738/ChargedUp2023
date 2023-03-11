@@ -183,11 +183,11 @@ public class SwerveTrajectory implements Loggable {
           swerve.drive(
               _speeds.vyMetersPerSecond,
               _speeds.vxMetersPerSecond,
-              _speeds.omegaRadiansPerSecond, false);
+              _speeds.omegaRadiansPerSecond, false, false);
 
         } else {
 
-          swerve.drive(0, 0, 0, false);
+          swerve.drive(0, 0, 0, false, false);
           trajectoryStatus = "done";
 
         }
