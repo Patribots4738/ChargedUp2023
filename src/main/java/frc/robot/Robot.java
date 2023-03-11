@@ -142,7 +142,7 @@ public class Robot extends TimedRobot {
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
-    autoAlignment.calibrateOdometry();
+    // autoAlignment.calibrateOdometry();
 
   }
 
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 
     arm.periodic();
     claw.periodic();
-    autoAlignment.calibrateOdometry();
+    // autoAlignment.calibrateOdometry();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
