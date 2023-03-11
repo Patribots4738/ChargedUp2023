@@ -142,7 +142,6 @@ public class Swerve implements Loggable{
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
-
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative, boolean rateLimit) {
       if (rateLimit) {
         double xSpeedCommanded;
