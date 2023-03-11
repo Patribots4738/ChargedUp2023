@@ -157,21 +157,14 @@ public class Arm implements Loggable {
     }
 
     public void periodic() {
-        if (wentOverHeightLimit) {
-          System.out.println("WENT OVER HEIGHT LIMIT!!");
-          // setArmIndex(PlacementConstants.STOWED_INDEX);
-        }
         if (!operatorOverride) { indexPeriodic();}
-        // setLowerArmPosition(lowerReferenceAngle);
-        // setUpperArmAngle(upperReferenceAngle);
+        setLowerArmPosition(lowerReferenceAngle);
+        setUpperArmAngle(upperReferenceAngle);
         upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // Use forward kinematics to get the x and y position of the end effector
         armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
-        if (armYPos > ArmConstants.MAX_REACH_Y) {
-            wentOverHeightLimit = true;
-        }
         // System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
