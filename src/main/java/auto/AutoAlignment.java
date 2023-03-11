@@ -125,7 +125,7 @@ public class AutoAlignment implements Loggable{
 
                 /*
                   If we are on red alliance, left of the tag is going to be the negative on the Y axis
-                  Due to moveToTag checking if we are on the blue alliance and flipping the sign,
+                  Due to this.mveToTag() checking if we are on the blue alliance and flipping the sign,
                   we need to flip the sign here
                 */
                 if (negativeOffsetNorm < positiveOffsetNorm) {
@@ -187,7 +187,7 @@ public class AutoAlignment implements Loggable{
 
       PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
       (
-          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED),
+          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
           new PathPoint(swerve.getPose().getTranslation(),
               heading,
               swerve.getPose().getRotation(), 

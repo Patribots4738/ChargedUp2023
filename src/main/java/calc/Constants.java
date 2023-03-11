@@ -28,7 +28,11 @@ public final class Constants {
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         public static double MAX_ANGULAR_SPEED = 4 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4;
+
+        public static final double kDirectionSlewRate = 3.14; // radians per second
+        public static final double kMagnitudeSlewRate = 80.0; // percent per second (1 = 100%)
+        public static final double kRotationalSlewRate = 80.0; // percent per second (1 = 100%)
 
         public static final double kDirectionSlewRate = 1.2; // radians per second
         public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
@@ -393,7 +397,7 @@ public final class Constants {
     public static final class AlignmentConstants {
 
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 2.25;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75;
 
         public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
