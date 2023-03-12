@@ -188,9 +188,9 @@ public class Swerve implements Loggable{
         m_currentRotation = m_rotLimiter.calculate(rotSpeed);
         
         // Convert the commanded speeds into the correct units for the drivetrain
-        double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
-        double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
-        double rotDelivered = m_currentRotation * DriveConstants.MAX_ANGULAR_SPEED;
+        double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
+        double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
+        double rotDelivered = m_currentRotation * DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier;
     
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative

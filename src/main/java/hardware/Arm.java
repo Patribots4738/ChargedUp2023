@@ -79,8 +79,6 @@ public class Arm implements Loggable {
     @Log
     private double armYPos = 0;
 
-    private boolean wentOverHeightLimit = false;
-
     private final CANSparkMax _lowerArmRight;
     private final CANSparkMax _lowerArmLeft;
     private final CANSparkMax _upperArm;
@@ -301,7 +299,7 @@ public class Arm implements Loggable {
           this.armYReference = position.getY();
         }
 
-        System.out.println("Mirr: " + armMirrored + " PosX " + armXReference);
+        // System.out.println("Mirr: " + armMirrored + " PosX " + armXReference);
 
         // Make sure armX and armY are within the range of 0 to infinity
         // Because we cannot reach below the ground.
