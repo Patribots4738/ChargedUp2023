@@ -250,6 +250,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
+        stateHasFinished = false;
         currentWaypointNumber++;
         stateHasInitialized = false;
       }
