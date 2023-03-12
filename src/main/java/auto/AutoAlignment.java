@@ -190,13 +190,12 @@ public class AutoAlignment implements Loggable{
           new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
           new PathPoint(swerve.getPose().getTranslation(),
               heading,
-              swerve.getPose().getRotation(), 
-              // start the path at the current speed of the robot
+              swerve.getPose().getRotation(),
               swerve.getSpeedMetersPerSecond()),
 
           new PathPoint(targetPose.getTranslation(),
               heading,
-              targetPose.getRotation())
+              targetPose.getRotation(), 0)
       );
       
       // System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
@@ -443,14 +442,14 @@ public class AutoAlignment implements Loggable{
 
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/32)), 0.05, 0.20),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/24)), 0.055, 0.20),
             0, 
             0, 
             true, false);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/32)), -0.20, -0.05),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/24)), -0.20, -0.055),
             0, 
             0, 
             true, false);
