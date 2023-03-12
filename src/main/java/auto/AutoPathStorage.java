@@ -714,7 +714,6 @@ public class AutoPathStorage implements Loggable {
 
     myAutoContainer = new AutoPose[] {
       // AutoPoses for the bottom of the field:
-      new AutoPose("1H_A", _1H_A),
       new AutoPose("1H_A_2H_CHARGE", _1H_A_2H_CHARGE),
       new AutoPose("1H_A_2H", _1H_A_2H),
       new AutoPose("1H_A_2H_B", _1H_A_2H_B),
@@ -723,7 +722,6 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("1H_A_3H", _1H_A_3H),
       new AutoPose("1H_A_3H_B", _1H_A_3H_B),
 
-      new AutoPose("2H_A", _2H_A),
       new AutoPose("2H_A_1H_CHARGE", _2H_A_1H_CHARGE),
       new AutoPose("2H_A_1H", _2H_A_1H),
       new AutoPose("2H_A_1H_B", _2H_A_1H_B),
@@ -732,7 +730,6 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("2H_A_3H", _2H_A_3H),
       new AutoPose("2H_A_3H_B", _2H_A_3H_B),
 
-      new AutoPose("3H_A", _3H_A),
       new AutoPose("3H_A_1H_CHARGE", _3H_A_1H_CHARGE),
       new AutoPose("3H_A_1H", _3H_A_1H),
       new AutoPose("3H_A_1H_B", _3H_A_1H_B),
@@ -742,7 +739,6 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("3H_A_2H_B", _3H_A_2H_B),
 
       // AutoPoses for the top of the field:
-      new AutoPose("7H_D", _7H_D),
       new AutoPose("7H_D_8H_CHARGE", _7H_D_8H_CHARGE),
       new AutoPose("7H_D_8H", _7H_D_8H),
       new AutoPose("7H_D_8H_C", _7H_D_8H_C),
@@ -751,7 +747,6 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("7H_D_9H", _7H_D_9H),
       new AutoPose("7H_D_9H_C", _7H_D_9H_C),
 
-      new AutoPose("8H_D", _8H_D),
       new AutoPose("8H_D_7H_CHARGE", _8H_D_7H_CHARGE),
       new AutoPose("8H_D_7H", _8H_D_7H),
       new AutoPose("8H_D_7H_C", _8H_D_7H_C),
@@ -760,7 +755,6 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("8H_D_9H", _8H_D_9H),
       new AutoPose("8H_D_9H_C", _8H_D_9H_C),
 
-      new AutoPose("9H_D", _9H_D),
       new AutoPose("9H_D_7H_CHARGE", _9H_D_7H_CHARGE),
       new AutoPose("9H_D_7H", _9H_D_7H),
       new AutoPose("9H_D_7H_C", _9H_D_7H_C),
@@ -772,6 +766,12 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("1H_A_CHARGE", _1H_A_CHARGE),
       new AutoPose("2H_A_CHARGE", _2H_A_CHARGE),
       new AutoPose("3H_A_CHARGE", _3H_A_CHARGE),
+      new AutoPose("1H_A", _1H_A),
+      new AutoPose("2H_A", _2H_A),
+      new AutoPose("3H_A", _3H_A),
+      new AutoPose("7H_D", _7H_D),
+      new AutoPose("8H_D", _8H_D),
+      new AutoPose("9H_D", _9H_D),
       new AutoPose("4H_MOBILITY_CHARGE", _4H_MOBILITY_CHARGE),
       new AutoPose("5H_MOBILITY_CHARGE", _5H_MOBILITY_CHARGE),
       new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
