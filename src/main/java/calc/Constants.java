@@ -393,12 +393,12 @@ public final class Constants {
     public static final class AlignmentConstants {
 
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 1;
 
         public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT_METERS = Units.inchesToMeters(27.38);
-        public static final double GRID_BARRIER_METERS = Units.inchesToMeters(15);
+        public static final double GRID_BARRIER_METERS = Units.inchesToMeters(12); // real is 14-15
         public static final double SUBSTATION_OFFSET_METERS = 0.7;
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.53;
@@ -494,8 +494,8 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
-      public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(11, 43.25);
-      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(6,29);
+      public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(35, 38);
+      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(29,25);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
@@ -534,10 +534,12 @@ public final class Constants {
         },
         // Index 5
         {
+          TRANSITION_POSITION,
           CUBE_MID_LAUNCH
         },
         // Index 6
         {
+          TRANSITION_POSITION,
           CUBE_HIGH_LAUNCH
         },
         // Index 7
