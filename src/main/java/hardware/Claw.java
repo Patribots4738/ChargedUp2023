@@ -51,7 +51,7 @@ public class Claw {
                 finishedOuttaking = true;
             }
             if (!AutoAlignment.coneMode) {
-                desiredSpeed = MathUtil.clamp(desiredSpeed, -1, 0.8);
+                desiredSpeed = MathUtil.clamp(desiredSpeed, -0.25, 0.8);
             }
             else if (desiredSpeed > 0.7) {
                 desiredSpeed = 1;
