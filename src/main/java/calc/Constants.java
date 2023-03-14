@@ -501,8 +501,8 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
-      public static final Translation2d MID_CONE_TRANSITION_POINT = new Translation2d(24,35);
+      public static final Translation2d HIGH_CONE_PREP_POINT = new Translation2d(24,38);
+      public static final Translation2d MID_CONE_PREP_POINT = new Translation2d(24,35);
 
       public static final Translation2d[][] ARM_POSITIONS = {
         // Index 0
@@ -561,7 +561,7 @@ public final class Constants {
         },
         // Index 10
         {
-          HIGH_CONE_TRANSITION_POINT,
+                HIGH_CONE_PREP_POINT,
           TRANSITION_POSITION,
           STOWED_POSITION
         },
@@ -577,7 +577,7 @@ public final class Constants {
         },
         // Index 13
         {
-          HIGH_CONE_TRANSITION_POINT
+                HIGH_CONE_PREP_POINT
         },
         // Index 14
         {
@@ -602,7 +602,7 @@ public final class Constants {
         },
         // Index 18
         {
-          MID_CONE_TRANSITION_POINT
+                MID_CONE_PREP_POINT
         },
         // Index 19
         {
