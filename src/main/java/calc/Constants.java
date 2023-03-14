@@ -494,8 +494,8 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
-      public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(35, 38);
-      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(29,25);
+      public static final Translation2d CUBE_HIGH_PLACE = new Translation2d(35, 38);
+      public static final Translation2d CUBE_MID_PLACE = new Translation2d(20,25);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
@@ -535,12 +535,12 @@ public final class Constants {
         // Index 5
         {
           TRANSITION_POSITION,
-          CUBE_MID_LAUNCH
+          CUBE_MID_PLACE
         },
         // Index 6
         {
           TRANSITION_POSITION,
-          CUBE_HIGH_LAUNCH
+          CUBE_HIGH_PLACE
         },
         // Index 7
         {
