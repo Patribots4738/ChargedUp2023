@@ -241,7 +241,7 @@ public class Robot extends TimedRobot {
     }
 
     // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
-    if (driver.getRightStickButtonPressed()) {
+    if (driver.getLeftStickButtonPressed()) {
       swerve.toggleSpeed();
     }
 
