@@ -204,6 +204,7 @@ public class Robot extends TimedRobot {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         autoAlignment.setTagID(autoAlignment.getNearestTag());
+        autoAlignment.generateTagTrajectory();
 
       }
       
