@@ -3,7 +3,6 @@ package auto;
 import java.util.Objects;
 import java.util.Optional;
 
-import calc.Constants;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -50,7 +49,7 @@ public class AutoAlignment implements Loggable{
     private int substationOffset = -1;
     private double startedChargePad = -1;
 
-    // This variable is used to allow us to calibrate using the tag more often but not every loop
+    // This variable is used to allow us to calibrate using the tag more often, but not every loop
     private double originalNorm = 1;
     // This variable is used to tell us how far away we currently are from an april tag
     private double currentNorm = -1;
@@ -166,7 +165,7 @@ public class AutoAlignment implements Loggable{
       }
       Pose2d targetPose = swerve.getPose();
 
-      // Check if our tagID is valid... (assume it is for logic purposes)
+      // Check if our tagID is valid... (Assume it is for logic purposes)
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
           // Get the target pose (the pose of the tag we want to go to)
           targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
@@ -176,7 +175,7 @@ public class AutoAlignment implements Loggable{
       // If we are on the right side of the field: we need to subtract the grid offset + cone/substation offset
       // If we are going to a substation: we need to add the substation offset instead of the cone offset
       // We add the grid length to both because we still want to be a small bit away from the tag
-      // There is a bit of a logic issue that the else statement "should" be subtracting but it doesn't work when you do that...
+      // There is a bit of a logic issue that the else statement "should" be subtracting, but it doesn't work when you do that...
       // oh well.
       targetPose = getModifiedTargetPose(targetPose);
 
@@ -227,7 +226,7 @@ public class AutoAlignment implements Loggable{
           // Skip over to our substation
           if (i == 5) { i = 4; }
 
-          // This if statement prevents the robot from crashing if we input an absurd tag ID,
+          // This if a statement prevents the robot from crashing if we input an absurd tag ID,
           // but it should be assumed that the tag location is present.
           if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
             currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
@@ -245,7 +244,7 @@ public class AutoAlignment implements Loggable{
           // Skip over to our substation
           if (i == 4) { i = 5; }
 
-          // This if statement prevents the robot from crashing if we input an absurd tag ID,
+          // This if a statement prevents the robot from crashing if we input an absurd tag ID,
           // but it should be assumed that the tag location is present.
           if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
             currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
@@ -317,7 +316,7 @@ public class AutoAlignment implements Loggable{
       // in other words,
       // if we are on cone mode, at cone index 1, and we want to go to cone index 2, skip cone index 0
       // or,
-      // if we are *not* on cone mode, (at cone index 0) and we want to go to cone index 1, skip cone index 1 and go to 2
+      // if we are *not* on cone mode, (at cone index 0) and we want to go to cone index 1, skip cone index 1 and go to 2.
       // This is because the call from robot.java will run as (setConeOffset(getConeOffset +/- 1))
       if (coneMode) {
         if (previousConeOffset == -1) {
@@ -481,7 +480,7 @@ public class AutoAlignment implements Loggable{
 
       // Use a Holonomic Drive Controller to calculate the speeds for the robot
       var trajectorySpeeds = SwerveTrajectory.HDC.calculate(swerve.getPose(), rotationalTrajectory.getEndState(), desiredAngle);
-      // Notice that only the turning speed is used, we still want to be able to drive forward and strafe
+      // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       swerve.drive(driverAxis.getY(), driverAxis.getX(), trajectorySpeeds.omegaRadiansPerSecond, true, true);
     }
 }
