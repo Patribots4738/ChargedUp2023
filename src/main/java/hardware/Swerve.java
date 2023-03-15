@@ -4,22 +4,21 @@
 
 package hardware;
 
+import calc.Constants;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Quaternion;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -122,12 +121,32 @@ public class Swerve implements Loggable{
         // Update the odometry in the periodic block
         this.field.setRobotPose(getPose());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+        clampOdometry();
         getPitch();
         getRoll();
         // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
         //     System.out.println("Robot is not level");
         //     System.out.printf("Time: %.2f Pitch: %.2f Roll: %.2f", Timer.getFPGATimestamp(), getPitch().getDegrees(), getRoll().getDegrees());
         // }
+    }
+
+    private void clampOdometry() {
+        // Clamp the position Odometry on the low end when on BLUE alliance
+        // Clamp the position Odometry on the high end when on RED alliance
+        Pose2d clampedPose =
+            (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ?
+                new Pose2d(
+                        MathUtil.clamp(getPose().getX(), Constants.AlignmentConstants.GRID_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS),
+                                Constants.AlignmentConstants.FIELD_WIDTH_METERS - Constants.AlignmentConstants.SUBSTATION_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS)),
+                        MathUtil.clamp(getPose().getY(), (0), Constants.AlignmentConstants.FIELD_HEIGHT_METERS),
+                        getPose().getRotation()) :
+                new Pose2d(
+                        MathUtil.clamp(getPose().getX(), Constants.AlignmentConstants.SUBSTATION_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS),
+                                Constants.AlignmentConstants.FIELD_WIDTH_METERS - Constants.AlignmentConstants.GRID_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS)),
+                        MathUtil.clamp(getPose().getY(), (0), Constants.AlignmentConstants.FIELD_HEIGHT_METERS),
+                        getPose().getRotation());
+
+        resetOdometry(clampedPose);
     }
 
     /**
