@@ -462,5 +462,26 @@ public class AutoAlignment implements Loggable{
     public void startChargePad() {
       startedChargePad = Timer.getFPGATimestamp();
     }
-  
+
+    public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
+
+      // Make a simple trajectory for use in the Holonomic Drive Controller
+      // Notice that the start and end states have the same position, but different holonomic rotations
+      PathPlannerTrajectory rotationalTrajectory = PathPlanner.generatePath
+          (
+              new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
+              new PathPoint(swerve.getPose().getTranslation(),
+                  Rotation2d.fromDegrees(0),
+                  swerve.getYaw()),
+
+              new PathPoint(swerve.getPose().getTranslation(),
+                  Rotation2d.fromDegrees(0),
+                  desiredAngle)
+          );
+
+      // Use a Holonomic Drive Controller to calculate the speeds for the robot
+      var trajectorySpeeds = SwerveTrajectory.HDC.calculate(swerve.getPose(), rotationalTrajectory.getEndState(), desiredAngle);
+      // Notice that only the turning speed is used, we still want to be able to drive forward and strafe
+      swerve.drive(driverAxis.getY(), driverAxis.getX(), trajectorySpeeds.omegaRadiansPerSecond, true, true);
+    }
 }
