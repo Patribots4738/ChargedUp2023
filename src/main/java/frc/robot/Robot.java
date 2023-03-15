@@ -5,6 +5,7 @@ import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
+import calc.Constants;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
@@ -389,6 +390,11 @@ public class Robot extends TimedRobot {
     } else if (operator.getLeftTriggerAxis() > 0) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
+      
+      //Rumble the claw if it is stalling, judged by whether or not the claw is drawing more amps than a preset limit.
+      if (Math.abs(claw.getOutputCurrent() - Constants.ClawConstants.CLAW_STALL_LIMIT) > Constants.ClawConstants.MAXIMUM_CLAW_CURRENT_DIFFERNECE) {
+        operator.setRumble(RumbleType.kLeftRumble, 1);
+      }
 
     } else if (operator.getRightTriggerAxis() > 0) {
 
