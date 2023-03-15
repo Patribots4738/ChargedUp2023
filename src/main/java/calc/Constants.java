@@ -510,106 +510,106 @@ public final class Constants {
           TRANSITION_POSITION,
           STOWED_POSITION
         },
-        // Index 1
+        // Index 1 | STOWED_INDEX
         {
           TRANSITION_POSITION,
           HYBRID_POSITION
         },
-        // Index 2
+        // Index 2 | MID_CONE_PLACEMENT_INDEX
         {
           TRANSITION_POSITION,
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
-        // Index 3
+        // Index 3 | HIGH_CONE_PLACEMENT_INDEX
         {
           TRANSITION_POSITION,
           HIGH_CONE_POSITION_0,
           // ARM_HIGH_CONE_POSITION_1,
           HIGH_CONE_POSITION_2
         },
-        // Index 4
+        // Index 4 | HUMAN_TAG_PICKUP_INDEX
         {
           HUMAN_TAG_PICKUP
         },
-        // Index 5
+        // Index 5 | MID_CUBE_LAUNCH_INDEX
         {
           TRANSITION_POSITION,
           CUBE_MID_LAUNCH
         },
-        // Index 6
+        // Index 6 | HIGH_CUBE_LAUNCH_INDEX
         {
           TRANSITION_POSITION,
           CUBE_HIGH_LAUNCH
         },
-        // Index 7
+        // Index 7 | FLOOR_INTAKE_INDEX
         {
           CUBE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 8
+        // Index 8 | SOLUTION_FLIP_INDEX
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_POSITIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 9
+        // Index 9 | HIGH_TO_STOWWED_INDEX
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_NEGATIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 10
+        // Index 10 | MID_CONE_PREP_INDEX
         {
           HIGH_CONE_TRANSITION_POINT,
           TRANSITION_POSITION,
           STOWED_POSITION
         },
-        // Index 11
+        // Index 11 | LONG_ARM_REACH_INDEX
         {
           LONG_ARM_REACH_0,
           LONG_ARM_REACH_1,
           LONG_ARM_REACH_2
         },
-        // Index 12
+        // Index 12 | FLOOR_INTAKE_PREP_INDEX
         {
           CUBE_INTAKE_POSITION_PREP
         },
-        // Index 13
+        // Index 13 | HIGH_CONE_PREP_INDEX
         {
           HIGH_CONE_TRANSITION_POINT
         },
-        // Index 14
+        // Index 14 | HIGH_CONE_PREP_TO_PLACE_INDEX
         {
           HIGH_CONE_POSITION_0,
           HIGH_CONE_POSITION_2
         },
-        // Index 15
+        // Index 15 | CONE_INTAKE_INDEX
         {
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 16
+        // Index 16 | CUBE_INTAKE_INDEX
         {
           CUBE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 17
+        // Index 17 | CONE_FLIP_INDEX
         {
           CONE_FLIP_POSITION_0,
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 18
+        // Index 18 | MID_CONE_PREP_INDEX
         {
           MID_CONE_TRANSITION_POINT
         },
-        // Index 19
+        // Index 19 | MID_CONE_PLACEMENT_INDEX
         {
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
-        // Index 20
+        // Index 20 | AUTO_INIT_INDEX
         {
           AUTO_INIT_PICKUP
         }
