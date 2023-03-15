@@ -85,11 +85,12 @@ public class AutoAlignment implements Loggable{
           camEstimatedPose.estimatedPose.toPose2d(),
           Timer.getFPGATimestamp());
 
-        setAlignmentOffset();
+        setNearestAlignmentOffset();
 
         if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
             // Get the target pose (the pose of the tag we want to go to)
             Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+            setNearestAlignmentOffset();
             targetPose = getModifiedTargetPose(targetPose);
             currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
         }
@@ -230,7 +231,7 @@ public class AutoAlignment implements Loggable{
      * But if we were to the left of tag ID 5,
      * we set substationOffset to -1
      */
-    private void setAlignmentOffset() {
+    private void setNearestAlignmentOffset() {
       // If we are half the distance from the last "originalNorm" we were at, reset originalNorm
       // This is primarily used to tell the arm to move halfway through the path when going to the substation
       if ((currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) && DriverStation.isTeleop())) {
