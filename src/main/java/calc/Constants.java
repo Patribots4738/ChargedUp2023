@@ -174,6 +174,7 @@ public final class Constants {
 
         public static final int CLAW_STALL_LIMIT = 25;
         public static final int CLAW_FREE_LIMIT = 30;
+        public static final double MAXIMUM_CLAW_CURRENT_DIFFERNECE = 0.5;
 
 
         // from the edge of the upper arm, straight out,

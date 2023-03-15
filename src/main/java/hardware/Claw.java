@@ -122,4 +122,7 @@ public class Claw {
         this.finishedOuttaking = finishedOuttaking;
     }
 
+    public double getOutputCurrent() {
+        return _claw.getOutputCurrent();
+    }
 }
