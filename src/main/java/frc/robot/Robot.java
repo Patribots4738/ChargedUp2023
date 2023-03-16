@@ -231,7 +231,7 @@ public class Robot extends TimedRobot {
 
     } else {
       // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
-      if (driver.getLeftStickButton()) {
+      if (driver.getRightStickButton()) {
         autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getYaw().getDegrees()) > 90 ? 180 : 0));
       }
       // If the driver holds the Y button, the robot will drive relative to itself
