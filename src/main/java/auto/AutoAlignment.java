@@ -10,7 +10,8 @@ import org.photonvision.EstimatedRobotPose;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint; 
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
@@ -43,6 +44,8 @@ public class AutoAlignment implements Loggable{
     Swerve swerve;
     Claw claw;
     PhotonCameraPose photonCameraPose;
+    PathPlannerTrajectory rotationalTrajectory;
+    double snapToAngleTimer = 0;
 
     private int tagID;
     private int coneOffset = 0;
@@ -462,24 +465,33 @@ public class AutoAlignment implements Loggable{
       startedChargePad = Timer.getFPGATimestamp();
     }
 
-    public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
+    public void generateAngleTrajectory(Rotation2d desiredAngle) {
 
       // Make a simple trajectory for use in the Holonomic Drive Controller
       // Notice that the start and end states have the same position, but different holonomic rotations
-      PathPlannerTrajectory rotationalTrajectory = PathPlanner.generatePath
-          (
-              new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
-              new PathPoint(swerve.getPose().getTranslation(),
-                  Rotation2d.fromDegrees(0),
-                  swerve.getYaw()),
+      rotationalTrajectory = PathPlanner.generatePath
+      (
+        new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
+        new PathPoint(swerve.getPose().getTranslation(),
+            Rotation2d.fromDegrees(0),
+            swerve.getYaw()),
 
-              new PathPoint(swerve.getPose().getTranslation(),
-                  Rotation2d.fromDegrees(0),
-                  desiredAngle)
-          );
+        new PathPoint(swerve.getPose().getTranslation(),
+            Rotation2d.fromDegrees(0),
+            desiredAngle)
+      );
 
-      // Use a Holonomic Drive Controller to calculate the speeds for the robot
-      var trajectorySpeeds = SwerveTrajectory.HDC.calculate(swerve.getPose(), rotationalTrajectory.getInitialState(), desiredAngle);
+      snapToAngleTimer = Timer.getFPGATimestamp();
+    }
+
+    public void snapToAngle(Translation2d driverAxis) {
+
+      double elapsedTime = Timer.getFPGATimestamp() - snapToAngleTimer;
+      PathPlannerState currentState = (PathPlannerState) rotationalTrajectory.sample(elapsedTime);
+
+      // Use our Holonomic Drive Controller to calculate the speeds for the robot
+      var trajectorySpeeds = SwerveTrajectory.HDC.calculate(swerve.getPose(), currentState, currentState.holonomicRotation);
+
       // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,
       // I wonder if that will cause issues in the future.
