@@ -3,7 +3,6 @@ package auto;
 import java.util.Objects;
 import java.util.Optional;
 
-import calc.Constants;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
