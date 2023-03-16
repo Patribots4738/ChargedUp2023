@@ -89,6 +89,7 @@ public class AutoAlignment implements Loggable{
         Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         setNearestAlignmentOffset();
         targetPose = getModifiedTargetPose(targetPose);
+        swerve.setRobotPose(targetPose);
         currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
         System.out.println("Current norm: " + currentNorm);
       }

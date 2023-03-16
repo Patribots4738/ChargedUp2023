@@ -435,5 +435,9 @@ public class Swerve implements Loggable{
         }
     }
 
+    public void setRobotPose(Pose2d pose) {
+      field.setRobotPose(pose);
+    }
+
 
 }
