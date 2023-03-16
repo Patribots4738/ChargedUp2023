@@ -294,20 +294,12 @@ public class AutoAlignment implements Loggable{
     }
     
     private double getTagXOffset() {
-        return (tagID == 4) ?
-            // Tag 4 means we need to subtract the grid barrier
+        return (tagID == 4 || (tagID == 5)) ?
+            // Tag 4/5 means we need to subtract the grid barrier
             // since it is on the right side of the field
             (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
-            // Tag 5 means we need to add the grid barrier
-            // since it is on the left side of the field
-            (tagID == 5) ?
-                (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
-                // We are looking at a grid tag, is it on the left side of the field?
-                (tagID < 4) ?
-                    // We are looking at a tag on the right side of the field, subtract the barrier
-                    (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS) :
-                    // We are looking at a tag on the left side of the field, add the barrier
-                    (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS);
+            // Otherwise, we need to add the grid barrier
+            (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS);
     }
 
     private double getTagYOffset() {
@@ -322,32 +314,14 @@ public class AutoAlignment implements Loggable{
      * @param targetPose the target pose of the tag we want to go to
      * @return the modified target pose using constants for grid/substation
      */
-    private Pose2d getModifiedTargetPose(Pose2d targetPose) {
-      if (0 < tagID && tagID < 5) {
-
-        targetPose = targetPose.plus(new Transform2d(
-            new Translation2d(
-                (tagID == 4) ?
-                    (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() + ClawConstants.CLAW_LENGTH_INCHES)) :
-                    (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
-                (tagID == 4) ?
-                    (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                    (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
-            Rotation2d.fromDegrees(180)));
-
-      } else {
-
-        targetPose = targetPose.plus(new Transform2d(
-            new Translation2d(
-                (tagID == 5) ?
-                    (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
-                    (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
-                ((tagID == 5) ?
-                    (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                    (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
-            Rotation2d.fromDegrees(180)));
-
-      }
+    public Pose2d getModifiedTargetPose(Pose2d targetPose) {
+      targetPose = targetPose.plus(new Transform2d(
+        new Translation2d(
+            getTagXOffset(),
+            (tagID == 4) ?
+                (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
+        Rotation2d.fromDegrees(180)));
       return targetPose;
     }
 
