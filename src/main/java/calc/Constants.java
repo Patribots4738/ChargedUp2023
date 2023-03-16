@@ -441,24 +441,25 @@ public final class Constants {
       public static final int STOWED_INDEX = 0;
       public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
       public static final int MID_CONE_PLACEMENT_INDEX = 2;
-      public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
-      public static final int MID_CUBE_LAUNCH_INDEX = 5;
+      public static final int HIGH_CUBE_LAUNCH_INDEX = 7;
+      public static final int MID_CUBE_LAUNCH_INDEX = 6;
       public static final int HYBRID_PLACEMENT_INDEX = 1;
       public static final int HUMAN_TAG_PICKUP_INDEX = 4;
-      public static final int FLOOR_INTAKE_INDEX = 7;
-      public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
-      public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
-      public static final int HIGH_TO_STOWWED_INDEX = 10;
-      public static final int LONG_ARM_REACH_INDEX = 11;
-      public static final int FLOOR_INTAKE_PREP_INDEX = 12;
-      public static final int HIGH_CONE_PREP_INDEX = 13;
-      public static final int HIGH_CONE_PREP_TO_PLACE_INDEX = 14;
-      public static final int CONE_INTAKE_INDEX = 15;
-      public static final int CUBE_INTAKE_INDEX = 16;
-      public static final int CONE_FLIP_INDEX = 17;
-      public static final int MID_CONE_PREP_INDEX = 18;
-      public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
-      public static final int AUTO_INIT_INDEX = 20;
+      public static final int SINGLE_SUBSTATION_PICKUP_INDEX = 5;
+      public static final int FLOOR_INTAKE_INDEX = 8;
+      public static final int SOLUTION_FLIP_INDEX_POSITIVE = 9;
+      public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 10;
+      public static final int HIGH_TO_STOWWED_INDEX = 11;
+      public static final int LONG_ARM_REACH_INDEX = 12;
+      public static final int FLOOR_INTAKE_PREP_INDEX = 13;
+      public static final int HIGH_CONE_PREP_INDEX = 14;
+      public static final int HIGH_CONE_PREP_TO_PLACE_INDEX = 15;
+      public static final int CONE_INTAKE_INDEX = 16;
+      public static final int CUBE_INTAKE_INDEX = 17;
+      public static final int CONE_FLIP_INDEX = 18;
+      public static final int MID_CONE_PREP_INDEX = 19;
+      public static final int MID_CONE_PREP_TO_PLACE_INDEX = 20;
+      public static final int AUTO_INIT_INDEX = 21;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
@@ -495,6 +496,7 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
+      public static final Translation2d SINGLE_SUBSTATION_PICKUP = new Translation2d(12, 12.5);
       public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(35, 38);
       public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(29,25);
 
@@ -533,84 +535,88 @@ public final class Constants {
         {
           HUMAN_TAG_PICKUP
         },
-        // Index 5 | MID_CUBE_LAUNCH_INDEX
+        // Index 5 | SINGLE_SUBSTATION_PICKUP_INDEX
+        {
+          SINGLE_SUBSTATION_PICKUP
+        },
+        // Index 6 | MID_CUBE_LAUNCH_INDEX
         {
           TRANSITION_POSITION,
           CUBE_MID_LAUNCH
         },
-        // Index 6 | HIGH_CUBE_LAUNCH_INDEX
+        // Index 7 | HIGH_CUBE_LAUNCH_INDEX
         {
           TRANSITION_POSITION,
           CUBE_HIGH_LAUNCH
         },
-        // Index 7 | FLOOR_INTAKE_INDEX
+        // Index 8 | FLOOR_INTAKE_INDEX
         {
           CUBE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 8 | SOLUTION_FLIP_INDEX
+        // Index 9 | SOLUTION_FLIP_INDEX
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_POSITIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 9 | HIGH_TO_STOWWED_INDEX
+        // Index 10 | HIGH_TO_STOWWED_INDEX
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_NEGATIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 10 | MID_CONE_PREP_INDEX
+        // Index 11 | MID_CONE_PREP_INDEX
         {
           HIGH_CONE_TRANSITION_POINT,
           TRANSITION_POSITION,
           STOWED_POSITION
         },
-        // Index 11 | LONG_ARM_REACH_INDEX
+        // Index 12 | LONG_ARM_REACH_INDEX
         {
           LONG_ARM_REACH_0,
           LONG_ARM_REACH_1,
           LONG_ARM_REACH_2
         },
-        // Index 12 | FLOOR_INTAKE_PREP_INDEX
+        // Index 13 | FLOOR_INTAKE_PREP_INDEX
         {
           CUBE_INTAKE_POSITION_PREP
         },
-        // Index 13 | HIGH_CONE_PREP_INDEX
+        // Index 14 | HIGH_CONE_PREP_INDEX
         {
           HIGH_CONE_TRANSITION_POINT
         },
-        // Index 14 | HIGH_CONE_PREP_TO_PLACE_INDEX
+        // Index 15 | HIGH_CONE_PREP_TO_PLACE_INDEX
         {
           HIGH_CONE_POSITION_0,
           HIGH_CONE_POSITION_2
         },
-        // Index 15 | CONE_INTAKE_INDEX
+        // Index 16 | CONE_INTAKE_INDEX
         {
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 16 | CUBE_INTAKE_INDEX
+        // Index 17 | CUBE_INTAKE_INDEX
         {
           CUBE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 17 | CONE_FLIP_INDEX
+        // Index 18 | CONE_FLIP_INDEX
         {
           CONE_FLIP_POSITION_0,
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 18 | MID_CONE_PREP_INDEX
+        // Index 19 | MID_CONE_PREP_INDEX
         {
           MID_CONE_TRANSITION_POINT
         },
-        // Index 19 | MID_CONE_PLACEMENT_INDEX
+        // Index 20 | MID_CONE_PLACEMENT_INDEX
         {
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
-        // Index 20 | AUTO_INIT_INDEX
+        // Index 21 | AUTO_INIT_INDEX
         {
           AUTO_INIT_PICKUP
         }
