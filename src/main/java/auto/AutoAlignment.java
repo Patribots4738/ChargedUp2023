@@ -13,6 +13,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint; 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import hardware.Swerve;
 import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
@@ -464,22 +465,11 @@ public class AutoAlignment implements Loggable{
 
     public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
 
-      // Make a simple trajectory for use in the Holonomic Drive Controller
-      // Notice that the start and end states have the same position, but different holonomic rotations
-      PathPlannerTrajectory rotationalTrajectory = PathPlanner.generatePath
-          (
-              new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
-              new PathPoint(swerve.getPose().getTranslation(),
-                  Rotation2d.fromDegrees(0),
-                  swerve.getYaw()),
-
-              new PathPoint(swerve.getPose().getTranslation(),
-                  Rotation2d.fromDegrees(0),
-                  desiredAngle)
-          );
-
       // Use a Holonomic Drive Controller to calculate the speeds for the robot
-      var trajectorySpeeds = SwerveTrajectory.HDC.calculate(swerve.getPose(), rotationalTrajectory.getInitialState(), desiredAngle);
+      // Notice that the desiredLinearVelocity is set to zero, because we don't care about driving
+      // We only care about turning, and in the caluclate method the desiredLinearVelocity is not used for our use case
+      ChassisSpeeds trajectorySpeeds = SwerveTrajectory.HDC.calculate(swerve.getPose(), swerve.getPose(), 0, desiredAngle);
+      
       // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,
       // I wonder if that will cause issues in the future.
