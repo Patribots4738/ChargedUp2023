@@ -194,7 +194,7 @@ public class Robot extends TimedRobot {
     // When not aligning, reset the max speed to the teleop speed
     if (driver.getAButtonReleased()) {
       DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
-      autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
+      //autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
     }
 
     else if (driver.getAButton()) {

@@ -50,8 +50,6 @@ public class AutoAlignment implements Loggable{
     private int substationOffset = -1;
     private double startedChargePad = -1;
 
-    // This variable is used to allow us to calibrate using the tag more often but not every loop
-    private double originalNorm = 1;
     // This variable is used to tell us how far away we currently are from an april tag
     private double currentNorm = -1;
 
@@ -120,38 +118,22 @@ public class AutoAlignment implements Loggable{
 
       currentNorm = swerve.getPose().minus(modifiedTargetPose).getTranslation().getNorm();
 
-      if (tagID != 4 && tagID != 5) {
-        // Calculate the direct heading to our destination, so we can drive straight to it
-        Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
+      // Calculate the direct heading to our destination, so we can drive straight to it
+      Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
 
-        this.tagTrajectory = PathPlanner.generatePath
-            (
-                new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 3),
-                new PathPoint(swerve.getPose().getTranslation(),
-                    segment1Heading,
-                    swerve.getPose().getRotation(),
-                    swerve.getSpeedMetersPerSecond()),
+      this.tagTrajectory = PathPlanner.generatePath
+          (
+              new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 3),
+              new PathPoint(swerve.getPose().getTranslation(),
+                  segment1Heading,
+                  swerve.getPose().getRotation(),
+                  swerve.getSpeedMetersPerSecond()),
 
-                new PathPoint(modifiedTargetPose.getTranslation(),
-                    segment1Heading,
-                    modifiedTargetPose.getRotation(), 0)
-            );
-      } else {
-        Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
-        this.tagTrajectory = PathPlanner.generatePath
-            (
-                new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 3),
-                new PathPoint(swerve.getPose().getTranslation(),
-                    segment1Heading,
-                    swerve.getPose().getRotation(),
-                    swerve.getSpeedMetersPerSecond()),
+              new PathPoint(modifiedTargetPose.getTranslation(),
+                  segment1Heading,
+                  modifiedTargetPose.getRotation(), 0)
+          );
 
-                new PathPoint(modifiedTargetPose.getTranslation(),
-                    segment1Heading,
-                    modifiedTargetPose.getRotation(), 0)
-            );
-      }
-      
       // System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
       // System.out.println("Modified Target Pose: " + targetPose);
       // System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
@@ -226,40 +208,43 @@ public class AutoAlignment implements Loggable{
      * we set substationOffset to -1
      */
     private void setNearestAlignmentOffset() {
-      // If we are half the distance from the last "originalNorm" we were at, reset originalNorm
-      // This is primarily used to tell the arm to move halfway through the path when going to the substation
-      // if ((currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) && DriverStation.isTeleop())) {
 
         if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
-          originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
 
-          // if (!Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
+            Pose2d aprilTagPose2d = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+            double tagXOffset = getTagXOffset();
+            double tagYOffset = getTagYOffset();
 
             moveArmToHumanTag = (tagID == 4 || tagID == 5);
 
             // Find which side of the human tag we are closest to based on the tag ID's location and the robot's location
-            double negativeOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
+            double zeroOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
                 new Translation2d(
-                    getTagXOffset(),
-                    -getTagYOffset()),
+                    tagXOffset,
+                    0),
                 new Rotation2d()))).getTranslation().getNorm();
 
-            double positiveOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
+            double negativeOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
                 new Translation2d(
-                    getTagXOffset(),
-                    getTagYOffset()),
+                    tagXOffset,
+                    -tagYOffset),
                 new Rotation2d()))).getTranslation().getNorm();
 
-            double zeroOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
-              new Translation2d( getTagXOffset(), 0),
-              new Rotation2d()))).getTranslation().getNorm();
+            double positiveOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
+                new Translation2d(
+                    tagXOffset,
+                    tagYOffset),
+                new Rotation2d()))).getTranslation().getNorm();
+
 
             /*
               If we are on red alliance, left of the tag is going to be the negative on the Y axis
-              Due to this.mveToTag() checking if we are on the blue alliance and flipping the sign,
+              Due to this.moveToTag() checking if we are on the blue alliance and flipping the sign,
               we need to flip the sign here
             */
-            if (negativeOffsetNorm < positiveOffsetNorm) {
+            double smallestNorm = Math.min(zeroOffsetNorm, Math.min(negativeOffsetNorm, positiveOffsetNorm));
+
+            if (smallestNorm == negativeOffsetNorm || ((tagID == 4 || tagID == 5) && negativeOffsetNorm < positiveOffsetNorm)) {
 
               // If we are looking at a human player tag,
               // Then we have been evaluating for the substationOffset
@@ -271,10 +256,10 @@ public class AutoAlignment implements Loggable{
 
               // If we are approaching a substation tag,
               // Start intaking the claw when we get close
-              if ((tagID == 4 || tagID == 5) && negativeOffsetNorm < 2) {
-                claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+              if ((tagID == 4 || tagID == 5) && negativeOffsetNorm < 1) {
+                claw.setDesiredSpeed(coneMode ? PlacementConstants.CLAW_INTAKE_SPEED_CONE : PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
               }
-            } else if (positiveOffsetNorm < zeroOffsetNorm) {
+            } else if (smallestNorm == positiveOffsetNorm || ((tagID == 4 || tagID == 5) && positiveOffsetNorm < negativeOffsetNorm)) {
 
               // If we are looking at a human player tag,
               // Then we have been evaluating for the substationOffset
@@ -286,25 +271,23 @@ public class AutoAlignment implements Loggable{
 
               // If we are approaching a substation tag,
               // Start intaking the claw when we get close
-              if ((tagID == 4 || tagID == 5) && positiveOffsetNorm < 2) {
+              if ((tagID == 4 || tagID == 5) && positiveOffsetNorm < 1) {
                 claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
               }
-            // }
-          // If we are not going to the substation, we don't need to move the arm
-          // This will primarily trigger when the tag does not equal 4 or 5
+            // If we are not going to the substation, we don't need to move the arm
+            // This will primarily trigger when the tag does not equal 4 or 5
             } else {
-              if (tagID == 4 || tagID == 5) {
-                this.substationOffset = 0;
-              } else {
+
+              if (!(tagID == 4 || tagID == 5)) {
                 this.coneOffset = 0;
               }
+
             }
           if (!(tagID == 4 || tagID == 5)) {
 
             moveArmToHumanTag = false;
 
           }
-        // }
       }
       // System.out.println(currentNorm + " " + originalNorm);
     }
@@ -313,17 +296,15 @@ public class AutoAlignment implements Loggable{
         return (tagID == 4) ?
             // Tag 4 means we need to subtract the grid barrier
             // since it is on the right side of the field
-            // (blue alliance)
-            -(Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
+            (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
             // Tag 5 means we need to add the grid barrier
             // since it is on the left side of the field
-            // (red alliance)
             (tagID == 5) ?
                 (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
                 // We are looking at a grid tag, is it on the left side of the field?
                 (tagID < 4) ?
                     // We are looking at a tag on the right side of the field, subtract the barrier
-                    -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS) :
+                    (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS) :
                     // We are looking at a tag on the left side of the field, add the barrier
                     (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS);
     }
@@ -346,11 +327,11 @@ public class AutoAlignment implements Loggable{
         targetPose = targetPose.plus(new Transform2d(
             new Translation2d(
                 (tagID == 4) ?
-                    Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() + ClawConstants.CLAW_LENGTH_INCHES) :
+                    (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() + ClawConstants.CLAW_LENGTH_INCHES)) :
                     (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
                 (tagID == 4) ?
-                    -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                    -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
+                    (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                    (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
             Rotation2d.fromDegrees(180)));
 
       } else {
@@ -358,7 +339,7 @@ public class AutoAlignment implements Loggable{
         targetPose = targetPose.plus(new Transform2d(
             new Translation2d(
                 (tagID == 5) ?
-                    Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES) :
+                    (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
                     (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
                 ((tagID == 5) ?
                     (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
