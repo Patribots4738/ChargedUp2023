@@ -84,16 +84,15 @@ public class AutoAlignment implements Loggable{
         swerve.getPoseEstimator().addVisionMeasurement(
           camEstimatedPose.estimatedPose.toPose2d(),
           Timer.getFPGATimestamp());
+      }
 
+      if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+        // Get the target pose (the pose of the tag we want to go to)
+        Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         setNearestAlignmentOffset();
-
-        if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
-            // Get the target pose (the pose of the tag we want to go to)
-            Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
-            setNearestAlignmentOffset();
-            targetPose = getModifiedTargetPose(targetPose);
-            currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-        }
+        targetPose = getModifiedTargetPose(targetPose);
+        currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
+        System.out.println("Current norm: " + currentNorm);
       }
     }
 
@@ -123,8 +122,7 @@ public class AutoAlignment implements Loggable{
 
       if (tagID != 4 && tagID != 5) {
         // Calculate the direct heading to our destination, so we can drive straight to it
-        Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(originalTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
-        Rotation2d segment2Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - originalTargetPose.getY(), modifiedTargetPose.getX()));
+        Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
 
         this.tagTrajectory = PathPlanner.generatePath
             (
@@ -135,11 +133,7 @@ public class AutoAlignment implements Loggable{
                     swerve.getSpeedMetersPerSecond()),
 
                 new PathPoint(modifiedTargetPose.getTranslation(),
-                    segment2Heading,
-                    modifiedTargetPose.getRotation()),
-
-                new PathPoint(modifiedTargetPose.getTranslation(),
-                    segment2Heading,
+                    segment1Heading,
                     modifiedTargetPose.getRotation(), 0)
             );
       } else {
@@ -234,14 +228,14 @@ public class AutoAlignment implements Loggable{
     private void setNearestAlignmentOffset() {
       // If we are half the distance from the last "originalNorm" we were at, reset originalNorm
       // This is primarily used to tell the arm to move halfway through the path when going to the substation
-      if ((currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) && DriverStation.isTeleop())) {
+      // if ((currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) && DriverStation.isTeleop())) {
 
         if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
           originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
 
-          if (!Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
+          // if (!Objects.equals(SwerveTrajectory.trajectoryStatus, "setup")) {
 
-            moveArmToHumanTag = true;
+            moveArmToHumanTag = (tagID == 4 || tagID == 5);
 
             // Find which side of the human tag we are closest to based on the tag ID's location and the robot's location
             double negativeOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
@@ -255,6 +249,10 @@ public class AutoAlignment implements Loggable{
                     getTagXOffset(),
                     getTagYOffset()),
                 new Rotation2d()))).getTranslation().getNorm();
+
+            double zeroOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
+              new Translation2d( getTagXOffset(), 0),
+              new Rotation2d()))).getTranslation().getNorm();
 
             /*
               If we are on red alliance, left of the tag is going to be the negative on the Y axis
@@ -276,7 +274,7 @@ public class AutoAlignment implements Loggable{
               if ((tagID == 4 || tagID == 5) && negativeOffsetNorm < 2) {
                 claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
               }
-            } else {
+            } else if (positiveOffsetNorm < zeroOffsetNorm) {
 
               // If we are looking at a human player tag,
               // Then we have been evaluating for the substationOffset
@@ -291,18 +289,26 @@ public class AutoAlignment implements Loggable{
               if ((tagID == 4 || tagID == 5) && positiveOffsetNorm < 2) {
                 claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
               }
-            }
+            // }
           // If we are not going to the substation, we don't need to move the arm
           // This will primarily trigger when the tag does not equal 4 or 5
-          } else if (!(tagID == 4 || tagID == 5)){
+            } else {
+              if (tagID == 4 || tagID == 5) {
+                this.substationOffset = 0;
+              } else {
+                this.coneOffset = 0;
+              }
+            }
+          if (!(tagID == 4 || tagID == 5)) {
 
             moveArmToHumanTag = false;
 
           }
-        }
+        // }
       }
       // System.out.println(currentNorm + " " + originalNorm);
     }
+    
     private double getTagXOffset() {
         return (tagID == 4) ?
             // Tag 4 means we need to subtract the grid barrier
