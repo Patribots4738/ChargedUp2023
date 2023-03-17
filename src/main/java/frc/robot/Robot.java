@@ -14,6 +14,8 @@ import calc.Constants.PlacementConstants;
 import calc.OICalc;
 import debug.Debug;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -194,7 +196,7 @@ public class Robot extends TimedRobot {
     // When not aligning, reset the max speed to the teleop speed
     if (driver.getAButtonReleased()) {
       DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
-      autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
+      //autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
     }
 
     else if (driver.getAButton()) {
@@ -204,6 +206,7 @@ public class Robot extends TimedRobot {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         autoAlignment.setTagID(autoAlignment.getNearestTag());
+        autoAlignment.generateTagTrajectory();
 
       }
       

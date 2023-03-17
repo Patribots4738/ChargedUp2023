@@ -26,7 +26,7 @@ public class PhotonCameraPose {
         }
 
         try {
-          photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+            photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
         } catch (Exception e) {
             System.out.println("Camera not found!");
             return;
