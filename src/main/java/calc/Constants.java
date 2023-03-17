@@ -403,6 +403,10 @@ public final class Constants {
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.53;
 
+        public static final double GRID_WIDTH_METERS = 1.364;
+        public static final double SUBSTATION_WIDTH_METERS = 0.344;
+        public static final double FIELD_HEIGHT_METERS = 8.029;
+
         public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
         public static final Pose3d TAG_0_POSE = null;

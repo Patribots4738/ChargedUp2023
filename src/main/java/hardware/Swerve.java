@@ -20,13 +20,16 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.SwerveUtils;
+import calc.Constants.AlignmentConstants;
 import calc.Constants.DriveConstants;
+import calc.Constants.PlacementConstants;
 
 public class Swerve implements Loggable{
 
@@ -122,6 +125,7 @@ public class Swerve implements Loggable{
         // Update the odometry in the periodic block
         this.field.setRobotPose(getPose());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+        clampOdometry();
         getPitch();
         getRoll();
         // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
@@ -130,6 +134,30 @@ public class Swerve implements Loggable{
         // }
     }
 
+    private void clampOdometry() {
+      // Clamp the position Odometry on the low end when on BLUE alliance
+      // Clamp the position Odometry on the high end when on RED alliance
+      Pose2d clampedPose =
+          (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ?
+              new Pose2d(
+                      MathUtil.clamp(getPose().getX(), AlignmentConstants.GRID_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2),
+                          AlignmentConstants.FIELD_WIDTH_METERS - AlignmentConstants.SUBSTATION_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2)),
+                      MathUtil.clamp(getPose().getY(),
+                          (0),
+                          AlignmentConstants.FIELD_HEIGHT_METERS),
+                      getPose().getRotation()) :
+              new Pose2d(
+                      MathUtil.clamp(getPose().getX(), AlignmentConstants.SUBSTATION_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2),
+                          AlignmentConstants.FIELD_WIDTH_METERS - AlignmentConstants.GRID_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2)),
+                      MathUtil.clamp(getPose().getY(),
+                          (0),
+                          AlignmentConstants.FIELD_HEIGHT_METERS),
+                      getPose().getRotation());
+
+      if (getPose().minus(clampedPose).getTranslation().getNorm() != 0) {
+        resetOdometry(clampedPose);
+      }
+  }
     /**
      * Returns the currently-estimated pose of the robot.
      *
