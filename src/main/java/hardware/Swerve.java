@@ -4,7 +4,7 @@
 
 package hardware;
 
-import calc.Constants;
+import calc.Constants.*;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
@@ -120,35 +120,37 @@ public class Swerve implements Loggable{
     public void periodic() {
         // Update the odometry in the periodic block
         this.field.setRobotPose(getPose());
-        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
-        clampOdometry();
+        if (positionInRange()) {
+          poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+        }
         getPitch();
         getRoll();
-        // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
+        // if ((Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) && getSpeedMetersPerSecond() < 0.1) {
         //     System.out.println("Robot is not level");
         //     System.out.printf("Time: %.2f Pitch: %.2f Roll: %.2f", Timer.getFPGATimestamp(), getPitch().getDegrees(), getRoll().getDegrees());
         // }
     }
 
-    private void clampOdometry() {
+    /**
+     * Check if the robot is in the field's boundaries,
+     * This is defined by the grid barrier / the substation barrier
+     * And the field height
+     *
+     * @return if the robot is in the field's boundaries
+     */
+    private boolean positionInRange() {
         // Clamp the position Odometry on the low end when on BLUE alliance
         // Clamp the position Odometry on the high end when on RED alliance
-        Pose2d clampedPose =
+        return (getPose().getTranslation().minus(
             (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ?
-                new Pose2d(
-                        MathUtil.clamp(getPose().getX(), Constants.AlignmentConstants.GRID_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS),
-                                Constants.AlignmentConstants.FIELD_WIDTH_METERS - Constants.AlignmentConstants.SUBSTATION_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS)),
-                        MathUtil.clamp(getPose().getY(), (0), Constants.AlignmentConstants.FIELD_HEIGHT_METERS),
-                        getPose().getRotation()) :
-                new Pose2d(
-                        MathUtil.clamp(getPose().getX(), Constants.AlignmentConstants.SUBSTATION_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS),
-                                Constants.AlignmentConstants.FIELD_WIDTH_METERS - Constants.AlignmentConstants.GRID_WIDTH_METERS - (Constants.PlacementConstants.ROBOT_LENGTH_METERS/2 + Constants.PlacementConstants.BUMPER_LENGTH_METERS)),
-                        MathUtil.clamp(getPose().getY(), (0), Constants.AlignmentConstants.FIELD_HEIGHT_METERS),
-                        getPose().getRotation());
-
-        if (getPose().minus(clampedPose).getTranslation().getNorm() != 0) {
-            resetOdometry(clampedPose);
-        }
+                new Translation2d(
+                    MathUtil.clamp(getPose().getX(), AlignmentConstants.GRID_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2),
+                        AlignmentConstants.FIELD_WIDTH_METERS - AlignmentConstants.SUBSTATION_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2)),
+                    MathUtil.clamp(getPose().getY(), (0), AlignmentConstants.FIELD_HEIGHT_METERS)) :
+                new Translation2d(
+                    MathUtil.clamp(getPose().getX(), AlignmentConstants.SUBSTATION_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2),
+                        AlignmentConstants.FIELD_WIDTH_METERS - AlignmentConstants.GRID_WIDTH_METERS - (PlacementConstants.ROBOT_LENGTH_METERS/2)),
+                    MathUtil.clamp(getPose().getY(), (0), AlignmentConstants.FIELD_HEIGHT_METERS))).getNorm() == 0);
     }
 
     /**
