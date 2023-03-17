@@ -123,7 +123,7 @@ public class SwerveTrajectory implements Loggable {
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState mirroredState = new PathPlannerState();
 
-          System.out.print("Changed from " + state.poseMeters.getTranslation());
+          // System.out.print("Desired position " + state.poseMeters.getTranslation() + "\n Swerve pose: " + swerve.getPose().getTranslation());
 
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
@@ -151,22 +151,6 @@ public class SwerveTrajectory implements Loggable {
             System.out.println(" To " + mirroredState.poseMeters.getTranslation());
 
           }
-
-          // if ((swerve.getPose().minus(_pathTraj.sample(elapsedTime).poseMeters)).getTranslation().getNorm() < 0.1 &&
-          //     (Math.abs(swerve.getYaw().minus((state.holonomicRotation)).getDegrees()) < 3) && DriverStation.isAutonomous())
-          // {
-          //   swerve.drive(0, 0, 0, false);
-          //   trajectoryStatus = "done";
-          //   break;
-          // }
-
-          System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
-              ? mirroredState.poseMeters.getTranslation() : state.poseMeters.getTranslation(),
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
-              ? mirroredState.holonomicRotation
-              : state.holonomicRotation)).getTranslation() + "\n");
-
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
