@@ -465,14 +465,12 @@ public class AutoAlignment implements Loggable{
 
     public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
 
-      // Use a Holonomic Drive Controller to calculate the speeds for the robot
-      // Notice that the desiredLinearVelocity is set to zero, because we don't care about driving
-      // We only care about turning, and in the caluclate method the desiredLinearVelocity is not used for our use case
-      ChassisSpeeds trajectorySpeeds = SwerveTrajectory.HDC.calculate(swerve.getPose(), swerve.getPose(), 0, desiredAngle);
+      // Use a PID controller to get the desired angle
+      double rotSpeed = MathUtil.clamp(swerve.getYaw().minus(desiredAngle).getDegrees() * AlignmentConstants.SNAP_TO_ANGLE_P, -1, 1);
       
       // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,
       // I wonder if that will cause issues in the future.
-      swerve.drive(driverAxis.getY(), driverAxis.getX(), trajectorySpeeds.omegaRadiansPerSecond, true, true);
+      swerve.drive(driverAxis.getY(), driverAxis.getX(), rotSpeed, true, true);
     }
 }

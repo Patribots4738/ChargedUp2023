@@ -394,6 +394,8 @@ public final class Constants {
 
 
         public static final double MAX_SPEED_METERS_PER_SECOND = 1;
+        public static final double SNAP_TO_ANGLE_P = 0.0025;
+        
 
         public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
