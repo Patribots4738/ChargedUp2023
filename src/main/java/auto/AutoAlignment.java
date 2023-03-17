@@ -1,11 +1,14 @@
 package auto;
 
+import java.sql.Driver;
 import java.util.Objects;
 import java.util.Optional;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import org.photonvision.EstimatedRobotPose;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -89,9 +92,8 @@ public class AutoAlignment implements Loggable{
         Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         setNearestAlignmentOffset();
         targetPose = getModifiedTargetPose(targetPose);
-        swerve.setRobotPose(targetPose);
         currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-        System.out.println("Current norm: " + currentNorm);
+        // System.out.println("Current norm: " + currentNorm);
       }
     }
 
@@ -120,7 +122,8 @@ public class AutoAlignment implements Loggable{
       currentNorm = swerve.getPose().minus(modifiedTargetPose).getTranslation().getNorm();
 
       // Calculate the direct heading to our destination, so we can drive straight to it
-      Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
+      Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), swerve.getPose().getX()));
+      Rotation2d segment2Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
 
       this.tagTrajectory = PathPlanner.generatePath
           (
@@ -130,10 +133,16 @@ public class AutoAlignment implements Loggable{
                   swerve.getPose().getRotation(),
                   swerve.getSpeedMetersPerSecond()),
 
+              new PathPoint(new Translation2d(swerve.getPose().getX(), modifiedTargetPose.getTranslation().getY()),
+                  segment2Heading,
+                  modifiedTargetPose.getRotation()),
+
               new PathPoint(modifiedTargetPose.getTranslation(),
-                  segment1Heading,
+                  segment2Heading,
                   modifiedTargetPose.getRotation(), 0)
           );
+
+      SwerveTrajectory.resetTrajectoryStatus();
 
       // System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
       // System.out.println("Modified Target Pose: " + targetPose);
