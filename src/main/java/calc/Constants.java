@@ -172,8 +172,8 @@ public final class Constants {
         public static final double CLAW_MIN_OUTPUT = -1;
         public static final double CLAW_MAX_OUTPUT = 1;
 
-        public static final int CLAW_STALL_LIMIT = 10;
-        public static final int CLAW_FREE_LIMIT = 10;
+        public static final int CLAW_STALL_LIMIT = 2;
+        public static final int CLAW_FREE_LIMIT = 15;
 
 
         // from the edge of the upper arm, straight out,
@@ -506,8 +506,8 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
-      public static final Translation2d MID_CONE_TRANSITION_POINT = new Translation2d(24,35);
+      public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(28,36);
+      public static final Translation2d MID_CONE_TRANSITION_POINT = new Translation2d(28,36);
 
       public static final Translation2d[][] ARM_POSITIONS = {
         // Index 0

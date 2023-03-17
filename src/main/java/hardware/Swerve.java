@@ -125,7 +125,7 @@ public class Swerve implements Loggable{
         // Update the odometry in the periodic block
         this.field.setRobotPose(getPose());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
-        clampOdometry();
+        // clampOdometry();
         getPitch();
         getRoll();
         // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
