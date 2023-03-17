@@ -146,7 +146,9 @@ public class Swerve implements Loggable{
                         MathUtil.clamp(getPose().getY(), (0), Constants.AlignmentConstants.FIELD_HEIGHT_METERS),
                         getPose().getRotation());
 
-        resetOdometry(clampedPose);
+        if (getPose().minus(clampedPose).getTranslation().getNorm() != 0) {
+            resetOdometry(clampedPose);
+        }
     }
 
     /**
