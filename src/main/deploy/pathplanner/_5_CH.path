@@ -2,12 +2,12 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.7,
+        "x": 1.77874,
         "y": 2.73
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0808153536160567,
+        "x": 2.1595553536160565,
         "y": 2.73
       },
       "holonomicAngle": 180.0,
