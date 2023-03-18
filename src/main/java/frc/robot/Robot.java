@@ -352,6 +352,9 @@ public class Robot extends TimedRobot {
     if (operator.getBButtonPressed()){
       arm.setArmIndex(PlacementConstants.CONE_FLIP_INDEX);
     }
+    if(operator.getRightStickButtonPressed() && operator.getLeftBumperPressed()) {
+      arm.setArmIndex(PlacementConstants.SINGLE_SUBSTATION_PICKUP_INDEX);
+    }
     if (operator.getRightStickButtonPressed()) {
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
     }
