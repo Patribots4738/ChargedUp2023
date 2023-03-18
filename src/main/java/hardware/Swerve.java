@@ -104,7 +104,7 @@ public class Swerve implements Loggable{
                 // X, Y, theta
         new MatBuilder<>(
                 Nat.N3(),
-                Nat.N1()).fill(0.9, 0.9, 3)
+                Nat.N1()).fill(0.01, 0.01, 4.5)
                 // Vision measurement
                 // standard deviations
                 // X, Y, theta
@@ -123,8 +123,8 @@ public class Swerve implements Loggable{
 
     public void periodic() {
         // Update the odometry in the periodic block
-        this.field.setRobotPose(getPose());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+        this.field.setRobotPose(getPose());
         getPitch();
         getRoll();
         // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {

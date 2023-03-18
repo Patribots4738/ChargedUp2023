@@ -143,7 +143,7 @@ public class SwerveTrajectory implements Loggable {
                 state.poseMeters.getTranslation().getY(),
                 state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
             mirroredState.curvatureRadPerMeter = state.curvatureRadPerMeter;
-            mirroredState.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+            mirroredState.holonomicRotation = state.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
             mirroredState.angularVelocityRadPerSec = state.angularVelocityRadPerSec;
             mirroredState.holonomicAngularVelocityRadPerSec = state.holonomicAngularVelocityRadPerSec;
 

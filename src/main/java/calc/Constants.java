@@ -26,7 +26,7 @@ public final class Constants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-        public static double MAX_ANGULAR_SPEED = 6 * Math.PI; // radians per second
+        public static double MAX_ANGULAR_SPEED = 4.5 * Math.PI; // radians per second
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(13.51);
 
@@ -146,7 +146,7 @@ public final class Constants {
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 6.03;
+        public static final double Y_CORRECTION_P = 7.1;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
@@ -172,8 +172,8 @@ public final class Constants {
         public static final double CLAW_MIN_OUTPUT = -1;
         public static final double CLAW_MAX_OUTPUT = 1;
 
-        public static final int CLAW_STALL_LIMIT = 2;
-        public static final int CLAW_FREE_LIMIT = 15;
+        public static final int CLAW_STALL_LIMIT = 20;
+        public static final int CLAW_FREE_LIMIT = 25;
 
 
         // from the edge of the upper arm, straight out,
@@ -438,8 +438,7 @@ public final class Constants {
       public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
       // Length of the bumpers on the robot
       // Remember that the bumpers are on TWO SIDES of the robot
-      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(3.1);
-
+      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.5);
       public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
 
       public static final int STOWED_INDEX = 0;

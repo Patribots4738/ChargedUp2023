@@ -57,7 +57,7 @@ public class Claw {
                 desiredSpeed = 1;
             }
         }
-        // setSpeed(desiredSpeed);
+        setSpeed(desiredSpeed);
     }
 
     private void setSpeed(double speed) {

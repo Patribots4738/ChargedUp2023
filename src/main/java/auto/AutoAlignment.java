@@ -124,14 +124,16 @@ public class AutoAlignment implements Loggable{
       // Calculate the direct heading to our destination, so we can drive straight to it
       Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), swerve.getPose().getX()));
       Rotation2d segment2Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
-
+      // if (swerve.getPose().getY() > 14 || swerve.getPose().getY() < 2) {
+      //   segment1Heading = Rotation2d.fromDegrees((swerve.getPose().getY() < 2) ? 180 : 0);
+      //   segment2Heading = segment1Heading;
+      // }
       this.tagTrajectory = PathPlanner.generatePath
           (
               new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 3),
               new PathPoint(swerve.getPose().getTranslation(),
                   segment1Heading,
-                  swerve.getPose().getRotation(),
-                  swerve.getSpeedMetersPerSecond()),
+                  swerve.getPose().getRotation()),
 
               new PathPoint(new Translation2d(swerve.getPose().getX(), modifiedTargetPose.getTranslation().getY()),
                   segment2Heading,
@@ -139,7 +141,7 @@ public class AutoAlignment implements Loggable{
 
               new PathPoint(modifiedTargetPose.getTranslation(),
                   segment2Heading,
-                  modifiedTargetPose.getRotation(), 0)
+                  modifiedTargetPose.getRotation())
           );
 
       SwerveTrajectory.resetTrajectoryStatus();
@@ -419,6 +421,7 @@ public class AutoAlignment implements Loggable{
       // If we actually changed indexes, reset the auto alignment status,
       // so we can re-align to the new index
       if (previousConeOffset != this.coneOffset) {
+        generateTagTrajectory();
         SwerveTrajectory.resetTrajectoryStatus();
       }
     }
