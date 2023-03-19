@@ -24,6 +24,7 @@ public class Claw {
     private boolean finishedOuttaking = false;
     private double outtakeSeconds = 0;
     private double startedOuttakingTimestamp = 0;
+    private double startedIntakingTimestamp = 0;
 
     public Claw() {
 
@@ -121,5 +122,11 @@ public class Claw {
     public void setFinishedOuttaking(boolean finishedOuttaking) {
         this.finishedOuttaking = finishedOuttaking;
     }
+
+    public double getOutputCurrent() {
+        return _claw.getOutputCurrent();
+    }
+
+    
 
 }

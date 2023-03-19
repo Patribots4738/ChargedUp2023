@@ -434,11 +434,11 @@ public class Robot extends TimedRobot {
     if (Math.abs(swerve.getPitch().getDegrees()) > 60) {
       arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
     }
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
-      driver.setRumble(RumbleType.kLeftRumble, 0.5);
-      driver.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kLeftRumble, 0.5);
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER) && (autoAlignment.getCurrentNorm() != -1)) {
+      driver.setRumble(RumbleType.kLeftRumble, 0.75);
+      driver.setRumble(RumbleType.kRightRumble, 0.75);
+      operator.setRumble(RumbleType.kRightRumble, 0.75);
+      operator.setRumble(RumbleType.kLeftRumble, 0.75);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
     }
     else {
@@ -453,6 +453,13 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kLeftRumble, 0);
     }
+
+    //Rumble the claw if it is stalling, judged by whether or not the claw is drawing more amps than a preset limit.
+    if (claw.getOutputCurrent() > 25) {
+      driver.setRumble(RumbleType.kBothRumble, 0.1);
+      operator.setRumble(RumbleType.kBothRumble, 0.1);
+    }
+
   }  
 
   @Override
