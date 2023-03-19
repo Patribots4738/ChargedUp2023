@@ -467,6 +467,7 @@ public class AutoAlignment implements Loggable{
 
       // Use a Holonomic Drive Controller to calculate the speeds for the robot
       double thetaSpeed = SwerveTrajectory.HDC.getThetaController().calculate(swerve.getYaw().getRadians(), desiredAngle.getRadians());
+
       // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,
       // I wonder if that will cause issues in the future.
