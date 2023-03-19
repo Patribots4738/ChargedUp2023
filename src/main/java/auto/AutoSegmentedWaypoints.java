@@ -126,8 +126,10 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     // Check if the arm is ready to move to the next waypoint mid-path
-    if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions()) {
-
+    if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions() && 
+        ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
+          DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90)) {
+      
       // Prepare the arm for the next waypoint before the path is done
       switch (armIndex) {
         // If the next waypoint is a floor pickup, prepare the arm for a floor pickup
