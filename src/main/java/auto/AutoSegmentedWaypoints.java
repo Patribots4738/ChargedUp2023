@@ -44,6 +44,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   public boolean startedChargePad = false;
   @Log
   public boolean armInit = false;
+  public boolean halfway = false;
 
   public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
     this.swerve = swerve;
@@ -82,7 +83,7 @@ public class AutoSegmentedWaypoints implements Loggable {
         initialPathPose.poseMeters.getTranslation().getY(), 
         initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
 
-      initialPathPose.holonomicRotation = initialPathPose.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+      initialPathPose.holonomicRotation = initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
 
     }
 
@@ -92,6 +93,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     hasMovedArm = false;
     startedChargePad = false;
     armInit = false;
+    halfway = false;
 
     swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
 
@@ -252,6 +254,9 @@ public class AutoSegmentedWaypoints implements Loggable {
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
         stateHasFinished = false;
         currentWaypointNumber++;
+        if (currentWaypointNumber > 1) {
+          halfway = true;
+        }
         stateHasInitialized = false;
       }
       

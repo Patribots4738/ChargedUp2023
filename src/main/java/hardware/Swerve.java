@@ -20,16 +20,13 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.SwerveUtils;
-import calc.Constants.AlignmentConstants;
 import calc.Constants.DriveConstants;
-import calc.Constants.PlacementConstants;
 
 public class Swerve implements Loggable{
 
@@ -104,7 +101,7 @@ public class Swerve implements Loggable{
                 // X, Y, theta
         new MatBuilder<>(
                 Nat.N3(),
-                Nat.N1()).fill(0.01, 0.01, 4.5)
+                Nat.N1()).fill(0.6, 0.6, 3)
                 // Vision measurement
                 // standard deviations
                 // X, Y, theta
