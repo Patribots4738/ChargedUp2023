@@ -212,6 +212,7 @@ public class Robot extends TimedRobot {
 
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
+        SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
         autoAlignment.setTagID(autoAlignment.getNearestTag());
 
       }
@@ -240,6 +241,9 @@ public class Robot extends TimedRobot {
     } else {
       // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
       if (driver.getRightStickButton()) {
+        if (driver.getRightStickButtonPressed()) {
+          SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        }
         autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getYaw().getDegrees()) > 90 ? 180 : 0));
       }
       // If the driver holds the Y button, the robot will drive relative to itself
