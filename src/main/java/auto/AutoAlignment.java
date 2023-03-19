@@ -3,6 +3,7 @@ package auto;
 import java.util.Objects;
 import java.util.Optional;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,7 +14,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint; 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import hardware.Swerve;
 import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
@@ -158,7 +158,12 @@ public class AutoAlignment implements Loggable{
       }
     }
 
-    public void moveToTag() {
+    /**
+     * Align to the tag we are closest to
+     * Only do the Y and Theta axis,
+     * as we will manually move the robot to the X axis
+     */
+    public void alignToTag(double driverX) {
 
       // If we cannot see a tag
       if (tagID == 0) {
@@ -180,29 +185,39 @@ public class AutoAlignment implements Loggable{
       // oh well.
       targetPose = getModifiedTargetPose(targetPose);
 
-      currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-
-      // Calculate the direct heading to our destination, so we can drive straight to it
-      Rotation2d heading = Rotation2d.fromRadians(Math.atan2(targetPose.getY() - swerve.getPose().getY(),targetPose.getX() - swerve.getPose().getX()));
-
-      PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
-      (
-          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
-          new PathPoint(swerve.getPose().getTranslation(),
-              heading,
-              swerve.getPose().getRotation(),
-              swerve.getSpeedMetersPerSecond()),
-
-          new PathPoint(targetPose.getTranslation(),
-              heading,
-              targetPose.getRotation(), 0)
+      ChassisSpeeds alignmentSpeeds = SwerveTrajectory.HDC.calculate(
+          swerve.getPose(),
+          new Pose2d(
+              swerve.getPose().getX(),
+              targetPose.getY(),
+              targetPose.getRotation()),
+              // Notice the 0 m/s here
+              // This is because we want the robot to end at a stop,
+              // This might be funky when we manually drive it on the X axis
+              0,
+              targetPose.getRotation()
       );
-      
-      // System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
-      // System.out.println("Modified Target Pose: " + targetPose);
-      // System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
-      
-      SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve);
+
+      ChassisSpeeds controllerSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          driverX,
+          0,
+          0,
+          swerve.getPose().getRotation()
+      );
+
+      ChassisSpeeds comboSpeeds = new ChassisSpeeds(
+          controllerSpeeds.vxMetersPerSecond + alignmentSpeeds.vxMetersPerSecond,
+          controllerSpeeds.vyMetersPerSecond + alignmentSpeeds.vyMetersPerSecond,
+          controllerSpeeds.omegaRadiansPerSecond + alignmentSpeeds.omegaRadiansPerSecond
+      );
+
+      swerve.drive(
+          comboSpeeds.vxMetersPerSecond,
+          comboSpeeds.vyMetersPerSecond,
+          comboSpeeds.omegaRadiansPerSecond,
+          false,
+          false
+      );
     }
 
 
@@ -464,7 +479,7 @@ public class AutoAlignment implements Loggable{
     }
 
     public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
-
+    
       // Use a Holonomic Drive Controller to calculate the speeds for the robot
       double thetaSpeed = SwerveTrajectory.HDC.getThetaController().calculate(swerve.getYaw().getRadians(), desiredAngle.getRadians());
 

@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import java.io.IOException;
 import java.util.Optional;
 import calc.Constants.VisionConstants;
 
@@ -27,7 +26,7 @@ public class PhotonCameraPose {
         }
 
         try {
-          photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+            photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
         } catch (Exception e) {
             System.out.println("Camera not found!");
             return;
