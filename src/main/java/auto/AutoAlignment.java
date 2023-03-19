@@ -185,7 +185,7 @@ public class AutoAlignment implements Loggable{
       // oh well.
       targetPose = getModifiedTargetPose(targetPose);
 
-      ChassisSpeeds chassisSpeeds = SwerveTrajectory.HDC.calculate(
+      ChassisSpeeds alignmentSpeeds = SwerveTrajectory.HDC.calculate(
           swerve.getPose(),
           new Pose2d(
               swerve.getPose().getX(),
@@ -198,7 +198,26 @@ public class AutoAlignment implements Loggable{
               targetPose.getRotation()
       );
 
-      swerve.drive(driverX, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond, false, false);
+      ChassisSpeeds controllerSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          driverX,
+          0,
+          0,
+          swerve.getPose().getRotation()
+      );
+
+      ChassisSpeeds comboSpeeds = new ChassisSpeeds(
+          controllerSpeeds.vxMetersPerSecond + alignmentSpeeds.vxMetersPerSecond,
+          controllerSpeeds.vyMetersPerSecond + alignmentSpeeds.vyMetersPerSecond,
+          controllerSpeeds.omegaRadiansPerSecond + alignmentSpeeds.omegaRadiansPerSecond
+      );
+
+      swerve.drive(
+          comboSpeeds.vxMetersPerSecond,
+          comboSpeeds.vyMetersPerSecond,
+          comboSpeeds.omegaRadiansPerSecond,
+          false,
+          false
+      );
     }
 
 

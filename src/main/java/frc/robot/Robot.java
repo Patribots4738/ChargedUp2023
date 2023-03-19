@@ -216,7 +216,7 @@ public class Robot extends TimedRobot {
 
       }
       
-      autoAlignment.alignToTag(driverLeftX);
+      autoAlignment.alignToTag(driverLeftAxis.getY());
 
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
