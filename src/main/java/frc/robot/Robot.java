@@ -212,12 +212,11 @@ public class Robot extends TimedRobot {
 
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
-        autoAlignment.setTagID(autoAlignment.getNearestTag());  
-        autoAlignment.generateTagTrajectory();
+        autoAlignment.setTagID(autoAlignment.getNearestTag());
 
       }
       
-      autoAlignment.moveToTag();
+      autoAlignment.alignToTag(driverLeftX);
 
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
