@@ -184,12 +184,18 @@ public class AutoAlignment implements Loggable{
       // There is a bit of a logic issue that the else statement "should" be subtracting, but it doesn't work when you do that...
       // oh well.
       targetPose = getModifiedTargetPose(targetPose);
-
+      
+      double adjustedY = targetPose.getY() - swerve.getPose().getY();
+      
+      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_DIAMETER/2));
+      
+      adjustedY += swerve.getPose().getY();
+      
       ChassisSpeeds alignmentSpeeds = SwerveTrajectory.HDC.calculate(
           swerve.getPose(),
           new Pose2d(
               swerve.getPose().getX(),
-              targetPose.getY(),
+              adjustedY,
               targetPose.getRotation()),
               // Notice the 0 m/s here
               // This is because we want the robot to end at a stop,
@@ -197,7 +203,6 @@ public class AutoAlignment implements Loggable{
               0,
               targetPose.getRotation()
       );
-
       ChassisSpeeds controllerSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
           driverX,
           0,
@@ -212,8 +217,8 @@ public class AutoAlignment implements Loggable{
       );
 
       swerve.drive(
-          comboSpeeds.vxMetersPerSecond,
           comboSpeeds.vyMetersPerSecond,
+          comboSpeeds.vxMetersPerSecond,
           comboSpeeds.omegaRadiansPerSecond,
           false,
           false
