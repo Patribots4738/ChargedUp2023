@@ -119,7 +119,7 @@ public class AutoAlignment implements Loggable{
 
       // Calculate the direct heading to our destination, so we can drive straight to it
       Rotation2d segment1Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), swerve.getPose().getX()));
-      Rotation2d segment2Heading = Rotation2d.fromRadians(Math.atan2(modifiedTargetPose.getY() - swerve.getPose().getY(), modifiedTargetPose.getX() - swerve.getPose().getX()));
+      Rotation2d segment2Heading = Rotation2d.fromDegrees(DriverStation.getAlliance() == Alliance.Blue ? 0 : 180);
       // if (swerve.getPose().getY() > 14 || swerve.getPose().getY() < 2) {
       //   segment1Heading = Rotation2d.fromDegrees((swerve.getPose().getY() < 2) ? 180 : 0);
       //   segment2Heading = segment1Heading;
