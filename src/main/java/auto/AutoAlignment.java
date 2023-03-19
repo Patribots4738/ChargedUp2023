@@ -1,14 +1,10 @@
 package auto;
 
-import java.sql.Driver;
-import java.util.Objects;
 import java.util.Optional;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-
 import org.photonvision.EstimatedRobotPose;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;

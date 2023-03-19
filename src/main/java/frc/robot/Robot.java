@@ -14,8 +14,6 @@ import calc.Constants.PlacementConstants;
 import calc.OICalc;
 import debug.Debug;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;  
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -93,7 +91,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-      swerve.periodic();
       // arm.periodic();
 
       Logger.updateEntries();
@@ -110,13 +107,18 @@ public class Robot extends TimedRobot {
 
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
+    
+    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
+    arduinoController.sendByte(LEDConstants.ARM_RAINBOW);
+
+    System.out.println(swerve.getPose().getTranslation());
 
   }
 
   @Override
   public void disabledPeriodic() {
     // SwerveTrajectory.resetHDC();
-    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
+
   }
 
   @Override
@@ -132,6 +134,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    swerve.periodic();
     // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
@@ -144,7 +147,9 @@ public class Robot extends TimedRobot {
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
-    autoAlignment.calibrateOdometry();
+    if (autoSegmentedWaypoints.halfway) {
+      autoAlignment.calibrateOdometry();
+    }
 
   }
 
@@ -160,6 +165,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    swerve.periodic();
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
@@ -205,7 +211,7 @@ public class Robot extends TimedRobot {
 
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
-        autoAlignment.setTagID(autoAlignment.getNearestTag());
+        autoAlignment.setTagID(autoAlignment.getNearestTag());  
         autoAlignment.generateTagTrajectory();
 
       }
@@ -443,11 +449,23 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    arm.setCoastMode();
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+    arm.setBrakeMode();
+    // arm.setArmIndex(PlacementConstants.STOWED_INDEX);
   }
 
   @Override
   public void testPeriodic() {
-    arm.periodic();
+
+    double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+    double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+    
+    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+    
+    swerve.periodic();
+    // arm.periodic();
+
+    swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true, true);
   }
 }
