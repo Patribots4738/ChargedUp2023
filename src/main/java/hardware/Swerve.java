@@ -101,7 +101,7 @@ public class Swerve implements Loggable{
                 // X, Y, theta
         new MatBuilder<>(
                 Nat.N3(),
-                Nat.N1()).fill(0.6, 0.6, 3)
+                Nat.N1()).fill(0.9, 0.9, 3)
                 // Vision measurement
                 // standard deviations
                 // X, Y, theta
@@ -227,7 +227,7 @@ public class Swerve implements Loggable{
         ySpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
         rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier);
 
-        var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation())
                         : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed));
