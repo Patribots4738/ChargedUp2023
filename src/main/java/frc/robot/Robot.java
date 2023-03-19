@@ -214,7 +214,7 @@ public class Robot extends TimedRobot {
         SwerveTrajectory.resetTrajectoryStatus();
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
         autoAlignment.setTagID(autoAlignment.getNearestTag());
-
+        
       }
       
       autoAlignment.alignToTag(driverLeftAxis.getY());
@@ -434,7 +434,7 @@ public class Robot extends TimedRobot {
     if (Math.abs(swerve.getPitch().getDegrees()) > 60) {
       arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
     }
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/4) && (autoAlignment.getCurrentNorm() != -1)) {
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
       driver.setRumble(RumbleType.kLeftRumble, 0.5);
       driver.setRumble(RumbleType.kRightRumble, 0.5);
       operator.setRumble(RumbleType.kRightRumble, 0.5);
