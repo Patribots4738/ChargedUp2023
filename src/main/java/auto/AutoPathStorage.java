@@ -109,6 +109,9 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _9H_D_8H;
   public static Waypoint[] _9H_D_8H_C;
 
+  public static Waypoint[] _4H_MOBILITY;
+  public static Waypoint[] _5H_MOBILITY;
+  public static Waypoint[] _6H_MOBILITY;
   public static Waypoint[] _4H_MOBILITY_CHARGE;
   public static Waypoint[] _5H_MOBILITY_CHARGE;
   public static Waypoint[] _6H_MOBILITY_CHARGE;
@@ -360,12 +363,12 @@ public class AutoPathStorage implements Loggable {
      * When going to a number, the claw will outtake, and the arm will go to a placement position
      * H = high, M = mid, L = hybrid
      * When going to a letter, the claw will intake, and the arm will go to the floor intake
-     * When going to a charge, the claw will stop, and arm stowed
+     * When going to a charge, the claw will  stop, and arm stowed
      * Create waypoint arrays in order as defined from the top of the file
      */
 
     _SQUARE_HALF = new Waypoint[] {
-        // new Waypoint(square1, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
+        new Waypoint(square1, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
         new Waypoint(square2, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
@@ -645,6 +648,21 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_8_C, PlacementConstants.CONE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CONE)
     };
 
+    _4H_MOBILITY = new Waypoint[] {
+        new Waypoint(_4, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_4_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
+    _5H_MOBILITY = new Waypoint[] {
+        new Waypoint(_5, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_5_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
+    _6H_MOBILITY = new Waypoint[] {
+        new Waypoint(_6, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
+        new Waypoint(_6_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
     _4H_MOBILITY_CHARGE = new Waypoint[] {
         new Waypoint(_4, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
         new Waypoint(_4_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
@@ -772,6 +790,9 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("7H_D", _7H_D),
       new AutoPose("8H_D", _8H_D),
       new AutoPose("9H_D", _9H_D),
+      new AutoPose("4H_MOBILITY", _4H_MOBILITY),
+      new AutoPose("5H_MOBILITY", _5H_MOBILITY),
+      new AutoPose("6H_MOBILITY", _6H_MOBILITY),
       new AutoPose("4H_MOBILITY_CHARGE", _4H_MOBILITY_CHARGE),
       new AutoPose("5H_MOBILITY_CHARGE", _5H_MOBILITY_CHARGE),
       new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
