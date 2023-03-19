@@ -26,7 +26,7 @@ public final class Constants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-        public static double MAX_ANGULAR_SPEED = 6 * Math.PI; // radians per second
+        public static double MAX_ANGULAR_SPEED = 5 * Math.PI; // radians per second
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(13.51);
 
@@ -133,22 +133,23 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75; // previously 1.75
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_SPEED_METERS_PER_SECOND = 4; // previously 1.75
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        ;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 6.88;
+        public static final double X_CORRECTION_P = 2.5;//7;
         public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0;
+        public static final double X_CORRECTION_D = 0.2;
 
-        public static final double Y_CORRECTION_P = 6.03;
+        public static final double Y_CORRECTION_P = 2.5;//6.03;
         public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0;
+        public static final double Y_CORRECTION_D = 0.2;
 
         public static final double ROTATION_CORRECTION_P = .63;
         public static final double ROTATION_CORRECTION_I = 0;
@@ -435,7 +436,7 @@ public final class Constants {
       // The length of the robot
       public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
       // Length of the bumpers on the robot
-      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(4);
+      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
 
       public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
 
