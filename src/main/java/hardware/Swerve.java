@@ -227,7 +227,7 @@ public class Swerve implements Loggable{
         ySpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
         rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier);
 
-        var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation())
                         : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed));

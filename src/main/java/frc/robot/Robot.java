@@ -14,6 +14,7 @@ import calc.Constants.PlacementConstants;
 import calc.OICalc;
 import debug.Debug;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -238,9 +239,13 @@ public class Robot extends TimedRobot {
       swerve.setWheelsX();
 
     } else {
+      // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
+      if (driver.getRightStickButton()) {
+        autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getYaw().getDegrees()) > 90 ? 180 : 0));
+      }
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
-      if (driver.getYButton()) {
+      else if (driver.getYButton()) {
         swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, true);
       }
       else {

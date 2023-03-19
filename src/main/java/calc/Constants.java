@@ -26,7 +26,7 @@ public final class Constants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-        public static double MAX_ANGULAR_SPEED = 4.5 * Math.PI; // radians per second
+        public static double MAX_ANGULAR_SPEED = 6 * Math.PI; // radians per second
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(13.51);
 
@@ -133,8 +133,8 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4.0; // previously 1.75
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75; // previously 1.75
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
@@ -146,7 +146,7 @@ public final class Constants {
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 7.1;
+        public static final double Y_CORRECTION_P = 6.03;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
@@ -172,8 +172,8 @@ public final class Constants {
         public static final double CLAW_MIN_OUTPUT = -1;
         public static final double CLAW_MAX_OUTPUT = 1;
 
-        public static final int CLAW_STALL_LIMIT = 20;
-        public static final int CLAW_FREE_LIMIT = 25;
+        public static final int CLAW_STALL_LIMIT = 25;
+        public static final int CLAW_FREE_LIMIT = 30;
 
 
         // from the edge of the upper arm, straight out,
@@ -393,19 +393,17 @@ public final class Constants {
     public static final class AlignmentConstants {
 
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 1;
+        public static final double SNAP_TO_ANGLE_P = 0.0025;
+        
 
         public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
         private static final double HUMAN_TAG_HEIGHT_METERS = Units.inchesToMeters(27.38);
-        public static final double GRID_BARRIER_METERS = Units.inchesToMeters(13.8); // real is 14-15
+        public static final double GRID_BARRIER_METERS = Units.inchesToMeters(12); // real is 14-15
         public static final double SUBSTATION_OFFSET_METERS = 0.7;
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.53;
-
-        public static final double GRID_WIDTH_METERS = 1.364;
-        public static final double SUBSTATION_WIDTH_METERS = 0.344;
-        public static final double FIELD_HEIGHT_METERS = 8.029;
 
         public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
@@ -437,8 +435,8 @@ public final class Constants {
       // The length of the robot
       public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
       // Length of the bumpers on the robot
-      // Remember that the bumpers are on TWO SIDES of the robot
-      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.5);
+      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(4);
+
       public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
 
       public static final int STOWED_INDEX = 0;
@@ -505,8 +503,8 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(28,36);
-      public static final Translation2d MID_CONE_TRANSITION_POINT = new Translation2d(28,36);
+      public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
+      public static final Translation2d MID_CONE_TRANSITION_POINT = new Translation2d(24,35);
 
       public static final Translation2d[][] ARM_POSITIONS = {
         // Index 0
@@ -514,108 +512,106 @@ public final class Constants {
           TRANSITION_POSITION,
           STOWED_POSITION
         },
-        // Index 1 | STOWED_INDEX
+        // Index 1
         {
           TRANSITION_POSITION,
           HYBRID_POSITION
         },
-        // Index 2 | MID_CONE_PLACEMENT_INDEX
+        // Index 2
         {
           TRANSITION_POSITION,
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
-        // Index 3 | HIGH_CONE_PLACEMENT_INDEX
+        // Index 3
         {
           TRANSITION_POSITION,
           HIGH_CONE_POSITION_0,
           // ARM_HIGH_CONE_POSITION_1,
           HIGH_CONE_POSITION_2
         },
-        // Index 4 | HUMAN_TAG_PICKUP_INDEX
+        // Index 4
         {
           HUMAN_TAG_PICKUP
         },
-        // Index 5 | MID_CUBE_LAUNCH_INDEX
+        // Index 5
         {
           TRANSITION_POSITION,
           CUBE_MID_LAUNCH
         },
-        // Index 6 | HIGH_CUBE_LAUNCH_INDEX
+        // Index 6
         {
           TRANSITION_POSITION,
           CUBE_HIGH_LAUNCH
         },
-        // Index 7 | FLOOR_INTAKE_INDEX
+        // Index 7
         {
           CUBE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 8 | SOLUTION_FLIP_INDEX
+        // Index 8
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_POSITIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 9 | HIGH_TO_STOWWED_INDEX
+        // Index 9
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_NEGATIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 10 | MID_CONE_PREP_INDEX
+        // Index 10
         {
           HIGH_CONE_TRANSITION_POINT,
           TRANSITION_POSITION,
           STOWED_POSITION
         },
-        // Index 11 | LONG_ARM_REACH_INDEX
+        // Index 11
         {
           LONG_ARM_REACH_0,
           LONG_ARM_REACH_1,
           LONG_ARM_REACH_2
         },
-        // Index 12 | FLOOR_INTAKE_PREP_INDEX
+        // Index 12
         {
           CUBE_INTAKE_POSITION_PREP
         },
-        // Index 13 | HIGH_CONE_PREP_INDEX
+        // Index 13
         {
-          TRANSITION_POSITION,
           HIGH_CONE_TRANSITION_POINT
         },
-        // Index 14 | HIGH_CONE_PREP_TO_PLACE_INDEX
+        // Index 14
         {
           HIGH_CONE_POSITION_0,
           HIGH_CONE_POSITION_2
         },
-        // Index 15 | CONE_INTAKE_INDEX
+        // Index 15
         {
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 16 | CUBE_INTAKE_INDEX
+        // Index 16
         {
           CUBE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 17 | CONE_FLIP_INDEX
+        // Index 17
         {
           CONE_FLIP_POSITION_0,
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 18 | MID_CONE_PREP_INDEX
+        // Index 18
         {
-          TRANSITION_POSITION,
           MID_CONE_TRANSITION_POINT
         },
-        // Index 19 | MID_CONE_PLACEMENT_INDEX
+        // Index 19
         {
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
-        // Index 20 | AUTO_INIT_INDEX
+        // Index 20
         {
           AUTO_INIT_PICKUP
         }
