@@ -393,7 +393,7 @@ public final class Constants {
     public static final class AlignmentConstants {
 
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
         
 
