@@ -14,6 +14,7 @@ import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
+import calc.Constants.ClawConstants;
 import calc.Constants.PlacementConstants;
 
 public class AutoSegmentedWaypoints implements Loggable {
@@ -254,6 +255,9 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
+        if (currentWaypointNumber == 1 && claw.getOutputCurrent() < 15 && claw.getDesiredSpeed() > 0) {
+          return;
+        }
         stateHasFinished = false;
         currentWaypointNumber++;
         if (currentWaypointNumber > 1) {
