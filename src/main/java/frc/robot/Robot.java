@@ -126,7 +126,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-    AutoAlignment.coneMode = true;
+    autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -156,7 +156,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
+    autoAlignment.setConeMode(true);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -213,11 +213,11 @@ public class Robot extends TimedRobot {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
-        autoAlignment.setTagID(autoAlignment.getNearestTag());
+        autoAlignment.setNearestValues();
         
       }
       
-      autoAlignment.alignToTag(driverLeftAxis.getY());
+      autoAlignment.alignToTag(driverLeftAxis.getY()*5);
 
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
@@ -400,7 +400,7 @@ public class Robot extends TimedRobot {
     } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool()) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
-        claw.outTakeforXSeconds(0.5);
+        claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
       }
 
     } else if (operator.getLeftTriggerAxis() > 0) {
