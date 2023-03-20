@@ -297,10 +297,12 @@ public class Robot extends TimedRobot {
     if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_PURPLE);
+      arduinoController.sendByte(LEDConstants.ARM_PURPLE);
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_YELLOW);
+      arduinoController.sendByte(LEDConstants.ARM_YELLOW);
     }
 
     // POV = D-Pad...
