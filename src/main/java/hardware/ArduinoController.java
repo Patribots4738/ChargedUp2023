@@ -13,5 +13,4 @@ public class ArduinoController {
       arduino.write(ARDUINO_ADDRESS, value);
     }
   }
-
 }
