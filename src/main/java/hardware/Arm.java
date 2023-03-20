@@ -1,7 +1,5 @@
 package hardware;
 
-import java.util.ArrayList;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -57,7 +55,9 @@ public class Arm implements Loggable {
     private double lowerRotation = 0;
 
     // The DESIRED rotation of the upper and lower arm(s)
+    @Log
     private double upperReferenceAngle = 0;
+    @Log
     private double lowerReferenceAngle = 0;
 
     @Log

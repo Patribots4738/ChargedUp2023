@@ -22,8 +22,10 @@ public class Claw {
     // Timer values to have the claw auto outtake for X seconds
     private boolean startedOuttakingBool = false;
     private boolean finishedOuttaking = false;
+    private boolean hasGameElement = false;
     private double outtakeSeconds = 0;
     private double startedOuttakingTimestamp = 0;
+    private double startedIntakingTimestamp = 0;
 
     public Claw() {
 
@@ -34,7 +36,7 @@ public class Claw {
         _clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
         _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-        _claw.setInverted(false);
+        _claw.setInverted(true);
         _claw.burnFlash();
         setBrakeMode();
 
@@ -46,12 +48,24 @@ public class Claw {
 
     public void periodic() {
 
+      if (getOutputCurrent() > 20 && !hasGameElement && AutoAlignment.coneMode) {
+        startedIntakingTimestamp = Timer.getFPGATimestamp();
+        hasGameElement = true;
+        _claw.setSmartCurrentLimit(40);
+      }
+
+      if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
+        if (getOutputCurrent() < 10) { hasGameElement = false; }
+        _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
+      }
+
         if (DriverStation.isTeleop()) {
+
             if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
                 finishedOuttaking = true;
             }
             if (!AutoAlignment.coneMode) {
-                desiredSpeed = MathUtil.clamp(desiredSpeed, -0.25, 0.8);
+                desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.8);
             }
             else if (desiredSpeed > 0.7) {
                 desiredSpeed = 1;
@@ -122,4 +136,7 @@ public class Claw {
         this.finishedOuttaking = finishedOuttaking;
     }
 
+    public double getOutputCurrent() {
+        return _claw.getOutputCurrent();
+    }
 }
