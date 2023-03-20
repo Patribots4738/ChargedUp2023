@@ -89,14 +89,15 @@ public class AutoAlignment implements Loggable{
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
         // Get the target pose (the pose of the tag we want to go to)
         Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
-        setNearestAlignmentOffset();
         targetPose = getModifiedTargetPose(targetPose);
         currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
         // System.out.println("Current norm: " + currentNorm);
       }
     }
     
-    private void setNearestAlignmentOffset() {
+    public void setNearestAlignmentOffset() {
+
+      if (!coneMode && !(tagID == 4 || tagID == 5)) { this.coneOffset = 0; }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
 
@@ -105,13 +106,6 @@ public class AutoAlignment implements Loggable{
           double tagYOffset = getTagYOffset();
 
           moveArmToHumanTag = (tagID == 4 || tagID == 5);
-
-          // Find which side of the human tag we are closest to based on the tag ID's location and the robot's location
-          double zeroOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
-              new Translation2d(
-                  tagXOffset,
-                  0),
-              new Rotation2d()))).getTranslation().getNorm();
 
           double negativeOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
               new Translation2d(
@@ -125,15 +119,12 @@ public class AutoAlignment implements Loggable{
                   tagYOffset),
               new Rotation2d()))).getTranslation().getNorm();
 
-
           /*
             If we are on red alliance, left of the tag is going to be the negative on the Y axis
             Due to this.moveToTag() checking if we are on the blue alliance and flipping the sign,
             we need to flip the sign here
           */
-          double smallestNorm = Math.min(zeroOffsetNorm, Math.min(negativeOffsetNorm, positiveOffsetNorm));
-
-          if (smallestNorm == negativeOffsetNorm || ((tagID == 4 || tagID == 5) && negativeOffsetNorm < positiveOffsetNorm)) {
+          if (negativeOffsetNorm < positiveOffsetNorm) {
 
             // If we are looking at a human player tag,
             // Then we have been evaluating for the substationOffset
@@ -148,7 +139,7 @@ public class AutoAlignment implements Loggable{
             if ((tagID == 4 || tagID == 5) && negativeOffsetNorm < 1) {
               claw.setDesiredSpeed(coneMode ? PlacementConstants.CLAW_INTAKE_SPEED_CONE : PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
             }
-          } else if (smallestNorm == positiveOffsetNorm || ((tagID == 4 || tagID == 5) && positiveOffsetNorm < negativeOffsetNorm)) {
+          } else /* (positiveOffsetNorm < negativeOffsetNorm) */ {
 
             // If we are looking at a human player tag,
             // Then we have been evaluating for the substationOffset
@@ -163,22 +154,14 @@ public class AutoAlignment implements Loggable{
             if ((tagID == 4 || tagID == 5) && positiveOffsetNorm < 1) {
               claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
             }
-          // If we are not going to the substation, we don't need to move the arm
-          // This will primarily trigger when the tag does not equal 4 or 5
-          } else {
-
-            if (!(tagID == 4 || tagID == 5)) {
-              this.coneOffset = 0;
-            }
-
           }
+        // If we are not going to the substation, we don't need to move the arm to human tag
+        // This will primarily trigger when the tag does not equal 4 or 5
         if (!(tagID == 4 || tagID == 5)) {
-
           moveArmToHumanTag = false;
-
         }
-      }
       // System.out.println(currentNorm + " " + originalNorm);
+      }
     }
 
     /**
@@ -247,7 +230,11 @@ public class AutoAlignment implements Loggable{
           false
       );
     }
-
+    
+    public void setNearestValues() {
+      this.setTagID(getNearestTag());
+      this.setNearestAlignmentOffset();
+    }
 
     /**
      * Get the tag nearest to the robot using its position
@@ -321,21 +308,21 @@ public class AutoAlignment implements Loggable{
         AlignmentConstants.CONE_OFFSET_METERS;
   }
 
-  /**
-   * Get the modified target pose based on the alliance color
-   * @param targetPose the target pose of the tag we want to go to
-   * @return the modified target pose using constants for grid/substation
-   */
-  public Pose2d getModifiedTargetPose(Pose2d targetPose) {
-    targetPose = targetPose.plus(new Transform2d(
-      new Translation2d(
-          getTagXOffset(),
-          (tagID == 4) ?
-              (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-              (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
-      Rotation2d.fromDegrees(180)));
-    return targetPose;
-  }
+    /**
+     * Get the modified target pose based on the alliance color
+     * @param targetPose the target pose of the tag we want to go to
+     * @return the modified target pose using constants for grid/substation
+     */
+    public Pose2d getModifiedTargetPose(Pose2d targetPose) {
+      targetPose = targetPose.plus(new Transform2d(
+        new Translation2d(
+            getTagXOffset(),
+            (tagID == 4) ?
+                (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
+        Rotation2d.fromDegrees(180)));
+      return targetPose;
+    }
 
     public int getTagID() {
         return tagID;
