@@ -498,7 +498,7 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
       public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(35, 38);
-      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(29,25);
+      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(20,25);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
