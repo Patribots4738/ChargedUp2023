@@ -14,6 +14,7 @@ import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
+import calc.Constants.ClawConstants;
 import calc.Constants.PlacementConstants;
 
 public class AutoSegmentedWaypoints implements Loggable {
@@ -44,6 +45,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   public boolean startedChargePad = false;
   @Log
   public boolean armInit = false;
+  public boolean halfway = false;
 
   public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
     this.swerve = swerve;
@@ -82,7 +84,7 @@ public class AutoSegmentedWaypoints implements Loggable {
         initialPathPose.poseMeters.getTranslation().getY(), 
         initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
 
-      initialPathPose.holonomicRotation = initialPathPose.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+      initialPathPose.holonomicRotation = initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
 
     }
 
@@ -92,6 +94,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     hasMovedArm = false;
     startedChargePad = false;
     armInit = false;
+    halfway = false;
 
     swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
 
@@ -124,8 +127,10 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     // Check if the arm is ready to move to the next waypoint mid-path
-    if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions()) {
-
+    if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions() && 
+        ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
+          DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90)) {
+      
       // Prepare the arm for the next waypoint before the path is done
       switch (armIndex) {
         // If the next waypoint is a floor pickup, prepare the arm for a floor pickup
@@ -176,8 +181,8 @@ public class AutoSegmentedWaypoints implements Loggable {
         clawHasStarted = true;
       }
 
-      // 0.3 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.3) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
+      // 0.2 seconds since the claw has moved (and if there are more waypoints)
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.2) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
         stateHasFinished = true;
       }
     }
@@ -250,8 +255,14 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
+        if (currentWaypointNumber == 1 && claw.getOutputCurrent() < 15 && claw.getDesiredSpeed() > 0) {
+          return;
+        }
         stateHasFinished = false;
         currentWaypointNumber++;
+        if (currentWaypointNumber > 1) {
+          halfway = true;
+        }
         stateHasInitialized = false;
       }
       

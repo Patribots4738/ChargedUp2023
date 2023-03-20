@@ -115,7 +115,7 @@ public class SwerveTrajectory implements Loggable {
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < _pathTraj.getTotalTimeSeconds() + 2)
+        if (elapsedTime < _pathTraj.getTotalTimeSeconds() + 0.5)
         {
           System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 
@@ -143,7 +143,7 @@ public class SwerveTrajectory implements Loggable {
                 state.poseMeters.getTranslation().getY(),
                 state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
             mirroredState.curvatureRadPerMeter = state.curvatureRadPerMeter;
-            mirroredState.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+            mirroredState.holonomicRotation = state.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
             mirroredState.angularVelocityRadPerSec = state.angularVelocityRadPerSec;
             mirroredState.holonomicAngularVelocityRadPerSec = state.holonomicAngularVelocityRadPerSec;
 

@@ -15,7 +15,6 @@ import calc.Constants.PlacementConstants;
 import calc.OICalc;
 import debug.Debug;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -94,7 +93,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-      swerve.periodic();
       // arm.periodic();
 
       Logger.updateEntries();
@@ -111,20 +109,25 @@ public class Robot extends TimedRobot {
 
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
+    
+    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
+    arduinoController.sendByte(LEDConstants.ARM_RAINBOW);
+
+    System.out.println(swerve.getPose().getTranslation());
 
   }
 
   @Override
   public void disabledPeriodic() {
     // SwerveTrajectory.resetHDC();
-    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
+
   }
 
   @Override
   public void autonomousInit() {
 
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-    AutoAlignment.coneMode = true;
+    autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -133,6 +136,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    swerve.periodic();
     // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
@@ -145,13 +149,15 @@ public class Robot extends TimedRobot {
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
-    autoAlignment.calibrateOdometry();
+    if (autoSegmentedWaypoints.halfway) {
+      autoAlignment.calibrateOdometry();
+    }
 
   }
 
   @Override
   public void teleopInit() {
-
+    autoAlignment.setConeMode(true);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -161,6 +167,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    swerve.periodic();
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
@@ -206,12 +213,12 @@ public class Robot extends TimedRobot {
 
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
-        autoAlignment.setTagID(autoAlignment.getNearestTag());
-        autoAlignment.generateTagTrajectory();
-
+        SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        autoAlignment.setNearestValues();
+        
       }
       
-      autoAlignment.moveToTag();
+      autoAlignment.alignToTag(driverLeftAxis.getY()*5);
 
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
@@ -233,9 +240,16 @@ public class Robot extends TimedRobot {
       swerve.setWheelsX();
 
     } else {
+      // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
+      if (driver.getRightStickButton()) {
+        if (driver.getRightStickButtonPressed()) {
+          SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        }
+        autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getYaw().getDegrees()) > 90 ? 180 : 0));
+      }
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
-      if (driver.getYButton()) {
+      else if (driver.getYButton()) {
         swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, true);
       }
       else {
@@ -384,10 +398,10 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper() || operator.getAButtonReleased()) && !claw.getStartedOuttakingBool()) {
+    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool()) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
-        claw.outTakeforXSeconds(0.5);
+        claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
       }
 
     } else if (operator.getLeftTriggerAxis() > 0) {
@@ -426,11 +440,11 @@ public class Robot extends TimedRobot {
     if (Math.abs(swerve.getPitch().getDegrees()) > 60) {
       arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
     }
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/4) && (autoAlignment.getCurrentNorm() != -1)) {
-      driver.setRumble(RumbleType.kLeftRumble, 0.5);
-      driver.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kLeftRumble, 0.5);
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER) && (autoAlignment.getCurrentNorm() != -1)) {
+      driver.setRumble(RumbleType.kLeftRumble, 0.75);
+      driver.setRumble(RumbleType.kRightRumble, 0.75);
+      operator.setRumble(RumbleType.kRightRumble, 0.75);
+      operator.setRumble(RumbleType.kLeftRumble, 0.75);
       arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
     }
     else {
@@ -445,15 +459,34 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kLeftRumble, 0);
     }
+
+    //Rumble the claw if it is stalling, judged by whether or not the claw is drawing more amps than a preset limit.
+    if (claw.getOutputCurrent() > 25) {
+      driver.setRumble(RumbleType.kBothRumble, 0.1);
+      operator.setRumble(RumbleType.kBothRumble, 0.1);
+    }
+
   }  
 
   @Override
   public void testInit() {
-    arm.setCoastMode();
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+    arm.setBrakeMode();
+    // arm.setArmIndex(PlacementConstants.STOWED_INDEX);
   }
 
   @Override
   public void testPeriodic() {
-    arm.periodic();
+
+    double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+    double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+    
+    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+    
+    swerve.periodic();
+    // arm.periodic();
+
+    swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true, true);
   }
 }
