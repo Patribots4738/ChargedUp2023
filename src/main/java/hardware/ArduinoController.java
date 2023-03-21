@@ -37,9 +37,9 @@ public class ArduinoController {
         // Set the current state to our value
         currentBellyPanState = queue.peek();
       }
-    }
-    // Send the latest byte in the queue to the arduino
-    sendByte();
+      // Send the latest byte in the queue to the arduino
+      sendByte();
+    } 
   }
 
   public void setLEDState(int state) {
