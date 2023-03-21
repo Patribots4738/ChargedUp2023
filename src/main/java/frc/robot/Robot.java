@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import hardware.ArduinoController;
 import hardware.Arm;
 import hardware.Claw;
@@ -91,10 +92,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
-      // arm.periodic();
-
-      Logger.updateEntries();
+        
+    Logger.updateEntries();
+    arduinoController.periodic();
 
   }
 
@@ -109,8 +109,8 @@ public class Robot extends TimedRobot {
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
     
-    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
-    arduinoController.sendByte(LEDConstants.ARM_RAINBOW);
+    arduinoController.setLEDState(LEDConstants.BELLY_PAN_RAINBOW);
+    arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED);
 
     System.out.println(swerve.getPose().getTranslation());
 
@@ -118,8 +118,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    // SwerveTrajectory.resetHDC();
-
+    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
+    }
   }
 
   @Override
@@ -166,7 +167,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
     swerve.periodic();
+    arm.periodic();
+    claw.periodic();
+    autoAlignment.calibrateOdometry();
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
@@ -174,10 +179,6 @@ public class Robot extends TimedRobot {
       swerve.setWheelsUp();
       return;
     }
-
-    arm.periodic();
-    claw.periodic();
-    autoAlignment.calibrateOdometry();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
@@ -200,12 +201,17 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
+    if (SwerveTrajectory.trajectoryStatus.equals("setup") && !driver.getAButton()) {
+      autoAlignment.setNearestValues();
+    }
+
     // When not aligning, reset the max speed to the teleop speed
     if (driver.getAButtonReleased()) {
       DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+      SwerveTrajectory.resetTrajectoryStatus();
+      SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
       //autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
     }
-
     else if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
@@ -213,11 +219,10 @@ public class Robot extends TimedRobot {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
-        autoAlignment.setNearestValues();
         
       }
       
-      autoAlignment.alignToTag(driverLeftAxis.getY()*5);
+      autoAlignment.alignToTag(driverLeftAxis.getY());
 
       if (autoAlignment.getMoveArmToHumanTag()) {
         arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
@@ -249,7 +254,12 @@ public class Robot extends TimedRobot {
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
       else if (driver.getYButton()) {
-        swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, true);
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+          swerve.drive(-driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+        }
+        else {
+          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+        }
       }
       else {
         // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick
@@ -296,13 +306,13 @@ public class Robot extends TimedRobot {
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_PURPLE);
-      arduinoController.sendByte(LEDConstants.ARM_PURPLE);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_PURPLE);
+      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_YELLOW);
-      arduinoController.sendByte(LEDConstants.ARM_YELLOW);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_YELLOW);
+      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
 
     // POV = D-Pad...
@@ -433,22 +443,22 @@ public class Robot extends TimedRobot {
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    if (Math.abs(swerve.getPitch().getDegrees()) > 60) {
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
+    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
     }
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER) && (autoAlignment.getCurrentNorm() != -1)) {
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
       driver.setRumble(RumbleType.kLeftRumble, 0.75);
       driver.setRumble(RumbleType.kRightRumble, 0.75);
       operator.setRumble(RumbleType.kRightRumble, 0.75);
       operator.setRumble(RumbleType.kLeftRumble, 0.75);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
     }
     else {
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
-        arduinoController.sendByte(LEDConstants.BELLY_PAN_RED);
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
       }
       else {
-        arduinoController.sendByte(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
       driver.setRumble(RumbleType.kLeftRumble, 0);
       driver.setRumble(RumbleType.kRightRumble, 0);

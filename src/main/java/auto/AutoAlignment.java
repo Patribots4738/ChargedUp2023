@@ -97,7 +97,10 @@ public class AutoAlignment implements Loggable{
     
     public void setNearestAlignmentOffset() {
 
-      if (!coneMode && !(tagID == 4 || tagID == 5)) { this.coneOffset = 0; }
+      if (!coneMode) { 
+        this.coneOffset = 0; 
+        return; 
+      }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
 
@@ -131,7 +134,7 @@ public class AutoAlignment implements Loggable{
             if (tagID == 4 || tagID == 5) {
               this.substationOffset = -1;
             } else {
-              this.coneOffset = -1;
+              this.coneOffset = -1 * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
             }
 
             // If we are approaching a substation tag,
@@ -146,7 +149,7 @@ public class AutoAlignment implements Loggable{
             if (tagID == 4 || tagID == 5) {
               this.substationOffset = 1;
             } else {
-              this.coneOffset = 1;
+              this.coneOffset = 1 * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
             }
 
             // If we are approaching a substation tag,
@@ -193,7 +196,7 @@ public class AutoAlignment implements Loggable{
       
       double adjustedY = targetPose.getY() - swerve.getPose().getY();
       
-      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_DIAMETER/2));
+      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_DIAMETER));
       
       adjustedY += swerve.getPose().getY();
       
@@ -287,7 +290,7 @@ public class AutoAlignment implements Loggable{
         }
       }
 
-      System.out.println("Current nearest tag " + nearestTag + " at distance " + Units.metersToInches(nearestDistance) + " Inches");
+      // System.out.println("Current nearest tag " + nearestTag + " at distance " + Units.metersToInches(nearestDistance) + " Inches");
 
       return nearestTag;
     }
@@ -317,9 +320,9 @@ public class AutoAlignment implements Loggable{
       targetPose = targetPose.plus(new Transform2d(
         new Translation2d(
             getTagXOffset(),
-            (tagID == 4) ?
+            (tagID == 4 || tagID == 5) ?
                 (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
+                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset) * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1)),
         Rotation2d.fromDegrees(180)));
       return targetPose;
     }
@@ -427,13 +430,9 @@ public class AutoAlignment implements Loggable{
 
     public void setConeMode(boolean coneMode) {
       AutoAlignment.coneMode = coneMode;
-
       // If the cone offset is 0, and we are switching to cone mode,
       // set the cone offset to 1 (closest to human tag)
-      if (coneMode && this.coneOffset == 0) {
-        this.coneOffset = 1;
-      }
-      else if (!coneMode) {
+      if (!coneMode) {
         this.coneOffset = 0;
       }
     }
