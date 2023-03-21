@@ -27,6 +27,7 @@ int data = -1;
 
 int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
+int bounceCenter = 0;
 
 int bellyPanPattern = 0;
 int sponsorPanelPattern = 0;
@@ -77,6 +78,27 @@ void allColor(int startIndex, int endIndex, CRGB c){
   }
   FastLED.show();
   
+}
+
+// Set the pattern of the LEDs to have a lighter color bounce left to right
+void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
+  if (bounceCenter < endIndex) {
+    for (int i = startIndex; i < endIndex; i++) {
+      // Set the 2nd led to a lighter version of param c
+      if (i > bounceCenter - (endIndex-startIndex/10) && i < bounceCenter + (endIndex-startIndex/10)) {
+        double brightness = (constrain(1/abs(i - bounceCenter), 1, 4));
+        leds[i] = CRGB(constrain(c.r*brightness, 0, 255), constrain(c.g*brightness, 0, 255), constrain(c.b*brightness, 0, 255));
+      }
+      leds[i] = c;
+    }
+    FastLED.show();
+    delay(speed);
+    bounceCenter += 1;
+  }
+  else {
+    bounceCenter = startIndex;
+  }
+
 }
 
 
@@ -229,7 +251,7 @@ void setBellyPan(int pattern){
       break;
       
     case 5: // Blue
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Blue);
+      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Blue, MEDIUM);
       break;
       
     case 6: // Green
