@@ -315,6 +315,8 @@ public final class Constants {
     }
 
     public static final class LEDConstants {
+
+      public static final int ARDUINO_ADDRESS = 8;
       public static final int BELLY_PAN_RAINBOW = 0;
       // The "theater chase" could possibly induce seizures,
       // Please refrain from using these.

@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
         
     Logger.updateEntries();
-    arduinoController.reset();
+    arduinoController.periodic();
 
   }
 
@@ -109,7 +109,8 @@ public class Robot extends TimedRobot {
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
     
-    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
+    arduinoController.setLEDState(LEDConstants.BELLY_PAN_RAINBOW);
+    arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED);
 
     System.out.println(swerve.getPose().getTranslation());
 
@@ -117,8 +118,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    // SwerveTrajectory.resetHDC();
-    arduinoController.sendByte(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED);
+    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
+    }
   }
 
   @Override
@@ -304,11 +306,13 @@ public class Robot extends TimedRobot {
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_PURPLE);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_PURPLE);
+      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_YELLOW);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_YELLOW);
+      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
 
     // POV = D-Pad...
@@ -440,21 +444,21 @@ public class Robot extends TimedRobot {
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
     if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
     }
     else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
       driver.setRumble(RumbleType.kLeftRumble, 0.75);
       driver.setRumble(RumbleType.kRightRumble, 0.75);
       operator.setRumble(RumbleType.kRightRumble, 0.75);
       operator.setRumble(RumbleType.kLeftRumble, 0.75);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
     }
     else {
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
-        arduinoController.sendByte(LEDConstants.BELLY_PAN_RED);
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
       }
       else {
-        arduinoController.sendByte(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
       driver.setRumble(RumbleType.kLeftRumble, 0);
       driver.setRumble(RumbleType.kRightRumble, 0);
