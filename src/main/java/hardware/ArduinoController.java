@@ -2,13 +2,15 @@ package hardware;
 
 import calc.Constants.LEDConstants;
 import edu.wpi.first.wpilibj.I2C;
+
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class ArduinoController {
 
   //Sets up the Arduino over I2C on port 8
   private final I2C arduino = new I2C(I2C.Port.kOnboard, LEDConstants.ARDUINO_ADDRESS);
-  private Queue<Integer> queue;
+  private Queue<Integer> queue = new LinkedList<Integer>();
   private int currentBellyPanState = -1;
   private int currentArmState = -1;
 
@@ -39,17 +41,24 @@ public class ArduinoController {
       }
       // Send the latest byte in the queue to the arduino
       sendByte();
-    } 
+    }
   }
 
   public void setLEDState(int state) {
     // Add the state to the queue
-    queue.add(state);
+    if (!queue.contains(state) && 
+        state != currentArmState && 
+        state != currentBellyPanState) 
+    {
+      System.out.println("Adding: " + state);
+      queue.offer(state);
+    }
+    
   }
 
   public void sendByte() {
     // Send the latest queue value to the arduino,
-    // Then, remove the latest value from the queue  
+    // Then, remove the latest value from the queue
     arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
   }
 }
