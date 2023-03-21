@@ -88,7 +88,7 @@ void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO direction
       if (i > bounceCenter - (endIndex-startIndex/10) && i < bounceCenter + (endIndex-startIndex/10)) {
         double brightness = 255;
         if (i != bounceCenter) {
-          brightness = (constrain((1/log(abs(i - bounceCenter)+1)+0.1), 0, 1))*255;
+          brightness = (constrain(((1 / (log(abs(i - bounceCenter) + 0.1))) - 1), 0, 1)) * 255;
         }
         leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 255), constrain(c.b + brightness, 0, 255));
       }
