@@ -109,7 +109,7 @@ public class Robot extends TimedRobot {
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
     
-    arduinoController.setLEDState(LEDConstants.BELLY_PAN_RAINBOW);
+    arduinoController.setLEDState(LEDConstants.ARM_RAINBOW);
     arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED);
 
     System.out.println(swerve.getPose().getTranslation());
@@ -306,12 +306,10 @@ public class Robot extends TimedRobot {
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
-      arduinoController.setLEDState(LEDConstants.BELLY_PAN_PURPLE);
       arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
-      arduinoController.setLEDState(LEDConstants.BELLY_PAN_YELLOW);
       arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
 
