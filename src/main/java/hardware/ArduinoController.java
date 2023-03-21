@@ -48,6 +48,8 @@ public class ArduinoController {
   }
 
   public void sendByte() {
+    // Send the latest queue value to the arduino,
+    // Then, remove the latest value from the queue  
     arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
   }
 }
