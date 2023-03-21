@@ -156,8 +156,8 @@ public class Arm implements Loggable {
 
     public void periodic() {
         if (!operatorOverride) { indexPeriodic();}
-        setLowerArmPosition(lowerReferenceAngle);
-        setUpperArmAngle(upperReferenceAngle);
+        // setLowerArmPosition(lowerReferenceAngle);
+        // setUpperArmAngle(upperReferenceAngle);
         upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // Use forward kinematics to get the x and y position of the end effector

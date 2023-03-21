@@ -3,7 +3,8 @@
 
 // How many leds in your strip?
 #define NUM_LEDS 150
-#define DATA_PIN 3
+#define DATA_PIN 7 
+
 #define FORWARD 0
 #define BACKWARD 1
 #define SLOW 250
@@ -31,14 +32,17 @@ int bellyPanPattern = 0;
 int sponsorPanelPattern = 0;
 int armPattern = 0;
 int clawPattern = 0;
+int statusLED = false;
 
 void setup() {
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
+  Serial.println("Recieved");
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   randomSeed(analogRead(0));
   Serial.begin(9600);
   FastLED.setBrightness(BRIGHTNESS);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
@@ -47,6 +51,7 @@ void loop() {
 //  setSponsorPanel(sponsorPanelPattern);
   setArm(armPattern);
 //  setClaw(clawPattern);
+  
 }
 
 void assignDataToSections(){
@@ -71,12 +76,6 @@ void allColor(int startIndex, int endIndex, CRGB c){
     leds[i] = c;
   }
   FastLED.show();
-  delay(FAST)
-  for (int i = startIndex; i < endIndex; i++){
-    leds[i] = CRGB::Black;
-  }
-  FastLED.show();
-  delay(FAST);
   
 }
 
@@ -181,7 +180,10 @@ void receiveEvent()
 //    Serial.print(c);
   }
   data = Wire.read();
-  Serial.println(data);
+//  Serial.println(data);
+
+  digitalWrite(LED_BUILTIN, true);
+  statusLED = !statusLED;
 }
 
 
@@ -219,7 +221,7 @@ void setBellyPan(int pattern){
       break;
       
     case 3: // FlashRed
-      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, MEDIUM);
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, SLOW);
       break;
       
     case 4: // 
@@ -306,7 +308,7 @@ void setArm(int pattern){
       break;
       
     case 23: // NULL
-      flash(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red, MEDIUM);
+      flash(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red, SLOW);
       break;
       
     case 24: // Red
