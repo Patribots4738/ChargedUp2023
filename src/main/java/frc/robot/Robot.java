@@ -159,6 +159,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     autoAlignment.setConeMode(true);
+    arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
