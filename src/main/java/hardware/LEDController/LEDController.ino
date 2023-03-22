@@ -28,7 +28,6 @@ int data = -1;
 int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
 int bounceCenter = 0;
-int bounceIncrement = 1;
 
 int bellyPanPattern = 5;
 int sponsorPanelPattern = 0;
@@ -83,7 +82,7 @@ void allColor(int startIndex, int endIndex, CRGB c){
 
 // Set the pattern of the LEDs to have a lighter color bounce left to right
 void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
-  if (bounceCenter < endIndex+20 && bounceCenter > 0) {
+  if (bounceCenter < endIndex+20) {
     for (int i = startIndex; i < endIndex; i++) {
       // Set the 2nd led to a lighter version of param c
       if (i > bounceCenter - (20) && i < bounceCenter + (20))
@@ -104,15 +103,10 @@ void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO direction
     }
     FastLED.show();
     delay(speed/4);
-    bounceCenter += bounceIncrement;
+    bounceCenter += 1;
   }
   else {
-    if (bounceCenter < 0) {
-      bounceIncrement = 1;
-    }
-    else {
-      bounceIncrement = -1;
-    }
+    bounceCenter = startIndex-20;
   }
 
 }
