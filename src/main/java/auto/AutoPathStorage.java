@@ -718,9 +718,9 @@ public class AutoPathStorage implements Loggable {
 
     _9H_D_CHARGE = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED),
-        new Waypoint(_9_D, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-        new Waypoint(_D_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-        new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+        new Waypoint(_9_D, PlacementConstants.CONE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CONE),
+        new Waypoint(_D_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CONE),
+        new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CONE)
     };
 
     _9H_D_7H_REACH = new Waypoint[] {
