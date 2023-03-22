@@ -322,10 +322,7 @@ public final class Constants {
       // Please refrain from using these.
       @Deprecated
       public static final int BELLY_PAN_THEATER_CHASE_RAINBOW = 1;
-      // The "theater chase" could possibly induce seizures,
-      // Please refrain from using these.
-      @Deprecated
-      public static final int BELLY_PAN_THEATER_CHASE = 2;
+      public static final int BELLY_PAN_RED_ALLIANCE = 2;
       public static final int BELLY_PAN_FLASH_RED = 3;
       public static final int BELLY_PAN_RED = 4;
       public static final int BELLY_PAN_BLUE = 5;

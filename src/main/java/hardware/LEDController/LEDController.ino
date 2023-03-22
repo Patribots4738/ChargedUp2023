@@ -29,7 +29,7 @@ int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
 int bounceCenter = 0;
 
-int bellyPanPattern = 0;
+int bellyPanPattern = 5;
 int sponsorPanelPattern = 0;
 int armPattern = 0;
 int clawPattern = 0;
@@ -82,24 +82,31 @@ void allColor(int startIndex, int endIndex, CRGB c){
 
 // Set the pattern of the LEDs to have a lighter color bounce left to right
 void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
-  if (bounceCenter < endIndex) {
+  if (bounceCenter < endIndex+20) {
     for (int i = startIndex; i < endIndex; i++) {
       // Set the 2nd led to a lighter version of param c
-      if (i > bounceCenter - (endIndex-startIndex/10) && i < bounceCenter + (endIndex-startIndex/10)) {
+      if (i > bounceCenter - (20) && i < bounceCenter + (20))
+      {
         double brightness = 255;
         if (i != bounceCenter) {
-          brightness = (constrain(((1 / (log(abs(i - bounceCenter) + 0.1))) - 1), 0, 1)) * 255;
+          brightness = 400/(abs(i - bounceCenter));
+        }
+        if (c.r == 255)
+        {
+          brightness = brightness * - 1;
         }
         leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 255), constrain(c.b + brightness, 0, 255));
       }
-      leds[i] = c;
+      else {
+        leds[i] = c;
+      }
     }
     FastLED.show();
-    delay(speed);
+    delay(speed/4);
     bounceCenter += 1;
   }
   else {
-    bounceCenter = startIndex;
+    bounceCenter = startIndex-20;
   }
 
 }
@@ -136,7 +143,7 @@ void rainbow(int startIndex, int endIndex, int cycles, int speed){ // TODO direc
   
 }
 
-// Theater-style crawling lights
+// Theater-st+yle crawling lights
 void theaterChase(int startIndex, int endIndex, CRGB c, int speed){ // TODO direction
   for (int q=0; q < 3; q++) {
     for (int i=startIndex; i < endIndex; i=i+3) {
@@ -241,15 +248,15 @@ void setBellyPan(int pattern){
       theaterChaseRainbow(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, MEDIUM);
       break;
 
-    case 2: //theaterChase
-      theaterChase(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, randomColor(), MEDIUM);
+    case 2: // Red Alliance
+      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, MEDIUM);
       break;
       
     case 3: // FlashRed
       flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, SLOW);
       break;
       
-    case 4: // 
+    case 4: // Red
       allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red);
       break;
       
