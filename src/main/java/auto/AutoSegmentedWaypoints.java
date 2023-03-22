@@ -245,6 +245,10 @@ public class AutoSegmentedWaypoints implements Loggable {
   
     else if (stateHasFinished) {
 
+      stateHasFinished = false;
+      clawHasStarted = false;
+      hasMovedArm = false;
+
       if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
           arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX)
       { 
@@ -255,13 +259,23 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
-        if (currentWaypointNumber == 1 && claw.getOutputCurrent() < 15 && claw.getDesiredSpeed() > 0) {
+        if (currentWaypointNumber == 1 && 
+            claw.getOutputCurrent() < 15 && 
+            claw.getDesiredSpeed() > 0 && 
+            !chosenAutoPath.getName().contains("D_CHARGE")) 
+        {
           return;
         }
-        stateHasFinished = false;
         currentWaypointNumber++;
         if (currentWaypointNumber > 1) {
-          halfway = true;
+          if (chosenAutoPath.getName().contains("D_CHARGE") ||
+              chosenAutoPath.getName().contains("A_CHARGE")) 
+          {
+            claw.setDesiredSpeed(1);
+            clawHasStarted = true;
+          } else {
+            halfway = true;
+          }
         }
         stateHasInitialized = false;
       }
@@ -272,10 +286,6 @@ public class AutoSegmentedWaypoints implements Loggable {
       {
         claw.stopClaw();
       }
-
-      stateHasFinished = false;
-      clawHasStarted = false;
-      hasMovedArm = false;
     }
   }
 }
