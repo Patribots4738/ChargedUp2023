@@ -476,8 +476,10 @@ public final class Constants {
 
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
+      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(15, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
+      
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
       
@@ -546,7 +548,7 @@ public final class Constants {
         // Index 7
         {
           CUBE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
+          CUBE_INTAKE_POSITION
         },
         // Index 8
         {
@@ -593,7 +595,7 @@ public final class Constants {
         // Index 16
         {
           CUBE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
+          CUBE_INTAKE_POSITION
         },
         // Index 17
         {
