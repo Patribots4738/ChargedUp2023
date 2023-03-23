@@ -78,7 +78,6 @@ public class AutoAlignment implements Loggable{
         Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         targetPose = getModifiedTargetPose(targetPose);
         currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-        // System.out.println("Current norm: " + currentNorm);
       }
     }
     
@@ -131,7 +130,6 @@ public class AutoAlignment implements Loggable{
             this.coneOffset = ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
           }
         }
-      // System.out.println(currentNorm + " " + originalNorm);
       }
     }
 
@@ -258,8 +256,6 @@ public class AutoAlignment implements Loggable{
         }
       }
 
-      // System.out.println("Current nearest tag " + nearestTag + " at distance " + Units.metersToInches(nearestDistance) + " Inches");
-
       return nearestTag;
     }
 
@@ -366,8 +362,6 @@ public class AutoAlignment implements Loggable{
           // System.out.println("Case 4: Tag = " + tagID + ", coneOffset = " + coneOffset);
         }
       }
-
-      System.out.println(this.coneOffset + " to " + coneOffset);
 
       // Clamp the cone offset to -1, 0, or 1
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);

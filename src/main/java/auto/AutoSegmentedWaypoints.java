@@ -169,12 +169,10 @@ public class AutoSegmentedWaypoints implements Loggable {
         // this is because the first transition point is the prep index's end point
         if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_INDEX)
         {
-          System.out.println("Moving arm to index HIGH_PLACE_AUTO (" + PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX + ") at waypoint: " + currentWaypointNumber);
           arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX);
         }
         // The arm is not at a prep index...
         else {
-          System.out.println("Moving arm to index: " + armIndex + " at waypoint: " + currentWaypointNumber);
           arm.setArmIndex(armIndex);
         }
         // Prevent the arm from setting the index again

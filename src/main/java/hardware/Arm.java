@@ -163,7 +163,6 @@ public class Arm implements Loggable {
         // Use forward kinematics to get the x and y position of the end effector
         armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
-        // System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
     public void indexPeriodic() {
@@ -223,7 +222,6 @@ public class Arm implements Loggable {
           armsAtDesiredPosition = true;
           return;
         }
-        // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
       }
     }
@@ -272,7 +270,6 @@ public class Arm implements Loggable {
         // Turn off operator override to prevent arm.drive from setting values wrong
         this.operatorOverride = false;
 
-        System.out.println("Changed index to " + armPosDimension1);
     }
 
     public int getArmIndex() {
@@ -301,8 +298,6 @@ public class Arm implements Loggable {
           this.armXReference = position.getX() * (this.armMirrored ? -1 : 1);
           this.armYReference = position.getY();
         }
-
-        // System.out.println("Mirr: " + armMirrored + " PosX " + armXReference);
 
         // Make sure armX and armY are within the range of 0 to infinity
         // Because we cannot reach below the ground.
