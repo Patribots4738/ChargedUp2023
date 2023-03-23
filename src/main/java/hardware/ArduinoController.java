@@ -50,7 +50,6 @@ public class ArduinoController {
         state != currentArmState && 
         state != currentBellyPanState) 
     {
-      System.out.println("Adding: " + state);
       queue.offer(state);
     }
     
@@ -59,6 +58,8 @@ public class ArduinoController {
   public void sendByte() {
     // Send the latest queue value to the arduino,
     // Then, remove the latest value from the queue
-    arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
+    if (queue.peek() != null) {
+      arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
+    }
   }
 }
