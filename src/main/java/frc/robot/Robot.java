@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
       // Debug class for ShuffleBoard
-      debug = new Debug();
+      // debug = new Debug();
 
       // Drivetrain instantiation
       swerve = new Swerve();
@@ -111,7 +111,8 @@ public class Robot extends TimedRobot {
     
     arduinoController.setLEDState(LEDConstants.ARM_RAINBOW);
     arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
-    swerve.speedMultiplier = 1;
+
+    swerve.setSpeedMultiplier(1);
 
     System.out.println(swerve.getPose().getTranslation());
 
