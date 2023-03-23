@@ -40,7 +40,7 @@ public class Swerve implements Loggable{
     @Log
     public double roll = 0;
 
-    private double speedMultiplier = 1;
+    public double speedMultiplier = 1;
 
       // Slew rate filter variables for controlling lateral acceleration
       private double m_currentRotation = 0.0;
