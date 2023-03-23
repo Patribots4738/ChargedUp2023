@@ -134,8 +134,8 @@ public final class Constants {
     public static final class AutoConstants {
 
         public static final double MAX_SPEED_METERS_PER_SECOND = 4; // previously 1.75
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.25; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 3 * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/2; 
 
         public static final double PX_CONTROLLER = 1;
@@ -476,7 +476,7 @@ public final class Constants {
 
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
-      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(15, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(17, 7);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
       
