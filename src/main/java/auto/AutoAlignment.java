@@ -1,6 +1,5 @@
 package auto;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -8,10 +7,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint; 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
@@ -19,8 +14,6 @@ import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
-import calc.Constants.AutoConstants;
-import calc.Constants.DriveConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.ClawConstants;
 import calc.PhotonCameraPose;
