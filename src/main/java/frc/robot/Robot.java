@@ -111,6 +111,7 @@ public class Robot extends TimedRobot {
     
     arduinoController.setLEDState(LEDConstants.ARM_RAINBOW);
     arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
+    swerve.speedMultiplier = 1;
 
     System.out.println(swerve.getPose().getTranslation());
 
