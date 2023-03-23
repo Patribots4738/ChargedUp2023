@@ -21,7 +21,7 @@ public class AutoPathStorage implements Loggable {
   @Log(tabName = "AutoPicker", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
   public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
 
-  public static Waypoint[] chosenWaypoints;
+  public static Waypoint[] chosenWaypoints ;
 
   public static AutoPose[] myAutoContainer;
 
