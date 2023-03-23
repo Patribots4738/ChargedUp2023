@@ -21,7 +21,7 @@ public class AutoPathStorage implements Loggable {
   @Log(tabName = "AutoPicker", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
   public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
 
-  public static Waypoint[] chosenWaypoints ;
+  public static Waypoint[] chosenWaypoints;
 
   public static AutoPose[] myAutoContainer;
 
@@ -124,7 +124,6 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _9H_D_CHARGE;
 
   public static Waypoint[] _9H_D_7H_REACH;
-  public static Waypoint[] _9H_D_CUBE;
 
   public static PathPlannerTrajectory square1;
   public static PathPlannerTrajectory square2;
@@ -634,21 +633,18 @@ public class AutoPathStorage implements Loggable {
 
     _9H_D_8H_CHARGE = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D, PlacementConstants.CONE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+        new Waypoint(_9_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
     };
 
     _9H_D_8H = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D, PlacementConstants.CONE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE)
+        new Waypoint(_9_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
     };
 
     _9H_D_8H_C = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D, PlacementConstants.CONE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        new Waypoint(_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_C, PlacementConstants.CONE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CONE)
     };
 
@@ -734,12 +730,6 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
-    _9H_D_CUBE = new Waypoint[] {
-      new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-      new Waypoint(_9_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-      new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-    };
-
 
     myAutoContainer = new AutoPose[] {
       // AutoPoses for the bottom of the field:
@@ -788,10 +778,6 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("9H_D_7H", _9H_D_7H),
       new AutoPose("9H_D_7H_C", _9H_D_7H_C),
 
-      new AutoPose("9H_D_8H_CHARGE", _9H_D_8H_CHARGE),
-      new AutoPose("9H_D_8H", _9H_D_8H),
-      new AutoPose("9H_D_8H_C", _9H_D_8H_C),
-
       new AutoPose("1H_A_CHARGE", _1H_A_CHARGE),
       new AutoPose("2H_A_CHARGE", _2H_A_CHARGE),
       new AutoPose("3H_A_CHARGE", _3H_A_CHARGE),
@@ -811,9 +797,9 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("8H_D_CHARGE", _8H_D_CHARGE),
       new AutoPose("9H_D_CHARGE", _9H_D_CHARGE),
 
-      new AutoPose("9H_D_7H_REACH", _9H_D_7H_REACH),
-      new AutoPose("9H_D_CUBE", _9H_D_CUBE),
-      new AutoPose("SQUARE_HALF", _SQUARE_HALF),
+      new AutoPose("9H_D_8H_CHARGE", _9H_D_8H_CHARGE),
+      new AutoPose("9H_D_8H", _9H_D_8H),
+      new AutoPose("9H_D_8H_C", _9H_D_8H_C),
 
     };
 
@@ -836,7 +822,7 @@ public class AutoPathStorage implements Loggable {
   }
 
   // The waypoint class is used to create a waypoint set
-  // This is so we can create a larget path using multiple waypoints
+  // This is so we can create a larger path using multiple waypoints
   public static class Waypoint {
 
     private final PathPlannerTrajectory pathPlannerSegment;
@@ -863,7 +849,7 @@ public class AutoPathStorage implements Loggable {
   }
 
   // The auto pose class is used to create a waypoint set with a string
-  // This is so we can have it in a drop down menu in shuffleboard
+  // This is so we can have it in a drop-down menu in shuffleboard
   @SuppressWarnings({"CanBeFinal", "SameParameterValue"})
   public static class AutoPose {
     
