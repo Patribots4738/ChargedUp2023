@@ -14,7 +14,6 @@ import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
-import calc.Constants.ClawConstants;
 import calc.Constants.PlacementConstants;
 
 public class AutoSegmentedWaypoints implements Loggable {
@@ -151,7 +150,7 @@ public class AutoSegmentedWaypoints implements Loggable {
         halfway = true;
       
         if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX)
-          arm.setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX);
+          arm.setArmIndex(PlacementConstants.AUTO_CUBE_INTAKE_INDEX);
         claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
       }
     }

@@ -459,6 +459,7 @@ public final class Constants {
       public static final int MID_CONE_PREP_INDEX = 18;
       public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
       public static final int AUTO_INIT_INDEX = 20;
+      public static final int AUTO_CUBE_INTAKE_INDEX = 21;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
@@ -478,6 +479,7 @@ public final class Constants {
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
       public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(40, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
       
@@ -616,6 +618,11 @@ public final class Constants {
         // Index 20
         {
           AUTO_INIT_PICKUP
+        },
+        // Index 21
+        {
+          CONE_INTAKE_POSITION_PREP,
+          CUBE_INTAKE_POSITION_AUTO
         }
       };
   }
