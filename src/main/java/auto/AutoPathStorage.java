@@ -256,7 +256,7 @@ public class AutoPathStorage implements Loggable {
     _5_CH = PathPlanner.loadPath("_5_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _6_CH = PathPlanner.loadPath("_6_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _7_CH = PathPlanner.loadPath("_7_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_CH = PathPlanner.loadPath("_8_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _8_CH = PathPlanner.loadPath("_8_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, 3);
     _9_CH = PathPlanner.loadPath("_9_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _M_CH = PathPlanner.loadPath("_M_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 

@@ -152,7 +152,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       
         if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX)
           arm.setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX);
-        claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+        claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
       }
     }
 

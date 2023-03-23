@@ -108,7 +108,6 @@ public class Claw {
     }
 
     public double getDesiredSpeed() {
-        if (this.desiredSpeed > 0) { return (this.desiredSpeed / 0.7); }
         return this.desiredSpeed;
     }
 
