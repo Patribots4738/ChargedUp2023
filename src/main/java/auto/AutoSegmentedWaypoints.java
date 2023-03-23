@@ -114,40 +114,55 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     // Limit the claw speed based on what object we plan on placing
     // This will reduce the possibility of popping a cube, for example.
-    if (clawSpeed == PlacementConstants.CLAW_OUTTAKE_SPEED && !clawHasStarted) {
+    if (clawSpeed == PlacementConstants.CLAW_OUTTAKE_SPEED_CONE && !clawHasStarted) {
       switch (armIndex) {
         case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
         case PlacementConstants.MID_CONE_PLACEMENT_INDEX:
           claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
           break;
         default:
-          claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
+          claw.setDesiredSpeed(((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) ? PlacementConstants.CLAW_INTAKE_SPEED_CUBE : PlacementConstants.CLAW_INTAKE_SPEED_CONE));
           break;
       }
     }
 
     // Check if the arm is ready to move to the next waypoint mid-path
-    if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions() && 
-        ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
-          DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90)) {
+    if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions()) {
       
-      // Prepare the arm for the next waypoint before the path is done
-      switch (armIndex) {
-        // If the next waypoint is a floor pickup, prepare the arm for a floor pickup
-        case PlacementConstants.CUBE_INTAKE_INDEX:
-          arm.setArmIndex(PlacementConstants.FLOOR_INTAKE_PREP_INDEX);
-          break;
-
-        // If the next waypoint is a high cone placement, prepare the arm for a high cone placement
-        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
-          arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
-          break;
+      if ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
+          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90) && halfway) 
+      {
+        // Prepare the arm for the next waypoint before the path is done
+        switch (armIndex) {
+          // If the next waypoint is a high cone placement, prepare the arm for a high cone placement
+          case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
+            arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
+            break;
+          case PlacementConstants.HIGH_CUBE_LAUNCH_INDEX:
+            arm.setArmIndex(PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+            break;
+        }
       }
-      // Do not change hasMovedArm because we are not done moving the arm
+      else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && currentWaypointNumber == 1 &&
+              (DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) < 90) || 
+              (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) > 90))
+      {
+        AutoAlignment.coneMode = false;
+        halfway = true;
+      
+        if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX)
+          arm.setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX);
+        claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+      }
     }
 
     // Once the robot is in position...
     else if (SwerveTrajectory.trajectoryStatus.equals("done")) {
+      if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && currentWaypointNumber == 1)
+      {
+        stateHasFinished = true;
+        return;
+      }
       // If the arm is not in the desired position, move it
       if (!hasMovedArm) {
         // If the arm is at a prep index, change the desired index to be the other half of that prep index...
@@ -182,7 +197,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       // 0.2 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.2) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.35) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
         stateHasFinished = true;
       }
     }
@@ -250,11 +265,12 @@ public class AutoSegmentedWaypoints implements Loggable {
       hasMovedArm = false;
 
       if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
-          arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX)
+          arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX || 
+          arm.getArmIndex() == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX)
       { 
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
       }
-      else { 
+      else if (!(chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8"))) { 
         arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
       }
 
@@ -282,7 +298,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED)
+      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE)
       {
         claw.stopClaw();
       }
