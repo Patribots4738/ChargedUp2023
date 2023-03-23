@@ -36,7 +36,7 @@ public class Claw {
         _clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
         _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-        _claw.setInverted(false);
+        _claw.setInverted(true);
         _claw.burnFlash();
         setBrakeMode();
 
@@ -113,7 +113,7 @@ public class Claw {
     }
 
     public void outTakeforXSeconds(double X) {
-        setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
+        setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
         this.startedOuttakingBool = true;
         this.outtakeSeconds = X;
         this.finishedOuttaking = false;
