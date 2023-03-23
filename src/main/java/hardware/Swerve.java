@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
@@ -114,7 +115,8 @@ public class Swerve implements Loggable{
         resetEncoders();
         zeroHeading();
         setBrakeMode();
-        SmartDashboard.putData("Field", field);
+        // SmartDashboard.putData("Field", field);
+        Shuffleboard.getTab("AutoPicker").add(field);
 
     }
 
