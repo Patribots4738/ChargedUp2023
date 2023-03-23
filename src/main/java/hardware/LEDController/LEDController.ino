@@ -29,9 +29,9 @@ int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
 int bounceCenter = 0;
 
-int bellyPanPattern = 5;
+int bellyPanPattern = 1;
 int sponsorPanelPattern = 0;
-int armPattern = 0;
+int armPattern = 20
 int clawPattern = 0;
 int statusLED = false;
 
@@ -95,7 +95,12 @@ void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO direction
         {
           brightness = brightness * - 1;
         }
-        leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 255), constrain(c.b + brightness, 0, 255));
+        if (c.g > 100) {
+          leds[i] = CRGB::Yellow;
+        }
+        else {
+          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 255), constrain(c.b + brightness, 0, 255));
+        }
       }
       else {
         leds[i] = c;
@@ -244,8 +249,8 @@ void setBellyPan(int pattern){
       rainbow(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, 1, FAST);
       break;
 
-    case 1: //theaterChaseRainbow
-      theaterChaseRainbow(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, MEDIUM);
+    case 1: // Green+Gold Bounce
+      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green, MEDIUM);
       break;
 
     case 2: // Red Alliance
