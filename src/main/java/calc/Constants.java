@@ -439,12 +439,12 @@ public final class Constants {
       public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
 
       public static final int STOWED_INDEX = 0;
-      public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
-      public static final int MID_CONE_PLACEMENT_INDEX = 2;
-      public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
-      public static final int MID_CUBE_LAUNCH_INDEX = 5;
       public static final int HYBRID_PLACEMENT_INDEX = 1;
+      public static final int MID_CONE_PLACEMENT_INDEX = 2;
+      public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
       public static final int HUMAN_TAG_PICKUP_INDEX = 4;
+      public static final int MID_CUBE_LAUNCH_INDEX = 5;
+      public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
       public static final int FLOOR_INTAKE_INDEX = 7;
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
@@ -507,119 +507,119 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Translation2d HIGH_CONE_TRANSITION_POINT = new Translation2d(24,41);
-      public static final Translation2d MID_CONE_TRANSITION_POINT = new Translation2d(24,35);
+      public static final Translation2d HIGH_CONE_PREP = new Translation2d(24,41);
+      public static final Translation2d MID_CONE_PREP = new Translation2d(24,35);
 
       public static final Translation2d[][] ARM_POSITIONS = {
-        // Index 0
+        // Index 0 | Stowed
         {
           TRANSITION_POSITION,
           STOWED_POSITION
         },
-        // Index 1
+        // Index 1 | Hybrid
         {
           TRANSITION_POSITION,
           HYBRID_POSITION
         },
-        // Index 2
+        // Index 2 | Mid Cone
         {
           TRANSITION_POSITION,
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
-        // Index 3
+        // Index 3 | High Cone
         {
           TRANSITION_POSITION,
           HIGH_CONE_POSITION_0,
           // ARM_HIGH_CONE_POSITION_1,
           HIGH_CONE_POSITION_2
         },
-        // Index 4
+        // Index 4 | Human Tag
         {
           HUMAN_TAG_PICKUP
         },
-        // Index 5
+        // Index 5 | Cube Mid
         {
           TRANSITION_POSITION,
           CUBE_MID_LAUNCH
         },
-        // Index 6
+        // Index 6 | Cube High
         {
           TRANSITION_POSITION,
           CUBE_HIGH_LAUNCH
         },
-        // Index 7
+        // Index 7 | Floor Intake
         {
           CUBE_INTAKE_POSITION_PREP,
           CUBE_INTAKE_POSITION
         },
-        // Index 8
+        // Index 8 | Solution Flip Positive
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_POSITIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 9
+        // Index 9 | Solution Flip Negative
         {
           SOLUTION_FLIP_TRANSITION_POINT_START,
           SOLUTION_FLIP_POSIITON_NEGATIVE,
           SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 10
+        // Index 10 | High To Stowed
         {
-          HIGH_CONE_TRANSITION_POINT,
+          HIGH_CONE_PREP,
           TRANSITION_POSITION,
           STOWED_POSITION
         },
-        // Index 11
+        // Index 11 | Long Arm Reach
         {
           LONG_ARM_REACH_0,
           LONG_ARM_REACH_1,
           LONG_ARM_REACH_2
         },
-        // Index 12
+        // Index 12 | Floor Intake Prep
         {
           CUBE_INTAKE_POSITION_PREP
         },
-        // Index 13
+        // Index 13 | High Cone Prep
         {
-          HIGH_CONE_TRANSITION_POINT
+          HIGH_CONE_PREP
         },
-        // Index 14
+        // Index 14 | High Cone Prep to Place
         {
           HIGH_CONE_POSITION_0,
           HIGH_CONE_POSITION_2
         },
-        // Index 15
+        // Index 15 | Cone Intake
         {
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 16
+        // Index 16 | Cube Intake
         {
           CUBE_INTAKE_POSITION_PREP,
           CUBE_INTAKE_POSITION
         },
-        // Index 17
+        // Index 17 | Cone Flip
         {
           CONE_FLIP_POSITION_0,
           CONE_INTAKE_POSITION_PREP,
           BUMPER_INTAKE_POSITION
         },
-        // Index 18
+        // Index 18 | Mid Cone Prep
         {
-          MID_CONE_TRANSITION_POINT
+          MID_CONE_PREP
         },
-        // Index 19
+        // Index 19 | Mid Cone Prep to Place
         {
           MID_CONE_POSITION_0,
           MID_CONE_POSITION_1
         },
-        // Index 20
+        // Index 20 | Auto Init Pickup
         {
           AUTO_INIT_PICKUP
         },
-        // Index 21
+        // Index 21 | Cube Intake Auto
         {
           CONE_INTAKE_POSITION_PREP,
           CUBE_INTAKE_POSITION_AUTO
