@@ -406,27 +406,17 @@ public final class Constants {
 
         public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
-        public static final Pose3d TAG_0_POSE = null;
-        public static final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        public static final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        public static final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        public static final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        public static final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-
-        public static final Pose3d[] TAG_POSES = new Pose3d[] {
-            TAG_0_POSE,
-            TAG_1_POSE,
-            TAG_2_POSE,
-            TAG_3_POSE,
-            TAG_4_POSE,
-            TAG_5_POSE,
-            TAG_6_POSE,
-            TAG_7_POSE,
-            TAG_8_POSE
-        };
+        // The below code is not used, and is only here for reference...
+        // We instead use PhotonCameraPose.AprilTagFieldLayout
+        // private final Pose3d TAG_0_POSE = null;
+        // private final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        // private final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        // private final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        // private final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
+        // private final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        // private final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        // private final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        // private final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
     }
 
     public static final class PlacementConstants {
