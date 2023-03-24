@@ -76,6 +76,13 @@ void allColor(int startIndex, int endIndex, CRGB c){
   for (int i = startIndex; i < endIndex; i++){
     leds[i] = c;
   }
+  /*
+  for (int i = middle; i >= 0; i--){
+    leds[i] = c;
+    leds[middle + (middle-i) +1] = c;
+  } 
+  delay(FAST/4);
+  */
   FastLED.show();
   
 }
@@ -274,11 +281,11 @@ void setBellyPan(int pattern){
       break;
       
     case 7: // Purple
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple);
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple, SLOW);
       break;
       
     case 8: // Yellow
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow);
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow, SLOW);
       break;
 
     case 9: // Off
