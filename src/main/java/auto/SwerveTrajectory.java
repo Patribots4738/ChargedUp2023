@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
@@ -116,14 +115,14 @@ public class SwerveTrajectory implements Loggable {
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < _pathTraj.getTotalTimeSeconds() + 2)
+        if (elapsedTime < _pathTraj.getTotalTimeSeconds() + 0.5)
         {
-          System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
+          // System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState mirroredState = new PathPlannerState();
 
-          System.out.print("Changed from " + state.poseMeters.getTranslation());
+          // System.out.print("Desired position " + state.poseMeters.getTranslation() + "\n Swerve pose: " + swerve.getPose().getTranslation());
 
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
@@ -144,29 +143,13 @@ public class SwerveTrajectory implements Loggable {
                 state.poseMeters.getTranslation().getY(),
                 state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
             mirroredState.curvatureRadPerMeter = state.curvatureRadPerMeter;
-            mirroredState.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+            mirroredState.holonomicRotation = state.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
             mirroredState.angularVelocityRadPerSec = state.angularVelocityRadPerSec;
             mirroredState.holonomicAngularVelocityRadPerSec = state.holonomicAngularVelocityRadPerSec;
 
-            System.out.println(" To " + mirroredState.poseMeters.getTranslation());
+            // System.out.println(" To " + mirroredState.poseMeters.getTranslation());
 
           }
-
-          // if ((swerve.getPose().minus(_pathTraj.sample(elapsedTime).poseMeters)).getTranslation().getNorm() < 0.1 &&
-          //     (Math.abs(swerve.getYaw().minus((state.holonomicRotation)).getDegrees()) < 3) && DriverStation.isAutonomous())
-          // {
-          //   swerve.drive(0, 0, 0, false);
-          //   trajectoryStatus = "done";
-          //   break;
-          // }
-
-          System.out.println("\nDiff " + swerve.getPose().minus(new Pose2d(
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
-              ? mirroredState.poseMeters.getTranslation() : state.poseMeters.getTranslation(),
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red)
-              ? mirroredState.holonomicRotation
-              : state.holonomicRotation)).getTranslation() + "\n");
-
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there

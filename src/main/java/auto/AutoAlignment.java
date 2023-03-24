@@ -1,17 +1,12 @@
 package auto;
 
-import java.util.Objects;
 import java.util.Optional;
 
-import calc.Constants;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint; 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
@@ -19,8 +14,6 @@ import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
-import calc.Constants.AutoConstants;
-import calc.Constants.DriveConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.ClawConstants;
 import calc.PhotonCameraPose;
@@ -42,7 +35,6 @@ public class AutoAlignment implements Loggable{
      */
 
     Swerve swerve;
-    Claw claw;
     PhotonCameraPose photonCameraPose;
 
     private int tagID;
@@ -50,19 +42,14 @@ public class AutoAlignment implements Loggable{
     private int substationOffset = -1;
     private double startedChargePad = -1;
 
-    // This variable is used to allow us to calibrate using the tag more often but not every loop
-    private double originalNorm = 1;
     // This variable is used to tell us how far away we currently are from an april tag
     private double currentNorm = -1;
 
-    private boolean moveArmToHumanTag = false;
-  
     @Log
     public static boolean coneMode = false;
 
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
-        this.claw = claw;
         photonCameraPose = new PhotonCameraPose();
     }
 
@@ -84,81 +71,74 @@ public class AutoAlignment implements Loggable{
         swerve.getPoseEstimator().addVisionMeasurement(
           camEstimatedPose.estimatedPose.toPose2d(),
           Timer.getFPGATimestamp());
+      }
 
-          // If we are half the distance from the last "originalNorm" we were at, reset originalNorm
-          // This is primarily used to tell the arm to move halfway through the path
-          if (currentNorm < (originalNorm / 2) || (Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && DriverStation.isTeleop())) {
+      if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+        // Get the target pose (the pose of the tag we want to go to)
+        Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+        targetPose = getModifiedTargetPose(targetPose);
+        currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
+      }
+    }
+    
+    public void setNearestAlignmentOffset() {
 
-            if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
-              originalNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d()).getTranslation().getNorm();
+      if (!coneMode) { 
+        this.coneOffset = 0; 
+        return; 
+      }
 
-              if (!Objects.equals(SwerveTrajectory.trajectoryStatus, "setup") && (tagID == 4 || tagID == 5)) {
+      if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
 
-                moveArmToHumanTag = true;
+        Pose2d aprilTagPose2d = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+        double tagXOffset = getTagXOffset();
+        double tagYOffset = getTagYOffset();
 
-                // Find which side of the human tag we are closest to based on the tag ID's location and the robot's location
-                double negativeOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
-                    new Translation2d(
-                        // We know that the tag is going to be either 4 or 5, due to the if statement above ^^
-                        (tagID == 4) ?
-                            // Tag 4 means we need to subtract the grid barrier
-                            // since it is on the right side of the field
-                            // (red alliance)
-                            -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS) :
-                            // Tag 5 means we need to add the grid barrier
-                            (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
-                        -AlignmentConstants.CONE_OFFSET_METERS),
-                    new Rotation2d()))).getTranslation().getNorm();
+        double negativeOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
+            new Translation2d(
+                tagXOffset,
+                -tagYOffset),
+            new Rotation2d()))).getTranslation().getNorm();
 
-                double positiveOffsetNorm = swerve.getPose().minus(photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d().plus(new Transform2d(
-                    new Translation2d(
-                        // See comment 9ish lines above ^^
-                        (tagID == 4) ?
-                            // Tag 4 means we need to subtract the grid barrier
-                            // since it is on the right side of the field
-                            // (red alliance)
-                            -(AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS) :
-                            // Tag 5 means we need to add the grid barrier
-                            (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
-                        AlignmentConstants.CONE_OFFSET_METERS),
-                    new Rotation2d()))).getTranslation().getNorm();
+        double positiveOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
+            new Translation2d(
+                tagXOffset,
+                tagYOffset),
+            new Rotation2d()))).getTranslation().getNorm();
 
-                /*
-                  If we are on red alliance, left of the tag is going to be the negative on the Y axis
-                  Due to this.mveToTag() checking if we are on the blue alliance and flipping the sign,
-                  we need to flip the sign here
-                */
-                if (negativeOffsetNorm < positiveOffsetNorm) {
-                  this.substationOffset = -1;
-                  // Start intaking the claw when we get close to the tag
-                  if (negativeOffsetNorm < 2) {
-                    claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
-                  }
-                } else {
-                  this.substationOffset = 1;
-                  // Start intaking the claw when we get close to the tag
-                  if (positiveOffsetNorm < 2) {
-                    claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
-                  }
-                }
+        /*
+          If we are on red alliance, left of the tag is going to be the negative on the Y axis
+          Due to this.moveToTag() checking if we are on the blue alliance and flipping the sign,
+          we need to flip the sign here
+        */
+        if (negativeOffsetNorm < positiveOffsetNorm) {
 
-              } else {
-                moveArmToHumanTag = false;
-              }
-            }
+          // If we are looking at a human player tag,
+          // Then we have been evaluating for the substationOffset
+          if (tagID == 4 || tagID == 5) {
+            this.substationOffset = -1;
+          } else {
+            this.coneOffset = -1 * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
           }
-          // System.out.println(currentNorm + " " + originalNorm);
-          
-          if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
-            // Get the target pose (the pose of the tag we want to go to)
-            Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
-            targetPose = getModifiedTargetPose(targetPose);
-            currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
+        } else /* (positiveOffsetNorm < negativeOffsetNorm) */ {
+
+          // If we are looking at a human player tag,
+          // Then we have been evaluating for the substationOffset
+          if (tagID == 4 || tagID == 5) {
+            this.substationOffset = 1;
+          } else {
+            this.coneOffset = ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+          }
         }
       }
     }
 
-    public void moveToTag() {
+    /**
+     * Align to the tag we are closest to
+     * Only do the Y and Theta axis,
+     * as we will manually move the robot to the X axis
+     */
+    public void alignToTag(double driverX) {
 
       // If we cannot see a tag
       if (tagID == 0) {
@@ -166,7 +146,7 @@ public class AutoAlignment implements Loggable{
       }
       Pose2d targetPose = swerve.getPose();
 
-      // Check if our tagID is valid... (assume it is for logic purposes)
+      // Check if our tagID is valid... (Assume it is for logic purposes)
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
           // Get the target pose (the pose of the tag we want to go to)
           targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
@@ -176,35 +156,54 @@ public class AutoAlignment implements Loggable{
       // If we are on the right side of the field: we need to subtract the grid offset + cone/substation offset
       // If we are going to a substation: we need to add the substation offset instead of the cone offset
       // We add the grid length to both because we still want to be a small bit away from the tag
-      // There is a bit of a logic issue that the else statement "should" be subtracting but it doesn't work when you do that...
+      // There is a bit of a logic issue that the else statement "should" be subtracting, but it doesn't work when you do that...
       // oh well.
       targetPose = getModifiedTargetPose(targetPose);
-
-      currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-
-      // Calculate the direct heading to our destination, so we can drive straight to it
-      Rotation2d heading = Rotation2d.fromRadians(Math.atan2(targetPose.getY() - swerve.getPose().getY(),targetPose.getX() - swerve.getPose().getX()));
-
-      PathPlannerTrajectory tagTrajectory = PathPlanner.generatePath
-      (
-          new PathConstraints(DriveConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/3),
-          new PathPoint(swerve.getPose().getTranslation(),
-              heading,
-              swerve.getPose().getRotation(),
-              swerve.getSpeedMetersPerSecond()),
-
-          new PathPoint(targetPose.getTranslation(),
-              heading,
-              targetPose.getRotation(), 0)
+      
+      double adjustedY = targetPose.getY() - swerve.getPose().getY();
+      
+      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_DIAMETER));
+      
+      adjustedY += swerve.getPose().getY();
+      
+      ChassisSpeeds alignmentSpeeds = SwerveTrajectory.HDC.calculate(
+          swerve.getPose(),
+          new Pose2d(
+              swerve.getPose().getX(),
+              adjustedY,
+              targetPose.getRotation()),
+              // Notice the 0 m/s here
+              // This is because we want the robot to end at a stop,
+              // This might be funky when we manually drive it on the X axis
+              0,
+              targetPose.getRotation()
       );
-      
-      // System.out.println("April Pose: " + photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d());
-      // System.out.println("Modified Target Pose: " + targetPose);
-      // System.out.println("Current Pose: " + swerve.getPose() + "\n\n");
-      
-      SwerveTrajectory.PathPlannerRunner(tagTrajectory, swerve);
-    }
+      ChassisSpeeds controllerSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          driverX,
+          0,
+          0,
+          swerve.getPose().getRotation()
+      );
 
+      ChassisSpeeds comboSpeeds = new ChassisSpeeds(
+          controllerSpeeds.vxMetersPerSecond + alignmentSpeeds.vxMetersPerSecond,
+          controllerSpeeds.vyMetersPerSecond + alignmentSpeeds.vyMetersPerSecond,
+          controllerSpeeds.omegaRadiansPerSecond + alignmentSpeeds.omegaRadiansPerSecond
+      );
+
+      swerve.drive(
+          comboSpeeds.vyMetersPerSecond,
+          comboSpeeds.vxMetersPerSecond,
+          comboSpeeds.omegaRadiansPerSecond,
+          false,
+          false
+      );
+    }
+    
+    public void setNearestValues() {
+      this.setTagID(getNearestTag());
+      this.setNearestAlignmentOffset();
+    }
 
     /**
      * Get the tag nearest to the robot using its position
@@ -227,7 +226,7 @@ public class AutoAlignment implements Loggable{
           // Skip over to our substation
           if (i == 5) { i = 4; }
 
-          // This if statement prevents the robot from crashing if we input an absurd tag ID,
+          // This if a statement prevents the robot from crashing if we input an absurd tag ID,
           // but it should be assumed that the tag location is present.
           if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
             currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
@@ -245,7 +244,7 @@ public class AutoAlignment implements Loggable{
           // Skip over to our substation
           if (i == 4) { i = 5; }
 
-          // This if statement prevents the robot from crashing if we input an absurd tag ID,
+          // This if a statement prevents the robot from crashing if we input an absurd tag ID,
           // but it should be assumed that the tag location is present.
           if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
             currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
@@ -257,44 +256,40 @@ public class AutoAlignment implements Loggable{
         }
       }
 
-      System.out.println("Current nearest tag " + nearestTag + " at distance " + Units.metersToInches(nearestDistance) + " Inches");
-
       return nearestTag;
     }
+
+    private double getTagXOffset() {
+      return (tagID == 4 || (tagID == 5)) ?
+          // Tag 4/5 means we need to subtract the grid barrier
+          // since it is on the right side of the field
+          (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
+          // Otherwise, we need to add the grid barrier
+          (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS);
+  }
+
+  private double getTagYOffset() {
+    // Check if we are applying a substation offset or a cone offset
+    return (tagID == 4 || tagID == 5) ?
+        AlignmentConstants.SUBSTATION_OFFSET_METERS :
+        AlignmentConstants.CONE_OFFSET_METERS;
+  }
 
     /**
      * Get the modified target pose based on the alliance color
      * @param targetPose the target pose of the tag we want to go to
      * @return the modified target pose using constants for grid/substation
      */
-    private Pose2d getModifiedTargetPose(Pose2d targetPose) {
-    if (0 < tagID && tagID < 5) {
-
+    public Pose2d getModifiedTargetPose(Pose2d targetPose) {
       targetPose = targetPose.plus(new Transform2d(
-          new Translation2d(
-              (tagID == 4) ?
-                  Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() + ClawConstants.CLAW_LENGTH_INCHES) :
-                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
-              (tagID == 4) ?
-                  -(AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                  -(AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
-          Rotation2d.fromDegrees(180)));
-
-    } else {
-
-      targetPose = targetPose.plus(new Transform2d(
-          new Translation2d(
-              (tagID == 5) ?
-                  Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES) :
-                  (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS/2) + PlacementConstants.BUMPER_LENGTH_METERS),
-              ((tagID == 5) ?
-                  (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                  (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset))),
-          Rotation2d.fromDegrees(180)));
-
+        new Translation2d(
+            getTagXOffset(),
+            (tagID == 4 || tagID == 5) ?
+                (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset) * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1)),
+        Rotation2d.fromDegrees(180)));
+      return targetPose;
     }
-    return targetPose;
-  }
 
     public int getTagID() {
         return tagID;
@@ -317,7 +312,7 @@ public class AutoAlignment implements Loggable{
       // in other words,
       // if we are on cone mode, at cone index 1, and we want to go to cone index 2, skip cone index 0
       // or,
-      // if we are *not* on cone mode, (at cone index 0) and we want to go to cone index 1, skip cone index 1 and go to 2
+      // if we are *not* on cone mode, (at cone index 0) and we want to go to cone index 1, skip cone index 1 and go to 2.
       // This is because the call from robot.java will run as (setConeOffset(getConeOffset +/- 1))
       if (coneMode) {
         if (previousConeOffset == -1) {
@@ -368,8 +363,6 @@ public class AutoAlignment implements Loggable{
         }
       }
 
-      System.out.println(this.coneOffset + " to " + coneOffset);
-
       // Clamp the cone offset to -1, 0, or 1
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
 
@@ -385,10 +378,6 @@ public class AutoAlignment implements Loggable{
       }
     }
 
-    public boolean getMoveArmToHumanTag() {
-      return this.moveArmToHumanTag;
-    }
-
     public int getSubstationOffset() {
       return this.substationOffset;
     }
@@ -399,13 +388,9 @@ public class AutoAlignment implements Loggable{
 
     public void setConeMode(boolean coneMode) {
       AutoAlignment.coneMode = coneMode;
-
       // If the cone offset is 0, and we are switching to cone mode,
       // set the cone offset to 1 (closest to human tag)
-      if (coneMode && this.coneOffset == 0) {
-        this.coneOffset = 1;
-      }
-      else if (!coneMode) {
+      if (!coneMode) {
         this.coneOffset = 0;
       }
     }
@@ -442,14 +427,14 @@ public class AutoAlignment implements Loggable{
 
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/24)), 0.055, 0.20),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 18 : 20))), 0.055, 0.20),
             0, 
             0, 
             true, false);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/24)), -0.20, -0.055),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 18 : 20))), -0.20, -0.055),
             0, 
             0, 
             true, false);
@@ -462,5 +447,15 @@ public class AutoAlignment implements Loggable{
     public void startChargePad() {
       startedChargePad = Timer.getFPGATimestamp();
     }
-  
+
+    public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
+    
+      // Use a Holonomic Drive Controller to calculate the speeds for the robot
+      double thetaSpeed = SwerveTrajectory.HDC.getThetaController().calculate(swerve.getYaw().getRadians(), desiredAngle.getRadians());
+
+      // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
+      // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,
+      // I wonder if that will cause issues in the future.
+      swerve.drive(driverAxis.getY(), driverAxis.getX(), thetaSpeed, true, false);
+    }
 }

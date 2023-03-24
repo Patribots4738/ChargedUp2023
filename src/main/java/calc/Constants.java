@@ -26,9 +26,9 @@ public final class Constants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-        public static double MAX_ANGULAR_SPEED = 4 * Math.PI; // radians per second
+        public static double MAX_ANGULAR_SPEED = 5 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(13.51);
 
         public static final double DIRECTION_SLEW_RATE = 6.28; // radians per second
         public static final double MAGNITUDE_SLEW_RATE = 80.0; // percent per second (1 = 100%)
@@ -133,22 +133,22 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 1.75; // previously 1.75
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 4; // previously 1.75
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.25; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 3 * Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/1.7; 
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 6.88;
+        public static final double X_CORRECTION_P = 2.5;//7;
         public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0;
+        public static final double X_CORRECTION_D = 0.2;
 
-        public static final double Y_CORRECTION_P = 6.03;
+        public static final double Y_CORRECTION_P = 2.5;//6.03;
         public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0;
+        public static final double Y_CORRECTION_D = 0.2;
 
         public static final double ROTATION_CORRECTION_P = .63;
         public static final double ROTATION_CORRECTION_I = 0;
@@ -316,15 +316,14 @@ public final class Constants {
     }
 
     public static final class LEDConstants {
+
+      public static final int ARDUINO_ADDRESS = 8;
       public static final int BELLY_PAN_RAINBOW = 0;
       // The "theater chase" could possibly induce seizures,
       // Please refrain from using these.
       @Deprecated
       public static final int BELLY_PAN_THEATER_CHASE_RAINBOW = 1;
-      // The "theater chase" could possibly induce seizures,
-      // Please refrain from using these.
-      @Deprecated
-      public static final int BELLY_PAN_THEATER_CHASE = 2;
+      public static final int BELLY_PAN_RED_ALLIANCE = 2;
       public static final int BELLY_PAN_FLASH_RED = 3;
       public static final int BELLY_PAN_RED = 4;
       public static final int BELLY_PAN_BLUE = 5;
@@ -394,7 +393,9 @@ public final class Constants {
     public static final class AlignmentConstants {
 
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 1;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double SNAP_TO_ANGLE_P = 0.0025;
+        
 
         public static final double CONE_OFFSET_METERS = 0.542615;
         private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
@@ -434,7 +435,7 @@ public final class Constants {
       // The length of the robot
       public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
       // Length of the bumpers on the robot
-      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(4);
+      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
 
       public static final double CONE_BASE_DIAMETER = Units.inchesToMeters(6.629);
 
@@ -459,10 +460,12 @@ public final class Constants {
       public static final int MID_CONE_PREP_INDEX = 18;
       public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
       public static final int AUTO_INIT_INDEX = 20;
+      public static final int AUTO_CUBE_INTAKE_INDEX = 21;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
+      public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
-      public static final double CLAW_OUTTAKE_SPEED = -1;
+      public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
@@ -476,8 +479,11 @@ public final class Constants {
 
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
+      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(40, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
+      
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
       
@@ -496,7 +502,7 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(29, 32);
       public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(35, 38);
-      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(29,25);
+      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(20,25);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
@@ -546,7 +552,7 @@ public final class Constants {
         // Index 7
         {
           CUBE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
+          CUBE_INTAKE_POSITION
         },
         // Index 8
         {
@@ -593,7 +599,7 @@ public final class Constants {
         // Index 16
         {
           CUBE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
+          CUBE_INTAKE_POSITION
         },
         // Index 17
         {
@@ -613,6 +619,11 @@ public final class Constants {
         // Index 20
         {
           AUTO_INIT_PICKUP
+        },
+        // Index 21
+        {
+          CONE_INTAKE_POSITION_PREP,
+          CUBE_INTAKE_POSITION_AUTO
         }
       };
   }

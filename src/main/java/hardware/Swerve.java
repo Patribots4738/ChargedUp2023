@@ -21,8 +21,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.SwerveUtils;
@@ -101,7 +101,7 @@ public class Swerve implements Loggable{
                 // X, Y, theta
         new MatBuilder<>(
                 Nat.N3(),
-                Nat.N1()).fill(0.9, 0.9, 3)
+                Nat.N1()).fill(0.9, 0.9, 6)
                 // Vision measurement
                 // standard deviations
                 // X, Y, theta
@@ -114,22 +114,19 @@ public class Swerve implements Loggable{
         resetEncoders();
         zeroHeading();
         setBrakeMode();
-        SmartDashboard.putData("Field", field);
+        // SmartDashboard.putData("Field", field);
+        Shuffleboard.getTab("AutoPicker").add(field);
 
     }
 
     public void periodic() {
         // Update the odometry in the periodic block
-        this.field.setRobotPose(getPose());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+        this.field.setRobotPose(getPose());
         getPitch();
         getRoll();
-        // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
-        //     System.out.println("Robot is not level");
-        //     System.out.printf("Time: %.2f Pitch: %.2f Roll: %.2f", Timer.getFPGATimestamp(), getPitch().getDegrees(), getRoll().getDegrees());
-        // }
     }
-
+    
     /**
      * Returns the currently-estimated pose of the robot.
      *
@@ -142,8 +139,12 @@ public class Swerve implements Loggable{
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
+    
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative, boolean rateLimit) {
+      
       if (rateLimit) {
+    
+        // Make commanded variables 
         double xSpeedCommanded;
         double ySpeedCommanded;
     
@@ -153,36 +154,55 @@ public class Swerve implements Loggable{
 
         // Calculate the direction slew rate based on an estimate of the lateral acceleration
         double directionSlewRate;
+    
         if (m_currentTranslationMag != 0.0) {
+    
           directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE / m_currentTranslationMag);
+    
         } else {
-          directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
+    
+          // Some high number that means the slew rate is effectively instantaneous
+          directionSlewRate = 500.0; 
+    
         }
-        
 
+        // Calculate the current time and the time since the last call to this function
         double currentTime = WPIUtilJNI.now() * 1e-6;
         double elapsedTime = currentTime - m_prevTime;
-        double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
-        if (angleDif < 0.45*Math.PI) {
+    
+        // Calculate the difference in angle between the current and commanded directions
+        double angleDiff = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
+        
+        if (angleDiff < 0.45 * Math.PI) {
+          // Step the current direction towards the commanded direction
           m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
           m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+        
         }
-        else if (angleDif > 0.85*Math.PI) {
-          if (m_currentTranslationMag > 1e-4) { //some small number to avoid floating-point errors with equality checking
-            // keep currentTranslationDir unchanged
+        else if (angleDiff > 0.85 * Math.PI) {
+        
+          // Some small number to avoid floating-point errors with equality checking
+          if (m_currentTranslationMag > 1e-4) { 
+            // Keep currentTranslationDir unchanged if there is very little change in magnitude
             m_currentTranslationMag = m_magLimiter.calculate(0.0);
-          }
-          else {
+        
+          } else {
+            // Step the current direction towards the commanded direction
             m_currentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
             m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+        
           }
         }
         else {
+          // Step the current direction towards the commanded direction
           m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
           m_currentTranslationMag = m_magLimiter.calculate(0.0);
+        
         }
+        
         m_prevTime = currentTime;
         
+        // Calculate the commanded speeds and convert them out of polar
         xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
         ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
         m_currentRotation = m_rotLimiter.calculate(rotSpeed);
@@ -198,19 +218,23 @@ public class Swerve implements Loggable{
                 : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
         
         setModuleStates(swerveModuleStates);
-      } else {
-        xSpeed *= DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-        ySpeed *= DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-        rotSpeed *= DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier;
 
-        var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+      } else {
+        
+        xSpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+        ySpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+        rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier);
+
+        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation())
                         : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed));
 
         setModuleStates(swerveModuleStates);
+      
       }
     }
+
     /**
      * Sets the wheels into an X formation to prevent movement.
      */
@@ -361,9 +385,7 @@ public class Swerve implements Loggable{
 
       double dotProduct = multiplyOutput.dot(VecBuilder.fill(0, 1, 0));
 
-      double result = (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
-
-      return (result);
+      return (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
     }
 
     public void resetEncoders() {
@@ -383,6 +405,14 @@ public class Swerve implements Loggable{
 
     public void toggleSpeed() {
         this.speedMultiplier = (this.speedMultiplier == 1) ? 0.35 : 1;
+    }
+
+    public void setSpeedMultiplier(double speedMultiplier) {
+      this.speedMultiplier = speedMultiplier;
+    }
+
+    public double getSpeedMultiplier() {
+      return this.speedMultiplier;
     }
 
     /**
@@ -407,6 +437,4 @@ public class Swerve implements Loggable{
             mSwerveMod.setCoastMode();
         }
     }
-
-
 }

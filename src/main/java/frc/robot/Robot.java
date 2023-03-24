@@ -15,12 +15,14 @@ import calc.Constants.PlacementConstants;
 import calc.OICalc;
 import debug.Debug;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import hardware.ArduinoController;
 import hardware.Arm;
 import hardware.Claw;
@@ -60,7 +62,7 @@ public class Robot extends TimedRobot {
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
       // Debug class for ShuffleBoard
-      debug = new Debug();
+      // debug = new Debug();
 
       // Drivetrain instantiation
       swerve = new Swerve();
@@ -91,11 +93,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
-      swerve.periodic();
-      // arm.periodic();
-
-      Logger.updateEntries();
+        
+    Logger.updateEntries();
+    arduinoController.periodic();
 
   }
 
@@ -109,20 +109,31 @@ public class Robot extends TimedRobot {
 
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
+    
+    arduinoController.setLEDState(LEDConstants.ARM_RAINBOW);
+    arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
+
+    swerve.setSpeedMultiplier(1);
+
+    System.out.println(swerve.getPose().getTranslation());
 
   }
 
   @Override
   public void disabledPeriodic() {
-    // SwerveTrajectory.resetHDC();
-    arduinoController.sendByte(LEDConstants.BELLY_PAN_RAINBOW);
+    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
+    }
+    else {
+      arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
+    }
   }
 
   @Override
   public void autonomousInit() {
 
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-    AutoAlignment.coneMode = true;
+    autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -131,6 +142,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    swerve.periodic();
     // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
@@ -143,13 +155,16 @@ public class Robot extends TimedRobot {
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
-    autoAlignment.calibrateOdometry();
+    if (autoSegmentedWaypoints.halfway) {
+      autoAlignment.calibrateOdometry();
+    }
 
   }
 
   @Override
   public void teleopInit() {
-
+    autoAlignment.setConeMode(true);
+    arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
@@ -160,16 +175,17 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
+    swerve.periodic();
+    arm.periodic();
+    claw.periodic();
+    autoAlignment.calibrateOdometry();
+
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
     if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
       swerve.setWheelsUp();
       return;
     }
-
-    arm.periodic();
-    claw.periodic();
-    autoAlignment.calibrateOdometry();
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
@@ -192,27 +208,28 @@ public class Robot extends TimedRobot {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
+    if (SwerveTrajectory.trajectoryStatus.equals("setup") && !driver.getAButton()) {
+      autoAlignment.setNearestValues();
+    }
+
     // When not aligning, reset the max speed to the teleop speed
     if (driver.getAButtonReleased()) {
       DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
-      autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
+      SwerveTrajectory.resetTrajectoryStatus();
+      SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+      //autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
     }
-
     else if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
 
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
-        autoAlignment.setTagID(autoAlignment.getNearestTag());
-
+        SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        
       }
       
-      autoAlignment.moveToTag();
-
-      if (autoAlignment.getMoveArmToHumanTag()) {
-        arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-      }
+      autoAlignment.alignToTag(driverLeftAxis.getY());
 
     } else if (driver.getRightBumper()) {
 
@@ -230,10 +247,22 @@ public class Robot extends TimedRobot {
       swerve.setWheelsX();
 
     } else {
+      // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
+      if (driver.getRightStickButton()) {
+        if (driver.getRightStickButtonPressed()) {
+          SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        }
+        autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getYaw().getDegrees()) > 90 ? 180 : 0));
+      }
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
-      if (driver.getYButton()) {
-        swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, true);
+      else if (driver.getYButton()) {
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+          swerve.drive(-driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+        }
+        else {
+          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+        }
       }
       else {
         // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick
@@ -280,11 +309,11 @@ public class Robot extends TimedRobot {
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_PURPLE);
+      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_YELLOW);
+      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
 
     // POV = D-Pad...
@@ -381,10 +410,10 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper() || operator.getAButtonReleased()) && !claw.getStartedOuttakingBool()) {
+    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool()) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
-        claw.outTakeforXSeconds(0.5);
+        claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
       }
 
     } else if (operator.getLeftTriggerAxis() > 0) {
@@ -420,37 +449,56 @@ public class Robot extends TimedRobot {
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    if (Math.abs(swerve.getPitch().getDegrees()) > 60) {
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_FLASH_RED);
+    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
     }
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/4) && (autoAlignment.getCurrentNorm() != -1)) {
-      driver.setRumble(RumbleType.kLeftRumble, 0.5);
-      driver.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kRightRumble, 0.5);
-      operator.setRumble(RumbleType.kLeftRumble, 0.5);
-      arduinoController.sendByte(LEDConstants.BELLY_PAN_GREEN);
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
+      driver.setRumble(RumbleType.kLeftRumble, 0.75);
+      driver.setRumble(RumbleType.kRightRumble, 0.75);
+      operator.setRumble(RumbleType.kRightRumble, 0.75);
+      operator.setRumble(RumbleType.kLeftRumble, 0.75);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
     }
     else {
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
-        arduinoController.sendByte(LEDConstants.BELLY_PAN_RED);
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
       }
       else {
-        arduinoController.sendByte(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
       driver.setRumble(RumbleType.kLeftRumble, 0);
       driver.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kRightRumble, 0);
       operator.setRumble(RumbleType.kLeftRumble, 0);
     }
+
+    //Rumble the claw if it is stalling, judged by whether or not the claw is drawing more amps than a preset limit.
+    if (claw.getOutputCurrent() > 25) {
+      driver.setRumble(RumbleType.kBothRumble, 0.1);
+      operator.setRumble(RumbleType.kBothRumble, 0.1);
+    }
+
   }  
 
   @Override
   public void testInit() {
-    arm.setCoastMode();
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+    arm.setBrakeMode();
+    // arm.setArmIndex(PlacementConstants.STOWED_INDEX);
   }
 
   @Override
   public void testPeriodic() {
-    arm.periodic();
+
+    double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
+    double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
+    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
+    
+    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
+    
+    swerve.periodic();
+    // arm.periodic();
+
+    swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true, true);
   }
 }

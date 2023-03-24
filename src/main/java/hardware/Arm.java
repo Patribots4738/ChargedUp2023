@@ -1,7 +1,5 @@
 package hardware;
 
-import java.util.ArrayList;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -57,7 +55,9 @@ public class Arm implements Loggable {
     private double lowerRotation = 0;
 
     // The DESIRED rotation of the upper and lower arm(s)
+    @Log
     private double upperReferenceAngle = 0;
+    @Log
     private double lowerReferenceAngle = 0;
 
     @Log
@@ -163,7 +163,6 @@ public class Arm implements Loggable {
         // Use forward kinematics to get the x and y position of the end effector
         armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
-        // System.out.println(String.format("Lower Pos %.3f; Upper Pos %.3f", Math.toDegrees(getLowerArmPosition()), Math.toDegrees(getUpperArmPosition())));
     }
 
     public void indexPeriodic() {
@@ -223,7 +222,6 @@ public class Arm implements Loggable {
           armsAtDesiredPosition = true;
           return;
         }
-        // System.out.println("Switching dim2 from " + (armPosDimension2-1) + " to " + (armPosDimension2) + "\nArrayInfo: " + PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
       }
     }
@@ -240,11 +238,14 @@ public class Arm implements Loggable {
         // Check if we are already at the desired index, and if we are not operator overriding,
         // This is because, if we are operator overriding, we want to be able to go to any index
         // If we are trying to go to a floor index, allow it to restart itself
-        if (index == armPosDimension1 && 
+        if ((index == armPosDimension1 || 
+              (index == PlacementConstants.STOWED_INDEX && 
+              armPosDimension1 == PlacementConstants.HIGH_TO_STOWWED_INDEX)) &&
             index != PlacementConstants.CONE_FLIP_INDEX && 
             index != PlacementConstants.CONE_INTAKE_INDEX && 
             index != PlacementConstants.CUBE_INTAKE_INDEX &&
-            !operatorOverride) {
+            !operatorOverride) 
+        {
           startedTransition = true;
           return;
         }
@@ -269,7 +270,6 @@ public class Arm implements Loggable {
         // Turn off operator override to prevent arm.drive from setting values wrong
         this.operatorOverride = false;
 
-        System.out.println("Changed index to " + armPosDimension1);
     }
 
     public int getArmIndex() {
@@ -298,8 +298,6 @@ public class Arm implements Loggable {
           this.armXReference = position.getX() * (this.armMirrored ? -1 : 1);
           this.armYReference = position.getY();
         }
-
-        // System.out.println("Mirr: " + armMirrored + " PosX " + armXReference);
 
         // Make sure armX and armY are within the range of 0 to infinity
         // Because we cannot reach below the ground.
