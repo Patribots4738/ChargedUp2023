@@ -272,13 +272,6 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
-        if (currentWaypointNumber == 1 && 
-            claw.getOutputCurrent() < 15 && 
-            claw.getDesiredSpeed() > 0 && 
-            !chosenAutoPath.getName().contains("D_CHARGE")) 
-        {
-          return;
-        }
         currentWaypointNumber++;
         if (currentWaypointNumber > 1) {
           if (chosenAutoPath.getName().contains("D_CHARGE") ||

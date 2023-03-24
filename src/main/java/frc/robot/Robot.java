@@ -476,23 +476,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
-    arm.setBrakeMode();
-    // arm.setArmIndex(PlacementConstants.STOWED_INDEX);
   }
 
   @Override
   public void testPeriodic() {
+    if (operator.getXButton()) {
+      autoAlignment.setConeMode(false);
+      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
+    }
+    else if (operator.getYButton()) {
+      autoAlignment.setConeMode(true);
+      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
+    }
 
-    double driverLeftX = MathUtil.applyDeadband(driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
-    double driverLeftY = MathUtil.applyDeadband(driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
-    double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
     
-    Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
-    
-    swerve.periodic();
-    // arm.periodic();
-
-    swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true, true);
   }
 }

@@ -13,10 +13,10 @@
 #define BRIGHTNESS 100
 
 #define BELLYPAN_START_INDEX 0
-#define BELLYPAN_END_INDEX 97
+#define BELLYPAN_END_INDEX 96
 #define SPONSOR_PANEL_START_INDEX 0
 #define SPONSOR_PANEL_END_INDEX 0
-#define ARM_START_INDEX 98
+#define ARM_START_INDEX 97
 #define ARM_END_INDEX 131
 #define CLAW_START_INDEX 30
 #define CLAW_END_INDEX 34
@@ -31,7 +31,7 @@ int bounceCenter = 0;
 
 int bellyPanPattern = 1;
 int sponsorPanelPattern = 0;
-int armPattern = 20
+int armPattern = 20;
 int clawPattern = 0;
 int statusLED = false;
 
@@ -135,7 +135,6 @@ void flash(int startIndex, int endIndex, CRGB c, int speed){
     }
     delay(speed);
     allColor(startIndex, endIndex, CRGB::Black);
-    delay(speed);
   
 }
 
@@ -281,11 +280,11 @@ void setBellyPan(int pattern){
       break;
       
     case 7: // Purple
-      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple, SLOW);
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple);
       break;
       
     case 8: // Yellow
-      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow, SLOW);
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow);
       break;
 
     case 9: // Off
