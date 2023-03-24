@@ -1,6 +1,5 @@
 package auto;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -8,10 +7,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint; 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
@@ -19,8 +14,6 @@ import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
-import calc.Constants.AutoConstants;
-import calc.Constants.DriveConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.ClawConstants;
 import calc.PhotonCameraPose;
@@ -42,7 +35,6 @@ public class AutoAlignment implements Loggable{
      */
 
     Swerve swerve;
-    Claw claw;
     PhotonCameraPose photonCameraPose;
 
     private int tagID;
@@ -50,19 +42,14 @@ public class AutoAlignment implements Loggable{
     private int substationOffset = -1;
     private double startedChargePad = -1;
 
-    // This variable is used to allow us to calibrate using the tag more often, but not every loop
-    private double originalNorm = 1;
     // This variable is used to tell us how far away we currently are from an april tag
     private double currentNorm = -1;
 
-    private boolean moveArmToHumanTag = false;
-  
     @Log
     public static boolean coneMode = false;
 
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
-        this.claw = claw;
         photonCameraPose = new PhotonCameraPose();
     }
 
@@ -91,76 +78,58 @@ public class AutoAlignment implements Loggable{
         Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         targetPose = getModifiedTargetPose(targetPose);
         currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-        // System.out.println("Current norm: " + currentNorm);
       }
     }
     
     public void setNearestAlignmentOffset() {
 
-      if (!coneMode && !(tagID == 4 || tagID == 5)) { this.coneOffset = 0; }
+      if (!coneMode) { 
+        this.coneOffset = 0; 
+        return; 
+      }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
 
-          Pose2d aprilTagPose2d = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
-          double tagXOffset = getTagXOffset();
-          double tagYOffset = getTagYOffset();
+        Pose2d aprilTagPose2d = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+        double tagXOffset = getTagXOffset();
+        double tagYOffset = getTagYOffset();
 
-          moveArmToHumanTag = (tagID == 4 || tagID == 5);
+        double negativeOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
+            new Translation2d(
+                tagXOffset,
+                -tagYOffset),
+            new Rotation2d()))).getTranslation().getNorm();
 
-          double negativeOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
-              new Translation2d(
-                  tagXOffset,
-                  -tagYOffset),
-              new Rotation2d()))).getTranslation().getNorm();
+        double positiveOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
+            new Translation2d(
+                tagXOffset,
+                tagYOffset),
+            new Rotation2d()))).getTranslation().getNorm();
 
-          double positiveOffsetNorm = swerve.getPose().minus(aprilTagPose2d.plus(new Transform2d(
-              new Translation2d(
-                  tagXOffset,
-                  tagYOffset),
-              new Rotation2d()))).getTranslation().getNorm();
+        /*
+          If we are on red alliance, left of the tag is going to be the negative on the Y axis
+          Due to this.moveToTag() checking if we are on the blue alliance and flipping the sign,
+          we need to flip the sign here
+        */
+        if (negativeOffsetNorm < positiveOffsetNorm) {
 
-          /*
-            If we are on red alliance, left of the tag is going to be the negative on the Y axis
-            Due to this.moveToTag() checking if we are on the blue alliance and flipping the sign,
-            we need to flip the sign here
-          */
-          if (negativeOffsetNorm < positiveOffsetNorm) {
-
-            // If we are looking at a human player tag,
-            // Then we have been evaluating for the substationOffset
-            if (tagID == 4 || tagID == 5) {
-              this.substationOffset = -1;
-            } else {
-              this.coneOffset = -1;
-            }
-
-            // If we are approaching a substation tag,
-            // Start intaking the claw when we get close
-            if ((tagID == 4 || tagID == 5) && negativeOffsetNorm < 1) {
-              claw.setDesiredSpeed(coneMode ? PlacementConstants.CLAW_INTAKE_SPEED_CONE : PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
-            }
-          } else /* (positiveOffsetNorm < negativeOffsetNorm) */ {
-
-            // If we are looking at a human player tag,
-            // Then we have been evaluating for the substationOffset
-            if (tagID == 4 || tagID == 5) {
-              this.substationOffset = 1;
-            } else {
-              this.coneOffset = 1;
-            }
-
-            // If we are approaching a substation tag,
-            // Start intaking the claw when we get close
-            if ((tagID == 4 || tagID == 5) && positiveOffsetNorm < 1) {
-              claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
-            }
+          // If we are looking at a human player tag,
+          // Then we have been evaluating for the substationOffset
+          if (tagID == 4 || tagID == 5) {
+            this.substationOffset = -1;
+          } else {
+            this.coneOffset = -1 * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
           }
-        // If we are not going to the substation, we don't need to move the arm to human tag
-        // This will primarily trigger when the tag does not equal 4 or 5
-        if (!(tagID == 4 || tagID == 5)) {
-          moveArmToHumanTag = false;
+        } else /* (positiveOffsetNorm < negativeOffsetNorm) */ {
+
+          // If we are looking at a human player tag,
+          // Then we have been evaluating for the substationOffset
+          if (tagID == 4 || tagID == 5) {
+            this.substationOffset = 1;
+          } else {
+            this.coneOffset = ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+          }
         }
-      // System.out.println(currentNorm + " " + originalNorm);
       }
     }
 
@@ -193,7 +162,7 @@ public class AutoAlignment implements Loggable{
       
       double adjustedY = targetPose.getY() - swerve.getPose().getY();
       
-      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_DIAMETER/2));
+      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_DIAMETER));
       
       adjustedY += swerve.getPose().getY();
       
@@ -287,8 +256,6 @@ public class AutoAlignment implements Loggable{
         }
       }
 
-      System.out.println("Current nearest tag " + nearestTag + " at distance " + Units.metersToInches(nearestDistance) + " Inches");
-
       return nearestTag;
     }
 
@@ -317,9 +284,9 @@ public class AutoAlignment implements Loggable{
       targetPose = targetPose.plus(new Transform2d(
         new Translation2d(
             getTagXOffset(),
-            (tagID == 4) ?
+            (tagID == 4 || tagID == 5) ?
                 (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset)),
+                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset) * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1)),
         Rotation2d.fromDegrees(180)));
       return targetPose;
     }
@@ -396,8 +363,6 @@ public class AutoAlignment implements Loggable{
         }
       }
 
-      System.out.println(this.coneOffset + " to " + coneOffset);
-
       // Clamp the cone offset to -1, 0, or 1
       this.coneOffset = MathUtil.clamp(coneOffset, -1, 1);
 
@@ -413,10 +378,6 @@ public class AutoAlignment implements Loggable{
       }
     }
 
-    public boolean getMoveArmToHumanTag() {
-      return this.moveArmToHumanTag;
-    }
-
     public int getSubstationOffset() {
       return this.substationOffset;
     }
@@ -427,13 +388,9 @@ public class AutoAlignment implements Loggable{
 
     public void setConeMode(boolean coneMode) {
       AutoAlignment.coneMode = coneMode;
-
       // If the cone offset is 0, and we are switching to cone mode,
       // set the cone offset to 1 (closest to human tag)
-      if (coneMode && this.coneOffset == 0) {
-        this.coneOffset = 1;
-      }
-      else if (!coneMode) {
+      if (!coneMode) {
         this.coneOffset = 0;
       }
     }

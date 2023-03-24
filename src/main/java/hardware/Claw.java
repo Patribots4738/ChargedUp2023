@@ -48,16 +48,16 @@ public class Claw {
 
     public void periodic() {
 
-      if (getOutputCurrent() > 20 && !hasGameElement && AutoAlignment.coneMode) {
-        startedIntakingTimestamp = Timer.getFPGATimestamp();
-        hasGameElement = true;
-        _claw.setSmartCurrentLimit(40);
-      }
+        if (getOutputCurrent() > 20 && !hasGameElement && AutoAlignment.coneMode) {
+            startedIntakingTimestamp = Timer.getFPGATimestamp();
+            hasGameElement = true;
+            _claw.setSmartCurrentLimit(40);
+        }
 
-      if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
-        if (getOutputCurrent() < 10) { hasGameElement = false; }
-        _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-      }
+        if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
+            if (getOutputCurrent() < 10) { hasGameElement = false; }
+            _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
+        }
 
         if (DriverStation.isTeleop()) {
 
@@ -108,12 +108,11 @@ public class Claw {
     }
 
     public double getDesiredSpeed() {
-        if (this.desiredSpeed > 0) { return (this.desiredSpeed / 0.7); }
         return this.desiredSpeed;
     }
 
     public void outTakeforXSeconds(double X) {
-        setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED);
+        setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
         this.startedOuttakingBool = true;
         this.outtakeSeconds = X;
         this.finishedOuttaking = false;
@@ -125,7 +124,7 @@ public class Claw {
     }
 
     public void setStartedOuttakingBool(boolean startedOuttakingBool) {
-      this.startedOuttakingBool = startedOuttakingBool;
+        this.startedOuttakingBool = startedOuttakingBool;
     }
 
     public boolean getStartedOuttakingBool() {

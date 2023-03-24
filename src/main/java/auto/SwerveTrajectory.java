@@ -117,7 +117,7 @@ public class SwerveTrajectory implements Loggable {
         // If the path has not completed time wise
         if (elapsedTime < _pathTraj.getTotalTimeSeconds() + 0.5)
         {
-          System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
+          // System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState mirroredState = new PathPlannerState();
@@ -147,7 +147,7 @@ public class SwerveTrajectory implements Loggable {
             mirroredState.angularVelocityRadPerSec = state.angularVelocityRadPerSec;
             mirroredState.holonomicAngularVelocityRadPerSec = state.holonomicAngularVelocityRadPerSec;
 
-            System.out.println(" To " + mirroredState.poseMeters.getTranslation());
+            // System.out.println(" To " + mirroredState.poseMeters.getTranslation());
 
           }
           // Use elapsedTime as a refrence for where we NEED to be

@@ -21,8 +21,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.SwerveUtils;
@@ -101,7 +101,7 @@ public class Swerve implements Loggable{
                 // X, Y, theta
         new MatBuilder<>(
                 Nat.N3(),
-                Nat.N1()).fill(0.9, 0.9, 3)
+                Nat.N1()).fill(0.9, 0.9, 6)
                 // Vision measurement
                 // standard deviations
                 // X, Y, theta
@@ -114,7 +114,8 @@ public class Swerve implements Loggable{
         resetEncoders();
         zeroHeading();
         setBrakeMode();
-        SmartDashboard.putData("Field", field);
+        // SmartDashboard.putData("Field", field);
+        Shuffleboard.getTab("AutoPicker").add(field);
 
     }
 
@@ -124,11 +125,8 @@ public class Swerve implements Loggable{
         this.field.setRobotPose(getPose());
         getPitch();
         getRoll();
-        // if (Math.abs(getPitch().getDegrees()) > 7 || Math.abs(getRoll().getDegrees()) > 7) {
-        //     System.out.println("Robot is not level");
-        //     System.out.printf("Time: %.2f Pitch: %.2f Roll: %.2f", Timer.getFPGATimestamp(), getPitch().getDegrees(), getRoll().getDegrees());
-        // }
     }
+    
     /**
      * Returns the currently-estimated pose of the robot.
      *
@@ -387,9 +385,7 @@ public class Swerve implements Loggable{
 
       double dotProduct = multiplyOutput.dot(VecBuilder.fill(0, 1, 0));
 
-      double result = (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
-
-      return (result);
+      return (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
     }
 
     public void resetEncoders() {
@@ -409,6 +405,14 @@ public class Swerve implements Loggable{
 
     public void toggleSpeed() {
         this.speedMultiplier = (this.speedMultiplier == 1) ? 0.35 : 1;
+    }
+
+    public void setSpeedMultiplier(double speedMultiplier) {
+      this.speedMultiplier = speedMultiplier;
+    }
+
+    public double getSpeedMultiplier() {
+      return this.speedMultiplier;
     }
 
     /**
@@ -433,10 +437,4 @@ public class Swerve implements Loggable{
             mSwerveMod.setCoastMode();
         }
     }
-
-    public void setRobotPose(Pose2d pose) {
-      field.setRobotPose(pose);
-    }
-
-
 }

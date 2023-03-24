@@ -3,7 +3,8 @@
 
 // How many leds in your strip?
 #define NUM_LEDS 150
-#define DATA_PIN 3
+#define DATA_PIN 7 
+
 #define FORWARD 0
 #define BACKWARD 1
 #define SLOW 250
@@ -26,19 +27,23 @@ int data = -1;
 
 int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
+int bounceCenter = 0;
 
-int bellyPanPattern = 0;
+int bellyPanPattern = 1;
 int sponsorPanelPattern = 0;
-int armPattern = 0;
+int armPattern = 20
 int clawPattern = 0;
+int statusLED = false;
 
 void setup() {
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
+  Serial.println("Recieved");
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   randomSeed(analogRead(0));
   Serial.begin(9600);
   FastLED.setBrightness(BRIGHTNESS);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
@@ -47,6 +52,7 @@ void loop() {
 //  setSponsorPanel(sponsorPanelPattern);
   setArm(armPattern);
 //  setClaw(clawPattern);
+  
 }
 
 void assignDataToSections(){
@@ -70,14 +76,51 @@ void allColor(int startIndex, int endIndex, CRGB c){
   for (int i = startIndex; i < endIndex; i++){
     leds[i] = c;
   }
+  /*
+  for (int i = middle; i >= 0; i--){
+    leds[i] = c;
+    leds[middle + (middle-i) +1] = c;
+  } 
+  delay(FAST/4);
+  */
   FastLED.show();
-  delay(FAST)
-  for (int i = startIndex; i < endIndex; i++){
-    leds[i] = CRGB::Black;
-  }
-  FastLED.show();
-  delay(FAST);
   
+}
+
+// Set the pattern of the LEDs to have a lighter color bounce left to right
+void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
+  if (bounceCenter < endIndex+20) {
+    for (int i = startIndex; i < endIndex; i++) {
+      // Set the 2nd led to a lighter version of param c
+      if (i > bounceCenter - (20) && i < bounceCenter + (20))
+      {
+        double brightness = 255;
+        if (i != bounceCenter) {
+          brightness = 400/(abs(i - bounceCenter));
+        }
+        if (c.r == 255)
+        {
+          brightness = brightness * - 1;
+        }
+        if (c.g > 100) {
+          leds[i] = CRGB::Yellow;
+        }
+        else {
+          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 255), constrain(c.b + brightness, 0, 255));
+        }
+      }
+      else {
+        leds[i] = c;
+      }
+    }
+    FastLED.show();
+    delay(speed/4);
+    bounceCenter += 1;
+  }
+  else {
+    bounceCenter = startIndex-20;
+  }
+
 }
 
 
@@ -112,7 +155,7 @@ void rainbow(int startIndex, int endIndex, int cycles, int speed){ // TODO direc
   
 }
 
-// Theater-style crawling lights
+// Theater-st+yle crawling lights
 void theaterChase(int startIndex, int endIndex, CRGB c, int speed){ // TODO direction
   for (int q=0; q < 3; q++) {
     for (int i=startIndex; i < endIndex; i=i+3) {
@@ -181,7 +224,10 @@ void receiveEvent()
 //    Serial.print(c);
   }
   data = Wire.read();
-  Serial.println(data);
+//  Serial.println(data);
+
+  digitalWrite(LED_BUILTIN, true);
+  statusLED = !statusLED;
 }
 
 
@@ -210,24 +256,24 @@ void setBellyPan(int pattern){
       rainbow(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, 1, FAST);
       break;
 
-    case 1: //theaterChaseRainbow
-      theaterChaseRainbow(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, MEDIUM);
+    case 1: // Green+Gold Bounce
+      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green, MEDIUM);
       break;
 
-    case 2: //theaterChase
-      theaterChase(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, randomColor(), MEDIUM);
+    case 2: // Red Alliance
+      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, MEDIUM);
       break;
       
     case 3: // FlashRed
-      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, MEDIUM);
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, SLOW);
       break;
       
-    case 4: // 
+    case 4: // Red
       allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red);
       break;
       
     case 5: // Blue
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Blue);
+      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Blue, MEDIUM);
       break;
       
     case 6: // Green
@@ -235,11 +281,11 @@ void setBellyPan(int pattern){
       break;
       
     case 7: // Purple
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple);
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple, SLOW);
       break;
       
     case 8: // Yellow
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow);
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow, SLOW);
       break;
 
     case 9: // Off
@@ -306,7 +352,7 @@ void setArm(int pattern){
       break;
       
     case 23: // NULL
-      flash(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red, MEDIUM);
+      flash(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red, SLOW);
       break;
       
     case 24: // Red

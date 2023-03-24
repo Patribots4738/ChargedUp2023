@@ -134,10 +134,9 @@ public final class Constants {
     public static final class AutoConstants {
 
         public static final double MAX_SPEED_METERS_PER_SECOND = 4; // previously 1.75
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
-        ;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.25; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 3 * Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/1.7; 
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -316,15 +315,14 @@ public final class Constants {
     }
 
     public static final class LEDConstants {
+
+      public static final int ARDUINO_ADDRESS = 8;
       public static final int BELLY_PAN_RAINBOW = 0;
       // The "theater chase" could possibly induce seizures,
       // Please refrain from using these.
       @Deprecated
       public static final int BELLY_PAN_THEATER_CHASE_RAINBOW = 1;
-      // The "theater chase" could possibly induce seizures,
-      // Please refrain from using these.
-      @Deprecated
-      public static final int BELLY_PAN_THEATER_CHASE = 2;
+      public static final int BELLY_PAN_RED_ALLIANCE = 2;
       public static final int BELLY_PAN_FLASH_RED = 3;
       public static final int BELLY_PAN_RED = 4;
       public static final int BELLY_PAN_BLUE = 5;
@@ -394,7 +392,7 @@ public final class Constants {
     public static final class AlignmentConstants {
 
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 1;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
         
 
@@ -461,10 +459,12 @@ public final class Constants {
       public static final int MID_CONE_PREP_INDEX = 18;
       public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
       public static final int AUTO_INIT_INDEX = 20;
+      public static final int AUTO_CUBE_INTAKE_INDEX = 21;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
+      public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
-      public static final double CLAW_OUTTAKE_SPEED = -1;
+      public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
@@ -478,8 +478,11 @@ public final class Constants {
 
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
+      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(40, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
+      
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
       
@@ -548,7 +551,7 @@ public final class Constants {
         // Index 7
         {
           CUBE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
+          CUBE_INTAKE_POSITION
         },
         // Index 8
         {
@@ -595,7 +598,7 @@ public final class Constants {
         // Index 16
         {
           CUBE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
+          CUBE_INTAKE_POSITION
         },
         // Index 17
         {
@@ -615,6 +618,11 @@ public final class Constants {
         // Index 20
         {
           AUTO_INIT_PICKUP
+        },
+        // Index 21
+        {
+          CONE_INTAKE_POSITION_PREP,
+          CUBE_INTAKE_POSITION_AUTO
         }
       };
   }
