@@ -159,8 +159,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     else if (SwerveTrajectory.trajectoryStatus.equals("done")) {
       if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && currentWaypointNumber == 1)
       {
-        stateHasFinished = true;
-        return;
+        hasMovedArm = true;
       }
       // If the arm is not in the desired position, move it
       if (!hasMovedArm) {
