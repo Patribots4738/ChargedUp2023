@@ -427,14 +427,14 @@ public class AutoAlignment implements Loggable{
 
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 18 : 20))), 0.055, 0.20),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 10 : 20))), 0.055, 0.20),
             0, 
             0, 
             true, false);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 18 : 20))), -0.20, -0.055),
+            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 10 : 20))), -0.20, -0.055),
             0, 
             0, 
             true, false);
