@@ -128,6 +128,7 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _9H_D_CHARGE;
 
   public static Waypoint[] _9H_D_7H_REACH;
+  public static Waypoint[] _MOBILITY_CHARGE_TEST_ONLY;
 
   public static PathPlannerTrajectory square1;
   public static PathPlannerTrajectory square2;
@@ -262,7 +263,7 @@ public class AutoPathStorage implements Loggable {
     _7_CH = PathPlanner.loadPath("_7_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _8_CH = PathPlanner.loadPath("_8_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, 3);
     _9_CH = PathPlanner.loadPath("_9_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _M_CH = PathPlanner.loadPath("_M_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _M_CH = PathPlanner.loadPath("_M_CH", 3, 0.75);
 
     _9_D_REACH = PathPlanner.loadPath("_9_D_REACH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _9_D_8_BLUE = PathPlanner.loadPath("_9_D_8_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -753,6 +754,10 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
+    _MOBILITY_CHARGE_TEST_ONLY = new Waypoint[] {
+      new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
 
     myAutoContainer = new AutoPose[] {
       // AutoPoses for the bottom of the field:
@@ -800,6 +805,8 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("9H_D_7H_CHARGE", _9H_D_7H_CHARGE),
       new AutoPose("9H_D_7H", _9H_D_7H),
       new AutoPose("9H_D_7H_C", _9H_D_7H_C),
+      
+      new AutoPose("MOBILITY CHARGE ONLY", _MOBILITY_CHARGE_TEST_ONLY),
 
       new AutoPose("1H_A_CHARGE", _1H_A_CHARGE),
       new AutoPose("2H_A_CHARGE", _2H_A_CHARGE),
