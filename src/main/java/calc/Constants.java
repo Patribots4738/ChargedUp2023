@@ -26,7 +26,10 @@ public final class Constants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-        public static double MAX_ANGULAR_SPEED = 5 * Math.PI; // radians per second
+        public static double DYNAMIC_MAX_ANGULAR_SPEED = 5 * Math.PI; // radians per second
+        public static final double MIN_ANGULAR_SPEED = 5 * Math.PI; // radians per second
+        // NEEDS TO BE TESTED vvv
+        public static final double MAX_ANGULAR_SPEED = 8 * Math.PI; // radians per second
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(13.51);
 

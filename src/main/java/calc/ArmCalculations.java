@@ -45,4 +45,16 @@ public class ArmCalculations {
 
         return q1;
     }
+
+
+    /**
+     * A util function to linearly interpolate between two values
+     * @param a the minimum value to interpolate between
+     * @param b the maximum value to interpolate between
+     * @param f the number to interpolate between the two values
+     * @return the interpolated value
+     */
+    public double lerp(double a, double b, double f) {
+      return a + f * (b - a);
+    }
 }
