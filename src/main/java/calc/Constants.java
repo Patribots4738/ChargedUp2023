@@ -27,7 +27,7 @@ public final class Constants {
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         public static double DYNAMIC_MAX_ANGULAR_SPEED = 5 * Math.PI; // radians per second
-        public static final double MIN_ANGULAR_SPEED = 5 * Math.PI; // radians per second
+        public static final double MIN_ANGULAR_SPEED = 3 * Math.PI; // radians per second
         // NEEDS TO BE TESTED vvv
         public static final double MAX_ANGULAR_SPEED = 8 * Math.PI; // radians per second
 
