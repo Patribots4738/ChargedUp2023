@@ -553,7 +553,7 @@ public class Arm implements Loggable {
           // Note that the arm mirroring process will first
           // go through the mirroring indices, so we don't need to worry about
           // the arm jolting to position.
-          this.armXReference = -40;
+          this.armXReference = 40;
           drive(new Translation2d(armXReference, armYReference));
         }
         else {
