@@ -154,9 +154,7 @@ public class Robot extends TimedRobot {
     arm.periodic();
     claw.periodic();
     autoSegmentedWaypoints.periodic();
-    if (autoSegmentedWaypoints.halfway) {
-      autoAlignment.calibrateOdometry();
-    }
+    autoAlignment.calibrateOdometry();
 
   }
 
