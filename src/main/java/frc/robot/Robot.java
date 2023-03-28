@@ -185,10 +185,10 @@ public class Robot extends TimedRobot {
       return;
     }
 
-    // Find the max angular velocity of the drivetrain
+    // Find the max angular velocity of the drivetrain using the arm location
     DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = armCalculations.lerp(
-      DriveConstants.MIN_ANGULAR_SPEED, 
       DriveConstants.MAX_ANGULAR_SPEED, 
+      DriveConstants.MIN_ANGULAR_SPEED, 
       MathUtil.clamp((MathUtil.applyDeadband(arm.getXPosition(), 6.5) / 30), 0, 1)
     );
 
