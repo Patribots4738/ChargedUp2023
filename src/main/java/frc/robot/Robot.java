@@ -279,28 +279,9 @@ public class Robot extends TimedRobot {
     }
     
     if (arm.getOperatorOverride()) {
-
-      // If the holonomic rotation is positive, (plus or minus 10 degrees around 180 or 0)
-      // Then set the operator X input to be negative.
-      // This aims to preserve the operator's input direction when translating to the arm
-      if (swerve.getYaw().getDegrees() > 0 || 
-          (swerve.getYaw().getDegrees() < 10 && swerve.getYaw().getDegrees() > -10) ||
-          swerve.getYaw().getDegrees() < -170 && swerve.getYaw().getDegrees() > 170) 
-      {
-        arm.drive(new Translation2d(
-          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? -operatorLeftAxis.getX() 
-              : operatorLeftAxis.getX()), 
-          -operatorLeftAxis.getY()));
-      }
-      else {
-        arm.drive(new Translation2d(
-          ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) 
-              ? operatorLeftAxis.getX() 
-              : -operatorLeftAxis.getX()), 
-          -operatorLeftAxis.getY()));
-      }
-
+      
+      arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
+      
     }
 
     // The moment the robot takes in a cone/cube,
