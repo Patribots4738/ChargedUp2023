@@ -181,6 +181,7 @@ public class Robot extends TimedRobot {
     // This is to prevent any charge pad sliding
     if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
       swerve.setWheelsUp();
+      claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
       return;
     }
 
