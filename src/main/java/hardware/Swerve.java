@@ -101,7 +101,7 @@ public class Swerve implements Loggable{
                 // X, Y, theta
         new MatBuilder<>(
                 Nat.N3(),
-                Nat.N1()).fill(0.9, 0.9, 6)
+                Nat.N1()).fill(0.6, 0.6, 3)
                 // Vision measurement
                 // standard deviations
                 // X, Y, theta
