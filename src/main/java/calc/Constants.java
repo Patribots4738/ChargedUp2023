@@ -468,7 +468,7 @@ public final class Constants {
 
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
-      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 6);
       public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(40, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
