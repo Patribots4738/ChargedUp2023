@@ -13,7 +13,7 @@
 #define BRIGHTNESS 100
 
 #define BELLYPAN_START_INDEX 0
-#define BELLYPAN_END_INDEX 96
+#define BELLYPAN_END_INDEX 95
 #define SPONSOR_PANEL_START_INDEX 0
 #define SPONSOR_PANEL_END_INDEX 0
 #define ARM_START_INDEX 97
@@ -72,19 +72,14 @@ void assignDataToSections(){
 }
 
 // Changes all LEDS to given color
-void allColor(int startIndex, int endIndex, CRGB c){
-  for (int i = startIndex; i < endIndex; i++){
-    leds[i] = c;
-  }
-  /*
+void allColor(int startIndex, int endIndex, CRGB c, int speed){
+  int middle = ((endIndex-startIndex)/2);
   for (int i = middle; i >= 0; i--){
     leds[i] = c;
     leds[middle + (middle-i) +1] = c;
-  } 
-  delay(FAST/4);
-  */
-  FastLED.show();
-  
+    FastLED.show();
+    delay(speed);
+  }
 }
 
 // Set the pattern of the LEDs to have a lighter color bounce left to right
@@ -127,15 +122,35 @@ void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO direction
 // Flashes given color
 // If c==NULL, random color flash
 void flash(int startIndex, int endIndex, CRGB c, int speed){
-    if(c){
-      allColor(startIndex, endIndex, c);
+    if(c) {
+      allColor(startIndex, endIndex, c, (FAST/4));
     }
     else{
-      allColor(startIndex, endIndex, randomColor());
+      allColor(startIndex, endIndex, randomColor(), (FAST/4));
     }
-    delay(speed);
-    allColor(startIndex, endIndex, CRGB::Black);
-  
+    delay(100);
+    allColor(startIndex, endIndex, CRGB::Black, (FAST/4));
+    delay(50);
+}
+
+void greenNGold(int startIndex, int endIndex) {
+  int middle = ((endIndex-startIndex)/2);
+  for (int i = middle; i >= 0; i--) {
+    CRGB c = CRGB::Black;
+    if (i == 14) {
+      c = CRGB::Blue;
+    }
+    else if (i % 2 == 0) {
+      c = CRGB::Green;
+    }
+    else {
+      c = CRGB::Yellow;
+    }
+    leds[i] = c;
+    leds[middle + (middle-i) +1] = c;
+    FastLED.show();
+    delay((57000/(middle)));
+  }
 }
 
 void rainbow(int startIndex, int endIndex, int cycles, int speed){ // TODO directionk
@@ -249,14 +264,15 @@ void receiveEvent()
 void setBellyPan(int pattern){
   switch(pattern){
     case -1:
-      allColor(0, NUM_LEDS, CRGB::Black);
+      allColor(0, NUM_LEDS, CRGB::Black, (FAST/4));
       
     case 0: // Rainbow
       rainbow(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, 1, FAST);
       break;
 
     case 1: // Green+Gold Bounce
-      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green, MEDIUM);
+      greenNGold(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX);
+      //bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green, MEDIUM);
       break;
 
     case 2: // Red Alliance
@@ -268,7 +284,7 @@ void setBellyPan(int pattern){
       break;
       
     case 4: // Red
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red);
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, (FAST/4));
       break;
       
     case 5: // Blue
@@ -276,19 +292,19 @@ void setBellyPan(int pattern){
       break;
       
     case 6: // Green
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green);
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green, (FAST/4));
       break;
       
     case 7: // Purple
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple);
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple, (FAST/4));
       break;
       
     case 8: // Yellow
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow);
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow, (FAST/4));
       break;
 
     case 9: // Off
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Black);
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Black, (FAST/4));
       break;
   }
 }
@@ -311,27 +327,27 @@ void setSponsorPanel(int pattern){
       break;
       
     case 14: // Red
-      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Red);
+      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Red, (FAST/4));
       break;
       
     case 15: // Blue
-      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Blue);
+      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Blue, (FAST/4));
       break;
       
     case 16: // Green
-      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Green);
+      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Green, (FAST/4));
       break;
       
     case 17: // Purple
-      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Purple);
+      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Purple, (FAST/4));
       break;
       
     case 18: // Yellow
-      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Yellow);
+      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Yellow, (FAST/4));
       break;
 
     case 19: // Off
-      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Black);
+      allColor(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, CRGB::Black, (FAST/4));
       break;
   }
 }
@@ -355,27 +371,27 @@ void setArm(int pattern){
       break;
       
     case 24: // Red
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red);
+      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red, (FAST/4));
       break;
       
     case 25: // Blue
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Blue);
+      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Blue, (FAST/4));
       break;
       
     case 26: // Green
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Green);
+      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Green, (FAST/4));
       break;
       
     case 27: // Purple
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Purple);
+      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Purple, (FAST/4));
       break;
       
     case 28: // Yellow
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Yellow);
+      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Yellow, (FAST/4));
       break;
 
     case 29: // Off
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Black);
+      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Black, (FAST/4));
       break;
   }
 }
@@ -397,27 +413,27 @@ void setClaw(int pattern){
       break;
       
     case 34: // Red
-      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Red);
+      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Red, (FAST/4));
       break;
       
     case 35: // Blue
-      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Blue);
+      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Blue, (FAST/4));
       break;
       
     case 36: // Green
-      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Green);
+      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Green, (FAST/4));
       break;
       
     case 37: // Purple
-      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Purple);
+      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Purple, (FAST/4));
       break;
       
     case 38: // Yellow
-      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Yellow);
+      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Yellow, (FAST/4));
       break;
 
     case 39: // Off
-      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Black);
+      allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Black, (FAST/4));
       break;
   }
 }
