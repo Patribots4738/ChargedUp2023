@@ -547,7 +547,20 @@ public class Arm implements Loggable {
       // Only if we are changing the state of the arm mirrored
       // Then drive the robot to the new reference point
       if (changedState) {
-        drive(new Translation2d((armMirrored) ? armXReference : -armXReference, armYReference));
+        if (armMirrored) {
+          // Since the robot is assumed to be flipped over, 
+          // tell the arm to push out hard on the X axis
+          // Note that the arm mirroring process will first
+          // go through the mirroring indices, so we don't need to worry about
+          // the arm jolting to position.
+          this.armXReference = -40;
+          drive(new Translation2d(armXReference, armYReference));
+        }
+        else {
+          // Drive the arm to just past the flip point to trigger the motion
+          this.armXReference = (ArmConstants.ARM_FLIP_X + 0.1);
+          drive(new Translation2d(armXReference, armYReference));
+        }
       }
     }
 
