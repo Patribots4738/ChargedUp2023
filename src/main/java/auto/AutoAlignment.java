@@ -62,8 +62,8 @@ public class AutoAlignment implements Loggable{
       // This can be present (see's tag) or not present (does not see tag)
       Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPose());
 
-      // I do not believe this if a statement gets what we want it to get...
-      if (result.isPresent()) {
+      // If the result of the estimatedRobotPose exists, and the skew of the tag is less than 3 degrees (to prevent false results)
+      if (result.isPresent() && photonCameraPose.getPhotonCamera().get().getLatestResult().getBestTarget().getSkew() < 3) {
 
         EstimatedRobotPose camEstimatedPose = result.get();
         // If and only if the camera is confident in the pose, add the vision measurement to the pose estimator

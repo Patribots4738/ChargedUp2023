@@ -101,7 +101,7 @@ public class Swerve implements Loggable{
                 // X, Y, theta
         new MatBuilder<>(
                 Nat.N3(),
-                Nat.N1()).fill(0.9, 0.9, 6)
+                Nat.N1()).fill(0.6, 0.6, 3)
                 // Vision measurement
                 // standard deviations
                 // X, Y, theta
@@ -210,7 +210,7 @@ public class Swerve implements Loggable{
         // Convert the commanded speeds into the correct units for the drivetrain
         double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
         double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-        double rotDelivered = m_currentRotation * DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier;
+        double rotDelivered = m_currentRotation * DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier;
     
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative
@@ -223,7 +223,7 @@ public class Swerve implements Loggable{
         
         xSpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
         ySpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED * speedMultiplier);
+        rotSpeed *= (DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier);
 
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative

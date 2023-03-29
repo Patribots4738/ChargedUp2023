@@ -185,6 +185,13 @@ public class Robot extends TimedRobot {
       return;
     }
 
+    // Find the max angular velocity of the drivetrain using the arm location
+    DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = armCalculations.lerp(
+      DriveConstants.MAX_ANGULAR_SPEED, 
+      DriveConstants.MIN_ANGULAR_SPEED, 
+      MathUtil.clamp((MathUtil.applyDeadband(arm.getXPosition(), 6.5) / 30), 0, 1)
+    );
+
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
     // This is to ensure that the up direction on the joystick is positive inputs
     double driverLeftX = MathUtil.applyDeadband(-driver.getLeftX(), OIConstants.DRIVER_DEADBAND);

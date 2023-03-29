@@ -499,6 +499,14 @@ public class Arm implements Loggable {
         return this.armsAtDesiredPosition;
     }
 
+    public double getXPosition() {
+        return this.armXPos;
+    }
+    
+    public double getYPosition() {
+      return this.armYPos;
+    }
+
     // Check if the arm is at its desired position and that position is a placement index,
     // Note that the stowed position is not a placement index, but can be used as hybrid placement
     public boolean getAtPlacementPosition() {
