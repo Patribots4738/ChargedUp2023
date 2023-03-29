@@ -72,7 +72,7 @@ public class Swerve implements Loggable{
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     // The gyro sensor
-    private final ADIS16470_IMU gyro = new ADIS16470_IMU(ADIS16470_IMU.IMUAxis.kYaw, ADIS16470_IMU.IMUAxis.kPitch, ADIS16470_IMU.IMUAxis.kRoll);
+    private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
     private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[]{
             m_frontLeft,
@@ -124,7 +124,7 @@ public class Swerve implements Loggable{
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getYaw(), getModulePositions());
         this.field.setRobotPose(getPose());
         
-        this.yaw = getYaw().getDegrees();
+        this.yaw = getHolonomicRotation().getDegrees();
         this.pitch = getPitch().getDegrees();
         this.roll = getRoll().getDegrees();
     }
@@ -315,13 +315,21 @@ public class Swerve implements Loggable{
         gyro.resetAllAngles();
     }
     
-    public Rotation2d getYaw() { return Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())); }
+    public Rotation2d getYaw() { 
+      return Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())).unaryMinus();  
+    }
 
-    public Rotation2d getHolonomicRotation() { return this.getPose().getRotation(); }
+    public Rotation2d getHolonomicRotation() { 
+      return this.getPose().getRotation(); 
+    }
 
-    public Rotation2d getPitch() { return Rotation2d.fromDegrees(gyro.getAngle(gyro.getPitchAxis())); }
+    public Rotation2d getPitch() { 
+      return Rotation2d.fromDegrees(gyro.getAngle(gyro.getPitchAxis())); 
+    }
 
-    public Rotation2d getRoll() { return Rotation2d.fromDegrees(gyro.getAngle(gyro.getRollAxis())); }
+    public Rotation2d getRoll() { 
+      return Rotation2d.fromDegrees(gyro.getAngle(gyro.getRollAxis())); 
+    }
     
     public double getTilt() {
 
