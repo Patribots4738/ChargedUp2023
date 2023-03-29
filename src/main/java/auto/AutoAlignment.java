@@ -407,18 +407,18 @@ public class AutoAlignment implements Loggable{
 
       // If our heading is within -45 to 45 degrees or within -135 and -180 or within 135 to 180, use the pitch
       // Otherwise, use the roll
-      if (-45 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 45) {
+      if (-45 < swerve.getHolonomicRotation().getDegrees() && swerve.getHolonomicRotation().getDegrees() < 45) {
         tilt = -swerve.getPitch().getRadians();
       }
-      else if (-180 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < -135 ||
-          135 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 180) 
+      else if (-180 < swerve.getHolonomicRotation().getDegrees() && swerve.getHolonomicRotation().getDegrees() < -135 ||
+          135 < swerve.getHolonomicRotation().getDegrees() && swerve.getHolonomicRotation().getDegrees() < 180) 
       {
         tilt = swerve.getPitch().getRadians();
       }
-      else if (-135 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < -45) {
+      else if (-135 < swerve.getHolonomicRotation().getDegrees() && swerve.getHolonomicRotation().getDegrees() < -45) {
         tilt = swerve.getRoll().getRadians();
       }
-      else if (45 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 135) 
+      else if (45 < swerve.getHolonomicRotation().getDegrees() && swerve.getHolonomicRotation().getDegrees() < 135) 
       {
         tilt = -swerve.getRoll().getRadians();
       }
@@ -451,7 +451,7 @@ public class AutoAlignment implements Loggable{
     public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
     
       // Use a Holonomic Drive Controller to calculate the speeds for the robot
-      double thetaSpeed = SwerveTrajectory.HDC.getThetaController().calculate(swerve.getYaw().getRadians(), desiredAngle.getRadians());
+      double thetaSpeed = SwerveTrajectory.HDC.getThetaController().calculate(swerve.getHolonomicRotation().getRadians(), desiredAngle.getRadians());
 
       // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,

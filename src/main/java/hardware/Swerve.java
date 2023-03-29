@@ -19,7 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
+// import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -72,7 +72,7 @@ public class Swerve implements Loggable{
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     // The gyro sensor
-    private final ADIS16470_IMU gyro = new ADIS16470_IMU();
+    private final ADIS16470_IMU gyro = new ADIS16470_IMU(ADIS16470_IMU.IMUAxis.kYaw, ADIS16470_IMU.IMUAxis.kPitch, ADIS16470_IMU.IMUAxis.kRoll);
 
     private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[]{
             m_frontLeft,
@@ -83,7 +83,7 @@ public class Swerve implements Loggable{
 
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.DRIVE_KINEMATICS,
-        getGyroAngle(),
+        getYaw(),
         getModulePositions(),
         new Pose2d(),
         // Trust the information of the vision more
@@ -121,10 +121,12 @@ public class Swerve implements Loggable{
 
     public void periodic() {
         // Update the odometry in the periodic block
-        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getYaw(), getModulePositions());
         this.field.setRobotPose(getPose());
-        getPitch();
-        getRoll();
+        
+        this.yaw = getYaw().getDegrees();
+        this.pitch = getPitch().getDegrees();
+        this.roll = getRoll().getDegrees();
     }
     
     /**
@@ -246,10 +248,10 @@ public class Swerve implements Loggable{
     }
 
     public void setWheelsUp() {
-      m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getHolonomicRotation())));
+      m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getHolonomicRotation())));
+      m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getHolonomicRotation())));
+      m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getHolonomicRotation())));
   }
 
     /**
@@ -268,7 +270,7 @@ public class Swerve implements Loggable{
 
     public void resetOdometry(Pose2d pose) {
         poseEstimator.resetPosition(
-                getYaw(),
+                getHolonomicRotation(),
                 getModulePositions(),
                 pose);
     }
@@ -310,49 +312,20 @@ public class Swerve implements Loggable{
      * Zeroes the heading of the robot.
      */
     public void zeroHeading() {
-        gyro.reset();
+        gyro.resetAllAngles();
     }
     
-    public Rotation2d getGyroAngle() {
+    public Rotation2d getYaw() { return Rotation2d.fromDegrees(gyro.getAngle(gyro.getYawAxis())); }
 
-      // gyro.setYawAxis(IMUAxis.kZ);
-      
-      Rotation2d yawRotation2d = Rotation2d.fromDegrees(gyro.getAngle());
-      
-      if (DriveConstants.GYRO_REVERSED) {
-          yawRotation2d = yawRotation2d.unaryMinus();
-      }
+    public Rotation2d getHolonomicRotation() { return this.getPose().getRotation(); }
 
-      this.yaw = yawRotation2d.getDegrees();
+    public Rotation2d getPitch() { return Rotation2d.fromDegrees(gyro.getAngle(gyro.getPitchAxis())); }
 
-      return yawRotation2d;
-    }
-
-    public Rotation2d getYaw() { return this.getPose().getRotation(); }
-
-    public Rotation2d getPitch() {
-
-      Rotation2d pitchRotation2d = Rotation2d.fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
-
-      this.pitch = pitchRotation2d.unaryMinus().getDegrees();
-      
-      return pitchRotation2d;
-      
-    }
-
-    public Rotation2d getRoll() {
-
-      Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));
-
-      this.roll = rollRotation2d.unaryMinus().getDegrees();
-
-      return rollRotation2d;
-      
-    }
+    public Rotation2d getRoll() { return Rotation2d.fromDegrees(gyro.getAngle(gyro.getRollAxis())); }
     
     public double getTilt() {
 
-      Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getYaw().getRadians(), getPitch().getRadians());
+      Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getHolonomicRotation().getRadians(), getPitch().getRadians());
       
       // System.out.println(getRoll().getDegrees() + " " + getYaw().getDegrees() + " " + getPitch().getDegrees());
       
@@ -400,7 +373,7 @@ public class Swerve implements Loggable{
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+        return gyro.getRate(gyro.getYawAxis()) * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public void toggleSpeed() {

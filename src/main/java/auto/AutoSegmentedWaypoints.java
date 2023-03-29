@@ -128,8 +128,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     // Check if the arm is ready to move to the next waypoint mid-path
     if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions()) {
       
-      if ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
-          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90) && halfway) 
+      if ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getHolonomicRotation().getDegrees()) > 90) || 
+          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getHolonomicRotation().getDegrees()) < 90) && halfway) 
       {
         // Prepare the arm for the next waypoint before the path is done
         switch (armIndex) {
@@ -143,8 +143,8 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
       }
       else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && currentWaypointNumber == 1 &&
-              ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) < 90) || 
-              (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) > 90)))
+              ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getHolonomicRotation().getDegrees()) < 90) || 
+              (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getHolonomicRotation().getDegrees()) > 90)))
       {
         AutoAlignment.coneMode = false;
         halfway = true;

@@ -214,7 +214,7 @@ public class Robot extends TimedRobot {
     if (driver.getAButtonReleased()) {
       DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
       SwerveTrajectory.resetTrajectoryStatus();
-      SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+      SwerveTrajectory.HDC.getThetaController().reset(swerve.getHolonomicRotation().getRadians());
       //autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
     }
     else if (driver.getAButton()) {
@@ -223,7 +223,7 @@ public class Robot extends TimedRobot {
 
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
-        SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        SwerveTrajectory.HDC.getThetaController().reset(swerve.getHolonomicRotation().getRadians());
         
       }
       
@@ -248,9 +248,9 @@ public class Robot extends TimedRobot {
       // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
       if (driver.getRightStickButton()) {
         if (driver.getRightStickButtonPressed()) {
-          SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+          SwerveTrajectory.HDC.getThetaController().reset(swerve.getHolonomicRotation().getRadians());
         }
-        autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getYaw().getDegrees()) > 90 ? 180 : 0));
+        autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getHolonomicRotation().getDegrees()) > 90 ? 180 : 0));
       }
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
