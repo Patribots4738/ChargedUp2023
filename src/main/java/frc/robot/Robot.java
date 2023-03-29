@@ -155,7 +155,6 @@ public class Robot extends TimedRobot {
     claw.periodic();
     autoSegmentedWaypoints.periodic();
     autoAlignment.calibrateOdometry();
-
   }
 
   @Override
@@ -166,7 +165,6 @@ public class Robot extends TimedRobot {
     arm.setBrakeMode();
     SwerveTrajectory.resetTrajectoryStatus();
     autoAlignment.setConeOffset(0);
-
   }
 
   @Override
@@ -187,9 +185,9 @@ public class Robot extends TimedRobot {
 
     // Find the max angular velocity of the drivetrain using the arm location
     DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = armCalculations.lerp(
-      DriveConstants.MAX_ANGULAR_SPEED, 
       DriveConstants.MIN_ANGULAR_SPEED, 
-      MathUtil.clamp((MathUtil.applyDeadband(arm.getXPosition(), 6.5) / 30), 0, 1)
+      DriveConstants.MAX_ANGULAR_SPEED,
+      MathUtil.clamp(1-(arm.getXPosition()/40.0), 0, 1)
     );
 
     // Get the driver's inputs and apply deadband; Note that the Y axis is inverted
@@ -287,7 +285,7 @@ public class Robot extends TimedRobot {
     
     if (arm.getOperatorOverride()) {
       
-      arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+      arm.drive(new Translation2d(-operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
       
     }
 

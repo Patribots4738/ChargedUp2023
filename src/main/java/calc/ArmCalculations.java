@@ -55,6 +55,6 @@ public class ArmCalculations {
      * @return the interpolated value
      */
     public double lerp(double a, double b, double f) {
-      return a + f * (b - a);
+      return (a + f * (b - a));
     }
 }
