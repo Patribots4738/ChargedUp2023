@@ -67,16 +67,22 @@ void assignDataToSections(){
   }
   else if (data >= 30 && data <= 39){
     clawPattern = data;
-  }  
+  }
   
 }
 
 // Changes all LEDS to given color
 void allColor(int startIndex, int endIndex, CRGB c, int speed){
-  int middle = ((endIndex-startIndex)/2);
-  for (int i = middle; i >= 0; i--){
+  int middle = ((endIndex-startIndex) / 2);
+  for (int i = middle; i >= startIndex; i--) {
     leds[i] = c;
-    leds[middle + (middle-i) +1] = c;
+    leds[middle + (middle - i) + 1] = c;
+    
+    receiveEvent();
+    if (newByte()) {
+      return;
+    }
+    
     FastLED.show();
     delay(speed);
   }
@@ -84,7 +90,7 @@ void allColor(int startIndex, int endIndex, CRGB c, int speed){
 
 // Set the pattern of the LEDs to have a lighter color bounce left to right
 void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
-  if (bounceCenter < endIndex+20) {
+  if (bounceCenter < endIndex + 20) {
     for (int i = startIndex; i < endIndex; i++) {
       // Set the 2nd led to a lighter version of param c
       if (i > bounceCenter - (20) && i < bounceCenter + (20))
@@ -108,6 +114,12 @@ void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO direction
         leds[i] = c;
       }
     }
+    
+    receiveEvent();
+    if (newByte()) {
+      return;
+    }
+    
     FastLED.show();
     delay(speed/4);
     bounceCenter += 1;
@@ -128,8 +140,20 @@ void flash(int startIndex, int endIndex, CRGB c, int speed){
     else{
       allColor(startIndex, endIndex, randomColor(), (FAST/4));
     }
+
+    receiveEvent();
+    if (newByte()) {
+      return;
+    }
+    
     delay(100);
     allColor(startIndex, endIndex, CRGB::Black, (FAST/4));
+    
+    receiveEvent();
+    if (newByte()) {
+      return;
+    }
+    
     delay(50);
 }
 
@@ -148,6 +172,12 @@ void greenNGold(int startIndex, int endIndex) {
     }
     leds[i] = c;
     leds[middle + (middle-i) +1] = c;
+    
+    receiveEvent();
+    if (newByte()) {
+      return;
+    }
+    
     FastLED.show();
     delay((57000/(middle)));
   }
@@ -159,8 +189,15 @@ void rainbow(int startIndex, int endIndex, int cycles, int speed){ // TODO direc
         leds[i] = CHSV(i-(rainbowIncrementer*2), 255, 255);
       }
 //      fill_rainbow( leds, endIndex, rainbowIncrementer, 7);
+    
+      receiveEvent();
+      if (newByte()) {
+        return;
+      }
+      
       FastLED.show();
       delay(speed);
+
       rainbowIncrementer += 1;
     }
     else {
@@ -176,8 +213,13 @@ void theaterChase(int startIndex, int endIndex, CRGB c, int speed){ // TODO dire
       int pos = i+q;
       leds[pos] = c;    //turn every third pixel on
     }
+    
+    receiveEvent();
+    if (newByte()) {
+      return;
+    }
+    
     FastLED.show();
-
     delay(speed);
 
     for (int i=startIndex; i < endIndex; i=i+3) {
@@ -195,8 +237,14 @@ void theaterChaseRainbow(int startIndex, int endIndex, int speed){ // TODO direc
         int pos = i+q;
         leds[pos] = Wheel( (i+theaterChaseRainbowIncrementer) % 255);    //turn every third pixel on
       }
-      FastLED.show();
 
+      receiveEvent();
+
+      if (newByte()) {
+        return;
+      }
+
+      FastLED.show();
       delay(speed);
 
       for (int i=startIndex; i < endIndex; i=i+3) {
@@ -242,6 +290,13 @@ void receiveEvent()
 
   digitalWrite(LED_BUILTIN, true);
   statusLED = !statusLED;
+}
+
+boolean newByte() {
+  return (((data >= 0 && data <= 9) && (bellyPanPattern != data)) ||
+          ((data >= 10 && data <= 19) && (sponsorPanelPattern != data)) ||
+          ((data >= 20 && data <= 29) && (armPattern != data)) ||
+          ((data >= 30 && data <= 39) && (clawPattern != data)));
 }
 
 
