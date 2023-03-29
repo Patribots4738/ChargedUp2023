@@ -148,8 +148,10 @@ void greenNGold(int startIndex, int endIndex) {
     }
     leds[i] = c;
     leds[middle + (middle-i) +1] = c;
-    FastLED.show();
-    delay((57000/(middle)));
+    if (bellyPanPattern == 1) {
+      FastLED.show();
+      delay((57000/(middle)));
+    }
   }
 }
 
@@ -261,8 +263,8 @@ void receiveEvent()
 //                 Rainbow,  theaterChaseRainbow, theaterChase,   NULL,    Red, Blue, Green, Purple, Yellow, Off
 // ----------------------------------------------------------------------------------------------------------------
 
-void setBellyPan(int pattern){
-  switch(pattern){
+void setBellyPan(int pattern) {
+  switch(pattern) {
     case -1:
       allColor(0, NUM_LEDS, CRGB::Black, (FAST/4));
       
@@ -309,8 +311,8 @@ void setBellyPan(int pattern){
   }
 }
 
-void setSponsorPanel(int pattern){
-  switch(pattern){
+void setSponsorPanel(int pattern) {
+  switch(pattern) {
     case 10: // Rainbow
       rainbow(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, 1, FAST);
       break;
@@ -352,8 +354,8 @@ void setSponsorPanel(int pattern){
   }
 }
 
-void setArm(int pattern){
-    switch(pattern){
+void setArm(int pattern) {
+    switch(pattern) {
     case 20: // Rainbow
       rainbow(ARM_START_INDEX, ARM_END_INDEX, 1, FAST);
       break;
@@ -395,8 +397,8 @@ void setArm(int pattern){
       break;
   }
 }
-void setClaw(int pattern){
-    switch(pattern){
+void setClaw(int pattern) {
+    switch(pattern) {
     case 30: // Rainbow
       rainbow(CLAW_START_INDEX, CLAW_END_INDEX, 1, FAST);
       break;
