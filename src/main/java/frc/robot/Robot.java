@@ -468,6 +468,8 @@ public class Robot extends TimedRobot {
       autoAlignment.setConeMode(true);
       arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
+    swerve.periodic();
+    swerve.setWheelsUp();
 
     
   }
