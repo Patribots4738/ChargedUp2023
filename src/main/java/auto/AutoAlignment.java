@@ -66,11 +66,18 @@ public class AutoAlignment implements Loggable{
       if (result.isPresent() && photonCameraPose.getPhotonCamera().get().getLatestResult().getBestTarget().getSkew() < 3) {
 
         EstimatedRobotPose camEstimatedPose = result.get();
-
-        // Add the vision measurement to the pose estimator to update the odometry
-        swerve.getPoseEstimator().addVisionMeasurement(
-          camEstimatedPose.estimatedPose.toPose2d(),
-          Timer.getFPGATimestamp());
+        // If and only if the camera is confident in the pose, add the vision measurement to the pose estimator
+        if (photonCameraPose.getPhotonCamera().isPresent() && 
+            // Pose ambiguity checks if the result is shaped like an actual square
+            // (for the most part)
+            photonCameraPose.getPhotonCamera().get().getLatestResult().getBestTarget().getPoseAmbiguity() < 0.06) {
+        
+          // Add the vision measurement to the pose estimator to update the odometry
+          swerve.getPoseEstimator().addVisionMeasurement(
+            camEstimatedPose.estimatedPose.toPose2d(),
+            Timer.getFPGATimestamp());
+        
+        }
       }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {

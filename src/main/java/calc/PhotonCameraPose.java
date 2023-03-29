@@ -46,6 +46,8 @@ public class PhotonCameraPose {
     }
 
     public Optional<PhotonCamera> getPhotonCamera() {
-      return Optional.ofNullable(photonCamera);
+
+        return Optional.ofNullable(photonCamera);
+
     }
 }

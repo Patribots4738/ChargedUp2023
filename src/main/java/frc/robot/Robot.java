@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
   // The robot's subsystems and commands are defined here...
 
   Swerve swerve;
-
+  
   XboxController driver;
   XboxController operator;
   
@@ -287,7 +287,7 @@ public class Robot extends TimedRobot {
     
     if (arm.getOperatorOverride()) {
       
-      arm.drive(new Translation2d(operatorLeftAxis.getX(), operatorLeftAxis.getY()));
+      arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
       
     }
 
