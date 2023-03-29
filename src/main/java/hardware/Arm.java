@@ -124,6 +124,10 @@ public class Arm implements Loggable {
       _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
       _upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
 
+      _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
+      _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
+      _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_FREE_LIMIT);
+
       // Set PID constants for the lower and upper SPARK MAX(s)
       _lowerArmPIDController.setP(ArmConstants.LOWER_P);
       _lowerArmPIDController.setI(ArmConstants.LOWER_I);

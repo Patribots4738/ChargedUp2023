@@ -198,13 +198,13 @@ public final class Constants {
       public static final double UPPER_ARM_GEAR_RATIO = (115);
 
       // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
-      public static final int LOWER_FREE_LIMIT = 80;
-      public static final int LOWER_STALL_LIMIT = 80;
+      public static final int LOWER_FREE_LIMIT = 50;
+      public static final int LOWER_STALL_LIMIT = 50;
       // Make the max RPM equal to 1/4 rotations per second
       public static final int LOWER_MAX_RPM = ((int) (LOWER_ARM_GEAR_RATIO) * 15);
 
-      public static final int UPPER_FREE_LIMIT = 80;
-      public static final int UPPER_STALL_LIMIT = 80;
+      public static final int UPPER_FREE_LIMIT = 50;
+      public static final int UPPER_STALL_LIMIT = 50;
       // Make the max RPM equal to 1/4 rotations per second
 
       public static final int UPPER_MAX_RPM = ((int) (UPPER_ARM_GEAR_RATIO) * 15);
@@ -260,7 +260,7 @@ public final class Constants {
       public static final double LOWER_MAX_OUTPUT = 0.85;
       public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MAX_OUTPUT = 0.75;
+      public static final double UPPER_MAX_OUTPUT = 0.85;
       public static final double UPPER_MIN_OUTPUT = -UPPER_MAX_OUTPUT;
 
       /**
@@ -272,9 +272,9 @@ public final class Constants {
        * <p>
        */
       // PID values for the lower and upper arm
-      public static final double LOWER_P = 0.65;//0.25;
+      public static final double LOWER_P = 0.8;//0.25;
       public static final double LOWER_I = 0.0001;
-      public static final double LOWER_D = 0.075;
+      public static final double LOWER_D = 0.0375;
       public static final double LOWER_FF = 1;
 
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
