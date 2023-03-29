@@ -26,7 +26,7 @@ public class PhotonCameraPose {
         }
 
         try {
-            photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+            photonCamera = new PhotonCamera(VisionConstants.CAMERA_1_NAME);
         } catch (Exception e) {
             System.out.println("Camera not found!");
             return;
@@ -36,7 +36,7 @@ public class PhotonCameraPose {
                 aprilTagFieldLayout,
                 PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
                 photonCamera,
-                VisionConstants.CAMERA_POSITION);
+                VisionConstants.CAMERA_1_POSITION);
 
     }
 
