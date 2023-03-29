@@ -373,23 +373,37 @@ public final class Constants {
 
     public static final class VisionConstants {
 
-        public static final String CAMERA_NAME = "Patribots4738";
+      public static final String CAMERA_1_NAME = "FrontCam";
+      public static final String CAMERA_2_NAME = "BackCam";
+      public static final double AMBIGUITY_THRESHOLD = 0.06;
 
-        // Distance from the camera to the center
-        public static final Transform3d CAMERA_POSITION = new Transform3d(
-                new Translation3d(
-                        // Forward
+      // Distance from the camera to the center
+      public static final Transform3d CAMERA_1_POSITION = new Transform3d(
+          new Translation3d(
+              // Forward
+              Units.inchesToMeters(2),
+              // Left (neg because it's right)
+              Units.inchesToMeters(-6),
+              // Up
+              Units.inchesToMeters(10.25)),
+          new Rotation3d(
+              0,
+              0,
+              0));
 
-                        Units.inchesToMeters(2),
-                        // Left (neg because it's right)
-                        Units.inchesToMeters(-6),
-                        // Up
-                        Units.inchesToMeters(10.25)),
-                new Rotation3d(
-                        0,
-                        0,
-                        0));
-
+      // Distance from the camera to the center
+      public static final Transform3d CAMERA_2_POSITION = new Transform3d(
+          new Translation3d(
+              // Forward (neg because it's backwards)
+              Units.inchesToMeters(-2),
+              // Left (neg because it's right)
+              Units.inchesToMeters(-6),
+              // Up
+              Units.inchesToMeters(10.25)),
+          new Rotation3d(
+              0,
+              0,
+              180));
     }
 
     public static final class AlignmentConstants {

@@ -100,7 +100,7 @@ public class PhotonCameraPose {
       return Optional.empty();
 
     }
-3
+
     public Optional<PhotonCamera> getCam1() {
         return Optional.ofNullable(cam1);
     }
