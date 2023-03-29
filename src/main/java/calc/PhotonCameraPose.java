@@ -44,4 +44,8 @@ public class PhotonCameraPose {
         photonPoseEstimator.setReferencePose(pevEstimatedRobotPose);
         return photonPoseEstimator.update();
     }
+
+    public Optional<PhotonCamera> getPhotonCamera() {
+        return Optional.ofNullable(photonCamera);
+    }
 }
