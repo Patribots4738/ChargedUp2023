@@ -395,15 +395,15 @@ public final class Constants {
       public static final Transform3d CAMERA_2_POSITION = new Transform3d(
           new Translation3d(
               // Forward (neg because it's backwards)
-              Units.inchesToMeters(-2),
-              // Left (neg because it's right)
-              Units.inchesToMeters(-6),
+              Units.inchesToMeters(-10),
+              // Left 
+              Units.inchesToMeters(-6.125),
               // Up
-              Units.inchesToMeters(10.25)),
+              Units.inchesToMeters(9.438)),
           new Rotation3d(
               0,
-              0,
-              180));
+              180,
+              0));
     }
 
     public static final class AlignmentConstants {

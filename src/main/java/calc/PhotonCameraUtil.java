@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import java.io.IOException;
 import java.util.Optional;
 import calc.Constants.VisionConstants;
 
@@ -20,10 +21,9 @@ public class PhotonCameraUtil {
 
         // Load the AprilTag field layout from the "resource file" at edu.wpi.first.apriltag.AprilTagFieldLayout
         try {
-            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
-                AprilTagFields.k2023ChargedUp.m_resourceFile);
-        } catch (Exception e) {
-            System.out.println("April tag field layout not found!");
+            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+        } catch (IOException e) {
+            System.out.println("AprilTag field layout not found!");
         }
 
         try {
@@ -69,11 +69,17 @@ public class PhotonCameraUtil {
       double cam2Ambiguity = 1;
 
       // Get the ambiguity of each camera, if applicable
-      if (cam1.isPresent() && cam1.get().getLatestResult().hasTargets()) {
-        cam1Ambiguity = cam1.get().getLatestResult().getBestTarget().getPoseAmbiguity();
+      if (cam1.isPresent()) {
+        PhotonCamera result = cam1.get();
+        if (result.getLatestResult().hasTargets()) {
+          cam1Ambiguity = result.getLatestResult().getBestTarget().getPoseAmbiguity();
+        }
       }
-      if (cam2.isPresent() && cam2.get().getLatestResult().hasTargets()) {
-        cam2Ambiguity = cam2.get().getLatestResult().getBestTarget().getPoseAmbiguity();
+      if (cam2.isPresent()) {
+        PhotonCamera result = cam2.get();
+        if (result.getLatestResult().hasTargets()) {
+          cam2Ambiguity = result.getLatestResult().getBestTarget().getPoseAmbiguity();
+        }
       }
       
       // If both cameras have results, and both cameras can see a target, compare them
@@ -89,18 +95,14 @@ public class PhotonCameraUtil {
 
       // If only the front camera has a result, and it can see a target, return it
       // * if it has low ambiguity
-      if (cam1Pose.isPresent()) {
-        if (cam1Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
-          return cam1Pose;
-        }
+      if (cam1Pose.isPresent() && cam1Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
+        return cam1Pose;
       } 
 
       // If only the back camera has a result, and it can see a target, return it
       // * if it has low ambiguity
-      if (cam2Pose.isPresent()) {
-        if (cam2Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
-          return cam2Pose;
-        }
+      if (cam2Pose.isPresent() && cam2Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
+        return cam2Pose;
       }
       
       // return a null Optional<EstimatedRobotPose> if no camera can see a target
