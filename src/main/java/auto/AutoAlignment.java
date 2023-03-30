@@ -18,7 +18,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.ClawConstants;
-import calc.PhotonCameraPose;
+import calc.PhotonCameraUtil;
 
 public class AutoAlignment implements Loggable{
 
@@ -37,7 +37,7 @@ public class AutoAlignment implements Loggable{
      */
 
     Swerve swerve;
-    PhotonCameraPose photonCameraPose;
+    PhotonCameraUtil photonCameraPose;
 
     private int tagID;
     private int coneOffset = 0;
@@ -52,7 +52,7 @@ public class AutoAlignment implements Loggable{
 
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
-        photonCameraPose = new PhotonCameraPose();
+        photonCameraPose = new PhotonCameraUtil();
     }
 
     /**
@@ -63,19 +63,14 @@ public class AutoAlignment implements Loggable{
       // Create an "Optional" object that contains the estimated pose of the robot
       // This can be present (see's tag) or not present (does not see tag)
       Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose();
-      Optional<PhotonCamera> camera = photonCameraPose.getPhotonCamera();
-      
-      // If the result of the estimatedRobotPose exists, and the skew of the tag is less than 3 degrees (to prevent false results)
-      if (result.isPresent() && 
-          camera.isPresent() && 
-          camera.get().getLatestResult().hasTargets() &&
-          camera.get().getLatestResult().getBestTarget().getPoseAmbiguity() < 0.06) {
 
+      // If the result of the estimatedRobotPose exists, and the skew of the tag is less than 3 degrees (to prevent false results)
+      if (result.isPresent()) {
         EstimatedRobotPose camEstimatedPose = result.get();
-          // Add the vision measurement to the pose estimator to update the odometry
-          swerve.getPoseEstimator().addVisionMeasurement(
-            camEstimatedPose.estimatedPose.toPose2d(),
-            Timer.getFPGATimestamp());
+        // Add the vision measurement to the pose estimator to update the odometry
+        swerve.getPoseEstimator().addVisionMeasurement(
+          camEstimatedPose.estimatedPose.toPose2d(),
+          Timer.getFPGATimestamp());
       }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
