@@ -34,14 +34,13 @@ public class PhotonCameraPose {
 
         photonPoseEstimator = new PhotonPoseEstimator(
                 aprilTagFieldLayout,
-                PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
+                PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
                 photonCamera,
                 VisionConstants.CAMERA_1_POSITION);
 
     }
 
-    public Optional<EstimatedRobotPose> getEstimatedRobotPose(Pose2d pevEstimatedRobotPose) {
-        photonPoseEstimator.setReferencePose(pevEstimatedRobotPose);
+    public Optional<EstimatedRobotPose> getEstimatedRobotPose() {
         return photonPoseEstimator.update();
     }
 

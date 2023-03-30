@@ -7,6 +7,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
@@ -60,24 +62,20 @@ public class AutoAlignment implements Loggable{
 
       // Create an "Optional" object that contains the estimated pose of the robot
       // This can be present (see's tag) or not present (does not see tag)
-      Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose(swerve.getPose());
-
+      Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose();
+      Optional<PhotonCamera> camera = photonCameraPose.getPhotonCamera();
+      
       // If the result of the estimatedRobotPose exists, and the skew of the tag is less than 3 degrees (to prevent false results)
-      if (result.isPresent() && photonCameraPose.getPhotonCamera().get().getLatestResult().getBestTarget().getSkew() < 3) {
+      if (result.isPresent() && 
+          camera.isPresent() && 
+          camera.get().getLatestResult().hasTargets() &&
+          camera.get().getLatestResult().getBestTarget().getPoseAmbiguity() < 0.06) {
 
         EstimatedRobotPose camEstimatedPose = result.get();
-        // If and only if the camera is confident in the pose, add the vision measurement to the pose estimator
-        if (photonCameraPose.getPhotonCamera().isPresent() && 
-            // Pose ambiguity checks if the result is shaped like an actual square
-            // (for the most part)
-            photonCameraPose.getPhotonCamera().get().getLatestResult().getBestTarget().getPoseAmbiguity() < 0.06) {
-        
           // Add the vision measurement to the pose estimator to update the odometry
           swerve.getPoseEstimator().addVisionMeasurement(
             camEstimatedPose.estimatedPose.toPose2d(),
             Timer.getFPGATimestamp());
-        
-        }
       }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
