@@ -247,7 +247,7 @@ public final class Constants {
 
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
-      public static final double UPPER_ARM_LOWER_LIMIT = 0.3;
+      public static final double UPPER_ARM_LOWER_LIMIT = 0.34;
       public static final double UPPER_ARM_UPPER_LIMIT = 5.7;
 
       // The amount of error allowed for the arm's position, in Radians
@@ -270,6 +270,7 @@ public final class Constants {
        * SysID values:
        * <p>
        * Lower:
+       * 
        * P = 0.0032326
        * D = 0.0012612
        * <p>
@@ -277,7 +278,7 @@ public final class Constants {
       // PID values for the lower and upper arm
       public static final double LOWER_P = 0.8;//0.25;
       public static final double LOWER_I = 0.0001;
-      public static final double LOWER_D = 0.0375;
+      public static final double LOWER_D = 0.1;
       public static final double LOWER_FF = 1;
 
       public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
@@ -285,7 +286,7 @@ public final class Constants {
 
       public static final double UPPER_P = 0.8;//.25;
       public static final double UPPER_I = 0.0001;
-      public static final double UPPER_D = 0.125;
+      public static final double UPPER_D = 0.3;
       public static final double UPPER_FF = 1;
 
       public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
