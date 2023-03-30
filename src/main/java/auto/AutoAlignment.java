@@ -18,7 +18,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.ClawConstants;
-import calc.PhotonCameraPose;
+import calc.PhotonCameraUtil;
 
 public class AutoAlignment implements Loggable{
 
@@ -37,7 +37,7 @@ public class AutoAlignment implements Loggable{
      */
 
     Swerve swerve;
-    PhotonCameraPose photonCameraPose;
+    PhotonCameraUtil photonCameraPose;
 
     private int tagID;
     private int coneOffset = 0;
@@ -52,7 +52,7 @@ public class AutoAlignment implements Loggable{
 
     public AutoAlignment(Swerve swerve, Claw claw) {
         this.swerve = swerve;
-        photonCameraPose = new PhotonCameraPose();
+        photonCameraPose = new PhotonCameraUtil();
     }
 
     /**
