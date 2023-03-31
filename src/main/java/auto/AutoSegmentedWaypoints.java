@@ -196,7 +196,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       // 0.2 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.15) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.15 || currentWaypointNumber == 0) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
         stateHasFinished = true;
       }
     }
