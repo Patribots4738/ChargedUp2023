@@ -150,12 +150,17 @@ public class Robot extends TimedRobot {
     // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() < 0.1) {
+    if (timer.get() < 0.2) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
     if (timer.get() > 14.9) {
       swerve.setWheelsUp();
+      claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
+      return;
+    }
+    else if (timer.get() > 15) {
+      claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
     autoSegmentedWaypoints.periodic();
