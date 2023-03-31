@@ -33,7 +33,7 @@ public class Arm implements Loggable {
 
     // ceil -- force round up
     int armPosDimension1 = PlacementConstants.STOWED_INDEX;
-    int armPosDimension2 = 0;
+    int armPosDimension2 = 1;
 
     private boolean startedTransition = false;
 

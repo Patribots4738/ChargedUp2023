@@ -56,6 +56,8 @@ public class Robot extends TimedRobot {
 
   AutoAlignment autoAlignment;
 
+  public static Timer timer;
+
   @Override
   public void robotInit() {
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
@@ -79,6 +81,8 @@ public class Robot extends TimedRobot {
       autoPathStorage = new AutoPathStorage();
 
       arduinoController = new ArduinoController();
+
+      timer = new Timer();
 
       Logger.configureLoggingAndConfig(this, false);
   }
@@ -130,35 +134,40 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-
+    timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
     autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
-
   }
 
   @Override
   public void autonomousPeriodic() {
     swerve.periodic();
+    claw.periodic();
+    arm.periodic();
     // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
+    if (timer.get() < 0.1) {
+      claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+      return;
+    }
+    if (timer.get() > 14.9) {
       swerve.setWheelsUp();
       return;
     }
-
-    swerve.periodic();
-    arm.periodic();
-    claw.periodic();
     autoSegmentedWaypoints.periodic();
-    autoAlignment.calibrateOdometry();
+    if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
+        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5) {
+      autoAlignment.calibrateOdometry();
+    }
   }
 
   @Override
   public void teleopInit() {
+    timer.restart();
     autoAlignment.setConeMode(true);
     arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
@@ -177,7 +186,7 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (Timer.getMatchTime() < 0.1 && Timer.getMatchTime() != -1) {
+    if (timer.get() > 134.9) {
       swerve.setWheelsUp();
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
       return;
