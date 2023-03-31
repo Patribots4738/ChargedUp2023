@@ -467,6 +467,7 @@ public final class Constants {
       public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
       public static final int AUTO_INIT_INDEX = 20;
       public static final int AUTO_CUBE_INTAKE_INDEX = 21;
+      public static final int AUTO_CUBE_HIGH_INDEX = 22;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
@@ -507,7 +508,8 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 32);
-      public static final Translation2d CUBE_HIGH = new Translation2d(35, 41);
+      public static final Translation2d CUBE_HIGH = new Translation2d(35, 38);
+      public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(35, 41);
       public static final Translation2d CUBE_MID = new Translation2d(20,25);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
@@ -629,6 +631,11 @@ public final class Constants {
         {
           CONE_INTAKE_POSITION_PREP,
           CUBE_INTAKE_POSITION_AUTO
+        },
+        // Index 22 | Cube Intake Auto
+        {
+          TRANSITION_POSITION,
+          CUBE_HIGH_AUTO
         }
       };
   }
