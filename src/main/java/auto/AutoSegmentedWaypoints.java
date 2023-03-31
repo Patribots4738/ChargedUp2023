@@ -254,7 +254,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       // The transition point in stow is enough to stay away from the arena
       // Keep the arm out if we are at the cube intake index
       // (only will trigger on legacy auto paths)
-      else if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX)
+      else if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX) {
         arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
       }
 
