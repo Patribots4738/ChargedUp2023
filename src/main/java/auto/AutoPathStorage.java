@@ -815,7 +815,7 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("9H_D_8H_", _9H_D_8H),
       new AutoPose("9H_D_8H_C_", _9H_D_8H_C),
         //3P 3P 3P 3P
-      new AutoPose("9H_D_8H_C_8H", _9H_D_8H_C_8H),
+      new AutoPose("9H_D_8H_C_8H_", _9H_D_8H_C_8H),
 
     };
 
