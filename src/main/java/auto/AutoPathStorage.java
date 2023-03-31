@@ -345,8 +345,8 @@ public class AutoPathStorage implements Loggable {
     _9 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_9_D.getInitialState().poseMeters.getTranslation(), _9_D.getInitialState().poseMeters.getRotation(), _9_D.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_9_D.getInitialState().poseMeters.getTranslation(), _9_D.getInitialState().poseMeters.getRotation(), _9_D.getInitialHolonomicPose().getRotation())
+        new PathPoint(_9_D_8.getInitialState().poseMeters.getTranslation(), _9_D_8.getInitialState().poseMeters.getRotation(), _9_D_8.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_9_D_8.getInitialState().poseMeters.getTranslation(), _9_D_8.getInitialState().poseMeters.getRotation(), _9_D_8.getInitialHolonomicPose().getRotation())
     );
 
 
