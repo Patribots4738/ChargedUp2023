@@ -5,6 +5,8 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.targeting.PhotonPipelineResult;
+
 import java.io.IOException;
 import java.util.Optional;
 import calc.Constants.VisionConstants;
@@ -70,15 +72,15 @@ public class PhotonCameraUtil {
 
       // Get the ambiguity of each camera, if applicable
       if (cam1.isPresent()) {
-        PhotonCamera result = cam1.get();
-        if (result.getLatestResult().hasTargets()) {
-          cam1Ambiguity = result.getLatestResult().getBestTarget().getPoseAmbiguity();
+        PhotonPipelineResult result = cam1.get().getLatestResult();
+        if (result.hasTargets()) {
+          cam1Ambiguity = result.getBestTarget().getPoseAmbiguity();
         }
       }
       if (cam2.isPresent()) {
-        PhotonCamera result = cam2.get();
-        if (result.getLatestResult().hasTargets()) {
-          cam2Ambiguity = result.getLatestResult().getBestTarget().getPoseAmbiguity();
+        PhotonPipelineResult result = cam2.get().getLatestResult();
+        if (result.hasTargets()) {
+          cam2Ambiguity = result.getBestTarget().getPoseAmbiguity();
         }
       }
       
