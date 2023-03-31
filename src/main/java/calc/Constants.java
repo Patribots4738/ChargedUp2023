@@ -525,7 +525,6 @@ public final class Constants {
         },
         // Index 1 | Hybrid
         {
-          TRANSITION_POSITION,
           HYBRID_POSITION
         },
         // Index 2 | Mid Cone

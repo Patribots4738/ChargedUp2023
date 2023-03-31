@@ -108,7 +108,7 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _9H_D_8H_CHARGE;
   public static Waypoint[] _9H_D_8H;
   public static Waypoint[] _9H_D_8H_C;
-  public static Waypoint[] _9H_D_8H_C_8H;
+  public static Waypoint[] _9H_D_8H_C_8M;
 
   public static Waypoint[] _4H_MOBILITY;
   public static Waypoint[] _5H_MOBILITY;
@@ -738,10 +738,10 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_8_C, PlacementConstants.CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
-    _9H_D_8H_C_8H = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
+    _9H_D_8H_C_8M = new Waypoint[] {
+        new Waypoint(_9, PlacementConstants.HYBRID_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_9_D_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_8_C_8, PlacementConstants.HIGH_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_8_C_8, PlacementConstants.MID_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
     };
 
 
@@ -815,7 +815,7 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("9H_D_8H_", _9H_D_8H),
       new AutoPose("9H_D_8H_C_", _9H_D_8H_C),
         //3P 3P 3P 3P
-      new AutoPose("9H_D_8H_C_8H_", _9H_D_8H_C_8H),
+      new AutoPose("9H_D_8H_C_8M_", _9H_D_8H_C_8M),
 
     };
 

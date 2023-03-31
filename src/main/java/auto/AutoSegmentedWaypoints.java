@@ -140,6 +140,9 @@ public class AutoSegmentedWaypoints implements Loggable {
           case PlacementConstants.HIGH_CUBE_LAUNCH_INDEX:
             arm.setArmIndex(PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
             break;
+          case PlacementConstants.MID_CUBE_LAUNCH_INDEX:
+            arm.setArmIndex(PlacementConstants.MID_CUBE_LAUNCH_INDEX);
+            break;
         }
       }
       else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && !halfway &&
