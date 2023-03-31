@@ -142,7 +142,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             break;
         }
       }
-      else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && currentWaypointNumber == 1 &&
+      else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && !halfway &&
               ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) < 90) || 
               (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) > 90)))
       {
@@ -252,6 +252,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
         currentWaypointNumber++;
+
         if (currentWaypointNumber > 1) {
           if (chosenAutoPath.getName().contains("D_CHARGE") ||
               chosenAutoPath.getName().contains("A_CHARGE")) 
@@ -259,7 +260,11 @@ public class AutoSegmentedWaypoints implements Loggable {
             claw.setDesiredSpeed(1);
             clawHasStarted = true;
           } else {
-            halfway = true;
+            // Only set halfway to true if...
+            // we are doing a modular auto path,
+            // Else, reset it to continue the prep on the arm.
+            // We can check this by seeing if the path name has "_" on the end.
+            halfway = !(chosenAutoPath.getName().endsWith("_"));
           }
         }
         stateHasInitialized = false;
