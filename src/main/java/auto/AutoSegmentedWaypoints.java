@@ -295,7 +295,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE)
+      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE && currentWaypointNumber != 1)
       {
         claw.stopClaw();
       }

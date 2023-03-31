@@ -537,7 +537,7 @@ public final class Constants {
         {
           TRANSITION_POSITION,
           // HIGH_CONE_POSITION_0,
-          // ARM_HIGH_CONE_POSITION_1,
+          HIGH_CONE_POSITION_1,
           HIGH_CONE_POSITION_2
         },
         // Index 4 | Human Tag
