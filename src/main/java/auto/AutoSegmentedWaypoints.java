@@ -233,31 +233,51 @@ public class AutoSegmentedWaypoints implements Loggable {
       // Run the charge pad leveling PID loop
       autoAlignment.chargeAlign();
     }
-  
+    // We are not done with all of our auto segments,
+    // but we are done with one...
     else if (stateHasFinished) {
 
       stateHasFinished = false;
       clawHasStarted = false;
       hasMovedArm = false;
 
+      // If our arm was at a high-placement index,
+      // send it to stow while staying away from the grid
+      // using the high-to-stow index
       if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
           arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX || 
           arm.getArmIndex() == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX)
       { 
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
       }
-      else if (!(chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8"))) { 
+      // If our path placed a cube, just stow if we are not placing at high_cube_launch
+      // The transition point in stow is enough to stay away from the arena
+      // Keep the arm out if we are at the cube intake index
+      // (only will trigger on legacy auto paths)
+      else if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX)
         arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
       }
 
+      // If we are not done with all of our waypoints,
+      // move on to the next one
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
         currentWaypointNumber++;
 
+        // If we are not on the first waypoint,
+        // and we are doing a pickup-to-charge path,
+        // Keep the claw intaking while we go to the pad
         if (currentWaypointNumber > 1) {
-          if (chosenAutoPath.getName().contains("D_CHARGE") ||
-              chosenAutoPath.getName().contains("A_CHARGE")) 
+          if (chosenAutoPath.getName().contains("A_CHARGE") ||
+              chosenAutoPath.getName().contains("B_CHARGE") ||
+              chosenAutoPath.getName().contains("C_CHARGE") ||
+              chosenAutoPath.getName().contains("D_CHARGE"))
           {
-            claw.setDesiredSpeed(1);
+            // We can assume that we are holding a cube
+            // Since our claw is so strong
+            // that we can hold cones without moving the claw at all,
+            // and it wouldn't harm to use this speed for cones,
+            // but it would harm to use the cone speed for cubes.
+            claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
             clawHasStarted = true;
           } else {
             // Only set halfway to true if...
