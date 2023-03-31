@@ -154,12 +154,14 @@ public class Robot extends TimedRobot {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
-    if (timer.get() > 14.9) {
-      swerve.setWheelsUp();
+    if (timer.get() > 14.65) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
+    }
+    if (timer.get() > 14.9 && timer.get() < 15) {
+      swerve.setWheelsUp();
       return;
     }
-    else if (timer.get() > 15) {
+    if (timer.get() > 15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
