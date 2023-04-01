@@ -472,6 +472,7 @@ public final class Constants {
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
+      public static final double CLAW_OUTTAKE_SPEED_CUBE_AUTO = -0.7;
       public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
 
       public static final double CLAW_STOPPED_SPEED = 0;
