@@ -473,7 +473,7 @@ public final class Constants {
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
       public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
-      public static final double CLAW_OUTTAKE_SPEED_CUBE_AUTO = -0.7;
+      public static final double CLAW_OUTTAKE_SPEED_CUBE_AUTO = -0.5;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
@@ -488,7 +488,7 @@ public final class Constants {
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
       public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 6);
-      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(15, 7);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(13, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
       
@@ -633,7 +633,7 @@ public final class Constants {
           CONE_INTAKE_POSITION_PREP,
           CUBE_INTAKE_POSITION_AUTO
         },
-        // Index 22 | Cube Intake Auto
+        // Index 22 | Cube High Auto
         {
           TRANSITION_POSITION,
           CUBE_HIGH_AUTO
