@@ -222,8 +222,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     // If there are not more waypoints, tell the robot to level itself
-    // We can do this if we want to go on chargepad or not,
-    // because if we did not want, to then the robot is already leveled.
+    // We can do this if we want to go on charged or not,
+    // because if we did not want, to then the robot will already be level.
     if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
         (stateHasFinished)))
     {
@@ -296,7 +296,38 @@ public class AutoSegmentedWaypoints implements Loggable {
       
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE && currentWaypointNumber != 1)
+      if ((thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE) &&
+          // If we are on waypoint 1,
+          // since we just added 1 to the current waypoint number,
+          // we can assume we just placed a game piece...
+          // just in case there are issues, this is a failsafe
+          // in case the game piece is not placed
+          (currentWaypointNumber != 1) &&
+          /*
+            Lastly, if we just picked up a game piece and are going to the charge pad,
+            we want to keep the game piece in the claw
+            so... do NOT stop the claw if going to charge from a pickup
+
+            Also, be sure to check if startedChargePad is false...
+            since it triggers after the path is completed,
+            And if we were to only check the waypoint number,
+            it would be at the "final waypoint index"
+            before the robot is actually on the charge pad.
+
+            This would cause the claw to stop before the robot
+            is actually on the charge pad, and thus,
+            the arm would be in the way of the robot charging.
+
+
+            In other words, if we started the charge pad,
+            and we are on an A/B/C/D_CHARGE path,
+            then break out of this if statement
+          */
+          !(startedChargePad &&
+              (chosenAutoPath.getName().contains("A_CHARGE") ||
+              chosenAutoPath.getName().contains("B_CHARGE") ||
+              chosenAutoPath.getName().contains("C_CHARGE") ||
+              chosenAutoPath.getName().contains("D_CHARGE"))))
       {
         claw.stopClaw();
       }
