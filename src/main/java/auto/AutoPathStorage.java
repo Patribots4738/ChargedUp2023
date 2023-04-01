@@ -10,6 +10,7 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -266,7 +267,7 @@ public class AutoPathStorage implements Loggable {
 
     _9_D_REACH = PathPlanner.loadPath("_9_D_REACH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _9_D_8 = PathPlanner.loadPath("9_D_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_C_8 = PathPlanner.loadPath("8_C_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _8_C_8 = PathPlanner.loadPath("8_C_8", 4.12, 3);
     _8_C_CH = PathPlanner.loadPath("8_C_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     _D_REACH_7 = PathPlanner.loadPath("_D_REACH_7", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -743,7 +744,7 @@ public class AutoPathStorage implements Loggable {
 
     _9H_D_8H_C_8M = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.HIGH_CONE_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE_AUTO),
         new Waypoint(_8_C_8, PlacementConstants.MID_CUBE_LAUNCH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
     };
 

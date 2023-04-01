@@ -136,10 +136,10 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(13.51); // previously 1.75
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI*2;//Math.PI/1.7; 
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2.5;//Units.feetToMeters(13.51); // previously 1.75
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI*4;//Math.PI/1.7; 
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -473,6 +473,7 @@ public final class Constants {
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
       public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
+      public static final double CLAW_OUTTAKE_SPEED_CUBE_AUTO = -0.7;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
@@ -487,7 +488,7 @@ public final class Constants {
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
       public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 6);
-      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(18, 7);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(15, 7);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
       
