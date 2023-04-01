@@ -150,6 +150,7 @@ public class AutoSegmentedWaypoints implements Loggable {
               ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) < 90) || 
               (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) > 90)))
       {
+
         AutoAlignment.coneMode = false;
         halfway = true;
       
@@ -296,13 +297,13 @@ public class AutoSegmentedWaypoints implements Loggable {
       
       // Only move the claw before the arm
       // if it needs to hold a game piece
-      if ((thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE) &&
+      if (((thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE) ||
           // If we are on waypoint 1,
           // since we just added 1 to the current waypoint number,
           // we can assume we just placed a game piece...
           // just in case there are issues, this is a failsafe
           // in case the game piece is not placed
-          (currentWaypointNumber != 1) &&
+          (currentWaypointNumber != 1)) &&
           /*
             Lastly, if we just picked up a game piece and are going to the charge pad,
             we want to keep the game piece in the claw
