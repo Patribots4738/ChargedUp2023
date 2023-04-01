@@ -207,7 +207,12 @@ public class AutoSegmentedWaypoints implements Loggable {
   public void waypointRunner(Waypoint[] thisWaypointSet) {
     // If we made one round with the state, we have successfully initialized
     if (!stateHasInitialized) {
-      SwerveTrajectory.resetTrajectoryStatus();
+      if (currentWaypointNumber == 0) {
+        SwerveTrajectory.trajectoryStatus = "done";
+      }
+      else {
+        SwerveTrajectory.resetTrajectoryStatus();
+      }
       stateHasInitialized = true;
     }
 
@@ -294,44 +299,46 @@ public class AutoSegmentedWaypoints implements Loggable {
         }
         stateHasInitialized = false;
       }
-      
-      // Only move the claw before the arm
-      // if it needs to hold a game piece
-      if (((thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE) ||
-          // If we are on waypoint 1,
-          // since we just added 1 to the current waypoint number,
-          // we can assume we just placed a game piece...
-          // just in case there are issues, this is a failsafe
-          // in case the game piece is not placed
-          (currentWaypointNumber != 1)) &&
-          /*
-            Lastly, if we just picked up a game piece and are going to the charge pad,
-            we want to keep the game piece in the claw
-            so... do NOT stop the claw if going to charge from a pickup
 
-            Also, be sure to check if startedChargePad is false...
-            since it triggers after the path is completed,
-            And if we were to only check the waypoint number,
-            it would be at the "final waypoint index"
-            before the robot is actually on the charge pad.
-
-            This would cause the claw to stop before the robot
-            is actually on the charge pad, and thus,
-            the arm would be in the way of the robot charging.
-
-
-            In other words, if we started the charge pad,
-            and we are on an A/B/C/D_CHARGE path,
-            then break out of this if statement
-          */
+      // If we are on waypoint 0 or 1,
+      // (since this will also run right after 0 is over),
+      // we can assume we just placed a game piece...
+      // just in case there are issues, this is a failsafe
+      // in case the game piece is not placed
+      if ((currentWaypointNumber != 1) && (currentWaypointNumber != 0)) {
+        // Only move the claw before the arm
+        // if it needs to hold a game piece
+        if ((thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE) &&
+        /*
+         * Lastly, if we just picked up a game piece and are going to the charge pad,
+         * we want to keep the game piece in the claw
+         * so... do NOT stop the claw if going to charge from a pickup
+         * 
+         * Also, be sure to check if startedChargePad is false...
+         * since it triggers after the path is completed,
+         * And if we were to only check the waypoint number,
+         * it would be at the "final waypoint index"
+         * before the robot is actually on the charge pad.
+         * 
+         * This would cause the claw to stop before the robot
+         * is actually on the charge pad, and thus,
+         * the arm would be in the way of the robot charging.
+         * 
+         * 
+         * In other words, if we started the charge pad,
+         * and we are on an A/B/C/D_CHARGE path,
+         * then break out of this if statement
+         */
           !(startedChargePad &&
               (chosenAutoPath.getName().contains("A_CHARGE") ||
-              chosenAutoPath.getName().contains("B_CHARGE") ||
-              chosenAutoPath.getName().contains("C_CHARGE") ||
-              chosenAutoPath.getName().contains("D_CHARGE"))))
-      {
-        claw.stopClaw();
+                  chosenAutoPath.getName().contains("B_CHARGE") ||
+                  chosenAutoPath.getName().contains("C_CHARGE") ||
+                  chosenAutoPath.getName().contains("D_CHARGE")))) 
+        {
+          claw.stopClaw();
+        }
       }
-    }
+      }
+
   }
 }
