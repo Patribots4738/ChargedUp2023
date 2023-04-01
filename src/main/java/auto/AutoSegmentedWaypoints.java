@@ -138,6 +138,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
             break;
           case PlacementConstants.HIGH_CUBE_LAUNCH_INDEX:
+          case PlacementConstants.AUTO_CUBE_HIGH_INDEX:
             arm.setArmIndex(PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
             break;
           case PlacementConstants.MID_CUBE_LAUNCH_INDEX:
