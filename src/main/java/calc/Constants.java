@@ -136,10 +136,12 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 2.5;//Units.feetToMeters(13.51); // previously 1.75
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2.5; // 2.5 has worked very well for us so far
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI*4;//Math.PI/1.7; 
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI*4;//Math.PI/1.7;
+
+        public static double POST_PATH_CORRECTION_TIME_SECONDS = 0.75;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -155,7 +157,7 @@ public final class Constants {
 
         public static final double ROTATION_CORRECTION_P = .63;
         public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0;
+        public static final double ROTATION_CORRECTION_D = 0.0025;
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
