@@ -511,9 +511,11 @@ public class Arm implements Loggable {
     // Note that the stowed position is not a placement index, but can be used as hybrid placement
     public boolean getAtPlacementPosition() {
       return (armPosDimension1 == PlacementConstants.CUBE_HIGH_INDEX ||
+              armPosDimension1 == PlacementConstants.AUTO_CUBE_HIGH_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
               armPosDimension1 == PlacementConstants.CUBE_MID_INDEX ||
+              armPosDimension1 == PlacementConstants.AUTO_CUBE_MID_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
               armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
