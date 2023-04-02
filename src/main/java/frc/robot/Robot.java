@@ -140,7 +140,6 @@ public class Robot extends TimedRobot {
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
-    AutoConstants.POST_PATH_CORRECTION_TIME_SECONDS = 0.75;
   }
 
   @Override
@@ -155,13 +154,10 @@ public class Robot extends TimedRobot {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
-    if (timer.get() > 10) {
-      AutoConstants.POST_PATH_CORRECTION_TIME_SECONDS = 1.3;
-    }
     if (timer.get() > 14.65) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
     }
-    if (timer.get() > 14.9 && timer.get() < 15) {
+    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CHARGE")) {
       swerve.setWheelsUp();
       return;
     }
@@ -366,7 +362,7 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_PREP_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
         break;
 
       // Clicking down
@@ -376,7 +372,7 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.MID_CONE_PREP_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
         break;
 
       // Clicking right
@@ -432,8 +428,8 @@ public class Robot extends TimedRobot {
 
     } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX ||
-          arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX) {
+      if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
+          arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
           arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
       }
       else {

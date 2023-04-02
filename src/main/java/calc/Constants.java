@@ -136,12 +136,10 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 2.5; // 2.5 has worked very well for us so far
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2.65; // 2.5 has worked very well for us so far
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI*4;//Math.PI/1.7;
-
-        public static double POST_PATH_CORRECTION_TIME_SECONDS = 0.75;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -452,33 +450,35 @@ public final class Constants {
 
       public static final int STOWED_INDEX = 0;
       public static final int HYBRID_PLACEMENT_INDEX = 1;
-      public static final int MID_CONE_PLACEMENT_INDEX = 2;
-      public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
+      public static final int CONE_MID_PLACEMENT_INDEX = 2;
+      public static final int CONE_HIGH_PLACEMENT_INDEX = 3;
       public static final int HUMAN_TAG_PICKUP_INDEX = 4;
-      public static final int MID_CUBE_LAUNCH_INDEX = 5;
-      public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
+      public static final int CUBE_MID_INDEX = 5;
+      public static final int CUBE_HIGH_INDEX = 6;
       public static final int FLOOR_INTAKE_INDEX = 7;
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
       public static final int HIGH_TO_STOWWED_INDEX = 10;
       public static final int LONG_ARM_REACH_INDEX = 11;
       public static final int FLOOR_INTAKE_PREP_INDEX = 12;
-      public static final int HIGH_CONE_PREP_INDEX = 13;
-      public static final int HIGH_CONE_PREP_TO_PLACE_INDEX = 14;
+      public static final int CONE_HIGH_PREP_INDEX = 13;
+      public static final int CONE_HIGH_PREP_TO_PLACE_INDEX = 14;
       public static final int CONE_INTAKE_INDEX = 15;
       public static final int CUBE_INTAKE_INDEX = 16;
       public static final int CONE_FLIP_INDEX = 17;
-      public static final int MID_CONE_PREP_INDEX = 18;
-      public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
+      public static final int CONE_MID_PREP_INDEX = 18;
+      public static final int CONE_MID_PREP_TO_PLACE_INDEX = 19;
       public static final int AUTO_INIT_INDEX = 20;
       public static final int AUTO_CUBE_INTAKE_INDEX = 21;
       public static final int AUTO_CUBE_HIGH_INDEX = 22;
+      public static final int AUTO_CUBE_MID_INDEX = 23;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
       public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
-      public static final double CLAW_OUTTAKE_SPEED_CUBE_AUTO = -0.5;
+      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE = -0.5;
+      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST = -0.8;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
@@ -496,7 +496,6 @@ public final class Constants {
       public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(13, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
-      
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
       
@@ -517,6 +516,7 @@ public final class Constants {
       public static final Translation2d CUBE_HIGH = new Translation2d(35, 38);
       public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(35, 38);//41 on Y
       public static final Translation2d CUBE_MID = new Translation2d(20,25);
+      public static final Translation2d CUBE_MID_AUTO = new Translation2d(30, 26);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
@@ -642,6 +642,11 @@ public final class Constants {
         {
           TRANSITION_POSITION,
           CUBE_HIGH_AUTO
+        },
+        // Index 23 | Cube Mid Auto
+        {
+          TRANSITION_POSITION,
+          CUBE_MID_AUTO
         }
       };
   }

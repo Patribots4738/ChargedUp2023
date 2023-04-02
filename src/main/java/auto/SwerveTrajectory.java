@@ -116,7 +116,7 @@ public class SwerveTrajectory implements Loggable {
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + AutoConstants.POST_PATH_CORRECTION_TIME_SECONDS))
+        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + 0.75))
         {
           // System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 

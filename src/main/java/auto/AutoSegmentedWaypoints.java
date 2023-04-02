@@ -115,8 +115,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     // This will reduce the possibility of popping a cube, for example.
     if (clawSpeed == PlacementConstants.CLAW_OUTTAKE_SPEED_CONE && !clawHasStarted) {
       switch (armIndex) {
-        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
-        case PlacementConstants.MID_CONE_PLACEMENT_INDEX:
+        case PlacementConstants.CONE_HIGH_PLACEMENT_INDEX:
+        case PlacementConstants.CONE_MID_PLACEMENT_INDEX:
           claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
           break;
         default:
@@ -134,15 +134,18 @@ public class AutoSegmentedWaypoints implements Loggable {
         // Prepare the arm for the next waypoint before the path is done
         switch (armIndex) {
           // If the next waypoint is a high cone placement, prepare the arm for a high cone placement
-          case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
-            arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
+          case PlacementConstants.CONE_HIGH_PLACEMENT_INDEX:
+            arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX);
             break;
-          case PlacementConstants.HIGH_CUBE_LAUNCH_INDEX:
+          case PlacementConstants.CUBE_HIGH_INDEX:
           case PlacementConstants.AUTO_CUBE_HIGH_INDEX:
-            arm.setArmIndex(PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+            arm.setArmIndex(PlacementConstants.CUBE_HIGH_INDEX);
             break;
-          case PlacementConstants.MID_CUBE_LAUNCH_INDEX:
-            arm.setArmIndex(PlacementConstants.MID_CUBE_LAUNCH_INDEX);
+          case PlacementConstants.CUBE_MID_INDEX:
+            arm.setArmIndex(PlacementConstants.CUBE_MID_INDEX);
+            break;
+          case PlacementConstants.AUTO_CUBE_MID_INDEX:
+            arm.setArmIndex(PlacementConstants.AUTO_CUBE_MID_INDEX);
             break;
         }
       }
@@ -154,8 +157,9 @@ public class AutoSegmentedWaypoints implements Loggable {
         AutoAlignment.coneMode = false;
         halfway = true;
       
-        if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX)
+        if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX) {
           arm.setArmIndex(PlacementConstants.AUTO_CUBE_INTAKE_INDEX);
+        }
         claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
       }
     }
@@ -171,9 +175,9 @@ public class AutoSegmentedWaypoints implements Loggable {
         // If the arm is at a prep index, change the desired index to be the other half of that prep index...
         // Notice that the floor intake does not have a second half, 
         // this is because the first transition point is the prep index's end point
-        if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_INDEX)
+        if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_INDEX)
         {
-          arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX);
+          arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX);
         }
         // The arm is not at a prep index...
         else {
@@ -254,9 +258,9 @@ public class AutoSegmentedWaypoints implements Loggable {
       // If our arm was at a high-placement index,
       // send it to stow while staying away from the grid
       // using the high-to-stow index
-      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
-          arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX || 
-          arm.getArmIndex() == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX)
+      if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX || 
+          arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX || 
+          arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX)
       { 
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
       }
