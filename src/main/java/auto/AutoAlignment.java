@@ -15,6 +15,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.PlacementConstants;
+import calc.Constants.VisionConstants;
 import calc.Constants.ClawConstants;
 import calc.PhotonCameraUtil;
 
@@ -68,7 +69,7 @@ public class AutoAlignment implements Loggable{
         // Add the vision measurement to the pose estimator to update the odometry
         swerve.getPoseEstimator().addVisionMeasurement(
           camEstimatedPose.estimatedPose.toPose2d(),
-          Timer.getFPGATimestamp());
+          Timer.getFPGATimestamp() - VisionConstants.LATENCY);
       }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {

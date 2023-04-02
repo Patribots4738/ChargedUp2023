@@ -17,6 +17,7 @@ import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import calc.Constants;
 import calc.Constants.AlignmentConstants;
+import calc.Constants.AutoConstants;
 
 public class SwerveTrajectory implements Loggable {
 
@@ -115,7 +116,7 @@ public class SwerveTrajectory implements Loggable {
         //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
 
         // If the path has not completed time wise
-        if (elapsedTime < _pathTraj.getTotalTimeSeconds() + 0.5)
+        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + 0.75))
         {
           // System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 
@@ -170,7 +171,7 @@ public class SwerveTrajectory implements Loggable {
 
         } else {
 
-          swerve.drive(0, 0, 0, false, false);
+          swerve.drive(0, 0, 0, false, true);
           trajectoryStatus = "done";
 
         }
@@ -179,7 +180,7 @@ public class SwerveTrajectory implements Loggable {
 
       default:
 
-        swerve.drive(0, 0, 0, false, false);
+        swerve.drive(0, 0, 0, false, true);
         break;
 
     }

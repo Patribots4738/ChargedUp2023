@@ -115,8 +115,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     // This will reduce the possibility of popping a cube, for example.
     if (clawSpeed == PlacementConstants.CLAW_OUTTAKE_SPEED_CONE && !clawHasStarted) {
       switch (armIndex) {
-        case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
-        case PlacementConstants.MID_CONE_PLACEMENT_INDEX:
+        case PlacementConstants.CONE_HIGH_PLACEMENT_INDEX:
+        case PlacementConstants.CONE_MID_PLACEMENT_INDEX:
           claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
           break;
         default:
@@ -134,23 +134,32 @@ public class AutoSegmentedWaypoints implements Loggable {
         // Prepare the arm for the next waypoint before the path is done
         switch (armIndex) {
           // If the next waypoint is a high cone placement, prepare the arm for a high cone placement
-          case PlacementConstants.HIGH_CONE_PLACEMENT_INDEX:
-            arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_INDEX);
+          case PlacementConstants.CONE_HIGH_PLACEMENT_INDEX:
+            arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX);
             break;
-          case PlacementConstants.HIGH_CUBE_LAUNCH_INDEX:
-            arm.setArmIndex(PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+          case PlacementConstants.CUBE_HIGH_INDEX:
+          case PlacementConstants.AUTO_CUBE_HIGH_INDEX:
+            arm.setArmIndex(PlacementConstants.CUBE_HIGH_INDEX);
+            break;
+          case PlacementConstants.CUBE_MID_INDEX:
+            arm.setArmIndex(PlacementConstants.CUBE_MID_INDEX);
+            break;
+          case PlacementConstants.AUTO_CUBE_MID_INDEX:
+            arm.setArmIndex(PlacementConstants.AUTO_CUBE_MID_INDEX);
             break;
         }
       }
-      else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && currentWaypointNumber == 1 &&
+      else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && !halfway &&
               ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) < 90) || 
               (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) > 90)))
       {
+
         AutoAlignment.coneMode = false;
         halfway = true;
       
-        if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX)
+        if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX) {
           arm.setArmIndex(PlacementConstants.AUTO_CUBE_INTAKE_INDEX);
+        }
         claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
       }
     }
@@ -166,9 +175,9 @@ public class AutoSegmentedWaypoints implements Loggable {
         // If the arm is at a prep index, change the desired index to be the other half of that prep index...
         // Notice that the floor intake does not have a second half, 
         // this is because the first transition point is the prep index's end point
-        if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_INDEX)
+        if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_INDEX)
         {
-          arm.setArmIndex(PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX);
+          arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX);
         }
         // The arm is not at a prep index...
         else {
@@ -193,7 +202,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       }
 
       // 0.2 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.35) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
+      if ((Timer.getFPGATimestamp() - autoDelay > 0.15 || currentWaypointNumber == 0) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
         stateHasFinished = true;
       }
     }
@@ -202,7 +211,12 @@ public class AutoSegmentedWaypoints implements Loggable {
   public void waypointRunner(Waypoint[] thisWaypointSet) {
     // If we made one round with the state, we have successfully initialized
     if (!stateHasInitialized) {
-      SwerveTrajectory.resetTrajectoryStatus();
+      if (currentWaypointNumber == 0) {
+        SwerveTrajectory.trajectoryStatus = "done";
+      }
+      else {
+        SwerveTrajectory.resetTrajectoryStatus();
+      }
       stateHasInitialized = true;
     }
 
@@ -218,8 +232,8 @@ public class AutoSegmentedWaypoints implements Loggable {
     }
 
     // If there are not more waypoints, tell the robot to level itself
-    // We can do this if we want to go on chargepad or not,
-    // because if we did not want, to then the robot is already leveled.
+    // We can do this if we want to go on charged or not,
+    // because if we did not want, to then the robot will already be level.
     if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
         (stateHasFinished)))
     {
@@ -233,44 +247,102 @@ public class AutoSegmentedWaypoints implements Loggable {
       // Run the charge pad leveling PID loop
       autoAlignment.chargeAlign();
     }
-  
+    // We are not done with all of our auto segments,
+    // but we are done with one...
     else if (stateHasFinished) {
 
       stateHasFinished = false;
       clawHasStarted = false;
       hasMovedArm = false;
 
-      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX || 
-          arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX || 
-          arm.getArmIndex() == PlacementConstants.HIGH_CUBE_LAUNCH_INDEX)
+      // If our arm was at a high-placement index,
+      // send it to stow while staying away from the grid
+      // using the high-to-stow index
+      if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX || 
+          arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX || 
+          arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX)
       { 
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
       }
-      else if (!(chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8"))) { 
+      // If our path placed a cube, just stow if we are not placing at high_cube_launch
+      // The transition point in stow is enough to stay away from the arena
+      // Keep the arm out if we are at the cube intake index
+      // (only will trigger on legacy auto paths)
+      else if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX) {
         arm.setArmIndex(PlacementConstants.STOWED_INDEX); 
       }
 
+      // If we are not done with all of our waypoints,
+      // move on to the next one
       if (currentWaypointNumber < chosenWaypoints.length - 1) {
         currentWaypointNumber++;
+
+        // If we are not on the first waypoint,
+        // and we are doing a pickup-to-charge path,
+        // Keep the claw intaking while we go to the pad
         if (currentWaypointNumber > 1) {
-          if (chosenAutoPath.getName().contains("D_CHARGE") ||
-              chosenAutoPath.getName().contains("A_CHARGE")) 
+          if (chosenAutoPath.getName().contains("A_CHARGE") ||
+              chosenAutoPath.getName().contains("B_CHARGE") ||
+              chosenAutoPath.getName().contains("C_CHARGE") ||
+              chosenAutoPath.getName().contains("D_CHARGE"))
           {
-            claw.setDesiredSpeed(1);
+            // We can assume that we are holding a cube
+            // Since our claw is so strong
+            // that we can hold cones without moving the claw at all,
+            // and it wouldn't harm to use this speed for cones,
+            // but it would harm to use the cone speed for cubes.
+            claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
             clawHasStarted = true;
           } else {
-            halfway = true;
+            // Only set halfway to true if...
+            // we are doing a modular auto path,
+            // Else, reset it to continue the prep on the arm.
+            // We can check this by seeing if the path name has "_" on the end.
+            halfway = !(chosenAutoPath.getName().endsWith("_"));
           }
         }
         stateHasInitialized = false;
       }
-      
-      // Only move the claw before the arm
-      // if it needs to hold a game piece
-      if (thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE)
-      {
-        claw.stopClaw();
+
+      // If we are on waypoint 0 or 1,
+      // (since this will also run right after 0 is over),
+      // we can assume we just placed a game piece...
+      // just in case there are issues, this is a failsafe
+      // in case the game piece is not placed
+      if ((currentWaypointNumber != 1) && (currentWaypointNumber != 0)) {
+        // Only move the claw before the arm
+        // if it needs to hold a game piece
+        if ((thisWaypointSet[currentWaypointNumber].getClawDirection() != PlacementConstants.CLAW_OUTTAKE_SPEED_CONE) &&
+        /*
+         * Lastly, if we just picked up a game piece and are going to the charge pad,
+         * we want to keep the game piece in the claw
+         * so... do NOT stop the claw if going to charge from a pickup
+         * 
+         * Also, be sure to check if startedChargePad is false...
+         * since it triggers after the path is completed,
+         * And if we were to only check the waypoint number,
+         * it would be at the "final waypoint index"
+         * before the robot is actually on the charge pad.
+         * 
+         * This would cause the claw to stop before the robot
+         * is actually on the charge pad, and thus,
+         * the arm would be in the way of the robot charging.
+         * 
+         * 
+         * In other words, if we started the charge pad,
+         * and we are on an A/B/C/D_CHARGE path,
+         * then break out of this if statement
+         */
+          !(startedChargePad &&
+              (chosenAutoPath.getName().contains("A_CHARGE") ||
+                  chosenAutoPath.getName().contains("B_CHARGE") ||
+                  chosenAutoPath.getName().contains("C_CHARGE") ||
+                  chosenAutoPath.getName().contains("D_CHARGE")))) 
+        {
+          claw.stopClaw();
+        }
       }
-    }
+      }
+
   }
 }

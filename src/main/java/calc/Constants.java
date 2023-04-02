@@ -136,10 +136,10 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4; // previously 1.75
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1.25; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 3 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/1.7; 
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2.65; // 2.5 has worked very well for us so far
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI*4;//Math.PI/1.7;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -155,7 +155,7 @@ public final class Constants {
 
         public static final double ROTATION_CORRECTION_P = .63;
         public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0;
+        public static final double ROTATION_CORRECTION_D = 0.0025;
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
@@ -376,6 +376,9 @@ public final class Constants {
       public static final String CAMERA_1_NAME = "FrontCam";
       public static final String CAMERA_2_NAME = "BackCam";
       public static final double AMBIGUITY_THRESHOLD = 0.06;
+      // The latency of the camera, in seconds
+      // divide by 1000 since it is in milliseconds.
+      public static final double LATENCY = 13.0/1000.0;
 
       // Distance from the camera to the center
       public static final Transform3d CAMERA_1_POSITION = new Transform3d(
@@ -447,31 +450,35 @@ public final class Constants {
 
       public static final int STOWED_INDEX = 0;
       public static final int HYBRID_PLACEMENT_INDEX = 1;
-      public static final int MID_CONE_PLACEMENT_INDEX = 2;
-      public static final int HIGH_CONE_PLACEMENT_INDEX = 3;
+      public static final int CONE_MID_PLACEMENT_INDEX = 2;
+      public static final int CONE_HIGH_PLACEMENT_INDEX = 3;
       public static final int HUMAN_TAG_PICKUP_INDEX = 4;
-      public static final int MID_CUBE_LAUNCH_INDEX = 5;
-      public static final int HIGH_CUBE_LAUNCH_INDEX = 6;
+      public static final int CUBE_MID_INDEX = 5;
+      public static final int CUBE_HIGH_INDEX = 6;
       public static final int FLOOR_INTAKE_INDEX = 7;
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
       public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
       public static final int HIGH_TO_STOWWED_INDEX = 10;
       public static final int LONG_ARM_REACH_INDEX = 11;
       public static final int FLOOR_INTAKE_PREP_INDEX = 12;
-      public static final int HIGH_CONE_PREP_INDEX = 13;
-      public static final int HIGH_CONE_PREP_TO_PLACE_INDEX = 14;
+      public static final int CONE_HIGH_PREP_INDEX = 13;
+      public static final int CONE_HIGH_PREP_TO_PLACE_INDEX = 14;
       public static final int CONE_INTAKE_INDEX = 15;
       public static final int CUBE_INTAKE_INDEX = 16;
       public static final int CONE_FLIP_INDEX = 17;
-      public static final int MID_CONE_PREP_INDEX = 18;
-      public static final int MID_CONE_PREP_TO_PLACE_INDEX = 19;
+      public static final int CONE_MID_PREP_INDEX = 18;
+      public static final int CONE_MID_PREP_TO_PLACE_INDEX = 19;
       public static final int AUTO_INIT_INDEX = 20;
       public static final int AUTO_CUBE_INTAKE_INDEX = 21;
+      public static final int AUTO_CUBE_HIGH_INDEX = 22;
+      public static final int AUTO_CUBE_MID_INDEX = 23;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.8;
       public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
+      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE = -0.5;
+      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST = -0.8;
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
@@ -486,10 +493,9 @@ public final class Constants {
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
       public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(18, 6);
-      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(16, 7);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(13, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
-      
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
       
@@ -507,8 +513,10 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 32);
-      public static final Translation2d CUBE_HIGH_LAUNCH = new Translation2d(35, 38);
-      public static final Translation2d CUBE_MID_LAUNCH = new Translation2d(20,25);
+      public static final Translation2d CUBE_HIGH = new Translation2d(35, 38);
+      public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(35, 38);//41 on Y
+      public static final Translation2d CUBE_MID = new Translation2d(20,25);
+      public static final Translation2d CUBE_MID_AUTO = new Translation2d(30, 26);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
@@ -525,7 +533,6 @@ public final class Constants {
         },
         // Index 1 | Hybrid
         {
-          TRANSITION_POSITION,
           HYBRID_POSITION
         },
         // Index 2 | Mid Cone
@@ -537,9 +544,9 @@ public final class Constants {
         // Index 3 | High Cone
         {
           TRANSITION_POSITION,
-          HIGH_CONE_POSITION_0,
-          // ARM_HIGH_CONE_POSITION_1,
-          HIGH_CONE_POSITION_2
+          // HIGH_CONE_POSITION_0,
+          HIGH_CONE_POSITION_1
+          // HIGH_CONE_POSITION_2
         },
         // Index 4 | Human Tag
         {
@@ -548,12 +555,12 @@ public final class Constants {
         // Index 5 | Cube Mid
         {
           TRANSITION_POSITION,
-          CUBE_MID_LAUNCH
+          CUBE_MID
         },
         // Index 6 | Cube High
         {
           TRANSITION_POSITION,
-          CUBE_HIGH_LAUNCH
+          CUBE_HIGH
         },
         // Index 7 | Floor Intake
         {
@@ -630,6 +637,16 @@ public final class Constants {
         {
           CONE_INTAKE_POSITION_PREP,
           CUBE_INTAKE_POSITION_AUTO
+        },
+        // Index 22 | Cube High Auto
+        {
+          TRANSITION_POSITION,
+          CUBE_HIGH_AUTO
+        },
+        // Index 23 | Cube Mid Auto
+        {
+          TRANSITION_POSITION,
+          CUBE_MID_AUTO
         }
       };
   }

@@ -150,17 +150,25 @@ public class Robot extends TimedRobot {
     // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() < 0.1) {
+    if (timer.get() < 0.35) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
-    if (timer.get() > 14.9) {
+    if (timer.get() > 14.65) {
+      claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
+    }
+    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CHARGE")) {
       swerve.setWheelsUp();
+      return;
+    }
+    if (timer.get() > 15) {
+      claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
     autoSegmentedWaypoints.periodic();
     if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
-        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5) {
+        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5) 
+    {
       autoAlignment.calibrateOdometry();
     }
   }
@@ -354,7 +362,7 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_PREP_INDEX : PlacementConstants.HIGH_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
         break;
 
       // Clicking down
@@ -364,7 +372,7 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.MID_CONE_PREP_INDEX : PlacementConstants.MID_CUBE_LAUNCH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
         break;
 
       // Clicking right
@@ -393,7 +401,8 @@ public class Robot extends TimedRobot {
 
     // Claw speed controls
       // If the left bumper is pressed, e-stop the claw
-      // If the right bumper is held, outtake an object when the arm is at placement position
+      // If the right bumper is held, or if teleop just started,
+      // outtake an object when the arm is at placement position
       // If the left trigger is held, intake an object
         // Keep the fastest intake speed until the claw is e-stopped/reversed
         // This is to allow the trigger to be fully pressed intake an object,
@@ -403,7 +412,7 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool()) {
+    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || timer.get() < 0.1) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
@@ -419,8 +428,8 @@ public class Robot extends TimedRobot {
 
     } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-      if (arm.getArmIndex() == PlacementConstants.HIGH_CONE_PLACEMENT_INDEX ||
-          arm.getArmIndex() == PlacementConstants.HIGH_CONE_PREP_TO_PLACE_INDEX) {
+      if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
+          arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
           arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
       }
       else {
