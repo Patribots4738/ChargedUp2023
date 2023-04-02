@@ -13,6 +13,7 @@ import hardware.Claw;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import frc.robot.DriverUI;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.PlacementConstants;
 
@@ -55,13 +56,13 @@ public class AutoSegmentedWaypoints implements Loggable {
 
   public void init() {
 
-    if (AutoPathStorage.autoChooser.getSelected() == null) {
+    if (DriverUI.autoChooser.getSelected() == null) {
 
       chosenAutoPath = AutoPathStorage.myAutoContainer[0];
 
     } else {
 
-      chosenAutoPath = AutoPathStorage.autoChooser.getSelected();
+      chosenAutoPath = DriverUI.autoChooser.getSelected();
 
     }
 

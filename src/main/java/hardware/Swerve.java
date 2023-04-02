@@ -21,19 +21,16 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import frc.robot.DriverUI;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
-public class Swerve implements Loggable{
+public class Swerve implements Loggable {
 
-    @Log
-    private double yaw = 0;
+    public double yaw = 0;
 
-    private final Field2d field = new Field2d();
     @Log
     public double pitch = 0;
 
@@ -114,15 +111,13 @@ public class Swerve implements Loggable{
         resetEncoders();
         zeroHeading();
         setBrakeMode();
-        // SmartDashboard.putData("Field", field);
-        Shuffleboard.getTab("AutoPicker").add(field);
 
     }
 
     public void periodic() {
         // Update the odometry in the periodic block
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
-        this.field.setRobotPose(getPose());
+        DriverUI.field.setRobotPose(getPose());
         getPitch();
         getRoll();
     }
@@ -291,7 +286,7 @@ public class Swerve implements Loggable{
         // }
         // return (velocity / swerveModules.length);
 
-        return ((field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm())/0.02);
+        return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm())/0.02);
 
     }
 

@@ -9,16 +9,12 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
+import frc.robot.DriverUI;
 import calc.Constants.AutoConstants;
 import calc.Constants.PlacementConstants;
 
 public class AutoPathStorage implements Loggable {
-
-  @Log(tabName = "AutoPicker", rowIndex = 0, columnIndex = 3, height = 1, width = 2)
-  public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
 
   public static Waypoint[] chosenWaypoints;
 
@@ -754,6 +750,12 @@ public class AutoPathStorage implements Loggable {
 
 
     myAutoContainer = new AutoPose[] {
+      // More commonly used paths first:
+      //3P 3P 3P 3P
+      new AutoPose("9H_D_8H_C_8M_", _9H_D_8H_C_8M),
+      new AutoPose("9H_D_8H_C_CHARGE_", _9H_D_8H_C_CHARGE),
+      new AutoPose("6H_MOBILITY", _6H_MOBILITY),
+
       // AutoPoses for the bottom of the field:
       new AutoPose("1H_A_2H_CHARGE", _1H_A_2H_CHARGE),
       new AutoPose("1H_A_2H", _1H_A_2H),
@@ -814,7 +816,7 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("6H_MOBILITY", _6H_MOBILITY),
       new AutoPose("4H_MOBILITY_CHARGE", _4H_MOBILITY_CHARGE),
       new AutoPose("5H_MOBILITY_CHARGE", _5H_MOBILITY_CHARGE),
-      new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
+      // 6H is defined above
       new AutoPose("7H_D_CHARGE", _7H_D_CHARGE),
       new AutoPose("8H_D_CHARGE", _8H_D_CHARGE),
       new AutoPose("9H_D_CHARGE", _9H_D_CHARGE),
@@ -822,9 +824,6 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("9H_D_8H_CHARGE_", _9H_D_8H_CHARGE),
       new AutoPose("9H_D_8H_", _9H_D_8H),
       new AutoPose("9H_D_8H_C_", _9H_D_8H_C),
-        //3P 3P 3P 3P
-        new AutoPose("9H_D_8H_C_8M_", _9H_D_8H_C_8M),
-        new AutoPose("9H_D_8H_C_CHARGE_", _9H_D_8H_C_CHARGE),
 
     };
 
@@ -832,16 +831,16 @@ public class AutoPathStorage implements Loggable {
       
       if (i == 0) {
         AutoPose MobilityAutoPose = new AutoPose("MOBILITY ONLY!!!!!!", _MOBILITY_ONLY);
-        autoChooser.addOption(MobilityAutoPose.getName(), MobilityAutoPose);
+        DriverUI.autoChooser.addOption(MobilityAutoPose.getName(), MobilityAutoPose);
       }
       
       AutoPose AutoPose = myAutoContainer[i];
       
-      autoChooser.addOption(AutoPose.getName(), AutoPose);
+      DriverUI.autoChooser.addOption(AutoPose.getName(), AutoPose);
 
       // Every third index, add a spacer option for simplicity
       if (((i + 1) % 3 == 0) && (i != myAutoContainer.length - 1)) {
-        autoChooser.addOption(" " + " ".repeat(i), AutoPose);
+        DriverUI.autoChooser.addOption(" " + " ".repeat(i), AutoPose);
       }
     }
   }

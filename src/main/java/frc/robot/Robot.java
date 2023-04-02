@@ -53,12 +53,13 @@ public class Robot extends TimedRobot {
 
   AutoAlignment autoAlignment;
 
+  DriverUI driverUI = new DriverUI();
+
   public static Timer timer;
 
   @Override
   public void robotInit() {
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
-
       // Drivetrain instantiation
       swerve = new Swerve();
 
@@ -92,6 +93,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
         
     Logger.updateEntries();
+    DriverUI.connected = DriverStation.isDSAttached() || DriverStation.isFMSAttached();
     arduinoController.periodic();
 
   }
@@ -111,6 +113,8 @@ public class Robot extends TimedRobot {
     arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
 
     swerve.setSpeedMultiplier(1);
+
+    DriverUI.enabled = false;
 
     System.out.println(swerve.getPose().getTranslation());
 
@@ -133,6 +137,7 @@ public class Robot extends TimedRobot {
     autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
+    DriverUI.enabled = true;
     SwerveTrajectory.resetTrajectoryStatus();
   }
 
@@ -174,6 +179,7 @@ public class Robot extends TimedRobot {
     arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
+    DriverUI.enabled = true;
     SwerveTrajectory.resetTrajectoryStatus();
     autoAlignment.setConeOffset(0);
   }
@@ -449,10 +455,12 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kRightRumble, 0.75);
       operator.setRumble(RumbleType.kLeftRumble, 0.75);
       arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
+      DriverUI.aligned = true;
     }
     else {
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
         arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
+        DriverUI.aligned = false;
       }
       else {
         arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
@@ -485,7 +493,5 @@ public class Robot extends TimedRobot {
       autoAlignment.setConeMode(true);
       arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
-
-    
   }
 }

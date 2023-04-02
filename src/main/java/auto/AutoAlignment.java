@@ -12,11 +12,11 @@ import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
 import hardware.Claw;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.VisionConstants;
 import calc.Constants.ClawConstants;
+import frc.robot.DriverUI;
 import calc.PhotonCameraUtil;
 
 public class AutoAlignment implements Loggable{
@@ -46,7 +46,6 @@ public class AutoAlignment implements Loggable{
     // This variable is used to tell us how far away we currently are from an april tag
     private double currentNorm = -1;
 
-    @Log
     public static boolean coneMode = false;
 
     public AutoAlignment(Swerve swerve, Claw claw) {
@@ -71,6 +70,7 @@ public class AutoAlignment implements Loggable{
           camEstimatedPose.estimatedPose.toPose2d(),
           Timer.getFPGATimestamp() - VisionConstants.LATENCY);
       }
+      DriverUI.hasTargets = result.isPresent();
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
         // Get the target pose (the pose of the tag we want to go to)
@@ -387,6 +387,7 @@ public class AutoAlignment implements Loggable{
 
     public void setConeMode(boolean coneMode) {
       AutoAlignment.coneMode = coneMode;
+      DriverUI.coneMode = coneMode;
       // If the cone offset is 0, and we are switching to cone mode,
       // set the cone offset to 1 (closest to human tag)
       if (!coneMode) {
