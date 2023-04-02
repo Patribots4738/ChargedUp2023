@@ -12,7 +12,6 @@ import calc.Constants.LEDConstants;
 import calc.Constants.OIConstants;
 import calc.Constants.PlacementConstants;
 import calc.OICalc;
-import debug.Debug;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -49,8 +48,6 @@ public class Robot extends TimedRobot {
   Arm arm;
   Claw claw;
 
-  Debug debug;
-
   ArduinoController arduinoController;
   ArmCalculations armCalculations;
 
@@ -61,9 +58,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
-
-      // Debug class for ShuffleBoard
-      // debug = new Debug();
 
       // Drivetrain instantiation
       swerve = new Swerve();

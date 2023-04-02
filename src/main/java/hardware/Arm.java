@@ -7,8 +7,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-
-import debug.Debug;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -624,11 +622,5 @@ public class Arm implements Loggable {
           double zeroAngle = (ArmConstants.UPPER_ARM_LOWER_LIMIT) - unadjustedAngle;
           Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
           _upperArmEncoder.setZeroOffset(referenceAngle.getRadians());
-    }
-
-    public void setUpperPID() {
-      _upperArmPIDController.setP(Debug.armP.getDouble(ArmConstants.UPPER_P));
-      _upperArmPIDController.setI(Debug.armI.getDouble(ArmConstants.UPPER_I));
-      _upperArmPIDController.setD(Debug.armD.getDouble(ArmConstants.UPPER_D));
     }
 }

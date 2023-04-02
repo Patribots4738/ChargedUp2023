@@ -3,7 +3,6 @@ package auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import debug.Debug;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -15,6 +14,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Config.Configs;
 import calc.Constants;
 import calc.Constants.AlignmentConstants;
 
@@ -50,6 +51,9 @@ public class SwerveTrajectory implements Loggable {
    * If you rotate too much, then reduce the P for theta.
    * D can be seen as beneficial here as the rotation is allowed more speed than position.
    */
+
+  // IF YOU EVER WANT TO TUNE THIS, HERE IS HOW:
+  // look at the commented code below teehee
   public static HolonomicDriveController HDC = new HolonomicDriveController(
       new PIDController(
         Constants.AutoConstants.X_CORRECTION_P,
@@ -67,23 +71,52 @@ public class SwerveTrajectory implements Loggable {
             Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
             Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
 
+  // IF YOU EVER WANT TO TUNE THIS, READ BELOW:
+  // IF YOU EVER WANT TO TUNE THIS, READ BELOW:
+  // IF YOU EVER WANT TO TUNE THIS, READ BELOW:
+  // the @Config annotation here will save you many many redeploys.
+  // It allows you to change the values of the constants in the shuffleboard
+  // IN SHUFFLEBOARD, IN REAL TIME, REAL
+  // no more redeploys, no more redeploys, no more redeploys
+  // Have... fun? :) - Alexander Hamilton, 2023
+
+  // @Config
+  // public static double xP = Constants.AutoConstants.X_CORRECTION_P;
+  // @Config
+  // public static double xI = Constants.AutoConstants.X_CORRECTION_I;
+  // @Config
+  // public static double xD = Constants.AutoConstants.X_CORRECTION_D;
+  // @Config
+  // public static double yP = Constants.AutoConstants.Y_CORRECTION_P;
+  // @Config
+  // public static double yI = Constants.AutoConstants.Y_CORRECTION_I;
+  // @Config
+  // public static double yD = Constants.AutoConstants.Y_CORRECTION_D;
+  // @Config
+  // public static double rotP = Constants.AutoConstants.ROTATION_CORRECTION_P;
+  // @Config
+  // public static double rotI = Constants.AutoConstants.ROTATION_CORRECTION_I;
+  // @Config
+  // public static double rotD = Constants.AutoConstants.ROTATION_CORRECTION_D;
+  // @Config
+  // public static double maxAngularSpeed = Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+  // @Config
+  // public static double maxAngularAccel = Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED;
+  
   // public static HolonomicDriveController HDC = new HolonomicDriveController(
-  //   new PIDController(Debug.xP.getDouble(Constants.AutoConstants.X_CORRECTION_P),
-  //                     0,
-  //                     Debug.xD.getDouble(Constants.AutoConstants.X_CORRECTION_D)),
-  //   new PIDController(Debug.yP.getDouble(Constants.AutoConstants.Y_CORRECTION_P),
-  //                     0,
-  //                     Debug.yD.getDouble(Constants.AutoConstants.Y_CORRECTION_D)),
-  //   new ProfiledPIDController(Debug.rotP.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_P),
-  //                             0,
-  //                             Debug.rotD.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_D),
-  //                             new TrapezoidProfile.Constraints(
-  //                               Debug.maxAngularSpeed.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND),
-  //                               Debug.maxAngularAccel.getDouble(Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED))));
+  //   new PIDController(xP,
+  //                     xI,
+  //                     xD),
+  //   new PIDController(yP,
+  //                     yI,
+  //                     yD),
+  //   new ProfiledPIDController(rotP,
+  //                             rotI,
+  //                             rotD,
+  //                             new TrapezoidProfile.Constraints(maxAngularSpeed, maxAngularAccel)));
 
   /**
-   * This is PathPlanner.
-   * It's awesome :)
+   * Pathplanner time!
    * Open up pathplanner.exe on the driverstation laptop.
    * Point the application to the location of your coding project (must contain build.gradle).
    * Draw the path.
@@ -190,25 +223,4 @@ public class SwerveTrajectory implements Loggable {
     trajectoryStatus = "setup";
 
   }
-
-  /**
-   * This method is only needed if you want to use sliders from ShuffleBoard to tune the HDC without re-enabling.
-   * If you want it, add it to the disabledPeriodic() in Robot.java
-   */
-  public static void resetHDC() {
-    HDC = new HolonomicDriveController(
-    new PIDController(Debug.xP.getDouble(Constants.AutoConstants.X_CORRECTION_P),
-                      0,
-                      Debug.xD.getDouble(Constants.AutoConstants.X_CORRECTION_D)),
-    new PIDController(Debug.yP.getDouble(Constants.AutoConstants.Y_CORRECTION_P),
-                      0,
-                      Debug.yD.getDouble(Constants.AutoConstants.Y_CORRECTION_D)),
-    new ProfiledPIDController(Debug.rotP.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_P),
-                              0,
-                              Debug.rotD.getDouble(Constants.AutoConstants.ROTATION_CORRECTION_D),
-                              new TrapezoidProfile.Constraints(
-                                Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                                Constants.AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
-  }
-
 }
