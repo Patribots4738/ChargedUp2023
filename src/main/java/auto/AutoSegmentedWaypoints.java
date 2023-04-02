@@ -120,7 +120,12 @@ public class AutoSegmentedWaypoints implements Loggable {
           claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
           break;
         default:
-          claw.setDesiredSpeed(((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) ? PlacementConstants.CLAW_INTAKE_SPEED_CUBE : PlacementConstants.CLAW_INTAKE_SPEED_CONE));
+        // If our auto path contains "pickup and place a cube", 
+        // Then set the claw speed to intake cubes
+          claw.setDesiredSpeed(
+            ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) 
+            ? PlacementConstants.CLAW_INTAKE_SPEED_CUBE 
+            : PlacementConstants.CLAW_INTAKE_SPEED_CONE));
           break;
       }
     }
@@ -128,8 +133,22 @@ public class AutoSegmentedWaypoints implements Loggable {
     // Check if the arm is ready to move to the next waypoint mid-path
     if (SwerveTrajectory.trajectoryStatus.equals("execute") && currentWaypointNumber != 0 && arm.getAtDesiredPositions()) {
       
+      // This is where the arm will "prep" to go to placement locations
+      // Very useful for saving time
       if ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
-          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90) && halfway) 
+          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90) && halfway && 
+          /*
+           * Get if we are on a pickup -> charge path, 
+           * and if we are on the last waypoint, 
+           * don't move the arm
+           * 
+           * In other words, break out of this if statement
+           */
+          !((chosenAutoPath.getName().contains("A_CHARGE") ||
+            chosenAutoPath.getName().contains("B_CHARGE") ||
+            chosenAutoPath.getName().contains("C_CHARGE") ||
+            chosenAutoPath.getName().contains("D_CHARGE")) && 
+            currentWaypointNumber == chosenWaypoints.length - 1))
       {
         // Prepare the arm for the next waypoint before the path is done
         switch (armIndex) {
@@ -137,27 +156,31 @@ public class AutoSegmentedWaypoints implements Loggable {
           case PlacementConstants.CONE_HIGH_PLACEMENT_INDEX:
             arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX);
             break;
-          case PlacementConstants.CUBE_HIGH_INDEX:
-          case PlacementConstants.AUTO_CUBE_HIGH_INDEX:
-            arm.setArmIndex(PlacementConstants.CUBE_HIGH_INDEX);
+          // If the next waypoint is a mid cone placement, prepare the arm for a mid cone placement
+          case PlacementConstants.CONE_MID_PLACEMENT_INDEX:
+            arm.setArmIndex(PlacementConstants.CONE_MID_PREP_INDEX);
             break;
-          case PlacementConstants.CUBE_MID_INDEX:
-            arm.setArmIndex(PlacementConstants.CUBE_MID_INDEX);
-            break;
-          case PlacementConstants.AUTO_CUBE_MID_INDEX:
-            arm.setArmIndex(PlacementConstants.AUTO_CUBE_MID_INDEX);
+          // If the next waypoint is nothing that requires a prep, just go to the position
+          default: 
+            arm.setArmIndex(armIndex);
             break;
         }
       }
+      // This is where the arm will "prep" to go to pickup locations
+      // Very useful for saving time
       else if ((chosenAutoPath.getName().contains("A_2") || chosenAutoPath.getName().contains("D_8")) && !halfway &&
               ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) < 90) || 
               (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) > 90)))
       {
-
         AutoAlignment.coneMode = false;
         halfway = true;
-      
-        if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX) {
+
+        // Only set the claw to the intake position if it is not already there
+        // Small redundancy prevention to make sure we don't overload our runtimes
+        /// me when i one time boolean but not other time boolean
+        if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX && 
+            arm.getArmIndex() != PlacementConstants.AUTO_CUBE_INTAKE_INDEX)
+        {
           arm.setArmIndex(PlacementConstants.AUTO_CUBE_INTAKE_INDEX);
         }
         claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
