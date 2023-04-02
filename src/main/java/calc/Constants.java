@@ -376,6 +376,9 @@ public final class Constants {
       public static final String CAMERA_1_NAME = "FrontCam";
       public static final String CAMERA_2_NAME = "BackCam";
       public static final double AMBIGUITY_THRESHOLD = 0.06;
+      // The latency of the camera, in seconds
+      // divide by 1000 since it is in milliseconds.
+      public static final double LATENCY = 13.0/1000.0;
 
       // Distance from the camera to the center
       public static final Transform3d CAMERA_1_POSITION = new Transform3d(
@@ -510,7 +513,7 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 32);
       public static final Translation2d CUBE_HIGH = new Translation2d(35, 38);
-      public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(35, 41);
+      public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(35, 38);//41 on Y
       public static final Translation2d CUBE_MID = new Translation2d(20,25);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
@@ -540,8 +543,8 @@ public final class Constants {
         {
           TRANSITION_POSITION,
           // HIGH_CONE_POSITION_0,
-          HIGH_CONE_POSITION_1,
-          HIGH_CONE_POSITION_2
+          HIGH_CONE_POSITION_1
+          // HIGH_CONE_POSITION_2
         },
         // Index 4 | Human Tag
         {
