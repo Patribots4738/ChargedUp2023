@@ -17,7 +17,6 @@ import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import calc.Constants;
 import calc.Constants.AlignmentConstants;
-import calc.Constants.AutoConstants;
 
 public class SwerveTrajectory implements Loggable {
 
