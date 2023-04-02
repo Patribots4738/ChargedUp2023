@@ -417,8 +417,6 @@ public final class Constants {
         
 
         public static final double CONE_OFFSET_METERS = 0.542615;
-        private static final double GRID_TAG_HEIGHT_METERS = Units.inchesToMeters(18.22);
-        private static final double HUMAN_TAG_HEIGHT_METERS = Units.inchesToMeters(27.38);
         public static final double GRID_BARRIER_METERS = Units.inchesToMeters(12); // real is 14-15
         public static final double SUBSTATION_OFFSET_METERS = 0.7;
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
