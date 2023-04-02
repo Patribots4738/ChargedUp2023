@@ -140,6 +140,7 @@ public class Robot extends TimedRobot {
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     SwerveTrajectory.resetTrajectoryStatus();
+    AutoConstants.POST_PATH_CORRECTION_TIME_SECONDS = 0.75;
   }
 
   @Override
@@ -154,6 +155,9 @@ public class Robot extends TimedRobot {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
+    if (timer.get() > 10) {
+      AutoConstants.POST_PATH_CORRECTION_TIME_SECONDS = 1.3;
+    }
     if (timer.get() > 14.65) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
     }
@@ -167,7 +171,8 @@ public class Robot extends TimedRobot {
     }
     autoSegmentedWaypoints.periodic();
     if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
-        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5) {
+        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5) 
+    {
       autoAlignment.calibrateOdometry();
     }
   }
@@ -400,7 +405,8 @@ public class Robot extends TimedRobot {
 
     // Claw speed controls
       // If the left bumper is pressed, e-stop the claw
-      // If the right bumper is held, outtake an object when the arm is at placement position
+      // If the right bumper is held, or if teleop just started,
+      // outtake an object when the arm is at placement position
       // If the left trigger is held, intake an object
         // Keep the fastest intake speed until the claw is e-stopped/reversed
         // This is to allow the trigger to be fully pressed intake an object,
@@ -410,7 +416,7 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool()) {
+    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || timer.get() < 0.1) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
