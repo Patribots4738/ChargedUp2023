@@ -5,22 +5,17 @@ import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
-import calc.Constants.AlignmentConstants;
-import calc.Constants.AutoConstants;
-import calc.Constants.DriveConstants;
-import calc.Constants.LEDConstants;
-import calc.Constants.OIConstants;
-import calc.Constants.PlacementConstants;
+import calc.Constants.*;
 import calc.OICalc;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import hardware.ArduinoController;
 import hardware.Arm;
 import hardware.Claw;
@@ -450,10 +445,8 @@ public class Robot extends TimedRobot {
       arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
     }
     else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
-      driver.setRumble(RumbleType.kLeftRumble, 0.75);
-      driver.setRumble(RumbleType.kRightRumble, 0.75);
-      operator.setRumble(RumbleType.kRightRumble, 0.75);
-      operator.setRumble(RumbleType.kLeftRumble, 0.75);
+      driver.setRumble(RumbleType.kBothRumble, 1);
+      operator.setRumble(RumbleType.kBothRumble, 1);
       arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
       DriverUI.aligned = true;
     }
@@ -465,17 +458,20 @@ public class Robot extends TimedRobot {
       else {
         arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
-      driver.setRumble(RumbleType.kLeftRumble, 0);
-      driver.setRumble(RumbleType.kRightRumble, 0);
-      operator.setRumble(RumbleType.kRightRumble, 0);
-      operator.setRumble(RumbleType.kLeftRumble, 0);
+      driver.setRumble(RumbleType.kBothRumble, 0);
+      operator.setRumble(RumbleType.kBothRumble, 0);
     }
 
-    //Rumble the claw if it is stalling, judged by whether or not the claw is drawing more amps than a preset limit.
-    if (claw.getOutputCurrent() > 25) {
-      driver.setRumble(RumbleType.kBothRumble, 0.1);
-      operator.setRumble(RumbleType.kBothRumble, 0.1);
+    //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
+    if (claw.getSuperIntake()) {
+      driver.setRumble(RumbleType.kLeftRumble, 0.5);
+      operator.setRumble(RumbleType.kLeftRumble, 0.5);
     }
+    else if (claw.getOutputCurrent() > 25) {
+      driver.setRumble(RumbleType.kBothRumble, 0.25);
+      operator.setRumble(RumbleType.kBothRumble, 0.25);
+    }
+
 
   }  
 
