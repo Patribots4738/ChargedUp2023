@@ -4,7 +4,10 @@
 
 package calc;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -520,7 +523,7 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Translation2d HIGH_CONE_PREP = new Translation2d(24,41);
+      public static final Translation2d HIGH_CONE_PREP = new Translation2d(29.03, 46.46);
       public static final Translation2d MID_CONE_PREP = new Translation2d(24,35);
 
       public static final Translation2d[][] ARM_POSITIONS = {
