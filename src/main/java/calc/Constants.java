@@ -582,11 +582,11 @@ public final class Constants {
         },
         // Index 9 | Robot Un-Flip
         {
-          SOLUTION_FLIP_TRANSITION_POINT,
-          ARM_FLIP_POSITION_1,
+          // SOLUTION_FLIP_TRANSITION_POINT,
+          // ARM_FLIP_POSITION_1,
           // ARM_FLIP_POSITION_2,
-          // ARM_FLIP_POSITION_3,
-          SOLUTION_FLIP_TRANSITION_POINT,
+          ARM_FLIP_POSITION_3,
+          // SOLUTION_FLIP_TRANSITION_POINT,
           STOWED_POSITION
         },
         // Index 10 | High To Stowed

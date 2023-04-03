@@ -193,6 +193,8 @@ public class Arm implements Loggable {
         if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
           armsAtDesiredPosition = true;
+          armPosDimension1 = PlacementConstants.STOWED_INDEX;
+          armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length-1;
           return;
         }
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
