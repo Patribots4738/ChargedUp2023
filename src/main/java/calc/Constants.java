@@ -4,7 +4,10 @@
 
 package calc;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -454,9 +457,10 @@ public final class Constants {
       public static final int CUBE_MID_INDEX = 5;
       public static final int CUBE_HIGH_INDEX = 6;
       public static final int FLOOR_INTAKE_INDEX = 7;
+      @Deprecated // Please use ARM_FLIP_INDEX instead...
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
-      public static final int SOLUTION_FLIP_INDEX_NEGATIVE = 9;
-      public static final int HIGH_TO_STOWWED_INDEX = 10;
+      public static final int ARM_FLIP_INDEX = 9;
+      public static final int HIGH_TO_STOWED_INDEX = 10;
       public static final int LONG_ARM_REACH_INDEX = 11;
       public static final int FLOOR_INTAKE_PREP_INDEX = 12;
       public static final int CONE_HIGH_PREP_INDEX = 13;
@@ -480,10 +484,15 @@ public final class Constants {
 
       public static final double CLAW_STOPPED_SPEED = 0;
       
-      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT_START = new Translation2d(0,35);
-      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT_FINISH = new Translation2d(0,30);
-      public static final Translation2d SOLUTION_FLIP_POSIITON_POSITIVE = new Translation2d(28, 45);
-      public static final Translation2d SOLUTION_FLIP_POSIITON_NEGATIVE = new Translation2d(-28,45);
+      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,20);
+      //@Deprecated Please use ARM_FLIP_POSITION instead...
+      // public static final Translation2d SOLUTION_FLIP_POSITION_POSITIVE = new Translation2d(28, 45);
+      //@Deprecated Please use ARM_FLIP_POSITION instead...
+      // public static final Translation2d SOLUTION_FLIP_POSITION_NEGATIVE = new Translation2d(-28,45);
+      public static final Translation2d ARM_FLIP_POSITION_1 = new Translation2d(-40, 30);
+      public static final Translation2d ARM_FLIP_POSITION_2 = new Translation2d(-23, 22);
+      public static final Translation2d ARM_FLIP_POSITION_3 = new Translation2d(-9.45, 7.4);
+
 
       // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
       // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
@@ -502,9 +511,6 @@ public final class Constants {
       public static final Translation2d AUTO_INIT_PICKUP = new Translation2d(12.43, 8);
 
       public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
-      public static final Translation2d ARM_MEDIUM_GRID_POSITION = new Translation2d(28, 27);
-      public static final Translation2d ARM_HIGH_GRID_POSITION = new Translation2d(43, 35);
-        
       public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(29, 32.88);
       public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(30.5, 23.00);
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
@@ -565,17 +571,23 @@ public final class Constants {
           CUBE_INTAKE_POSITION_PREP,
           CUBE_INTAKE_POSITION
         },
-        // Index 8 | Solution Flip Positive
+        /*
+         * @Deprecated!
+         * Index 8 | Solution Flip Positive
+         */
         {
-          SOLUTION_FLIP_TRANSITION_POINT_START,
-          SOLUTION_FLIP_POSIITON_POSITIVE,
-          SOLUTION_FLIP_TRANSITION_POINT_FINISH
+          // SOLUTION_FLIP_TRANSITION_POINT_START,
+          // SOLUTION_FLIP_POSIITON_POSITIVE,
+          // SOLUTION_FLIP_TRANSITION_POINT_FINISH
         },
-        // Index 9 | Solution Flip Negative
+        // Index 9 | Robot Un-Flip
         {
-          SOLUTION_FLIP_TRANSITION_POINT_START,
-          SOLUTION_FLIP_POSIITON_NEGATIVE,
-          SOLUTION_FLIP_TRANSITION_POINT_FINISH
+          SOLUTION_FLIP_TRANSITION_POINT,
+          ARM_FLIP_POSITION_1,
+          // ARM_FLIP_POSITION_2,
+          // ARM_FLIP_POSITION_3,
+          SOLUTION_FLIP_TRANSITION_POINT,
+          STOWED_POSITION
         },
         // Index 10 | High To Stowed
         {

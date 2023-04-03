@@ -1,21 +1,21 @@
 // Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
 package auto;
 
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import auto.AutoPathStorage.AutoPose;
 import auto.AutoPathStorage.Waypoint;
+import calc.Constants.AlignmentConstants;
+import calc.Constants.PlacementConstants;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.DriverUI;
 import hardware.Arm;
 import hardware.Claw;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import frc.robot.DriverUI;
-import calc.Constants.AlignmentConstants;
-import calc.Constants.PlacementConstants;
 
 public class AutoSegmentedWaypoints implements Loggable {
 
@@ -286,7 +286,7 @@ public class AutoSegmentedWaypoints implements Loggable {
           arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX || 
           arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX)
       { 
-        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX); 
+        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
       }
       // If our path placed a cube, just stow if we are not placing at high_cube_launch
       // The transition point in stow is enough to stay away from the arena

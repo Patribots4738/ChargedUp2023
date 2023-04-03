@@ -5,22 +5,17 @@ import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
-import calc.Constants.AlignmentConstants;
-import calc.Constants.AutoConstants;
-import calc.Constants.DriveConstants;
-import calc.Constants.LEDConstants;
-import calc.Constants.OIConstants;
-import calc.Constants.PlacementConstants;
+import calc.Constants.*;
 import calc.OICalc;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import hardware.ArduinoController;
 import hardware.Arm;
 import hardware.Claw;
@@ -393,10 +388,10 @@ public class Robot extends TimedRobot {
     // These buttons are right below the Xbox logo, aimed to be a bit out of reach
     // (after all we don't want to accidentally press them)
     if (operator.getBackButtonPressed()) {
-      arm.setArmMirrored(true);
+      arm.setArmIndex(PlacementConstants.ARM_FLIP_INDEX);
     }
     else if (operator.getStartButtonPressed()) {
-      arm.setArmMirrored(false);
+      arm.setArmIndex(PlacementConstants.STOWED_INDEX);
     }
 
     // Claw speed controls
@@ -430,7 +425,7 @@ public class Robot extends TimedRobot {
 
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
           arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
-          arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
+          arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
       }
       else {
           arm.setArmIndex(PlacementConstants.STOWED_INDEX);
@@ -480,8 +475,7 @@ public class Robot extends TimedRobot {
   }  
 
   @Override
-  public void testInit() {
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {
