@@ -391,7 +391,7 @@ public class Robot extends TimedRobot {
       arm.setArmIndex(PlacementConstants.ARM_FLIP_INDEX);
     }
     else if (operator.getStartButtonPressed()) {
-      arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+      arm.setArmIndex(PlacementConstants.ARM_FLIP_INDEX);
     }
 
     // Claw speed controls
