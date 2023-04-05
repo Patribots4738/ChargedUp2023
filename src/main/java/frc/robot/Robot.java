@@ -5,7 +5,12 @@ import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
-import calc.Constants.*;
+import calc.Constants.AlignmentConstants;
+import calc.Constants.AutoConstants;
+import calc.Constants.DriveConstants;
+import calc.Constants.LEDConstants;
+import calc.Constants.OIConstants;
+import calc.Constants.PlacementConstants;
 import calc.OICalc;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -189,11 +194,11 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 134.9) {
-      swerve.setWheelsUp();
-      claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
-      return;
-    }
+    // if (timer.get() > 134.9) {
+    //   swerve.setWheelsUp();
+    //   claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
+    //   return;
+    // }
 
     // Find the max angular velocity of the drivetrain using the arm location
     DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = armCalculations.lerp(
@@ -241,10 +246,19 @@ public class Robot extends TimedRobot {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
         SwerveTrajectory.resetTrajectoryStatus();
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        autoAlignment.resetTimer();
         
       }
       
       autoAlignment.alignToTag(driverLeftAxis.getY());
+      
+      // Since we reset the timer when AButtonPressed(), for the first one second of alignment, 
+      // correct for any error in the odometry by resetting the nearest alignment offset. 
+      // This will work since the robot will be rotating, 
+      // and the camera will be writing the actual position of the robot.
+      if (autoAlignment.getAlignmentTimer() < 1) {
+        autoAlignment.setNearestAlignmentOffset();
+      }
 
     } else if (driver.getRightBumper()) {
 

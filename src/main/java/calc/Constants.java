@@ -250,7 +250,7 @@ public final class Constants {
 
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
-      public static final double UPPER_ARM_LOWER_LIMIT = 0.34;
+      public static final double UPPER_ARM_LOWER_LIMIT = 0.36;
       public static final double UPPER_ARM_UPPER_LIMIT = 5.7;
 
       // The amount of error allowed for the arm's position, in Radians
@@ -526,7 +526,7 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Translation2d HIGH_CONE_PREP = new Translation2d(24,41);
+      public static final Translation2d HIGH_CONE_PREP = new Translation2d(38.92, 39.73);
       public static final Translation2d MID_CONE_PREP = new Translation2d(24,35);
 
       public static final Translation2d[][] ARM_POSITIONS = {
@@ -607,11 +607,13 @@ public final class Constants {
         },
         // Index 13 | High Cone Prep
         {
+          TRANSITION_POSITION,
+          HIGH_CONE_POSITION_0,
           HIGH_CONE_PREP
         },
         // Index 14 | High Cone Prep to Place
         {
-          HIGH_CONE_POSITION_0,
+          HIGH_CONE_PREP,
           HIGH_CONE_POSITION_2
         },
         // Index 15 | Cone Intake
