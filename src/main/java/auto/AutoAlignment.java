@@ -42,6 +42,7 @@ public class AutoAlignment implements Loggable{
     private int coneOffset = 0;
     private int substationOffset = -1;
     private double startedChargePad = -1;
+    private Timer alignmentTimer = new Timer();
 
     // This variable is used to tell us how far away we currently are from an april tag
     private double currentNorm = -1;
@@ -70,7 +71,6 @@ public class AutoAlignment implements Loggable{
           camEstimatedPose.estimatedPose.toPose2d(),
           Timer.getFPGATimestamp() - VisionConstants.LATENCY);
       }
-      DriverUI.hasTargets = result.isPresent();
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
         // Get the target pose (the pose of the tag we want to go to)
@@ -375,6 +375,14 @@ public class AutoAlignment implements Loggable{
       if (previousConeOffset != this.coneOffset) {
         SwerveTrajectory.resetTrajectoryStatus();
       }
+    }
+
+    public void resetTimer() {
+      alignmentTimer.restart();
+    }
+
+    public double getAlignmentTimer() {
+      return alignmentTimer.get();
     }
 
     public int getSubstationOffset() {
