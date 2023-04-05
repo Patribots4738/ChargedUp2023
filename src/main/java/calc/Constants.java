@@ -526,7 +526,7 @@ public final class Constants {
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
       public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Translation2d HIGH_CONE_PREP = new Translation2d(46.35, 42);
+      public static final Translation2d HIGH_CONE_PREP = new Translation2d(38.92, 39.73);
       public static final Translation2d MID_CONE_PREP = new Translation2d(24,35);
 
       public static final Translation2d[][] ARM_POSITIONS = {
