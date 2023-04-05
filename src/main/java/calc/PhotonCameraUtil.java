@@ -2,11 +2,11 @@ package calc;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import frc.robot.DriverUI;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
-
 import java.io.IOException;
 import java.util.Optional;
 import calc.Constants.VisionConstants;
@@ -75,12 +75,14 @@ public class PhotonCameraUtil {
         PhotonPipelineResult result = cam1.get().getLatestResult();
         if (result.hasTargets()) {
           cam1Ambiguity = result.getBestTarget().getPoseAmbiguity();
+          DriverUI.hasTargets = true;
         }
       }
       if (cam2.isPresent()) {
         PhotonPipelineResult result = cam2.get().getLatestResult();
         if (result.hasTargets()) {
           cam2Ambiguity = result.getBestTarget().getPoseAmbiguity();
+          DriverUI.hasTargets = true;
         }
       }
       
@@ -106,7 +108,7 @@ public class PhotonCameraUtil {
       if (cam2Pose.isPresent() && cam2Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
         return cam2Pose;
       }
-      
+      DriverUI.hasTargets = false;
       // return a null Optional<EstimatedRobotPose> if no camera can see a target
       return Optional.empty();
     }
