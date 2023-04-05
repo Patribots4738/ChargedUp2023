@@ -388,10 +388,10 @@ public class Robot extends TimedRobot {
     // These buttons are right below the Xbox logo, aimed to be a bit out of reach
     // (after all we don't want to accidentally press them)
     if (operator.getBackButtonPressed()) {
-      arm.setArmMirrored(true);
+      arm.setArmIndex(PlacementConstants.ARM_FLIP_INDEX);
     }
     else if (operator.getStartButtonPressed()) {
-      arm.setArmMirrored(false);
+      arm.setArmIndex(PlacementConstants.ARM_FLIP_INDEX);
     }
 
     // Claw speed controls
@@ -425,7 +425,7 @@ public class Robot extends TimedRobot {
 
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
           arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
-          arm.setArmIndex(PlacementConstants.HIGH_TO_STOWWED_INDEX);
+          arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
       }
       else {
           arm.setArmIndex(PlacementConstants.STOWED_INDEX);
@@ -474,8 +474,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {

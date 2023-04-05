@@ -1,7 +1,7 @@
 // Kudos to https://youtu.be/IKOGwoJ2HLk for the theory!
 package calc;
 
-import calc.Constants.*;
+import calc.Constants.ArmConstants;
 
 public class ArmCalculations {
 
@@ -14,7 +14,7 @@ public class ArmCalculations {
      *          Due to an axis controlling the range, they will not go over
      * @return the angle to set the motor to, in radians
      */
-    public double getUpperAngle(double x, double y, boolean blueArmSolution)
+    public double getUpperAngle(double x, double y)
     {
         double upperAngle =
                 (Math.acos(
@@ -23,7 +23,7 @@ public class ArmCalculations {
                                 (Math.pow(ArmConstants.UPPER_ARM_LENGTH, 2)))) / 
                         (2 * (ArmConstants.LOWER_ARM_LENGTH * ArmConstants.UPPER_ARM_LENGTH))));
 
-        return upperAngle * ((blueArmSolution) ? 1 : -1);
+        return (upperAngle * -1);
     }
 
 

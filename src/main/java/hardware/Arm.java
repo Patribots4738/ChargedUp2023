@@ -1,12 +1,15 @@
 package hardware;
 
+import calc.ArmCalculations;
+import calc.Constants.ArmConstants;
+import calc.Constants.PlacementConstants;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,10 +17,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import calc.ArmCalculations;
-import calc.Constants.ArmConstants;
-import calc.Constants.PlacementConstants;
 
+// We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
 public class Arm implements Loggable {
 
     /**
@@ -36,10 +37,6 @@ public class Arm implements Loggable {
     private boolean startedTransition = false;
 
     private boolean operatorOverride = false;
-    private boolean operatorOverrideBeforeFlip = false;
-    private boolean armMirroredBeforeFlip = false;
-    private Translation2d armBeforeFlip = PlacementConstants.STOWED_POSITION;
-    private int indexBeforeFlip = PlacementConstants.STOWED_INDEX;
 
     private double armXReference = 0;
     private double armYReference = 0;
@@ -66,11 +63,6 @@ public class Arm implements Loggable {
 
     private boolean armsAtDesiredPosition = false;
     
-    // The blue arm solution found in desmos here:
-    // https://www.desmos.com/calculator/fqyyldertp
-    private boolean blueArmSolution = false;
-    private boolean armMirrored = false;
-
     @Log
     private double armXPos = 0;
 
@@ -195,33 +187,16 @@ public class Arm implements Loggable {
       {
         armPosDimension2++;
 
-        if ((armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
-            armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) && 
-            (armPosDimension2 == PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1))
-        {
-          // Flip the arm solution and go back to where we were
-          blueArmSolution = !blueArmSolution;
-        }
-
-        // This line isn't strictly necessary, but could be included.
+        // This line isn't strictly necessary, but could be included...
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length);
         
         if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
-          if (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
-              armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE)
-          {
-            this.armMirrored = this.armMirroredBeforeFlip;
-            drive(new Translation2d((armMirrored) ? -armBeforeFlip.getX() : armBeforeFlip.getX(), armBeforeFlip.getY()));
-            // Restore the operator override
-            this.operatorOverride = this.operatorOverrideBeforeFlip;
-            // If we were using index to flip solution...
-            if (!operatorOverride) {
-              // Set the arm index to where we were before flipping
-              setArmIndex(indexBeforeFlip);
-            }
-          }
           armsAtDesiredPosition = true;
+          if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX) {
+            armPosDimension1 = PlacementConstants.STOWED_INDEX;
+            armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length-1;
+          }
           return;
         }
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
@@ -242,9 +217,10 @@ public class Arm implements Loggable {
         // If we are trying to go to a floor index, allow it to restart itself
         if ((index == armPosDimension1 || 
               (index == PlacementConstants.STOWED_INDEX && 
-              armPosDimension1 == PlacementConstants.HIGH_TO_STOWWED_INDEX)) &&
-            index != PlacementConstants.CONE_FLIP_INDEX && 
-            index != PlacementConstants.CONE_INTAKE_INDEX && 
+              (armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX ||
+              (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX && armsAtDesiredPosition)))) &&
+            index != PlacementConstants.CONE_FLIP_INDEX &&
+            index != PlacementConstants.CONE_INTAKE_INDEX &&
             index != PlacementConstants.CUBE_INTAKE_INDEX &&
             !operatorOverride) 
         {
@@ -258,16 +234,6 @@ public class Arm implements Loggable {
 
         armPosDimension2 = 0;
 
-        // If we are flipping the arm solution, save the current arm state information
-        if ((index == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE || index == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE))
-        {
-          this.armBeforeFlip = new Translation2d(armXReference, armYReference);
-          this.operatorOverrideBeforeFlip = this.operatorOverride;
-          this.indexBeforeFlip = armPosDimension1;
-          this.armMirroredBeforeFlip = armMirrored;
-          armMirrored = false;
-        }
-        
         armPosDimension1 = index;
         // Turn off operator override to prevent arm.drive from setting values wrong
         this.operatorOverride = false;
@@ -297,7 +263,7 @@ public class Arm implements Loggable {
           this.armYReference += (position.getY());
         } else {
           // If the arm is mirrored, invert all incoming X values
-          this.armXReference = position.getX() * (this.armMirrored ? -1 : 1);
+          this.armXReference = position.getX();
           this.armYReference = position.getY();
         }
 
@@ -335,29 +301,9 @@ public class Arm implements Loggable {
           armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
         }
 
-
-        // Check if the arm is in the flip zone for black (but using the blue solution)
-        // aka the positive solution
-        if (blueArmSolution) {
-          if (armPosition.getX() > ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) {
-            // Set the arm to go to the nearest flip position
-            // in this case it is positive, because armPosition.getX() > 0
-            setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE);
-            return;
-          }
-        }
-        // Or... if the arm is in the flip zone for blue (but using the black solution)
-        else if (armPosition.getX() < -ArmConstants.ARM_FLIP_X && getArmIndex() != PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE) {
-          // Set the arm to go to the nearest flip position
-          // in this case it is negative, because armPosition.getX() < ARM_FLIP_X
-          setArmIndex(PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE);
-          return;
-        }
-
-
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
-        double upperArmAngle = armCalculations.getUpperAngle(armPosition.getX(), armPosition.getY(), blueArmSolution);
+        double upperArmAngle = armCalculations.getUpperAngle(armPosition.getX(), armPosition.getY());
         double lowerArmAngle = armCalculations.getLowerAngle(armPosition.getX(), armPosition.getY(), upperArmAngle);
 
         // If upperArmAngle is NaN, then tell the arm not to change position
@@ -519,13 +465,6 @@ public class Arm implements Loggable {
               armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
               armsAtDesiredPosition;
     }
-
-    public boolean getAtFlipPosition() {
-      return (armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_POSITIVE ||
-              armPosDimension1 == PlacementConstants.SOLUTION_FLIP_INDEX_NEGATIVE) &&
-              armsAtDesiredPosition;
-    }
-
     public boolean getAtPrepIndex() {
       return (armPosDimension1 == PlacementConstants.FLOOR_INTAKE_PREP_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_INDEX ||
@@ -551,33 +490,6 @@ public class Arm implements Loggable {
 
     public boolean getOperatorOverride() {
       return this.operatorOverride;
-    }
-
-    public void setArmMirrored(boolean armMirrored) {
-      boolean changedState = (this.armMirrored != armMirrored);
-      this.armMirrored = armMirrored;
-      // Only if we are changing the state of the arm mirrored
-      // Then drive the robot to the new reference point
-      if (changedState) {
-        if (armMirrored) {
-          // Since the robot is assumed to be flipped over, 
-          // tell the arm to push out hard on the X axis
-          // Note that the arm mirroring process will first
-          // go through the mirroring indices, so we don't need to worry about
-          // the arm jolting to position.
-          this.armXReference = 40;
-          drive(new Translation2d(armXReference, armYReference));
-        }
-        else {
-          // Drive the arm to just past the flip point to trigger the motion
-          this.armXReference = (ArmConstants.ARM_FLIP_X + 0.1);
-          drive(new Translation2d(armXReference, armYReference));
-        }
-      }
-    }
-
-    public boolean getArmMirrored() {
-      return this.armMirrored;
     }
 
     /**
