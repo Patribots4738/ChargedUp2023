@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Config;
-import io.github.oblarg.oblog.annotations.Config.Configs;
 import calc.Constants;
 import calc.Constants.AlignmentConstants;
 
@@ -141,12 +139,6 @@ public class SwerveTrajectory implements Loggable {
 
       case "execute":
 
-        // If you want to see the difference in X and Y vs their desired position on a graph... uncomment below.
-        // Debug.debugPeriodic(
-        //     _pathTraj.sample(elapsedTime).poseMeters.getX() - _odometry.getX(),
-        //     _pathTraj.sample(elapsedTime).poseMeters.getY() - _odometry.getY(),
-        //     _pathTraj.sample(elapsedTime).poseMeters.getRotation().getDegrees() - _odometry.getRotation().getDegrees());
-
         // If the path has not completed time wise
         if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + 0.75))
         {
@@ -155,18 +147,9 @@ public class SwerveTrajectory implements Loggable {
           PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
           PathPlannerState mirroredState = new PathPlannerState();
 
-          // System.out.print("Desired position " + state.poseMeters.getTranslation() + "\n Swerve pose: " + swerve.getPose().getTranslation());
-
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
           if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
-
-            // state.poseMeters = new Pose2d(
-            //   (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
-            //   state.poseMeters.getTranslation().getY(),
-            //   state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
-
-            // state.holonomicRotation = state.poseMeters.getRotation().plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
 
             mirroredState.timeSeconds = state.timeSeconds;
             mirroredState.velocityMetersPerSecond = state.velocityMetersPerSecond;
@@ -180,17 +163,20 @@ public class SwerveTrajectory implements Loggable {
             mirroredState.angularVelocityRadPerSec = state.angularVelocityRadPerSec;
             mirroredState.holonomicAngularVelocityRadPerSec = state.holonomicAngularVelocityRadPerSec;
 
-            // System.out.println(" To " + mirroredState.poseMeters.getTranslation());
-
           }
+          
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
           ChassisSpeeds _speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) ? mirroredState : state,//(DriverStation.isAutonomous()) ? mirroredState : state,
-              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) ? mirroredState.holonomicRotation : state.holonomicRotation);//(DriverStation.isAutonomous()) ? (mirroredState.poseMeters.getRotation()) : state.holonomicRotation);
+              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) 
+                  ? mirroredState
+                  : state,
+              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) 
+                  ? mirroredState.holonomicRotation 
+                  : state.holonomicRotation);
 
           // Set the states for the motor using calculated values above
           // It is important to note that fieldRelative is false,
