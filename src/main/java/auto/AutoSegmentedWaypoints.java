@@ -304,6 +304,10 @@ public class AutoSegmentedWaypoints implements Loggable {
         // If we are not on the first waypoint,
         // and we are doing a pickup-to-charge path,
         // Keep the claw intaking while we go to the pad
+        // This is because under the hood in some paths, 
+        // The robot will say "A_CHARGE", 
+        // But really go from A to MOBILITY to CHARGE
+        // And for those paths we want to keep intaking
         if (currentWaypointNumber > 1) {
           if (chosenAutoPath.getName().contains("A_CHARGE") ||
               chosenAutoPath.getName().contains("B_CHARGE") ||
