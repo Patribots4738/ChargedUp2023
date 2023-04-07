@@ -12,7 +12,6 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import io.github.oblarg.oblog.Loggable;
@@ -518,21 +517,21 @@ public class Arm implements Loggable {
     // and zero it with the knowledge that it is at the hard stop
     // when the method is called
     public void zeroLowerArmEncoder() {
-
-        double unadjustedAngle = (_lowerArmEncoder.getPosition() - _lowerArmEncoder.getZeroOffset());
-        double zeroAngle = (ArmConstants.LOWER_ARM_UPPER_LIMIT) - unadjustedAngle;
-        Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
-        _lowerArmEncoder.setZeroOffset(referenceAngle.getRadians());
+      // The constant found here can be found in 
+      // REV Hardware client when the arm is pointed straight up
+      // Then, depending on if the value is more or less than PI,
+      // Add or subtract PI to the valu
+      _lowerArmEncoder.setZeroOffset(5.4613822-Math.PI);
     }
 
     // Very rough code below: this method is meant to take an encoder
     // and zero it with the knowledge that it is at the hard stop
     // when the method is called
     public void zeroUpperArmEncoder() {
-
-          double unadjustedAngle = (_upperArmEncoder.getPosition() - _upperArmEncoder.getZeroOffset());
-          double zeroAngle = (ArmConstants.UPPER_ARM_LOWER_LIMIT) - unadjustedAngle;
-          Rotation2d referenceAngle = Rotation2d.fromRadians(zeroAngle);
-          _upperArmEncoder.setZeroOffset(referenceAngle.getRadians());
+      // The constant found here can be found in 
+      // REV Hardware client when the arm is pointed straight up
+      // Then, depending on if the value is more or less than PI,
+      // Add or subtract PI to the valu
+      _upperArmEncoder.setZeroOffset(2.7524223+Math.PI);
     }
 }
