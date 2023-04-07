@@ -139,10 +139,10 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3; // 2.5 has worked very well for us so far
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.25; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;//)3; // 2.5 has worked very well for us so far
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI*4;//Math.PI/1.7;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 9;//Math.PI/1.7;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -500,7 +500,8 @@ public final class Constants {
       public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
       public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(15, 7);
-      public static final Translation2d CUBE_INTAKE_POSITION_AUTO = new Translation2d(13, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO_0 = new Translation2d(14, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO_1 = new Translation2d(11, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
@@ -520,7 +521,7 @@ public final class Constants {
       public static final Translation2d CUBE_HIGH = new Translation2d(35, 38);
       public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(35, 38);//41 on Y
       public static final Translation2d CUBE_MID = new Translation2d(20,25);
-      public static final Translation2d CUBE_MID_AUTO = new Translation2d(30, 26);
+      public static final Translation2d CUBE_MID_AUTO = new Translation2d(23, 25);
 
       public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
       public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
@@ -549,8 +550,8 @@ public final class Constants {
         {
           TRANSITION_POSITION,
           // HIGH_CONE_POSITION_0,
-          HIGH_CONE_POSITION_1
-          // HIGH_CONE_POSITION_2
+          HIGH_CONE_POSITION_1,
+          HIGH_CONE_POSITION_2
         },
         // Index 4 | Human Tag
         {
@@ -648,7 +649,8 @@ public final class Constants {
         // Index 21 | Cube Intake Auto
         {
           CONE_INTAKE_POSITION_PREP,
-          CUBE_INTAKE_POSITION_AUTO
+          CUBE_INTAKE_POSITION_AUTO_0,
+          CUBE_INTAKE_POSITION_AUTO_1
         },
         // Index 22 | Cube High Auto
         {
