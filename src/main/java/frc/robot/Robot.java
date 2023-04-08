@@ -138,6 +138,7 @@ public class Robot extends TimedRobot {
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     DriverUI.enabled = true;
+    DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
   }
 
@@ -180,6 +181,7 @@ public class Robot extends TimedRobot {
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     DriverUI.enabled = true;
+    DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
     autoAlignment.setConeOffset(0);
   }

@@ -48,6 +48,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   public boolean halfway = false;
 
   public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
+    // Good ol' references to subsystems :>
     this.swerve = swerve;
     this.arm = arm;
     this.claw = claw;
@@ -72,11 +73,8 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     PathPlannerState initialPathPose = chosenWaypoints[0].getPathPlannerSegment().getInitialState();
 
-    // Pose2d mirroredPose = new Pose2d(
-    //   (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
-    //     initialPathPose.poseMeters.getTranslation().getY(), 
-    //     initialPathPose.holonomicRotation.minus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
-    
+    // Ahh yes, the start of pain.
+    // I mean-- mirror the path if we are on the red alliance :D
     if (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous()) {
 
       initialPathPose.poseMeters = new Pose2d(
@@ -88,6 +86,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     }
 
+    // Scrumptious boolean resets
     stateHasFinished = false;
     stateHasInitialized = false;
     clawHasStarted = false;
