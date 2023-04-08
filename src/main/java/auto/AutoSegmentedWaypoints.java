@@ -48,6 +48,7 @@ public class AutoSegmentedWaypoints implements Loggable {
   public boolean halfway = false;
 
   public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
+    // Good ol' references to subsystems :>
     this.swerve = swerve;
     this.arm = arm;
     this.claw = claw;
@@ -72,11 +73,8 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     PathPlannerState initialPathPose = chosenWaypoints[0].getPathPlannerSegment().getInitialState();
 
-    // Pose2d mirroredPose = new Pose2d(
-    //   (((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? AlignmentConstants.FIELD_WIDTH_METERS : 0) + (initialPathPose.poseMeters.getTranslation().getX() * ((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? -1 : 1))), 
-    //     initialPathPose.poseMeters.getTranslation().getY(), 
-    //     initialPathPose.holonomicRotation.minus(Rotation2d.fromRadians((DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Math.PI : 0)));
-    
+    // Ahh yes, the start of pain.
+    // I mean-- mirror the path if we are on the red alliance :D
     if (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous()) {
 
       initialPathPose.poseMeters = new Pose2d(
@@ -88,6 +86,7 @@ public class AutoSegmentedWaypoints implements Loggable {
 
     }
 
+    // Scrumptious boolean resets
     stateHasFinished = false;
     stateHasInitialized = false;
     clawHasStarted = false;
@@ -136,8 +135,8 @@ public class AutoSegmentedWaypoints implements Loggable {
       
       // This is where the arm will "prep" to go to placement locations
       // Very useful for saving time
-      if ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
-          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90) && halfway && 
+      if (((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 150) || 
+          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90)) && halfway && 
           /*
            * Get if we are on a pickup -> charge path, 
            * and if we are on the last waypoint, 
@@ -162,7 +161,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             arm.setArmIndex(PlacementConstants.CONE_MID_PREP_INDEX);
             break;
           // If the next waypoint is nothing that requires a prep, just go to the position
-          default: 
+          default:
             arm.setArmIndex(armIndex);
             break;
         }
@@ -250,7 +249,9 @@ public class AutoSegmentedWaypoints implements Loggable {
       SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
     }
 
-    // If auto is about to start, tell the arm to go near the bumper to intake the game peice 
+    // During the path, loop through our periodic loop
+    // notice the "this." 
+    // it makes sure we don't call Arm.java's "setArmIndex()"
     if (!stateHasFinished) {
       this.setArmIndex(thisWaypointSet[currentWaypointNumber].getArmPosIndex(), thisWaypointSet[currentWaypointNumber].getClawDirection());
     }
@@ -323,7 +324,7 @@ public class AutoSegmentedWaypoints implements Loggable {
             clawHasStarted = true;
           } else {
             // Only set halfway to true if...
-            // we are doing a modular auto path,
+            // we are doing legacy auto path,
             // Else, reset it to continue the prep on the arm.
             // We can check this by seeing if the path name has "_" on the end.
             halfway = !(chosenAutoPath.getName().endsWith("_"));

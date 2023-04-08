@@ -378,7 +378,7 @@ public final class Constants {
 
       public static final String CAMERA_1_NAME = "FrontCam";
       public static final String CAMERA_2_NAME = "BackCam";
-      public static final double AMBIGUITY_THRESHOLD = 0.06;
+      public static final double AMBIGUITY_THRESHOLD = 0.04;
       // The latency of the camera, in seconds
       // divide by 1000 since it is in milliseconds.
       public static final double LATENCY = 13.0/1000.0;
@@ -501,7 +501,7 @@ public final class Constants {
       public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
       public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(15, 7);
       public static final Translation2d CUBE_INTAKE_POSITION_AUTO_0 = new Translation2d(14, 8);
-      public static final Translation2d CUBE_INTAKE_POSITION_AUTO_1 = new Translation2d(11, 8);
+      public static final Translation2d CUBE_INTAKE_POSITION_AUTO_1 = new Translation2d(10, 8);
       public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
 
       public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
@@ -519,7 +519,7 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 26);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 32);
       public static final Translation2d CUBE_HIGH = new Translation2d(35, 38);
-      public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(35, 38);//41 on Y
+      public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(40, 35);//41 on Y
       public static final Translation2d CUBE_MID = new Translation2d(20,25);
       public static final Translation2d CUBE_MID_AUTO = new Translation2d(23, 25);
 

@@ -187,7 +187,8 @@ public class AutoPathStorage implements Loggable {
   public static PathPlannerTrajectory _8_D;
   public static PathPlannerTrajectory _9_C;
   public static PathPlannerTrajectory _9_D;
-  public static PathPlannerTrajectory _9_D_8;
+  public static PathPlannerTrajectory _9_D_8_RED;
+  public static PathPlannerTrajectory _9_D_8_BLUE;
   public static PathPlannerTrajectory _8_C_8_RED;
   public static PathPlannerTrajectory _8_C_8_BLUE;
   public static PathPlannerTrajectory _8_C_CH_RED;
@@ -265,7 +266,8 @@ public class AutoPathStorage implements Loggable {
     _M_CH = PathPlanner.loadPath("_M_CH", 3, 0.75);
 
     _9_D_REACH = PathPlanner.loadPath("_9_D_REACH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _9_D_8 = PathPlanner.loadPath("9_D_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _9_D_8_RED = PathPlanner.loadPath("9_D_8_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _9_D_8_BLUE = PathPlanner.loadPath("9_D_8_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _8_C_8_RED = PathPlanner.loadPath("8_C_8_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _8_C_CH_RED = PathPlanner.loadPath("8_C_CH_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
@@ -351,8 +353,8 @@ public class AutoPathStorage implements Loggable {
     _9 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_9_D_8.getInitialState().poseMeters.getTranslation(), _9_D_8.getInitialState().poseMeters.getRotation(), _9_D_8.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_9_D_8.getInitialState().poseMeters.getTranslation(), _9_D_8.getInitialState().poseMeters.getRotation(), _9_D_8.getInitialHolonomicPose().getRotation())
+        new PathPoint(_9_D_8_RED.getInitialState().poseMeters.getTranslation(), _9_D_8_RED.getInitialState().poseMeters.getRotation(), _9_D_8_RED.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_9_D_8_RED.getInitialState().poseMeters.getTranslation(), _9_D_8_RED.getInitialState().poseMeters.getRotation(), _9_D_8_RED.getInitialHolonomicPose().getRotation())
     );
 
 
@@ -725,42 +727,42 @@ public class AutoPathStorage implements Loggable {
 
     _9H_D_8H_CHARGE = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
     };
 
     _9H_D_8H = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
     };
 
     _9H_D_8H_C = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_C, PlacementConstants.CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
     _9H_D_8H_C_8M_RED = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_C_8_RED, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
     };
 
     _9H_D_8H_C_CHARGE_RED = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_C_CH_RED, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
     _9H_D_8H_C_8M_BLUE = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8_BLUE, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_C_8_BLUE, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
     };
 
     _9H_D_8H_C_CHARGE_BLUE = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_9_D_8_BLUE, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_C_CH_BLUE, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
@@ -773,12 +775,12 @@ public class AutoPathStorage implements Loggable {
       // More commonly used paths first:
       //3P 3P 3P 3P
       new AutoPose("9H_D_8H_C_8M_RED_", _9H_D_8H_C_8M_RED),
-      new AutoPose("9H_D_8H_C_CHARGE_RED_", _9H_D_8H_C_CHARGE_RED),
-
       new AutoPose("9H_D_8H_C_8M_BLUE_", _9H_D_8H_C_8M_BLUE),
-      new AutoPose("9H_D_8H_C_CHARGE_BLUE_", _9H_D_8H_C_CHARGE_BLUE),
       new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
-
+      
+      new AutoPose("9H_D_8H_C_CHARGE_RED_", _9H_D_8H_C_CHARGE_RED),
+      new AutoPose("9H_D_8H_C_CHARGE_BLUE_", _9H_D_8H_C_CHARGE_BLUE),
+      
       // AutoPoses for the bottom of the field:
       new AutoPose("1H_A_2H_CHARGE", _1H_A_2H_CHARGE),
       new AutoPose("1H_A_2H", _1H_A_2H),
@@ -867,8 +869,8 @@ public class AutoPathStorage implements Loggable {
       DriverUI.autoChooser.addOption(AutoPose.getName(), AutoPose);
 
       // Every third index, add a spacer option for simplicity
-      if (((i + 1) % 3 == 0) && (i != myAutoContainer.length - 1)) {
-        DriverUI.autoChooser.addOption(" " + " ".repeat(i), AutoPose);
+      if (((i > 0) && (i < 3)) || ((i + 2) % 3 == 0) && (i != myAutoContainer.length - 1)) {
+        DriverUI.autoChooser.addOption(" ".repeat(i), AutoPose);
       }
     }
   }

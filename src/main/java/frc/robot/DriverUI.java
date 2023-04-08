@@ -34,9 +34,12 @@ public class DriverUI implements Loggable {
     @Log.Field2d(name = "Field", rowIndex = 1, columnIndex = 0, height = 5, width = 10)
     public static Field2d field = new Field2d();
 
-    @BooleanBox(name = "Cone Mode", rowIndex = 1, columnIndex = 10, height = 4, width = 3, 
+    @BooleanBox(name = "Cone Mode", rowIndex = 1, columnIndex = 10, height = 3, width = 3, 
                 colorWhenTrue = "yellow", colorWhenFalse = "purple")
     public static boolean coneMode = false;
+
+    @BooleanBox(name = "Fresh Code", rowIndex = 4, columnIndex = 10, height = 2, width = 3, colorWhenTrue = "lime")
+    public static boolean freshCode = true;
 
     public DriverUI() {}
 }

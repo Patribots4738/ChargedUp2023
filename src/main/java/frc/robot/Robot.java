@@ -138,6 +138,7 @@ public class Robot extends TimedRobot {
     arm.setBrakeMode();
     autoSegmentedWaypoints.init();
     DriverUI.enabled = true;
+    DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
   }
 
@@ -166,7 +167,7 @@ public class Robot extends TimedRobot {
     }
     autoSegmentedWaypoints.periodic();
     if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
-        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5) 
+        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5 || autoSegmentedWaypoints.halfway) 
     {
       autoAlignment.calibrateOdometry();
     }
@@ -180,6 +181,7 @@ public class Robot extends TimedRobot {
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     DriverUI.enabled = true;
+    DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
     autoAlignment.setConeOffset(0);
   }
