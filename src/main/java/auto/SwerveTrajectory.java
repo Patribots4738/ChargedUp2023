@@ -126,7 +126,7 @@ public class SwerveTrajectory implements Loggable {
    * @param _pathTraj run Pathplanner.loadpath("name of file without an extension") pass it here
    * @param swerve the current instance of swerve
    */
-  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve) {
+  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, boolean longWait) {
 
     elapsedTime = Timer.getFPGATimestamp() - timeTrajectoryStarted;
 
@@ -140,7 +140,7 @@ public class SwerveTrajectory implements Loggable {
       case "execute":
 
         // If the path has not completed time wise
-        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + (DriverStation.getAlliance() == DriverStation.Alliance.Red ? 1 : 0.6)))
+        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + (DriverStation.getAlliance() == DriverStation.Alliance.Red || longWait ? 1 : 0.6)))
         {
           // System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 

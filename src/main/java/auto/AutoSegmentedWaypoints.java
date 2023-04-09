@@ -246,7 +246,7 @@ public class AutoSegmentedWaypoints implements Loggable {
     // Only run the path if the robot isn't trying to align
     // This will give priority to the alignment
     if (!startedChargePad) {
-      SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve);
+      SwerveTrajectory.PathPlannerRunner(thisWaypointSet[currentWaypointNumber].getPathPlannerSegment(), swerve, chosenAutoPath.getName().contains("1H_A_2H"));
     }
 
     // During the path, loop through our periodic loop
