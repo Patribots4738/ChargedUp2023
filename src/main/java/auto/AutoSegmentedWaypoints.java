@@ -135,7 +135,7 @@ public class AutoSegmentedWaypoints implements Loggable {
       
       // This is where the arm will "prep" to go to placement locations
       // Very useful for saving time
-      if (((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 150) || 
+      if (((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
           (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90)) && halfway && 
           /*
            * Get if we are on a pickup -> charge path, 
@@ -368,7 +368,10 @@ public class AutoSegmentedWaypoints implements Loggable {
                   chosenAutoPath.getName().contains("C_CHARGE") ||
                   chosenAutoPath.getName().contains("D_CHARGE")))) 
         {
-          claw.stopClaw();
+          // Me when the biggest if statement,
+          // in all of code,
+          // has a singular commented out line
+          // claw.stopClaw();
         }
       }
       }
