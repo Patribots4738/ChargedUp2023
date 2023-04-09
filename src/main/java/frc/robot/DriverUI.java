@@ -15,9 +15,8 @@ public class DriverUI implements Loggable {
 
     @Log(name="Select Auto:", rowIndex = 0, columnIndex = 4, height = 1, width = 2)
     public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
-    
-    @Log(name="Yaw", rowIndex = 0, columnIndex = 10, height = 1, width = 1)
-    public static double yaw = 0;
+    @BooleanBox(name = "Fresh Code", rowIndex = 0, columnIndex = 10, height = 1, width = 1, colorWhenTrue = "lime")
+    public static boolean freshCode = true;
 
     @BooleanBox(name = "FMS?", rowIndex = 0, columnIndex = 11, height = 1, width = 1, colorWhenTrue = "lime")
     public static boolean connected = false;
@@ -31,15 +30,12 @@ public class DriverUI implements Loggable {
     @BooleanBox(name = "Target Found", rowIndex = 0, columnIndex = 0, height = 1, width = 4, colorWhenTrue = "lime")
     public static boolean hasTargets = false;
 
-    @Log.Field2d(name = "Field", rowIndex = 1, columnIndex = 0, height = 5, width = 10)
+    @Log.Field2d(name = "Field", rowIndex = 1, columnIndex = 0, height = 4, width = 10)
     public static Field2d field = new Field2d();
 
-    @BooleanBox(name = "Cone Mode", rowIndex = 1, columnIndex = 10, height = 4, width = 3, 
+    @BooleanBox(name = "Cone Mode", rowIndex = 1, columnIndex = 10, height = 5, width = 3, 
                 colorWhenTrue = "yellow", colorWhenFalse = "purple")
     public static boolean coneMode = false;
-
-    @BooleanBox(name = "Fresh Code", rowIndex = 5, columnIndex = 10, height = 1, width = 3, colorWhenTrue = "lime")
-    public static boolean freshCode = true;
 
     public DriverUI() {}
 }

@@ -167,7 +167,7 @@ public class Robot extends TimedRobot {
     }
     autoSegmentedWaypoints.periodic();
     if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
-        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5) 
+        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5 || autoSegmentedWaypoints.halfway) 
     {
       autoAlignment.calibrateOdometry();
     }

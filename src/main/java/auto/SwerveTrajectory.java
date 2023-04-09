@@ -140,7 +140,7 @@ public class SwerveTrajectory implements Loggable {
       case "execute":
 
         // If the path has not completed time wise
-        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + 0.75))
+        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + (DriverStation.getAlliance() == DriverStation.Alliance.Red ? 1 : 0.6)))
         {
           // System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
 
