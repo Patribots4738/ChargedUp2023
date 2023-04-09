@@ -196,11 +196,11 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    // if (timer.get() > 134.9) {
-    //   swerve.setWheelsUp();
-    //   claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
-    //   return;
-    // }
+    if (timer.get() > 134.9) {
+      swerve.setWheelsUp();
+      claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
+      return;
+    }
 
     // Find the max angular velocity of the drivetrain using the arm location
     DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = armCalculations.lerp(
@@ -479,11 +479,7 @@ public class Robot extends TimedRobot {
     }
 
     //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
-    if (claw.getSuperIntake()) {
-      driver.setRumble(RumbleType.kLeftRumble, 0.5);
-      operator.setRumble(RumbleType.kLeftRumble, 0.5);
-    }
-    else if (claw.getOutputCurrent() > 25) {
+    if (claw.getOutputCurrent() > 25) {
       driver.setRumble(RumbleType.kBothRumble, 0.25);
       operator.setRumble(RumbleType.kBothRumble, 0.25);
     }

@@ -16,15 +16,12 @@ public class Claw {
     private final RelativeEncoder _clawEncoder;
     private double desiredSpeed = 0;
     private boolean intakeMode = false;
-    private boolean superIntake = false;
 
     // Timer values to have the claw auto outtake for X seconds
     private boolean startedOuttakingBool = false;
     private boolean finishedOuttaking = false;
-    private boolean hasGameElement = false;
     private double outtakeSeconds = 0;
     private double startedOuttakingTimestamp = 0;
-    private double startedIntakingTimestamp = 0;
 
     public Claw() {
 
@@ -46,19 +43,6 @@ public class Claw {
     }
 
     public void periodic() {
-
-        if (getOutputCurrent() > 20 && !hasGameElement && AutoAlignment.coneMode) {
-            startedIntakingTimestamp = Timer.getFPGATimestamp();
-            hasGameElement = true;
-            _claw.setSmartCurrentLimit(40);
-            this.superIntake = true;
-        }
-
-        if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
-            if (getOutputCurrent() < 10) { hasGameElement = false; }
-            _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-            this.superIntake = false;
-        }
 
         if (DriverStation.isTeleop()) {
 
@@ -138,9 +122,5 @@ public class Claw {
 
     public double getOutputCurrent() {
         return _claw.getOutputCurrent();
-    }
-
-    public boolean getSuperIntake() {
-        return this.superIntake;
     }
 }
