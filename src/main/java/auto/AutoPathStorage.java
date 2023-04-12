@@ -37,7 +37,8 @@ public class AutoPathStorage implements Loggable {
 
   // Paths for the bottom of the field:
   // Start at grid index 1, place high, then go to field element A, intake, then go to grid index 2, and place high
-  public static Waypoint[] _1H_A_2H_CHARGE;
+  public static Waypoint[] _1H_A_2H_CHARGE_BLUE;
+  public static Waypoint[] _1H_A_2H_CHARGE_RED;
   public static Waypoint[] _1H_A_2H;
   public static Waypoint[] _1H_A_2H_B;
 
@@ -100,7 +101,8 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _9H_D_7H_C;
 
   // Start at grid index 9, place high, then go to field element D, intake, then go to grid index 8, and place high
-  public static Waypoint[] _9H_D_8H_CHARGE;
+  public static Waypoint[] _9H_D_8H_CHARGE_BLUE;
+  public static Waypoint[] _9H_D_8H_CHARGE_RED;
   public static Waypoint[] _9H_D_8H;
   public static Waypoint[] _9H_D_8H_C;
 
@@ -415,10 +417,15 @@ public class AutoPathStorage implements Loggable {
     };
 
     // WPs for the bottom of the field:
-    _1H_A_2H_CHARGE = new Waypoint[] {
+    _1H_A_2H_CHARGE_RED = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_1_A, PlacementConstants.CONE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        new Waypoint(_A_2, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
+        new Waypoint(_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
+        new Waypoint(_2_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
+    _1H_A_2H_CHARGE_BLUE = new Waypoint[] {
+        new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
+        new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
         new Waypoint(_2_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
@@ -748,7 +755,13 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_7_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
-    _9H_D_8H_CHARGE = new Waypoint[] {
+    _9H_D_8H_CHARGE_BLUE = new Waypoint[] {
+        new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
+        new Waypoint(_9_D_8_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
+    };
+
+    _9H_D_8H_CHARGE_RED = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_9_D_8_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
@@ -836,7 +849,8 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("1H_A_2H_B_CHARGE_RED_", _1H_A_2H_B_CHARGE_RED),
       
       // AutoPoses for the bottom of the field:
-      new AutoPose("1H_A_2H_CHARGE", _1H_A_2H_CHARGE),
+      new AutoPose("1H_A_2H_CHARGE_RED_", _1H_A_2H_CHARGE_RED),
+      new AutoPose("1H_A_2H_CHARGE_BLUE_", _1H_A_2H_CHARGE_BLUE),
       new AutoPose("1H_A_2H", _1H_A_2H),
       new AutoPose("1H_A_2H_B", _1H_A_2H_B),
 
@@ -905,7 +919,8 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("8H_D_CHARGE", _8H_D_CHARGE),
       new AutoPose("9H_D_CHARGE", _9H_D_CHARGE),
 
-      new AutoPose("9H_D_8H_CHARGE_", _9H_D_8H_CHARGE),
+      new AutoPose("9H_D_8H_CHARGE_BLUE_", _9H_D_8H_CHARGE_BLUE),
+      new AutoPose("9H_D_8H_CHARGE_RED_", _9H_D_8H_CHARGE_RED),
       new AutoPose("9H_D_8H_", _9H_D_8H),
       new AutoPose("9H_D_8H_C_", _9H_D_8H_C),
 
