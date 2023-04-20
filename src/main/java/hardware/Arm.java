@@ -139,6 +139,9 @@ public class Arm implements Loggable {
       _lowerArmLeft.follow(_lowerArmRight, true);
       _upperArmEncoder.setInverted(true);
 
+      // zeroUpperArmEncoder();
+      // zeroLowerArmEncoder();
+
       _lowerArmRight.burnFlash();
       _lowerArmLeft.burnFlash();
       _upperArm.burnFlash();
@@ -521,7 +524,7 @@ public class Arm implements Loggable {
       // REV Hardware client when the arm is pointed straight up
       // Then, depending on if the value is more or less than PI,
       // Add or subtract PI to the valu
-      _lowerArmEncoder.setZeroOffset(5.4613822-Math.PI);
+      _lowerArmEncoder.setZeroOffset(5.4559006-Math.PI);
     }
 
     // Very rough code below: this method is meant to take an encoder
@@ -532,6 +535,6 @@ public class Arm implements Loggable {
       // REV Hardware client when the arm is pointed straight up
       // Then, depending on if the value is more or less than PI,
       // Add or subtract PI to the valu
-      _upperArmEncoder.setZeroOffset(2.7524223+Math.PI);
+      _upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
     }
 }

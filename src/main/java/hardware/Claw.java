@@ -50,7 +50,7 @@ public class Claw {
                 finishedOuttaking = true;
             }
             if (!AutoAlignment.coneMode) {
-                desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.8);
+              desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.8);
             }
             else if (desiredSpeed > 0.7) {
                 desiredSpeed = 1;
@@ -122,5 +122,14 @@ public class Claw {
 
     public double getOutputCurrent() {
         return _claw.getOutputCurrent();
+    }
+
+    public void setSuperIntake(boolean superIntake) {
+      if (superIntake) {
+        _claw.setSmartCurrentLimit(30);
+      } 
+      else {
+        _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
+      }
     }
 }

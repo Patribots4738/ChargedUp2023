@@ -529,6 +529,7 @@ public final class Constants {
 
       public static final Translation2d HIGH_CONE_PREP = new Translation2d(38.92, 39.73);
       public static final Translation2d MID_CONE_PREP = new Translation2d(24,35);
+      public static final Translation2d HIGH_RETRACT = new Translation2d(26.35, 33);
 
       public static final Translation2d[][] ARM_POSITIONS = {
         // Index 0 | Stowed
@@ -592,7 +593,7 @@ public final class Constants {
         },
         // Index 10 | High To Stowed
         {
-          HIGH_CONE_PREP,
+          HIGH_RETRACT,
           TRANSITION_POSITION,
           STOWED_POSITION
         },
@@ -615,6 +616,7 @@ public final class Constants {
         // Index 14 | High Cone Prep to Place
         {
           HIGH_CONE_PREP,
+          HIGH_CONE_POSITION_1,
           HIGH_CONE_POSITION_2
         },
         // Index 15 | Cone Intake

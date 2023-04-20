@@ -152,7 +152,11 @@ public class Robot extends TimedRobot {
     // This is to prevent any charge pad sliding
     if (timer.get() < 0.35) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+      claw.setSuperIntake(true);
       return;
+    }
+    else if (timer.get() < 1) {
+      claw.setSuperIntake(false);
     }
     if (timer.get() > 14.65) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
