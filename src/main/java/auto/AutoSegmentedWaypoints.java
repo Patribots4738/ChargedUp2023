@@ -14,10 +14,8 @@ import frc.robot.DriverUI;
 import hardware.Arm;
 import hardware.Claw;
 import hardware.Swerve;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
-public class AutoSegmentedWaypoints implements Loggable {
+public class AutoSegmentedWaypoints {
 
   Swerve swerve;
   Arm arm;
@@ -27,23 +25,15 @@ public class AutoSegmentedWaypoints implements Loggable {
   public Waypoint[] chosenWaypoints;
   public AutoPose chosenAutoPath;
 
-  @Log
   public int currentWaypointNumber = 0;
 
-  @Log
   public double autoDelay;
 
-  @Log
   public boolean stateHasFinished = false;
-  @Log
   public boolean stateHasInitialized = false;
-  @Log
   public boolean clawHasStarted = false;
-  @Log
   public boolean hasMovedArm = false;
-  @Log
   public boolean startedChargePad = false;
-  @Log
   public boolean armInit = false;
   public boolean halfway = false;
 

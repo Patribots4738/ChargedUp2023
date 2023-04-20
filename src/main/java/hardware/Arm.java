@@ -14,11 +14,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
-public class Arm implements Loggable {
+public class Arm {
 
     /**
      * What the arm positions look like and the index in the array
@@ -41,31 +39,23 @@ public class Arm implements Loggable {
     private double armYReference = 0;
 
     // The current rotation of the upper arm
-    @Log
     private double upperRotation = 0;
 
     // The current rotation of the lower arm
-    @Log
     private double lowerRotation = 0;
 
     // The DESIRED rotation of the upper and lower arm(s)
-    @Log
     private double upperReferenceAngle = 0;
-    @Log
     private double lowerReferenceAngle = 0;
 
-    @Log
     private double lowerDiff = 0;
 
-    @Log
     private double upperDiff = 0;
 
     private boolean armsAtDesiredPosition = false;
     
-    @Log
     private double armXPos = 0;
 
-    @Log
     private double armYPos = 0;
 
     private final CANSparkMax _lowerArmRight;

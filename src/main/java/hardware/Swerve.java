@@ -21,20 +21,16 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.DriverUI;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
-public class Swerve implements Loggable {
+public class Swerve {
 
     public double yaw = 0;
 
-    @Log
     public double pitch = 0;
 
-    @Log
     public double roll = 0;
 
     private double speedMultiplier = 1;
