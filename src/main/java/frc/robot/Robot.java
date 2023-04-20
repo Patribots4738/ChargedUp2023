@@ -146,18 +146,17 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     swerve.periodic();
     claw.periodic();
-    arm.periodic();
     // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() < 0.35) {
+    if (timer.get() < 0.15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
-      claw.setSuperIntake(true);
       return;
     }
-    else if (timer.get() < 1) {
-      claw.setSuperIntake(false);
+    else { 
+      arm.periodic();
     }
+
     if (timer.get() > 14.65) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
     }
