@@ -124,12 +124,4 @@ public class Claw {
         return _claw.getOutputCurrent();
     }
 
-    public void setSuperIntake(boolean superIntake) {
-      if (superIntake) {
-        _claw.setSmartCurrentLimit(30);
-      } 
-      else {
-        _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-      }
-    }
 }
