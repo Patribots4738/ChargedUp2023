@@ -513,7 +513,7 @@ public class Arm {
       // The constant found here can be found in 
       // REV Hardware client when the arm is pointed straight up
       // Then, depending on if the value is more or less than PI,
-      // Add or subtract PI to the valu
+      // Add or subtract PI to the value
       _lowerArmEncoder.setZeroOffset(5.4559006-Math.PI);
     }
 
@@ -524,7 +524,7 @@ public class Arm {
       // The constant found here can be found in 
       // REV Hardware client when the arm is pointed straight up
       // Then, depending on if the value is more or less than PI,
-      // Add or subtract PI to the valu
+      // Add or subtract PI to the value
       _upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
     }
 }

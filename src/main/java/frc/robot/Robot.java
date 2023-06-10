@@ -132,43 +132,61 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    // Restart the timer to use at the end of auto
     timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
     autoAlignment.setConeMode(true);
     arm.setBrakeMode();
+    // initialize variables for auto
     autoSegmentedWaypoints.init();
     DriverUI.enabled = true;
+    // We had a issue where we needed to redeploy before restarting auto
+    // So this gives us an indicator to know if we have enabled yet
+    // (i lost my mind not knowing if i redeployed or not) - alexander hamilton
     DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
   }
 
   @Override
   public void autonomousPeriodic() {
+    // Update odometry to know where we are on the field
+    // and update our "position"
     swerve.periodic();
     claw.periodic();
-    // System.out.printf("Time Left %.1f\n", Timer.getMatchTime());
-    // If we are in the last 100 ms of the match, set the wheels up
-    // This is to prevent any charge pad sliding
+    // System.out.printf("Time Left %.1f\n s", Timer.getMatchTime());
+    // Force the claw to spit at the start of the match, for preload
     if (timer.get() < 0.15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
-    else { 
+    // If we are in the normal duration of auto, 
+    // let the arm move as normal
+    else {
       arm.periodic();
     }
 
+    // Have the claw outtake at the end of the match,
+    // This is for a last second score
     if (timer.get() > 14.65) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
     }
+    // If we are in the last 100 ms of the match, set the wheels up
+    // This is to prevent any charge pad sliding
     if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CHARGE")) {
       swerve.setWheelsUp();
       return;
     }
+    // Auto is over, stop the claw
+    // If we enabled in autonomous, this will stop stuff 
+    // to give you an indicator of timing
     if (timer.get() > 15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
+    // Keep the autonomous states updated
     autoSegmentedWaypoints.periodic();
+    // If we are close to the grid, allow the camera to modify odometry
+    // This is because the camera was getting inacurate at longer distances
     if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
         DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5 || autoSegmentedWaypoints.halfway) 
     {
@@ -178,6 +196,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // Reset the timer for teleopinit 
     timer.restart();
     autoAlignment.setConeMode(true);
     arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
@@ -247,10 +266,15 @@ public class Robot extends TimedRobot {
     else if (driver.getAButton()) {
 
       if (driver.getAButtonPressed()) {
-
+        // Slow the drive down for consistency
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
+        // This resets the "momentum" of the path
         SwerveTrajectory.resetTrajectoryStatus();
+        // This resets the "rotational momentum" of the integerals
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        // Reset the autoAlignment timer
+        // This is so that the robot can change its "closest" node 
+        // in the first second of aligning
         autoAlignment.resetTimer();
         
       }
@@ -283,6 +307,7 @@ public class Robot extends TimedRobot {
     } else {
       // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
       if (driver.getRightStickButton()) {
+        // Reset the integrals at the start of clicking the auto-rotation button
         if (driver.getRightStickButtonPressed()) {
           SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
         }
@@ -413,15 +438,16 @@ public class Robot extends TimedRobot {
       arm.setArmIndex(PlacementConstants.ARM_FLIP_INDEX);
     }
 
-    // Claw speed controls
-      // If the left bumper is pressed, e-stop the claw
-      // If the right bumper is held, or if teleop just started,
-      // outtake an object when the arm is at placement position
-      // If the left trigger is held, intake an object
-        // Keep the fastest intake speed until the claw is e-stopped/reversed
-        // This is to allow the trigger to be fully pressed intake an object,
-      // and then let go to keep the claw at the same speed
-      // If the right trigger is held, manually outtake an object (try to use the right bumper instead)
+    /* Claw speed controls:
+     *   If the left bumper is pressed, e-stop the claw
+     *   If the right bumper is held, or if teleop just started,
+     *   outtake an object when the arm is at placement position
+     *   If the left trigger is held, intake an object:
+     *     Keep the fastest intake speed until the claw is e-stopped/reversed
+     *     This is to allow the trigger to be fully pressed intake an object,
+     *   and then let go to keep the claw at the same speed
+     *   If the right trigger is held, manually outtake an object (try to use the right bumper instead)
+     */
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
@@ -443,48 +469,68 @@ public class Robot extends TimedRobot {
     } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
-          arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
-          arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+            arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
+      
+        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+
       }
       else {
-          arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
       }
 
       claw.setStartedOuttakingBool(false);
       claw.setFinishedOuttaking(false);
+
       claw.stopClaw();
 
     }
 
+    // Blink the lights red if we are flipped over
+    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
+
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
+    
+    }
     // Controller rumble settings:
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
-      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
-    }
     else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
+    
       driver.setRumble(RumbleType.kBothRumble, 1);
       operator.setRumble(RumbleType.kBothRumble, 1);
+
       arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
+
       DriverUI.aligned = true;
+    
     }
     else {
+    
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
+      
         arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
+
         DriverUI.aligned = false;
+    
       }
       else {
+    
         arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+      
       }
+    
       driver.setRumble(RumbleType.kBothRumble, 0);
       operator.setRumble(RumbleType.kBothRumble, 0);
+    
     }
 
     //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
     if (claw.getOutputCurrent() > 25) {
+    
       driver.setRumble(RumbleType.kBothRumble, 0.25);
       operator.setRumble(RumbleType.kBothRumble, 0.25);
+    
     }
   }
 

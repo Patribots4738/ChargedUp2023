@@ -46,12 +46,15 @@ public class Claw {
 
         if (DriverStation.isTeleop()) {
 
+            // This is for automatically outtaking the game piece
             if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
                 finishedOuttaking = true;
             }
+            // Slow down claw for cube mode
             if (!AutoAlignment.coneMode) {
               desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.8);
             }
+            // Speed up claw for cone mode
             else if (desiredSpeed > 0.7) {
                 desiredSpeed = 1;
             }
