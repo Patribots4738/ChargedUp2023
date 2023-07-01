@@ -259,7 +259,7 @@ public class Swerve {
 
     public void resetOdometry(Pose2d pose) {
         poseEstimator.resetPosition(
-                getYaw(),
+                getGyroAngle(),
                 getModulePositions(),
                 pose);
     }
