@@ -267,7 +267,7 @@ public final class Constants {
       public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
       public static final double UPPER_MAX_OUTPUT = 0.85;
-      public static final double UPPER_MIN_OUTPUT = -UPPER_MAX_OUTPUT;
+      public static final double UPPER_MIN_OUTPUT = -0.4;
 
       /**
        * SysID values:
@@ -508,6 +508,7 @@ public final class Constants {
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
       
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
+      public static final Translation2d STOWED_HALFWAY = new Translation2d(9.4, 20.8);
       public static final Translation2d STOWED_POSITION = new Translation2d(3.5, 14);
       public static final Translation2d AUTO_INIT_PICKUP = new Translation2d(12.43, 8);
 
@@ -535,6 +536,7 @@ public final class Constants {
         // Index 0 | Stowed
         {
           TRANSITION_POSITION,
+        //   STOWED_HALFWAY,
           STOWED_POSITION
         },
         // Index 1 | Hybrid
