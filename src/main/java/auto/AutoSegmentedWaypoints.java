@@ -47,12 +47,16 @@ public class AutoSegmentedWaypoints {
 
   public void init() {
 
+    boolean mirrored = false;
+
     if (DriverUI.autoChooser.getSelected() == null) {
 
       chosenAutoPath = AutoPathStorage.myAutoContainer[0];
 
     } else {
-
+    
+      // If we have already ran an auto path, 
+      // but without redeploying we changed the path...
       chosenAutoPath = DriverUI.autoChooser.getSelected();
 
     }
@@ -62,17 +66,26 @@ public class AutoSegmentedWaypoints {
     currentWaypointNumber = 0;
 
     PathPlannerState initialPathPose = chosenWaypoints[0].getPathPlannerSegment().getInitialState();
+    // Make a new initial pose, and set it to a different reference value
+    PathPlannerState mirroredInitialPathPose = new PathPlannerState();
 
-    // Ahh yes, the start of pain.
-    // I mean-- mirror the path if we are on the red alliance :D
-    if (DriverStation.getAlliance() == DriverStation.Alliance.Red && DriverStation.isAutonomous()) {
+    // Create a new pathplannerstate based on the mirrored state's position
+    // and taking the mirrored state's rotation and adding 180 degrees
+    if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
 
-      initialPathPose.poseMeters = new Pose2d(
-        (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()), 
-        initialPathPose.poseMeters.getTranslation().getY(), 
-        initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
+        mirrored = true;
 
-      initialPathPose.holonomicRotation = initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+        mirroredInitialPathPose.timeSeconds = initialPathPose.timeSeconds;
+        mirroredInitialPathPose.velocityMetersPerSecond = initialPathPose.velocityMetersPerSecond;
+        mirroredInitialPathPose.accelerationMetersPerSecondSq = initialPathPose.accelerationMetersPerSecondSq;
+        mirroredInitialPathPose.poseMeters = new Pose2d(
+            (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()),
+            initialPathPose.poseMeters.getTranslation().getY(),
+            initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
+        mirroredInitialPathPose.curvatureRadPerMeter = initialPathPose.curvatureRadPerMeter;
+        mirroredInitialPathPose.holonomicRotation = initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+        mirroredInitialPathPose.angularVelocityRadPerSec = initialPathPose.angularVelocityRadPerSec;
+        mirroredInitialPathPose.holonomicAngularVelocityRadPerSec = initialPathPose.holonomicAngularVelocityRadPerSec;
 
     }
 
@@ -85,7 +98,10 @@ public class AutoSegmentedWaypoints {
     armInit = false;
     halfway = false;
 
-    swerve.resetOdometry(new Pose2d(initialPathPose.poseMeters.getTranslation(), initialPathPose.holonomicRotation));
+    swerve.resetOdometry(new Pose2d((mirrored) ? mirroredInitialPathPose.poseMeters.getTranslation() : 
+                                            initialPathPose.poseMeters.getTranslation(), 
+                                    (mirrored) ? mirroredInitialPathPose.holonomicRotation : 
+                                            initialPathPose.holonomicRotation));
 
   }
 
