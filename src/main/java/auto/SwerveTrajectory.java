@@ -151,16 +151,17 @@ public class SwerveTrajectory implements Loggable {
           // and taking the mirrored state's rotation and adding 180 degrees
           if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
 
-            mirroredState.timeSeconds = state.timeSeconds;
-            mirroredState.velocityMetersPerSecond = state.velocityMetersPerSecond;
-            mirroredState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
-            mirroredState.poseMeters = new Pose2d(
-                (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
+            mirroredState.timeSeconds                       = state.timeSeconds;
+            mirroredState.velocityMetersPerSecond           = state.velocityMetersPerSecond;
+            mirroredState.accelerationMetersPerSecondSq     = state.accelerationMetersPerSecondSq;
+            mirroredState.poseMeters                        = new Pose2d(
+              (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
                 state.poseMeters.getTranslation().getY(),
-                state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
-            mirroredState.curvatureRadPerMeter = state.curvatureRadPerMeter;
-            mirroredState.holonomicRotation = state.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
-            mirroredState.angularVelocityRadPerSec = state.angularVelocityRadPerSec;
+                state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI))
+              );
+            mirroredState.curvatureRadPerMeter              = state.curvatureRadPerMeter;
+            mirroredState.holonomicRotation                 = state.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+            mirroredState.angularVelocityRadPerSec          = state.angularVelocityRadPerSec;
             mirroredState.holonomicAngularVelocityRadPerSec = state.holonomicAngularVelocityRadPerSec;
 
           }

@@ -75,16 +75,17 @@ public class AutoSegmentedWaypoints {
 
         mirrored = true;
 
-        mirroredInitialPathPose.timeSeconds = initialPathPose.timeSeconds;
-        mirroredInitialPathPose.velocityMetersPerSecond = initialPathPose.velocityMetersPerSecond;
-        mirroredInitialPathPose.accelerationMetersPerSecondSq = initialPathPose.accelerationMetersPerSecondSq;
-        mirroredInitialPathPose.poseMeters = new Pose2d(
-            (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()),
+        mirroredInitialPathPose.timeSeconds                       = initialPathPose.timeSeconds;
+        mirroredInitialPathPose.velocityMetersPerSecond           = initialPathPose.velocityMetersPerSecond;
+        mirroredInitialPathPose.accelerationMetersPerSecondSq     = initialPathPose.accelerationMetersPerSecondSq;
+        mirroredInitialPathPose.poseMeters                        = new Pose2d(
+          (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()),
             initialPathPose.poseMeters.getTranslation().getY(),
-            initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI)));
-        mirroredInitialPathPose.curvatureRadPerMeter = initialPathPose.curvatureRadPerMeter;
-        mirroredInitialPathPose.holonomicRotation = initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
-        mirroredInitialPathPose.angularVelocityRadPerSec = initialPathPose.angularVelocityRadPerSec;
+            initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI))
+          );
+        mirroredInitialPathPose.curvatureRadPerMeter              = initialPathPose.curvatureRadPerMeter;
+        mirroredInitialPathPose.holonomicRotation                 = initialPathPose.holonomicRotation.plus(Rotation2d.fromRadians(Math.PI)).unaryMinus();
+        mirroredInitialPathPose.angularVelocityRadPerSec          = initialPathPose.angularVelocityRadPerSec;
         mirroredInitialPathPose.holonomicAngularVelocityRadPerSec = initialPathPose.holonomicAngularVelocityRadPerSec;
 
     }
