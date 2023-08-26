@@ -18,16 +18,6 @@ import edu.wpi.first.math.util.Units;
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
 public class Arm {
 
-    /**
-     * What the arm positions look like and the index in the array
-     * 4
-     * O        __     8
-     * 1      |      7
-     * 3 | 5
-     * 2  |||||  6
-     */
-
-    // ceil -- force round up
     int armPosDimension1 = PlacementConstants.STOWED_INDEX;
     int armPosDimension2 = 1;
 
@@ -44,28 +34,26 @@ public class Arm {
     // The current rotation of the lower arm
     private double lowerRotation = 0;
 
-    // The DESIRED rotation of the upper and lower arm(s)
+    // The DESIRED rotation of the arms
     private double upperReferenceAngle = 0;
     private double lowerReferenceAngle = 0;
 
     private double lowerDiff = 0;
-
     private double upperDiff = 0;
 
     private boolean armsAtDesiredPosition = false;
     
     private double armXPos = 0;
-
     private double armYPos = 0;
 
-    private final CANSparkMax _lowerArmRight;
-    private final CANSparkMax _lowerArmLeft;
-    private final CANSparkMax _upperArm;
+    private final CANSparkMax lowerArmRight;
+    private final CANSparkMax lowerArmLeft;
+    private final CANSparkMax upperArm;
 
-    private final AbsoluteEncoder _lowerArmEncoder;
-    private final AbsoluteEncoder _upperArmEncoder;
-    private final SparkMaxPIDController _lowerArmPIDController;
-    private final SparkMaxPIDController _upperArmPIDController;
+    private final AbsoluteEncoder lowerArmEncoder;
+    private final AbsoluteEncoder upperArmEncoder;
+    private final SparkMaxPIDController lowerArmPIDController;
+    private final SparkMaxPIDController upperArmPIDController;
 
     private final ArmCalculations armCalculations;
 
@@ -74,67 +62,67 @@ public class Arm {
      */
     public Arm() {
 
-      _lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-      _lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
-      _upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+      lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
+      lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+      upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-      _lowerArmRight.setIdleMode(IdleMode.kBrake);
-      _lowerArmLeft.setIdleMode(IdleMode.kBrake);
-      _upperArm.setIdleMode(IdleMode.kCoast);
+      lowerArmRight.setIdleMode(IdleMode.kBrake);
+      lowerArmLeft.setIdleMode(IdleMode.kBrake);
+      upperArm.setIdleMode(IdleMode.kCoast);
 
       // Factory reset, so we get the SPARK MAX to a known state before configuring
       // them. This is useful in case a SPARK MAX is swapped out.
-      _lowerArmRight.restoreFactoryDefaults();
-      _lowerArmLeft.restoreFactoryDefaults();
-      _upperArm.restoreFactoryDefaults();
+      lowerArmRight.restoreFactoryDefaults();
+      lowerArmLeft.restoreFactoryDefaults();
+      upperArm.restoreFactoryDefaults();
 
-      _lowerArmEncoder = _lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
-      _upperArmEncoder = _upperArm.getAbsoluteEncoder(Type.kDutyCycle);
+      lowerArmEncoder = lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
+      upperArmEncoder = upperArm.getAbsoluteEncoder(Type.kDutyCycle);
 
-      _lowerArmPIDController = _lowerArmRight.getPIDController();
-      _upperArmPIDController = _upperArm.getPIDController();
+      lowerArmPIDController = lowerArmRight.getPIDController();
+      upperArmPIDController = upperArm.getPIDController();
 
-      _lowerArmPIDController.setFeedbackDevice(_lowerArmEncoder);
-      _upperArmPIDController.setFeedbackDevice(_upperArmEncoder);
+      lowerArmPIDController.setFeedbackDevice(lowerArmEncoder);
+      upperArmPIDController.setFeedbackDevice(upperArmEncoder);
 
-      _lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
-      _lowerArmEncoder.setVelocityConversionFactor(ArmConstants.LOWER_ENCODER_VELOCITY_FACTOR);
+      lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
+      lowerArmEncoder.setVelocityConversionFactor(ArmConstants.LOWER_ENCODER_VELOCITY_FACTOR);
 
-      _upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
-      _upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
+      upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
+      upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
 
-      _lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
-      _lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
-      _upperArm.setSmartCurrentLimit(ArmConstants.UPPER_FREE_LIMIT);
+      lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
+      lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
+      upperArm.setSmartCurrentLimit(ArmConstants.UPPER_FREE_LIMIT);
 
       // Set PID constants for the lower and upper SPARK MAX(s)
-      _lowerArmPIDController.setP(ArmConstants.LOWER_P);
-      _lowerArmPIDController.setI(ArmConstants.LOWER_I);
-      _lowerArmPIDController.setD(ArmConstants.LOWER_D);
-      _lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
-      _lowerArmPIDController.setOutputRange(
+      lowerArmPIDController.setP(ArmConstants.LOWER_P);
+      lowerArmPIDController.setI(ArmConstants.LOWER_I);
+      lowerArmPIDController.setD(ArmConstants.LOWER_D);
+      lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
+      lowerArmPIDController.setOutputRange(
       ArmConstants.LOWER_MIN_OUTPUT,
       ArmConstants.LOWER_MAX_OUTPUT);
 
-      _upperArmPIDController.setP(ArmConstants.UPPER_P);
-      _upperArmPIDController.setI(ArmConstants.UPPER_I);
-      _upperArmPIDController.setD(ArmConstants.UPPER_D);
-      _upperArmPIDController.setFF(ArmConstants.UPPER_FF);
-      _upperArmPIDController.setOutputRange(
+      upperArmPIDController.setP(ArmConstants.UPPER_P);
+      upperArmPIDController.setI(ArmConstants.UPPER_I);
+      upperArmPIDController.setD(ArmConstants.UPPER_D);
+      upperArmPIDController.setFF(ArmConstants.UPPER_FF);
+      upperArmPIDController.setOutputRange(
       ArmConstants.UPPER_MIN_OUTPUT,
       ArmConstants.UPPER_MAX_OUTPUT);
 
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration
-      _lowerArmLeft.follow(_lowerArmRight, true);
-      _upperArmEncoder.setInverted(true);
+      lowerArmLeft.follow(lowerArmRight, true);
+      upperArmEncoder.setInverted(true);
 
       // zeroUpperArmEncoder();
       // zeroLowerArmEncoder();
 
-      _lowerArmRight.burnFlash();
-      _lowerArmLeft.burnFlash();
-      _upperArm.burnFlash();
+      lowerArmRight.burnFlash();
+      lowerArmLeft.burnFlash();
+      upperArm.burnFlash();
 
       armCalculations = new ArmCalculations();
       setBrakeMode();
@@ -157,8 +145,8 @@ public class Arm {
           Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE &&
           Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_COARSE);
 
-      boolean atDesiredFine =
-          (Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
+      boolean atDesiredFine = (
+          Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
           Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
 
       boolean finalDeadband =
@@ -305,9 +293,12 @@ public class Arm {
           return;
         }
 
-        // These offsets are a result of the arm's "Zero" being straight down
+        // Add PI/2 to lowerArmAngle...
+        // because the calculated angle is relative to the ground,
+        // And the zero for the encoder is set to the direction of gravity
+        // Add PI to upperArmAngle...
+        // because armCalculations gives us the angle relative to the upper arm
         lowerArmAngle += (Math.PI/2);
-        // These offsets are a result of the arm's "Zero" being straight down
         upperArmAngle += Math.PI;
 
         // Clamp the output angles as to not murder our precious hard stops
@@ -330,14 +321,8 @@ public class Arm {
         this.armYReference = armPosition.getY();
 
         // Finally, set the reference values for the lower and upper arm:
-        // Add PI/2 to lowerArmAngle...
-        // because the calculated angle is relative to the ground,
-        // And the zero for the encoder is the direction of gravity
-        // Add PI to upperArmAngle...
-        // because armCalculations gives us the angle relative to the upper arm
         setLowerArmReference(lowerArmAngle);
         setUpperArmReference(upperArmAngle);
-
     }
 
     public void setLowerArmReference(double reference) {
@@ -352,7 +337,7 @@ public class Arm {
      * Set the position of an arm
      *
      * @param angle the position to set the upper arm to
-     *                 This unit is in rads
+     *                This unit is in rads
      */
     public void setUpperArmAngle(double angle) {
 
@@ -372,12 +357,12 @@ public class Arm {
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
         double FF = feedForward.calculate((angle), 0);
-        _upperArmPIDController.setFF(FF);
+        upperArmPIDController.setFF(FF);
 
         // Set the position of the neo controlling the upper arm to
-        _upperArmPIDController.setReference((angle), ControlType.kPosition);
+        upperArmPIDController.setReference((angle), ControlType.kPosition);
 
-        upperRotation = _upperArmEncoder.getPosition();
+        upperRotation = upperArmEncoder.getPosition();
     }
 
     /**
@@ -403,12 +388,12 @@ public class Arm {
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
         double FF = feedForward.calculate((position), 0);
-        _lowerArmPIDController.setFF(FF);
+        lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
-        _lowerArmPIDController.setReference((position), ControlType.kPosition);
+        lowerArmPIDController.setReference((position), ControlType.kPosition);
 
-        lowerRotation = _lowerArmEncoder.getPosition();
+        lowerRotation = lowerArmEncoder.getPosition();
     }
 
     /**
@@ -418,7 +403,7 @@ public class Arm {
      * This unit is in rads
      */
     public double getUpperArmAngle() {
-        return _upperArmEncoder.getPosition();
+        return upperArmEncoder.getPosition();
     }
 
     /**
@@ -428,7 +413,7 @@ public class Arm {
      * This unit is in rads
      */
     public double getLowerArmAngle() {
-        return _lowerArmEncoder.getPosition();
+        return lowerArmEncoder.getPosition();
     }
 
     public boolean getAtDesiredPositions() {
@@ -457,12 +442,15 @@ public class Arm {
               armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
               armsAtDesiredPosition;
     }
+
     public boolean getAtPrepIndex() {
       return (armPosDimension1 == PlacementConstants.FLOOR_INTAKE_PREP_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_MID_PREP_INDEX);
     }
 
+    // If we are at a prep index,
+    // set the index to the prep_to_place equivelent
     public void finishPlacement() {
       if (getAtPrepIndex()) {
         switch (armPosDimension1) {
@@ -484,26 +472,23 @@ public class Arm {
       return this.operatorOverride;
     }
 
-    /**
-     * Set the motor to coast mode
-     */
+    // Set the motors to coast mode
     public void setCoastMode() {
-        _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
-        _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
-        _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
+    // This exists for the purpose of being able to manually move the upper arm easier.
     public void setUpperArmCoastMode() {
-      _upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+      upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
-    /**
-     * Set the motor to brake mode
-     */
+    // Set the motors to brake mode
     public void setBrakeMode() {
-      _lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
-      _lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
-      _upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
+      upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
     // Very rough code below: this method is meant to take an encoder
@@ -514,7 +499,13 @@ public class Arm {
       // REV Hardware client when the arm is pointed straight up
       // Then, depending on if the value is more or less than PI,
       // Add or subtract PI to the value
-      _lowerArmEncoder.setZeroOffset(5.4559006-Math.PI);
+      
+      // Note, that this value must be within the range of 0-2PI
+      // absolutePosition = lowerArmEncoder.getPosition() + lowerArmEncoder.getZeroOffset();
+      // test that 2024 friends :) ^^ itll be kinda nice to just do
+      // lowerArmEncoder.setZeroOffset(absolutePosition + (absolutePosition > Math.PI) ? -Math.PI : Math.PI);
+      
+      lowerArmEncoder.setZeroOffset(5.4559006-Math.PI);
     }
 
     // Very rough code below: this method is meant to take an encoder
@@ -525,6 +516,6 @@ public class Arm {
       // REV Hardware client when the arm is pointed straight up
       // Then, depending on if the value is more or less than PI,
       // Add or subtract PI to the value
-      _upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
+      upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
     }
 }
