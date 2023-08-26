@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class Claw {
 
-    private final CANSparkMax _claw;
-    private final RelativeEncoder _clawEncoder;
+    private final CANSparkMax claw;
+    private final RelativeEncoder clawEncoder;
     private double desiredSpeed = 0;
     private boolean intakeMode = false;
 
@@ -25,21 +25,21 @@ public class Claw {
 
     public Claw() {
 
-        _claw = new CANSparkMax(ClawConstants.CLAW_CAN_ID, MotorType.kBrushless);
-        _claw.restoreFactoryDefaults();
+        claw = new CANSparkMax(ClawConstants.CLAW_CAN_ID, MotorType.kBrushless);
+        claw.restoreFactoryDefaults();
 
-        _clawEncoder = _claw.getEncoder();
-        _clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
+        clawEncoder = claw.getEncoder();
+        clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
-        _claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
-        _claw.setInverted(true);
-        _claw.burnFlash();
+        claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
+        claw.setInverted(true);
+        claw.burnFlash();
         setBrakeMode();
 
     }
 
     public void resetEncoder() {
-        _clawEncoder.setPosition(0);
+        clawEncoder.setPosition(0);
     }
 
     public void periodic() {
@@ -63,15 +63,15 @@ public class Claw {
     }
 
     private void setSpeed(double speed) {
-        _claw.set(speed);
+        claw.set(speed);
     }
 
     public void setBrakeMode() {
-        _claw.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        claw.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
     public void setCoastMode() {
-        _claw.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        claw.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
     
@@ -124,7 +124,7 @@ public class Claw {
     }
 
     public double getOutputCurrent() {
-        return _claw.getOutputCurrent();
+        return claw.getOutputCurrent();
     }
 
 }

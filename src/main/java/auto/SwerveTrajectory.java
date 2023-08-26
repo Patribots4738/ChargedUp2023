@@ -123,10 +123,10 @@ public class SwerveTrajectory implements Loggable {
    * i.e. when the robot goes 1 meter, it says it went one meter--
    * You only need to tune the Holonomic Drive Controller, which is explained above...
    *
-   * @param _pathTraj run Pathplanner.loadpath("name of file without an extension") pass it here
+   * @param pathTraj run Pathplanner.loadpath("name of file without an extension") pass it here
    * @param swerve the current instance of swerve
    */
-  public static void PathPlannerRunner(PathPlannerTrajectory _pathTraj, Swerve swerve, boolean longWait) {
+  public static void PathPlannerRunner(PathPlannerTrajectory pathTraj, Swerve swerve, boolean longWait) {
 
     elapsedTime = Timer.getFPGATimestamp() - timeTrajectoryStarted;
 
@@ -140,11 +140,11 @@ public class SwerveTrajectory implements Loggable {
       case "execute":
 
         // If the path has not completed time wise
-        if (elapsedTime < (_pathTraj.getTotalTimeSeconds() + (DriverStation.getAlliance() == DriverStation.Alliance.Red || longWait ? 1 : 0.6)))
+        if (elapsedTime < (pathTraj.getTotalTimeSeconds() + (DriverStation.getAlliance() == DriverStation.Alliance.Red || longWait ? 1 : 0.6)))
         {
-          // System.out.printf("Elapsed Time %.3f\n", elapsedTime - _pathTraj.getTotalTimeSeconds());
+          // System.out.printf("Elapsed Time %.3f\n", elapsedTime - pathTraj.getTotalTimeSeconds());
 
-          PathPlannerState state = (PathPlannerState) _pathTraj.sample(elapsedTime);
+          PathPlannerState state = (PathPlannerState) pathTraj.sample(elapsedTime);
           PathPlannerState mirroredState = new PathPlannerState();
 
           // Create a new pathplannerstate based on the mirrored state's position
@@ -168,7 +168,7 @@ public class SwerveTrajectory implements Loggable {
           // Use elapsedTime as a refrence for where we NEED to be
           // Then, sample the position and rotation for that time,
           // And calculate the ChassisSpeeds required to get there
-          ChassisSpeeds _speeds = HDC.calculate(
+          ChassisSpeeds speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
               ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) 
@@ -183,9 +183,9 @@ public class SwerveTrajectory implements Loggable {
           // but calculations make it, so it is true i.e. rotation is independent
           // (This is seen 6-5 lines above)
           swerve.drive(
-              _speeds.vyMetersPerSecond,
-              _speeds.vxMetersPerSecond,
-              _speeds.omegaRadiansPerSecond, false, false);
+              speeds.vyMetersPerSecond,
+              speeds.vxMetersPerSecond,
+              speeds.omegaRadiansPerSecond, false, false);
 
         } else {
 
