@@ -152,7 +152,7 @@ public class MAXSwerveModule {
         drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
         turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
 
-        desiredState = desiredState;
+        this.desiredState = desiredState;
     }
 
     /**
