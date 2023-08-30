@@ -36,30 +36,30 @@ public class Swerve {
     private double speedMultiplier = 1;
 
       // Slew rate filter variables for controlling lateral acceleration
-      private double m_currentRotation = 0.0;
-      private double m_currentTranslationDir = 0.0;
-      private double m_currentTranslationMag = 0.0;
+      private double currentRotation = 0.0;
+      private double currentTranslationDir = 0.0;
+      private double currentTranslationMag = 0.0;
 
-      private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
-      private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
-      private double m_prevTime = WPIUtilJNI.now() * 1e-6;
+      private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
+      private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
+      private double prevTime = WPIUtilJNI.now() * 1e-6;
 
-    private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
+    private final MAXSwerveModule frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
             DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
             DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
-    private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+    private final MAXSwerveModule frontRight = new MAXSwerveModule(
             DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
             DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
             DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-    private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+    private final MAXSwerveModule rearLeft = new MAXSwerveModule(
             DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
             DriveConstants.REAR_LEFT_TURNING_CAN_ID,
             DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
-    private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+    private final MAXSwerveModule rearRight = new MAXSwerveModule(
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
@@ -68,10 +68,10 @@ public class Swerve {
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
     private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[]{
-            m_frontLeft,
-            m_frontRight,
-            m_rearLeft,
-            m_rearRight
+            frontLeft,
+            frontRight,
+            rearLeft,
+            rearRight
     };
 
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
@@ -146,9 +146,9 @@ public class Swerve {
         // Calculate the direction slew rate based on an estimate of the lateral acceleration
         double directionSlewRate;
     
-        if (m_currentTranslationMag != 0.0) {
+        if (currentTranslationMag != 0.0) {
     
-          directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE / m_currentTranslationMag);
+          directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE / currentTranslationMag);
     
         } else {
     
@@ -159,49 +159,49 @@ public class Swerve {
 
         // Calculate the current time and the time since the last call to this function
         double currentTime = WPIUtilJNI.now() * 1e-6;
-        double elapsedTime = currentTime - m_prevTime;
+        double elapsedTime = currentTime - prevTime;
     
         // Calculate the difference in angle between the current and commanded directions
-        double angleDiff = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
+        double angleDiff = SwerveUtils.AngleDifference(inputTranslationDir, currentTranslationDir);
         
         if (angleDiff < 0.45 * Math.PI) {
           // Step the current direction towards the commanded direction
-          m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
-          m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+          currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+          currentTranslationMag = magLimiter.calculate(inputTranslationMag);
         
         }
         else if (angleDiff > 0.85 * Math.PI) {
         
           // Some small number to avoid floating-point errors with equality checking
-          if (m_currentTranslationMag > 1e-4) { 
+          if (currentTranslationMag > 1e-4) { 
             // Keep currentTranslationDir unchanged if there is very little change in magnitude
-            m_currentTranslationMag = m_magLimiter.calculate(0.0);
+            currentTranslationMag = magLimiter.calculate(0.0);
         
           } else {
             // Step the current direction towards the commanded direction
-            m_currentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
-            m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+            currentTranslationDir = SwerveUtils.WrapAngle(currentTranslationDir + Math.PI);
+            currentTranslationMag = magLimiter.calculate(inputTranslationMag);
         
           }
         }
         else {
           // Step the current direction towards the commanded direction
-          m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
-          m_currentTranslationMag = m_magLimiter.calculate(0.0);
+          currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+          currentTranslationMag = magLimiter.calculate(0.0);
         
         }
         
-        m_prevTime = currentTime;
+        prevTime = currentTime;
         
         // Calculate the commanded speeds and convert them out of polar
-        xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
-        ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
-        m_currentRotation = m_rotLimiter.calculate(rotSpeed);
+        xSpeedCommanded = currentTranslationMag * Math.cos(currentTranslationDir);
+        ySpeedCommanded = currentTranslationMag * Math.sin(currentTranslationDir);
+        currentRotation = rotLimiter.calculate(rotSpeed);
         
         // Convert the commanded speeds into the correct units for the drivetrain
         double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
         double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-        double rotDelivered = m_currentRotation * DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier;
+        double rotDelivered = currentRotation * DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier;
     
         var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative
@@ -230,17 +230,17 @@ public class Swerve {
      * Sets the wheels into an X formation to prevent movement.
      */
     public void setWheelsX() {
-        m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     }
 
     public void setWheelsUp() {
-      m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+      rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
   }
 
     /**
@@ -251,10 +251,10 @@ public class Swerve {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
                 desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
-        m_frontLeft.setDesiredState(desiredStates[0]);
-        m_frontRight.setDesiredState(desiredStates[1]);
-        m_rearLeft.setDesiredState(desiredStates[2]);
-        m_rearRight.setDesiredState(desiredStates[3]);
+        frontLeft.setDesiredState(desiredStates[0]);
+        frontRight.setDesiredState(desiredStates[1]);
+        rearLeft.setDesiredState(desiredStates[2]);
+        rearRight.setDesiredState(desiredStates[3]);
     }
 
     public void resetOdometry(Pose2d pose) {
