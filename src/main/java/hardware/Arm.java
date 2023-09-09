@@ -215,9 +215,9 @@ public class Arm {
         armPosDimension2 = 0;
 
         if (index == PlacementConstants.CONE_HIGH_PREP_INDEX &&
-             armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-              index == PlacementConstants.CONE_MID_PREP_INDEX && 
-               armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX) 
+                armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
+            index == PlacementConstants.CONE_MID_PREP_INDEX && 
+                armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX) 
         {
             armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length-1;
         }
