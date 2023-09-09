@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -35,14 +36,14 @@ public class Swerve {
 
     private double speedMultiplier = 1;
 
-      // Slew rate filter variables for controlling lateral acceleration
-      private double currentRotation = 0.0;
-      private double currentTranslationDir = 0.0;
-      private double currentTranslationMag = 0.0;
+    // Slew rate filter variables for controlling lateral acceleration
+    private double currentRotation = 0.0;
+    private double currentTranslationDir = 0.0;
+    private double currentTranslationMag = 0.0;
 
-      private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
-      private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
-      private double prevTime = WPIUtilJNI.now() * 1e-6;
+    private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
+    private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
+    private double prevTime = WPIUtilJNI.now() * 1e-6;
 
     private final MAXSwerveModule frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
@@ -67,7 +68,7 @@ public class Swerve {
     // The gyro sensor
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
-    private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[]{
+    private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[] {
             frontLeft,
             frontRight,
             rearLeft,
@@ -75,29 +76,30 @@ public class Swerve {
     };
 
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
-        DriveConstants.DRIVE_KINEMATICS,
-        getGyroAngle(),
-        getModulePositions(),
-        new Pose2d(),
-        // Trust the information of the vision more
-        // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
-        // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
-        // Notice that the theta on the vision is very large,
-        // and the state measurement is very small.
-        // This is because we assume that the IMU is very accurate.
-        // You can visualize these graphs working together here: https://www.desmos.com/calculator/a0kszyrwfe
-        new MatBuilder<>(
-            Nat.N3(),
-            Nat.N1()).fill(0.1, 0.1, 0.05),
-                // State measurement
-                // standard deviations
-                // X, Y, theta
-        new MatBuilder<>(
-                Nat.N3(),
-                Nat.N1()).fill(0.6, 0.6, 3)
-                // Vision measurement
-                // standard deviations
-                // X, Y, theta
+            DriveConstants.DRIVE_KINEMATICS,
+            getGyroAngle(),
+            getModulePositions(),
+            new Pose2d(),
+            // Trust the information of the vision more
+            // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
+            // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
+            // Notice that the theta on the vision is very large,
+            // and the state measurement is very small.
+            // This is because we assume that the IMU is very accurate.
+            // You can visualize these graphs working together here:
+            // https://www.desmos.com/calculator/a0kszyrwfe
+            new MatBuilder<>(
+                    Nat.N3(),
+                    Nat.N1()).fill(0.1, 0.1, 0.05),
+            // State measurement
+            // standard deviations
+            // X, Y, theta
+            new MatBuilder<>(
+                    Nat.N3(),
+                    Nat.N1()).fill(0.6, 0.6, 3)
+    // Vision measurement
+    // standard deviations
+    // X, Y, theta
     );
 
     /**
@@ -117,7 +119,7 @@ public class Swerve {
         getPitch();
         getRoll();
     }
-    
+
     /**
      * Returns the currently-estimated pose of the robot.
      *
@@ -130,100 +132,136 @@ public class Swerve {
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
-    
-    public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative, boolean rateLimit) {
-      
-      if (rateLimit) {
-    
-        // Make commanded variables 
-        double xSpeedCommanded;
-        double ySpeedCommanded;
-    
-        // Convert XY to polar for rate limiting
-        double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
-        double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
 
-        // Calculate the direction slew rate based on an estimate of the lateral acceleration
-        double directionSlewRate;
-    
-        if (currentTranslationMag != 0.0) {
-    
-          directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE / currentTranslationMag);
-    
-        } else {
-    
-          // Some high number that means the slew rate is effectively instantaneous
-          directionSlewRate = 500.0; 
-    
-        }
+    public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative, boolean rateLimit) {
 
         // Calculate the current time and the time since the last call to this function
         double currentTime = WPIUtilJNI.now() * 1e-6;
         double elapsedTime = currentTime - prevTime;
-    
-        // Calculate the difference in angle between the current and commanded directions
-        double angleDiff = SwerveUtils.AngleDifference(inputTranslationDir, currentTranslationDir);
-        
-        if (angleDiff < 0.45 * Math.PI) {
-          // Step the current direction towards the commanded direction
-          currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
-          currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-        
-        }
-        else if (angleDiff > 0.85 * Math.PI) {
-        
-          // Some small number to avoid floating-point errors with equality checking
-          if (currentTranslationMag > 1e-4) { 
-            // Keep currentTranslationDir unchanged if there is very little change in magnitude
-            currentTranslationMag = magLimiter.calculate(0.0);
-        
-          } else {
-            // Step the current direction towards the commanded direction
-            currentTranslationDir = SwerveUtils.WrapAngle(currentTranslationDir + Math.PI);
-            currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-        
-          }
-        }
-        else {
-          // Step the current direction towards the commanded direction
-          currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
-          currentTranslationMag = magLimiter.calculate(0.0);
-        
-        }
-        
-        prevTime = currentTime;
-        
-        // Calculate the commanded speeds and convert them out of polar
-        xSpeedCommanded = currentTranslationMag * Math.cos(currentTranslationDir);
-        ySpeedCommanded = currentTranslationMag * Math.sin(currentTranslationDir);
-        currentRotation = rotLimiter.calculate(rotSpeed);
-        
-        // Convert the commanded speeds into the correct units for the drivetrain
-        double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-        double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-        double rotDelivered = currentRotation * DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier;
-    
-        var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getPose().getRotation())
-                : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
-        
-        setModuleStates(swerveModuleStates);
 
-      } else {
-        
-        xSpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        ySpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        rotSpeed *= (DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier);
+        if (rateLimit) {
 
-        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+            // Make commanded variables
+            double xSpeedCommanded;
+            double ySpeedCommanded;
+
+            // Convert XY to polar for rate limiting
+            double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
+            double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
+
+            // Calculate the direction slew rate based on an estimate of the lateral
+            // acceleration
+            double directionSlewRate;
+
+            if (currentTranslationMag != 0.0) {
+
+                directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE / currentTranslationMag);
+
+            } else {
+
+                // Some high number that means the slew rate is effectively instantaneous
+                directionSlewRate = 500.0;
+
+            }
+
+            // Calculate the difference in angle between the current and commanded
+            // directions
+            double angleDiff = SwerveUtils.AngleDifference(inputTranslationDir, currentTranslationDir);
+
+            if (angleDiff < 0.45 * Math.PI) {
+                // Step the current direction towards the commanded direction
+                currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir,
+                        directionSlewRate * elapsedTime);
+                currentTranslationMag = magLimiter.calculate(inputTranslationMag);
+
+            } else if (angleDiff > 0.85 * Math.PI) {
+
+                // Some small number to avoid floating-point errors with equality checking
+                if (currentTranslationMag > 1e-4) {
+                    // Keep currentTranslationDir unchanged if there is very little change in
+                    // magnitude
+                    currentTranslationMag = magLimiter.calculate(0.0);
+
+                } else {
+                    // Step the current direction towards the commanded direction
+                    currentTranslationDir = SwerveUtils.WrapAngle(currentTranslationDir + Math.PI);
+                    currentTranslationMag = magLimiter.calculate(inputTranslationMag);
+
+                }
+            } else {
+                // Step the current direction towards the commanded direction
+                currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir,
+                        directionSlewRate * elapsedTime);
+                currentTranslationMag = magLimiter.calculate(0.0);
+
+            }
+
+            prevTime = currentTime;
+
+            // Calculate the commanded speeds and convert them out of polar
+            xSpeedCommanded = currentTranslationMag * Math.cos(currentTranslationDir);
+            ySpeedCommanded = currentTranslationMag * Math.sin(currentTranslationDir);
+            currentRotation = rotLimiter.calculate(rotSpeed);
+
+            // Convert the commanded speeds into the correct units for the drivetrain
+            double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
+            double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
+            double rotDelivered = currentRotation * DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier;
+
+            ChassisSpeeds originalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered,
+                    rotDelivered, getPose().getRotation());
+
+            Pose2d velocityPose2d = new Pose2d(
+                    originalSpeeds.vxMetersPerSecond * elapsedTime,
+                    originalSpeeds.vyMetersPerSecond * elapsedTime,
+                    new Rotation2d(originalSpeeds.omegaRadiansPerSecond * elapsedTime));
+
+            Pose2d fieldOrigin = new Pose2d(0, 0, new Rotation2d(0));
+            Twist2d twistVelocity = fieldOrigin.log(velocityPose2d);
+
+            ChassisSpeeds updatedChassisSpeeds = new ChassisSpeeds(
+                    twistVelocity.dx / elapsedTime,
+                    twistVelocity.dy / elapsedTime,
+                    twistVelocity.dtheta / elapsedTime);
+
+            var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+                    fieldRelative
+                            ? updatedChassisSpeeds
+                            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+
+            setModuleStates(swerveModuleStates);
+
+        } else {
+
+            xSpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+            ySpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+            rotSpeed *= (DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier);
+
+            ChassisSpeeds originalSpeeds = 
                 fieldRelative
-                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation())
-                        : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed));
+                    ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getPose().getRotation())
+                    : new ChassisSpeeds(ySpeed, xSpeed, rotSpeed);
 
-        setModuleStates(swerveModuleStates);
-      
-      }
+            Pose2d velocityPose2d = new Pose2d(
+                    originalSpeeds.vxMetersPerSecond * elapsedTime,
+                    originalSpeeds.vyMetersPerSecond * elapsedTime,
+                    new Rotation2d(originalSpeeds.omegaRadiansPerSecond * elapsedTime));
+
+            Pose2d fieldOrigin = new Pose2d(0, 0, new Rotation2d(0));
+            
+            Twist2d twistVelocity = fieldOrigin.log(velocityPose2d);
+
+            ChassisSpeeds updatedChassisSpeeds = new ChassisSpeeds(
+                    twistVelocity.dx / elapsedTime,
+                    twistVelocity.dy / elapsedTime,
+                    twistVelocity.dtheta / elapsedTime);
+
+            SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS
+                    .toSwerveModuleStates(updatedChassisSpeeds);
+
+            setModuleStates(swerveModuleStates);
+
+        }
     }
 
     /**
@@ -237,11 +275,11 @@ public class Swerve {
     }
 
     public void setWheelsUp() {
-      frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-      rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
-  }
+        frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+        frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+        rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+        rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(getYaw())));
+    }
 
     /**
      * Sets the swerve ModuleStates.
@@ -276,13 +314,13 @@ public class Swerve {
     }
 
     public double getSpeedMetersPerSecond() {
-        // double velocity = 0;  
+        // double velocity = 0;
         // for (int modNum = 0; modNum < swerveModules.length; modNum++) {
-        //   velocity += swerveModules[modNum].getState().speedMetersPerSecond;
+        // velocity += swerveModules[modNum].getState().speedMetersPerSecond;
         // }
         // return (velocity / swerveModules.length);
 
-        return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm())/0.02);
+        return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
 
     }
 
@@ -303,80 +341,88 @@ public class Swerve {
     public void zeroHeading() {
         gyro.reset();
     }
-    
+
     public Rotation2d getGyroAngle() {
 
-      // gyro.setYawAxis(IMUAxis.kZ);
-      
-      Rotation2d yawRotation2d = Rotation2d.fromDegrees(gyro.getAngle());
-      
-      if (DriveConstants.GYRO_REVERSED) {
-          yawRotation2d = yawRotation2d.unaryMinus();
-      }
+        // gyro.setYawAxis(IMUAxis.kZ);
 
-      this.yaw = yawRotation2d.getDegrees();
+        Rotation2d yawRotation2d = Rotation2d.fromDegrees(gyro.getAngle());
 
-      return yawRotation2d;
+        if (DriveConstants.GYRO_REVERSED) {
+            yawRotation2d = yawRotation2d.unaryMinus();
+        }
+
+        this.yaw = yawRotation2d.getDegrees();
+
+        return yawRotation2d;
     }
 
-    public Rotation2d getYaw() { return this.getPose().getRotation(); }
+    public Rotation2d getYaw() {
+        return this.getPose().getRotation();
+    }
 
     public Rotation2d getPitch() {
 
-      Rotation2d pitchRotation2d = Rotation2d.fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
+        Rotation2d pitchRotation2d = Rotation2d
+                .fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
 
-      this.pitch = pitchRotation2d.unaryMinus().getDegrees();
-      
-      return pitchRotation2d;
-      
+        this.pitch = pitchRotation2d.unaryMinus().getDegrees();
+
+        return pitchRotation2d;
+
     }
 
     public Rotation2d getRoll() {
 
-      Rotation2d rollRotation2d = Rotation2d.fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));
+        Rotation2d rollRotation2d = Rotation2d
+                .fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));
 
-      this.roll = rollRotation2d.unaryMinus().getDegrees();
+        this.roll = rollRotation2d.unaryMinus().getDegrees();
 
-      return rollRotation2d;
-      
+        return rollRotation2d;
+
     }
-    
+
     public double getTilt() {
 
-      Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getYaw().getRadians(), getPitch().getRadians());
-      
-      // System.out.println(getRoll().getDegrees() + " " + getYaw().getDegrees() + " " + getPitch().getDegrees());
-      
-      Quaternion gyroQuaternion = gyroRotation3d.getQuaternion();
-      // Multiply the quaternion by the UP direction as a vector to normalize it to UP
-      // In english: this basically converts the angles to be relative to the charging station
-      double num = gyroQuaternion.getX() + gyroQuaternion.getX();
-      double num2 = gyroQuaternion.getY() + gyroQuaternion.getY();
-      double num3 = gyroQuaternion.getZ() + gyroQuaternion.getZ();
-      double num4 = gyroQuaternion.getW() * num;
-      double num5 = gyroQuaternion.getW() * num2;
-      double num6 = gyroQuaternion.getW() * num3;
-      double num7 = gyroQuaternion.getX() * num;
-      double num8 = gyroQuaternion.getX() * num2;
-      double num9 = gyroQuaternion.getX() * num3;
-      double num10 = gyroQuaternion.getY() * num2;
-      double num11 = gyroQuaternion.getY() * num3;
-      double num12 = gyroQuaternion.getZ() * num3;
-      double num13 = 1.0 - num10 - num12;
-      double num14 = num8 - num6;
-      double num15 = num9 + num5;
-      double num16 = num8 + num6;
-      double num17 = 1.0 - num7 - num12;
-      double num18 = num11 - num4;
-      double num19 = num9 - num5;
-      double num20 = num11 + num4;
-      double num21 = 1.0 - num7 - num10;
+        Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getYaw().getRadians(),
+                getPitch().getRadians());
 
-      var multiplyOutput = VecBuilder.fill(0 * num13 + 1 * num14 + 0 * num15, 0 * num16 + 1 * num17 + 0 * num18, 0 * num19 + 1 * num20 + 0 * num21);
+        // System.out.println(getRoll().getDegrees() + " " + getYaw().getDegrees() + " "
+        // + getPitch().getDegrees());
 
-      double dotProduct = multiplyOutput.dot(VecBuilder.fill(0, 1, 0));
+        Quaternion gyroQuaternion = gyroRotation3d.getQuaternion();
+        // Multiply the quaternion by the UP direction as a vector to normalize it to UP
+        // In english: this basically converts the angles to be relative to the charging
+        // station
+        double num = gyroQuaternion.getX() + gyroQuaternion.getX();
+        double num2 = gyroQuaternion.getY() + gyroQuaternion.getY();
+        double num3 = gyroQuaternion.getZ() + gyroQuaternion.getZ();
+        double num4 = gyroQuaternion.getW() * num;
+        double num5 = gyroQuaternion.getW() * num2;
+        double num6 = gyroQuaternion.getW() * num3;
+        double num7 = gyroQuaternion.getX() * num;
+        double num8 = gyroQuaternion.getX() * num2;
+        double num9 = gyroQuaternion.getX() * num3;
+        double num10 = gyroQuaternion.getY() * num2;
+        double num11 = gyroQuaternion.getY() * num3;
+        double num12 = gyroQuaternion.getZ() * num3;
+        double num13 = 1.0 - num10 - num12;
+        double num14 = num8 - num6;
+        double num15 = num9 + num5;
+        double num16 = num8 + num6;
+        double num17 = 1.0 - num7 - num12;
+        double num18 = num11 - num4;
+        double num19 = num9 - num5;
+        double num20 = num11 + num4;
+        double num21 = 1.0 - num7 - num10;
 
-      return (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
+        var multiplyOutput = VecBuilder.fill(0 * num13 + 1 * num14 + 0 * num15, 0 * num16 + 1 * num17 + 0 * num18,
+                0 * num19 + 1 * num20 + 0 * num21);
+
+        double dotProduct = multiplyOutput.dot(VecBuilder.fill(0, 1, 0));
+
+        return (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
     }
 
     public void resetEncoders() {
@@ -399,11 +445,11 @@ public class Swerve {
     }
 
     public void setSpeedMultiplier(double speedMultiplier) {
-      this.speedMultiplier = speedMultiplier;
+        this.speedMultiplier = speedMultiplier;
     }
 
     public double getSpeedMultiplier() {
-      return this.speedMultiplier;
+        return this.speedMultiplier;
     }
 
     /**
