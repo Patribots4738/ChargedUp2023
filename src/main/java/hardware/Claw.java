@@ -40,7 +40,7 @@ public class Claw implements Loggable {
         clawEncoder = claw.getEncoder();
         clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
-        claw.setSmartCurrentLimit(ClawConstants.CLAW_CURRENT_LIMIT);
+        claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_CURRENT_LIMIT);
         claw.setInverted(true);
         claw.burnFlash();
         setBrakeMode();
@@ -53,20 +53,20 @@ public class Claw implements Loggable {
 
     public void periodic() {
 
-        current = getOutputCurrent();
+        // current = getOutputCurrent();
 
-        if (getOutputCurrent() > 30 && !hasGameElement && AutoAlignment.coneMode) {
-            startedIntakingTimestamp = Timer.getFPGATimestamp();
-            hasGameElement = true;
-            claw.setSmartCurrentLimit(25);
-            superIntake = true;
-        }
+        // if (getOutputCurrent() > 30 && !hasGameElement && AutoAlignment.coneMode) {
+        //     startedIntakingTimestamp = Timer.getFPGATimestamp();
+        //     hasGameElement = true;
+        //     claw.setSmartCurrentLimit(25);
+        //     superIntake = true;
+        // }
 
-        if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
-            if (getOutputCurrent() < 2) { hasGameElement = false; }
-            claw.setSmartCurrentLimit(15);
-            superIntake = false;
-        }
+        // if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
+        //     if (getOutputCurrent() < 2) { hasGameElement = false; }
+        //     claw.setSmartCurrentLimit(15);
+        //     superIntake = false;
+        // }
 
         if (DriverStation.isTeleop()) {
 
