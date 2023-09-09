@@ -178,9 +178,7 @@ public final class Constants {
         public static final double CLAW_MIN_OUTPUT = -1;
         public static final double CLAW_MAX_OUTPUT = 1;
 
-        public static final int CLAW_STALL_LIMIT = 25;
-        public static final int CLAW_FREE_LIMIT = 30;
-
+        public static final int CLAW_CURRENT_LIMIT = 15;
 
         // from the edge of the upper arm, straight out,
         // and stop at the end of the 3d-printed "grabber"

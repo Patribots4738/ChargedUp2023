@@ -9,8 +9,10 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
-public class Claw {
+public class Claw implements Loggable {
 
     private final CANSparkMax claw;
     private final RelativeEncoder clawEncoder;
@@ -21,7 +23,14 @@ public class Claw {
     private boolean startedOuttakingBool = false;
     private boolean finishedOuttaking = false;
     private double outtakeSeconds = 0;
+    private double startedIntakingTimestamp = 0;
     private double startedOuttakingTimestamp = 0;
+    @Log
+    private boolean hasGameElement = false;
+    @Log
+    private double current = 0;
+    @Log
+    private boolean superIntake = false;
 
     public Claw() {
 
@@ -31,7 +40,7 @@ public class Claw {
         clawEncoder = claw.getEncoder();
         clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
-        claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_FREE_LIMIT);
+        claw.setSmartCurrentLimit(ClawConstants.CLAW_CURRENT_LIMIT);
         claw.setInverted(true);
         claw.burnFlash();
         setBrakeMode();
@@ -43,6 +52,21 @@ public class Claw {
     }
 
     public void periodic() {
+
+        current = getOutputCurrent();
+
+        if (getOutputCurrent() > 30 && !hasGameElement && AutoAlignment.coneMode) {
+            startedIntakingTimestamp = Timer.getFPGATimestamp();
+            hasGameElement = true;
+            claw.setSmartCurrentLimit(25);
+            superIntake = true;
+        }
+
+        if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
+            if (getOutputCurrent() < 2) { hasGameElement = false; }
+            claw.setSmartCurrentLimit(15);
+            superIntake = false;
+        }
 
         if (DriverStation.isTeleop()) {
 
