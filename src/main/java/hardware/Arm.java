@@ -165,12 +165,7 @@ public class Arm {
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
       if (finalDeadband && !armsAtDesiredPosition)
       {
-        if (armPosDimension2 < PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1) {
-          armPosDimension2++;
-        }
-        else {
-          armPosDimension2--;
-        }
+        armPosDimension2++;
 
         // This line isn't strictly necessary, but could be included...
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length);
@@ -218,6 +213,14 @@ public class Arm {
         }
 
         armPosDimension2 = 0;
+
+        if (index == PlacementConstants.CONE_HIGH_PREP_INDEX &&
+             armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
+              index == PlacementConstants.CONE_MID_PREP_INDEX && 
+               armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX) 
+        {
+            armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length-1;
+        }
 
         armPosDimension1 = index;
         // Turn off operator override to prevent arm.drive from setting values wrong
