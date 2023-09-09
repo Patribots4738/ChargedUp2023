@@ -40,7 +40,7 @@ public class Claw implements Loggable {
         clawEncoder = claw.getEncoder();
         clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
-        claw.setSmartCurrentLimit(ClawConstants.CLAW_STALL_LIMIT, ClawConstants.CLAW_CURRENT_LIMIT);
+        claw.setSmartCurrentLimit(ClawConstants.CLAW_CURRENT_LIMIT);
         claw.setInverted(true);
         claw.burnFlash();
         setBrakeMode();
