@@ -165,7 +165,12 @@ public class Arm {
       // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
       if (finalDeadband && !armsAtDesiredPosition)
       {
-        armPosDimension2++;
+        if (armPosDimension2 < PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1) {
+          armPosDimension2++;
+        }
+        else {
+          armPosDimension2--;
+        }
 
         // This line isn't strictly necessary, but could be included...
         // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length);
