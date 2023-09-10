@@ -184,8 +184,8 @@ public class SwerveTrajectory implements Loggable {
           // but calculations make it, so it is true i.e. rotation is independent
           // (This is seen 6-5 lines above)
           swerve.drive(
-              speeds.vyMetersPerSecond,
               speeds.vxMetersPerSecond,
+              speeds.vyMetersPerSecond,
               speeds.omegaRadiansPerSecond, false, false);
 
         } else {
