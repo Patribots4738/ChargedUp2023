@@ -232,6 +232,11 @@ public class Arm {
         return this.armPosDimension1;
     }
 
+    public boolean halfwayFinishedWithConeFlip() {
+        return this.armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX && 
+                this.armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1;
+    }
+
     /**
      * Calculate the position of the arm based on the joystick input
      * as an absolute position in inches, multiplied by
