@@ -50,8 +50,8 @@ public final class Constants {
                            // Front Positive,   Left Positive
             new Translation2d( WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Front Left
             new Translation2d( WHEEL_BASE / 2, -TRACK_WIDTH / 2),  // Front Right
-            new Translation2d(-WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Rear Left
-            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
+            new Translation2d(-WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Rear  Left
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear  Right
 
         // Angular offsets of the modules relative to the chassis in radians
         // add 90 degrees to change the X and Y axis
