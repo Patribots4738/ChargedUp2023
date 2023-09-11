@@ -362,18 +362,18 @@ public class Swerve {
     // Multiply the quaternion by the UP direction as a vector to normalize it to UP
     // In english: this basically converts the angles to be relative to the charging
     // station
-    double num = gyroQuaternion.getX() + gyroQuaternion.getX();
-    double num2 = gyroQuaternion.getY() + gyroQuaternion.getY();
-    double num3 = gyroQuaternion.getZ() + gyroQuaternion.getZ();
-    double num4 = gyroQuaternion.getW() * num;
-    double num5 = gyroQuaternion.getW() * num2;
-    double num6 = gyroQuaternion.getW() * num3;
-    double num7 = gyroQuaternion.getX() * num;
-    double num8 = gyroQuaternion.getX() * num2;
-    double num9 = gyroQuaternion.getX() * num3;
-    double num10 = gyroQuaternion.getY() * num2;
-    double num11 = gyroQuaternion.getY() * num3;
-    double num12 = gyroQuaternion.getZ() * num3;
+    double num = gyroQuaternion.getW() + gyroQuaternion.getW();
+    double num2 = gyroQuaternion.getX() + gyroQuaternion.getX();
+    double num3 = gyroQuaternion.getY() + gyroQuaternion.getY();
+    double num4 = gyroQuaternion.getZ() * num;
+    double num5 = gyroQuaternion.getZ() * num2;
+    double num6 = gyroQuaternion.getZ() * num3;
+    double num7 = gyroQuaternion.getW() * num;
+    double num8 = gyroQuaternion.getW() * num2;
+    double num9 = gyroQuaternion.getW() * num3;
+    double num10 = gyroQuaternion.getX() * num2;
+    double num11 = gyroQuaternion.getX() * num3;
+    double num12 = gyroQuaternion.getY() * num3;
     double num13 = 1.0 - num10 - num12;
     double num14 = num8 - num6;
     double num15 = num9 + num5;
