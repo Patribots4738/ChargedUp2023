@@ -210,8 +210,8 @@ public class Swerve {
 
       var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
-            ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getPose().getRotation()), elapsedTime)
-            : discretize(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered), elapsedTime));
+            ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getPose().getRotation()))
+            : discretize(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered)));
 
       setModuleStates(swerveModuleStates);
 
@@ -223,8 +223,8 @@ public class Swerve {
 
       SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
-                ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation()), elapsedTime)
-                : discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed), elapsedTime));
+                ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation()))
+                : discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)));
 
       setModuleStates(swerveModuleStates);
 
@@ -237,9 +237,9 @@ public class Swerve {
    * @param vx    Forward velocity.
    * @param vy    Sideways velocity.
    * @param omega Angular velocity.
-   * @param dt    The duration of the timestep the speeds should be applied for.
    */
-  public static ChassisSpeeds discretize(ChassisSpeeds speeds, double dt) {
+  public static ChassisSpeeds discretize(ChassisSpeeds speeds) {
+    double dt = 0.02;
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
       speeds.vyMetersPerSecond * dt, 
