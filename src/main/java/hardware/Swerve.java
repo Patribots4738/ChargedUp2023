@@ -96,7 +96,7 @@ public class Swerve {
       // X, Y, theta
       new MatBuilder<>(
           Nat.N3(),
-          Nat.N1()).fill(0.6, 0.6, 3)
+          Nat.N1()).fill(0.6, 0.6, 2)
   // Vision measurement
   // standard deviations
   // X, Y, theta
