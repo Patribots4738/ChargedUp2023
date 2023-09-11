@@ -532,6 +532,10 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kBothRumble, 0.25);
     
     }
+    
+    if (arm.halfwayFinishedWithConeFlip()) {
+       claw.setDesiredSpeed(1);
+    }
   }
 
   @Override
