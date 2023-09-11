@@ -352,11 +352,8 @@ public class Swerve {
 
   public double getTilt() {
 
-    Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getYaw().getRadians(),
-        getPitch().getRadians());
-
-    // System.out.println(getRoll().getDegrees() + " " + getYaw().getDegrees() + " "
-    // + getPitch().getDegrees());
+    Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getPitch().getRadians(),
+        getYaw().getRadians());
 
     Quaternion gyroQuaternion = gyroRotation3d.getQuaternion();
     // Multiply the quaternion by the UP direction as a vector to normalize it to UP
