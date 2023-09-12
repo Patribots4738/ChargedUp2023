@@ -71,12 +71,12 @@ public class ArmCalculations {
     public static Trajectory generateHighTrajectory() {
 
         var startPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(180));
-        var endPos = new Pose2d(PlacementConstants.HIGH_CONE_POSITION_0, Rotation2d.fromDegrees(180));
+        var endPos = new Pose2d(PlacementConstants.HIGH_CONE_PREP, Rotation2d.fromDegrees(180));
     
         var interiorWaypoints = new ArrayList<Translation2d>();
-        interiorWaypoints.add(PlacementConstants.TRANSITION_POSITION);
+        interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
     
-        TrajectoryConfig config = new TrajectoryConfig(Units.inchesToMeters(48), Units.inchesToMeters(48));
+        TrajectoryConfig config = new TrajectoryConfig(800, 400);
     
         var trajectory = TrajectoryGenerator.generateTrajectory(
             startPos,
