@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
       timer = new Timer();
 
       Logger.configureLoggingAndConfig(this, false);
+
   }
 
   /**
@@ -402,6 +403,7 @@ public class Robot extends TimedRobot {
       // Clicking up
       case 0:
         arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
+        if (AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.HIGH_TRAJECTORY); }
         break;
 
       // Clicking down
