@@ -264,7 +264,7 @@ public final class Constants {
       public static final double LOWER_MAX_OUTPUT = 0.85;
       public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MAX_OUTPUT = 0.85;
+      public static final double UPPER_MAX_OUTPUT = 0.95;
       public static final double UPPER_MIN_OUTPUT = -0.4;
 
       /**
@@ -288,6 +288,12 @@ public final class Constants {
       public static final double UPPER_I = 0.0001;
       public static final double UPPER_D = 0.3;
       public static final double UPPER_FF = 1;
+
+      public static final double UPPER_P2 = 0.8;//.25;
+      public static final double UPPER_D2 = 0.3;
+
+      public static final boolean UPPER_PID_SLOT_MAIN = true;
+      public static final boolean UPPER_PID_SLOT_ALTERNATE = false;
 
       public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double UPPER_ENCODER_POSITION_PID_MAX_INPUT = UPPER_ENCODER_POSITION_FACTOR; // radians
