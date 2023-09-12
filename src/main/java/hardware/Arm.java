@@ -161,7 +161,9 @@ public class Arm {
             startedTransition = true;
             armsAtDesiredPosition = true;
             followingTrajectory = false;
+            handlePIDChange(ArmConstants.UPPER_PID_SLOT_MAIN);
             trajectoryTimer.stop();
+            System.out.println(trajectoryTimer.get());
             return;
         }
 
@@ -171,6 +173,8 @@ public class Arm {
 
     public void startTrajectory(Trajectory trajectory) {
 
+        handlePIDChange(ArmConstants.UPPER_PID_SLOT_ALTERNATE);
+
         this.currentTrajectory = trajectory;
         this.followingTrajectory = true;
         this.trajectoryTimer.restart();
@@ -179,6 +183,28 @@ public class Arm {
         
         double finalUpperAngle = armCalculations.getUpperAngle(finalPosition.getX(), finalPosition.getY());
         double finalLowerAngle = armCalculations.getLowerAngle(finalPosition.getX(), finalPosition.getY(), finalUpperAngle);
+
+        // Add PI/2 to lowerArmAngle...
+        // because the calculated angle is relative to the ground,
+        // And the zero for the encoder is set to the direction of gravity
+        // Add PI to upperArmAngle...
+        // because armCalculations gives us the angle relative to the upper arm
+        finalLowerAngle += (Math.PI/2);
+        finalUpperAngle += Math.PI;
+
+        // Clamp the output angles as to not murder our precious hard stops
+        finalUpperAngle = MathUtil.clamp(
+            finalUpperAngle,
+          ArmConstants.UPPER_ARM_LOWER_LIMIT,
+          ArmConstants.UPPER_ARM_UPPER_LIMIT
+        );
+
+        // Clamp the output angles as to not murder our precious hard stops
+        finalLowerAngle = MathUtil.clamp(
+            finalLowerAngle,
+          ArmConstants.LOWER_ARM_LOWER_LIMIT,
+          ArmConstants.LOWER_ARM_UPPER_LIMIT
+        );
         
         this.trajectoryFinalAngles = new double[] { finalLowerAngle, finalUpperAngle };
     
@@ -235,6 +261,8 @@ public class Arm {
      */
     public void setArmIndex(int index) {
 
+        this.followingTrajectory = false;
+
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
 
         // Check if we are already at the desired index, and if we are not operator overriding,
@@ -271,6 +299,20 @@ public class Arm {
         // Turn off operator override to prevent arm.drive from setting values wrong
         this.operatorOverride = false;
 
+        handlePIDChange(ArmConstants.UPPER_PID_SLOT_MAIN);
+    }
+
+    private void handlePIDChange(boolean mainSlot) {
+        if (mainSlot) {
+            if (upperArmPIDController.getP() == ArmConstants.UPPER_P2) {
+                upperArmPIDController.setP(ArmConstants.UPPER_P);
+            }
+
+            if (upperArmPIDController.getP() == ArmConstants.UPPER_D2) {
+                upperArmPIDController.setP(ArmConstants.UPPER_D);
+            }
+        }
+    
     }
 
     public int getArmIndex() {
@@ -453,6 +495,7 @@ public class Arm {
      * This unit is in rads
      */
     public double getUpperArmAngle() {
+        this.upperRotation = upperArmEncoder.getPosition();
         return upperArmEncoder.getPosition();
     }
 
@@ -463,6 +506,7 @@ public class Arm {
      * This unit is in rads
      */
     public double getLowerArmAngle() {
+        this.lowerRotation = lowerArmEncoder.getPosition();
         return lowerArmEncoder.getPosition();
     }
 
@@ -504,6 +548,7 @@ public class Arm {
     // set the index to the prep_to_place equivelent
     public void finishPlacement() {
       if (getAtPrepIndex()) {
+        followingTrajectory = false;
         switch (armPosDimension1) {
           case PlacementConstants.CONE_HIGH_PREP_INDEX:
             setArmIndex(PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX);
