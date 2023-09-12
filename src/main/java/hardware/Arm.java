@@ -312,6 +312,15 @@ public class Arm {
                 upperArmPIDController.setP(ArmConstants.UPPER_D);
             }
         }
+        else {
+            if (upperArmPIDController.getP() == ArmConstants.UPPER_P) {
+                upperArmPIDController.setP(ArmConstants.UPPER_P2);
+            }
+
+            if (upperArmPIDController.getP() == ArmConstants.UPPER_D) {
+                upperArmPIDController.setP(ArmConstants.UPPER_D2);
+            }
+        }
     
     }
 

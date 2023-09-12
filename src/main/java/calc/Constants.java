@@ -289,8 +289,8 @@ public final class Constants {
       public static final double UPPER_D = 0.3;
       public static final double UPPER_FF = 1;
 
-      public static final double UPPER_P2 = 0.8;//.25;
-      public static final double UPPER_D2 = 0.3;
+      public static final double UPPER_P2 = 3;//.25;
+      public static final double UPPER_D2 = 0.5;
 
       public static final boolean UPPER_PID_SLOT_MAIN = true;
       public static final boolean UPPER_PID_SLOT_ALTERNATE = false;
