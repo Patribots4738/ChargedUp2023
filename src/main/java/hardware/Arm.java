@@ -172,12 +172,15 @@ public class Arm {
         
         if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
-          armsAtDesiredPosition = true;
-          if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX) {
-            armPosDimension1 = PlacementConstants.STOWED_INDEX;
-            armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length-1;
-          }
-          return;
+            armsAtDesiredPosition = true;
+            if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX || 
+                armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX || 
+                armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX) 
+            {
+                armPosDimension1 = PlacementConstants.STOWED_INDEX;
+                armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length-1;
+            }
+            return;
         }
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
       }
@@ -198,7 +201,8 @@ public class Arm {
         if ((index == armPosDimension1 || 
               (index == PlacementConstants.STOWED_INDEX && 
               (armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX ||
-              (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX && armsAtDesiredPosition)))) &&
+              (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX ||
+               armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX && armsAtDesiredPosition)))) &&
             index != PlacementConstants.CONE_FLIP_INDEX &&
             index != PlacementConstants.CONE_INTAKE_INDEX &&
             index != PlacementConstants.CUBE_INTAKE_INDEX &&
