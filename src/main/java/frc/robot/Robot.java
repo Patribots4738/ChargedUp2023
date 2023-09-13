@@ -317,10 +317,10 @@ public class Robot extends TimedRobot {
       // This is useful for driving in a straight line (backwards to intake!)
       else if (driver.getYButton()) {
         if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-          swerve.drive(-driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+          swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, false);
         }
         else {
-          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+          swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, false, false);
         }
       }
       else {
@@ -539,6 +539,10 @@ public class Robot extends TimedRobot {
       driver.setRumble(RumbleType.kBothRumble, 0.25);
       operator.setRumble(RumbleType.kBothRumble, 0.25);
     
+    }
+    
+    if (arm.halfwayFinishedWithConeFlip()) {
+       claw.setDesiredSpeed(1);
     }
   }
 

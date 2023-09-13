@@ -87,10 +87,10 @@ public class Claw implements Loggable {
             }
             // Slow down claw for cube mode
             if (!AutoAlignment.coneMode) {
-              desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.8);
+              desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.5);
             }
             // Speed up claw for cone mode
-            else if (desiredSpeed > 0.7) {
+            else if (desiredSpeed > 0.45) {
                 desiredSpeed = 1;
             }
         }
