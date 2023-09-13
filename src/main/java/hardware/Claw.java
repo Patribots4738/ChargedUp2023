@@ -5,10 +5,12 @@ import calc.Constants.ClawConstants;
 import calc.Constants.PlacementConstants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -41,6 +43,8 @@ public class Claw implements Loggable {
         clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
 
         claw.setSmartCurrentLimit(ClawConstants.CLAW_CURRENT_LIMIT);
+        // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         claw.setInverted(true);
         claw.burnFlash();
         setBrakeMode();
@@ -52,6 +56,13 @@ public class Claw implements Loggable {
     }
 
     public void periodic() {
+
+        if (claw.getMotorTemperature() > 60) {
+            DriverUI.spicyClaw = true;
+        }
+        else {
+            DriverUI.spicyClaw = false;
+        }
 
         // current = getOutputCurrent();
 

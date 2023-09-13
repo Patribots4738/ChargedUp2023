@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
@@ -112,6 +113,12 @@ public class Arm {
       ArmConstants.UPPER_MIN_OUTPUT,
       ArmConstants.UPPER_MAX_OUTPUT);
 
+      // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+      lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+      lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+      upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+      upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration
       lowerArmLeft.follow(lowerArmRight, true);
@@ -172,12 +179,15 @@ public class Arm {
         
         if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
         {
-          armsAtDesiredPosition = true;
-          if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX) {
-            armPosDimension1 = PlacementConstants.STOWED_INDEX;
-            armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length-1;
-          }
-          return;
+            armsAtDesiredPosition = true;
+            if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX || 
+                armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX || 
+                armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX) 
+            {
+                armPosDimension1 = PlacementConstants.STOWED_INDEX;
+                armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length-1;
+            }
+            return;
         }
         drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
       }
@@ -198,7 +208,8 @@ public class Arm {
         if ((index == armPosDimension1 || 
               (index == PlacementConstants.STOWED_INDEX && 
               (armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX ||
-              (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX && armsAtDesiredPosition)))) &&
+              (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX ||
+               armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX && armsAtDesiredPosition)))) &&
             index != PlacementConstants.CONE_FLIP_INDEX &&
             index != PlacementConstants.CONE_INTAKE_INDEX &&
             index != PlacementConstants.CUBE_INTAKE_INDEX &&

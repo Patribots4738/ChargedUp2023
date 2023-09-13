@@ -96,7 +96,7 @@ public class Swerve {
       // X, Y, theta
       new MatBuilder<>(
           Nat.N3(),
-          Nat.N1()).fill(0.6, 0.6, 3)
+          Nat.N1()).fill(0.6, 0.6, 2)
   // Vision measurement
   // standard deviations
   // X, Y, theta
@@ -307,6 +307,7 @@ public class Swerve {
     // }
     // return (velocity / swerveModules.length);
 
+    // We update the UI at the end of the loop, so this is a way of looking into the past.
     return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
 
   }
@@ -372,28 +373,25 @@ public class Swerve {
 
   public double getTilt() {
 
-    Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getYaw().getRadians(),
-        getPitch().getRadians());
-
-    // System.out.println(getRoll().getDegrees() + " " + getYaw().getDegrees() + " "
-    // + getPitch().getDegrees());
+    Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getPitch().getRadians(),
+        getGyroAngle().getRadians());
 
     Quaternion gyroQuaternion = gyroRotation3d.getQuaternion();
     // Multiply the quaternion by the UP direction as a vector to normalize it to UP
     // In english: this basically converts the angles to be relative to the charging
     // station
-    double num = gyroQuaternion.getX() + gyroQuaternion.getX();
-    double num2 = gyroQuaternion.getY() + gyroQuaternion.getY();
-    double num3 = gyroQuaternion.getZ() + gyroQuaternion.getZ();
-    double num4 = gyroQuaternion.getW() * num;
-    double num5 = gyroQuaternion.getW() * num2;
-    double num6 = gyroQuaternion.getW() * num3;
-    double num7 = gyroQuaternion.getX() * num;
-    double num8 = gyroQuaternion.getX() * num2;
-    double num9 = gyroQuaternion.getX() * num3;
-    double num10 = gyroQuaternion.getY() * num2;
-    double num11 = gyroQuaternion.getY() * num3;
-    double num12 = gyroQuaternion.getZ() * num3;
+    double num = gyroQuaternion.getW() + gyroQuaternion.getW();
+    double num2 = gyroQuaternion.getX() + gyroQuaternion.getX();
+    double num3 = gyroQuaternion.getY() + gyroQuaternion.getY();
+    double num4 = gyroQuaternion.getZ() * num;
+    double num5 = gyroQuaternion.getZ() * num2;
+    double num6 = gyroQuaternion.getZ() * num3;
+    double num7 = gyroQuaternion.getW() * num;
+    double num8 = gyroQuaternion.getW() * num2;
+    double num9 = gyroQuaternion.getW() * num3;
+    double num10 = gyroQuaternion.getX() * num2;
+    double num11 = gyroQuaternion.getX() * num3;
+    double num12 = gyroQuaternion.getY() * num3;
     double num13 = 1.0 - num10 - num12;
     double num14 = num8 - num6;
     double num15 = num9 + num5;

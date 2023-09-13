@@ -468,22 +468,30 @@ public class Robot extends TimedRobot {
 
     } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-      if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
-            arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
-      
-        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+        if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
+                arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) 
+        {
 
-      }
-      else {
-        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-      }
+            arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
 
-      claw.setStartedOuttakingBool(false);
-      claw.setFinishedOuttaking(false);
+        } else if (arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
+                arm.getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX) 
+        {
 
-      claw.stopClaw();
+            arm.setArmIndex(PlacementConstants.MID_TO_STOWED_INDEX);
 
-    }
+        } else {
+
+            arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+        
+        }
+
+        claw.setStartedOuttakingBool(false);
+        claw.setFinishedOuttaking(false);
+
+        claw.stopClaw();
+
+  }
 
     // Blink the lights red if we are flipped over
     if (Math.abs(swerve.getPitch().getDegrees()) > 35) {

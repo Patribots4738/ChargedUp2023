@@ -7,6 +7,7 @@ package hardware;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
@@ -97,6 +98,11 @@ public class MAXSwerveModule {
         turningSparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
         drivingSparkMax.setSmartCurrentLimit(ModuleConstants.DRIVING_MOTOR_CURRENT_LIMIT);
         turningSparkMax.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
+        
+        // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-5-default-rate-200ms
+        drivingSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+        turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+        turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
 
         // Save the SPARK MAX configurations. If a SPARK MAX browns out during
         // operation, it will maintain the above configurations.

@@ -37,5 +37,8 @@ public class DriverUI implements Loggable {
                 colorWhenTrue = "yellow", colorWhenFalse = "purple")
     public static boolean coneMode = false;
 
+    @BooleanBox(name = "Cone Mode", rowIndex = 5, columnIndex = 2, height = 1, width = 3)
+    public static boolean spicyClaw = false;
+
     public DriverUI() {}
 }

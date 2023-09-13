@@ -50,8 +50,8 @@ public final class Constants {
                            // Front Positive,   Left Positive
             new Translation2d( WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Front Left
             new Translation2d( WHEEL_BASE / 2, -TRACK_WIDTH / 2),  // Front Right
-            new Translation2d(-WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Rear Left
-            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
+            new Translation2d(-WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Rear  Left
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear  Right
 
         // Angular offsets of the modules relative to the chassis in radians
         // add 90 degrees to change the X and Y axis
@@ -471,6 +471,7 @@ public final class Constants {
       public static final int AUTO_CUBE_INTAKE_INDEX = 21;
       public static final int AUTO_CUBE_HIGH_INDEX = 22;
       public static final int AUTO_CUBE_MID_INDEX = 23;
+      public static final int MID_TO_STOWED_INDEX = 24;
 
       public static final double CLAW_INTAKE_SPEED_CONE = 1;
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
@@ -511,7 +512,7 @@ public final class Constants {
 
       public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
       public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(29, 32.88);
-      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(30.5, 21.00);
+      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(28, 21.00);
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 25);
@@ -662,6 +663,10 @@ public final class Constants {
         {
           TRANSITION_POSITION,
           CUBE_MID_AUTO
+        },
+        // Index 24 | Mid to Stow
+        {
+            STOWED_POSITION
         }
       };
   }
