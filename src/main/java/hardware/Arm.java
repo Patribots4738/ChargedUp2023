@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
@@ -111,6 +112,12 @@ public class Arm {
       upperArmPIDController.setOutputRange(
       ArmConstants.UPPER_MIN_OUTPUT,
       ArmConstants.UPPER_MAX_OUTPUT);
+
+      // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+      lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+      lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+      upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+      upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
 
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration
