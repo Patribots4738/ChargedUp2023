@@ -463,7 +463,7 @@ public class Arm {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((angle), (this.usingVelocity ? this.currentDesiredVelocity : 0));
+        double FF = feedForward.calculate((angle), 0);
         upperArmPIDController.setFF(FF);
 
         // Set the position of the neo controlling the upper arm to
@@ -494,7 +494,7 @@ public class Arm {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((position), (this.usingVelocity ? this.currentDesiredVelocity : 0));
+        double FF = feedForward.calculate((position), 0);
         lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
