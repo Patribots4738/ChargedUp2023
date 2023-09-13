@@ -9,6 +9,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -52,6 +53,13 @@ public class Claw implements Loggable {
     }
 
     public void periodic() {
+
+        if (claw.getMotorTemperature() > 60) {
+            DriverUI.spicyClaw = true;
+        }
+        else {
+            DriverUI.spicyClaw = false;
+        }
 
         // current = getOutputCurrent();
 
