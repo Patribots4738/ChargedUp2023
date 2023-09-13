@@ -63,6 +63,9 @@ public class Arm {
     private Timer trajectoryTimer;
     private boolean followingTrajectory;
 
+    private boolean usingVelocity = false;
+    private double currentDesiredVelocity = 0;
+
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
      */
@@ -167,7 +170,8 @@ public class Arm {
             return;
         }
 
-        this.drive(currentTrajectory.sample(trajectoryTimer.get()).poseMeters.getTranslation());
+        this.drive(currentTrajectory.sample(trajectoryTimer.get()).poseMeters.getTranslation(),
+                    currentTrajectory.sample(trajectoryTimer.get()).velocityMetersPerSecond);
 
     }
 
@@ -336,7 +340,9 @@ public class Arm {
      * @param position either the joystick input or the desired absolute position
      *                 this case is handled under OperatorOverride
      */
-    public void drive(Translation2d position) {
+    public void drive(Translation2d position, double... velocity) {
+        this.usingVelocity = velocity.length > 0;
+        this.currentDesiredVelocity = (this.usingVelocity ? velocity[0] : 0);
 
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
@@ -457,7 +463,7 @@ public class Arm {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((angle), 0);
+        double FF = feedForward.calculate((angle), (this.usingVelocity ? this.currentDesiredVelocity : 0));
         upperArmPIDController.setFF(FF);
 
         // Set the position of the neo controlling the upper arm to
@@ -488,7 +494,7 @@ public class Arm {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((position), 0);
+        double FF = feedForward.calculate((position), (this.usingVelocity ? this.currentDesiredVelocity : 0));
         lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
