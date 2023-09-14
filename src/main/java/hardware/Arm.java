@@ -63,9 +63,6 @@ public class Arm {
     private Timer trajectoryTimer;
     private boolean followingTrajectory;
 
-    private boolean usingVelocity = false;
-    private double currentDesiredVelocity = 0;
-
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
      */
@@ -113,13 +110,21 @@ public class Arm {
       ArmConstants.LOWER_MIN_OUTPUT,
       ArmConstants.LOWER_MAX_OUTPUT);
 
-      upperArmPIDController.setP(ArmConstants.UPPER_P);
-      upperArmPIDController.setI(ArmConstants.UPPER_I);
-      upperArmPIDController.setD(ArmConstants.UPPER_D);
-      upperArmPIDController.setFF(ArmConstants.UPPER_FF);
+      upperArmPIDController.setP(ArmConstants.UPPER_P, 0);
+      upperArmPIDController.setI(ArmConstants.UPPER_I, 0);
+      upperArmPIDController.setD(ArmConstants.UPPER_D, 0);
+      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 0);
       upperArmPIDController.setOutputRange(
       ArmConstants.UPPER_MIN_OUTPUT,
-      ArmConstants.UPPER_MAX_OUTPUT);
+      ArmConstants.UPPER_MAX_OUTPUT, 0);
+
+      upperArmPIDController.setP(ArmConstants.UPPER_P2, 1);
+      upperArmPIDController.setI(ArmConstants.UPPER_I2, 1);
+      upperArmPIDController.setD(ArmConstants.UPPER_D2, 1);
+      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 1);
+      upperArmPIDController.setOutputRange(
+      ArmConstants.UPPER_MIN_OUTPUT,
+      ArmConstants.UPPER_MAX_OUTPUT, 1);
 
       // Save the SPARK MAX configuration. If a SPARK MAX
       // browns out, it will retain the last configuration
@@ -164,20 +169,16 @@ public class Arm {
             startedTransition = true;
             armsAtDesiredPosition = true;
             followingTrajectory = false;
-            handlePIDChange(ArmConstants.UPPER_PID_SLOT_MAIN);
             trajectoryTimer.stop();
             System.out.println(trajectoryTimer.get());
             return;
         }
 
-        this.drive(currentTrajectory.sample(trajectoryTimer.get()).poseMeters.getTranslation(),
-                    currentTrajectory.sample(trajectoryTimer.get()).velocityMetersPerSecond);
+        this.drive(currentTrajectory.sample(trajectoryTimer.get()).poseMeters.getTranslation());
 
     }
 
     public void startTrajectory(Trajectory trajectory) {
-
-        handlePIDChange(ArmConstants.UPPER_PID_SLOT_ALTERNATE);
 
         this.currentTrajectory = trajectory;
         this.followingTrajectory = true;
@@ -279,7 +280,7 @@ public class Arm {
             index != PlacementConstants.CONE_FLIP_INDEX &&
             index != PlacementConstants.CONE_INTAKE_INDEX &&
             index != PlacementConstants.CUBE_INTAKE_INDEX &&
-            !operatorOverride) 
+            !operatorOverride)
         {
           startedTransition = true;
           return;
@@ -303,29 +304,6 @@ public class Arm {
         // Turn off operator override to prevent arm.drive from setting values wrong
         this.operatorOverride = false;
 
-        handlePIDChange(ArmConstants.UPPER_PID_SLOT_MAIN);
-    }
-
-    private void handlePIDChange(boolean mainSlot) {
-        if (mainSlot) {
-            if (upperArmPIDController.getP() == ArmConstants.UPPER_P2) {
-                upperArmPIDController.setP(ArmConstants.UPPER_P);
-            }
-
-            if (upperArmPIDController.getP() == ArmConstants.UPPER_D2) {
-                upperArmPIDController.setP(ArmConstants.UPPER_D);
-            }
-        }
-        else {
-            if (upperArmPIDController.getP() == ArmConstants.UPPER_P) {
-                upperArmPIDController.setP(ArmConstants.UPPER_P2);
-            }
-
-            if (upperArmPIDController.getP() == ArmConstants.UPPER_D) {
-                upperArmPIDController.setP(ArmConstants.UPPER_D2);
-            }
-        }
-    
     }
 
     public int getArmIndex() {
@@ -340,9 +318,7 @@ public class Arm {
      * @param position either the joystick input or the desired absolute position
      *                 this case is handled under OperatorOverride
      */
-    public void drive(Translation2d position, double... velocity) {
-        this.usingVelocity = velocity.length > 0;
-        this.currentDesiredVelocity = (this.usingVelocity ? velocity[0] : 0);
+    public void drive(Translation2d position) {
 
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
@@ -464,10 +440,10 @@ public class Arm {
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
         double FF = feedForward.calculate((angle), 0);
-        upperArmPIDController.setFF(FF);
+        upperArmPIDController.setFF(FF, followingTrajectory ? 1 : 0);
 
         // Set the position of the neo controlling the upper arm to
-        upperArmPIDController.setReference((angle), ControlType.kPosition);
+        upperArmPIDController.setReference((angle), ControlType.kPosition, followingTrajectory ? 1 : 0);
 
         upperRotation = upperArmEncoder.getPosition();
     }
@@ -562,7 +538,7 @@ public class Arm {
     // If we are at a prep index,
     // set the index to the prep_to_place equivelent
     public void finishPlacement() {
-      if (getAtPrepIndex()) {
+      if (getAtPrepIndex() && armsAtDesiredPosition) {
         followingTrajectory = false;
         switch (armPosDimension1) {
           case PlacementConstants.CONE_HIGH_PREP_INDEX:
