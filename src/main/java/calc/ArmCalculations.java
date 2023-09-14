@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.util.Units;
 
 public class ArmCalculations {
 
@@ -77,6 +76,25 @@ public class ArmCalculations {
         interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
     
         TrajectoryConfig config = new TrajectoryConfig(800, 400);
+    
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+            startPos,
+            interiorWaypoints,
+            endPos,
+            config);
+
+        return trajectory;
+    }
+
+    public static Trajectory generateHighToStowTrajectory() {
+
+        var startPos = new Pose2d(PlacementConstants.HIGH_RETRACT, Rotation2d.fromDegrees(0));
+        var endPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(0));
+    
+        var interiorWaypoints = new ArrayList<Translation2d>();
+        interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
+    
+        TrajectoryConfig config = new TrajectoryConfig(400, 250);
     
         var trajectory = TrajectoryGenerator.generateTrajectory(
             startPos,
