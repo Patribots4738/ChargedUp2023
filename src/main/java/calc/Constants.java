@@ -249,7 +249,7 @@ public final class Constants {
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
       public static final double UPPER_ARM_LOWER_LIMIT = 0.36;
-      public static final double UPPER_ARM_UPPER_LIMIT = 5.7;
+      public static final double UPPER_ARM_UPPER_LIMIT = 3.14;
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
@@ -290,6 +290,7 @@ public final class Constants {
       public static final double UPPER_FF = 1;
 
       public static final double UPPER_P2 = 3;//.25;
+      public static final double UPPER_I2 = 0;
       public static final double UPPER_D2 = 0.5;
 
       public static final boolean UPPER_PID_SLOT_MAIN = true;
@@ -673,5 +674,6 @@ public final class Constants {
       };
 
       public static final Trajectory HIGH_TRAJECTORY = ArmCalculations.generateHighTrajectory();
+      public static final Trajectory HIGH_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();
   }
 }
