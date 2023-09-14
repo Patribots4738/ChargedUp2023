@@ -318,10 +318,10 @@ public class Robot extends TimedRobot {
       // This is useful for driving in a straight line (backwards to intake!)
       else if (driver.getYButton()) {
         if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-          swerve.drive(-driverLeftAxis.getX(), -driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+          swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, false);
         }
         else {
-          swerve.drive(driverLeftAxis.getX(), driverLeftAxis.getY(), -driverRightX * 0.25, false, false);
+          swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, false, false);
         }
       }
       else {
@@ -342,7 +342,7 @@ public class Robot extends TimedRobot {
     
     if (arm.getOperatorOverride()) {
       
-      arm.drive(new Translation2d(-operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+      arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
       
     }
 
@@ -428,7 +428,7 @@ public class Robot extends TimedRobot {
     if (operator.getRightStickButtonPressed()) {
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
     }
-    if (operator.getAButtonPressed()) {
+    if (operator.getAButton()) {
       arm.finishPlacement();
     }
 
@@ -475,6 +475,7 @@ public class Robot extends TimedRobot {
             arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
       
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+        arm.startTrajectory(PlacementConstants.HIGH_TO_STOWED_TRAJECTORY);
 
       }
       else {
