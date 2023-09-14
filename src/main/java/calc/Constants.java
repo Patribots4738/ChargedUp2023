@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -248,7 +249,7 @@ public final class Constants {
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
       public static final double UPPER_ARM_LOWER_LIMIT = 0.36;
-      public static final double UPPER_ARM_UPPER_LIMIT = 5.7;
+      public static final double UPPER_ARM_UPPER_LIMIT = 3.14;
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
@@ -263,7 +264,7 @@ public final class Constants {
       public static final double LOWER_MAX_OUTPUT = 0.85;
       public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      public static final double UPPER_MAX_OUTPUT = 0.85;
+      public static final double UPPER_MAX_OUTPUT = 0.95;
       public static final double UPPER_MIN_OUTPUT = -0.4;
 
       /**
@@ -287,6 +288,13 @@ public final class Constants {
       public static final double UPPER_I = 0.0001;
       public static final double UPPER_D = 0.3;
       public static final double UPPER_FF = 1;
+
+      public static final double UPPER_P2 = 8;//.25;
+      public static final double UPPER_I2 = 0;
+      public static final double UPPER_D2 = 0.4;
+
+      public static final boolean UPPER_PID_SLOT_MAIN = true;
+      public static final boolean UPPER_PID_SLOT_ALTERNATE = false;
 
       public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
       public static final double UPPER_ENCODER_POSITION_PID_MAX_INPUT = UPPER_ENCODER_POSITION_FACTOR; // radians
@@ -669,5 +677,8 @@ public final class Constants {
             STOWED_POSITION
         }
       };
+
+      public static final Trajectory HIGH_TRAJECTORY = ArmCalculations.generateHighTrajectory();
+      public static final Trajectory HIGH_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();
   }
 }

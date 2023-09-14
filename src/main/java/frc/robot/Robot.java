@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
       timer = new Timer();
 
       Logger.configureLoggingAndConfig(this, false);
+
   }
 
   /**
@@ -341,7 +342,7 @@ public class Robot extends TimedRobot {
     
     if (arm.getOperatorOverride()) {
       
-      arm.drive(new Translation2d(-operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
+      arm.drive(new Translation2d(operatorLeftAxis.getX(), -operatorLeftAxis.getY()));
       
     }
 
@@ -401,7 +402,9 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
+        boolean hotReload = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
         arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
+        if (AutoAlignment.coneMode && !hotReload) { arm.startTrajectory(PlacementConstants.HIGH_TRAJECTORY); }
         break;
 
       // Clicking down
@@ -425,7 +428,7 @@ public class Robot extends TimedRobot {
     if (operator.getRightStickButtonPressed()) {
       arm.setArmIndex(PlacementConstants.STOWED_INDEX);
     }
-    if (operator.getAButtonPressed()) {
+    if (operator.getAButton()) {
       arm.finishPlacement();
     }
 
@@ -468,11 +471,11 @@ public class Robot extends TimedRobot {
 
     } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
-        if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
-                arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) 
-        {
-
-            arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+      if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
+            arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
+      
+        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+        arm.startTrajectory(PlacementConstants.HIGH_TO_STOWED_TRAJECTORY);
 
         } else if (arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
                 arm.getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX) 

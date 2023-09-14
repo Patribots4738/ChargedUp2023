@@ -14,7 +14,9 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
 public class Arm {
@@ -57,6 +59,10 @@ public class Arm {
     private final SparkMaxPIDController upperArmPIDController;
 
     private final ArmCalculations armCalculations;
+    private Trajectory currentTrajectory;
+    private double[] trajectoryFinalAngles;
+    private Timer trajectoryTimer;
+    private boolean followingTrajectory;
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -105,13 +111,21 @@ public class Arm {
       ArmConstants.LOWER_MIN_OUTPUT,
       ArmConstants.LOWER_MAX_OUTPUT);
 
-      upperArmPIDController.setP(ArmConstants.UPPER_P);
-      upperArmPIDController.setI(ArmConstants.UPPER_I);
-      upperArmPIDController.setD(ArmConstants.UPPER_D);
-      upperArmPIDController.setFF(ArmConstants.UPPER_FF);
+      upperArmPIDController.setP(ArmConstants.UPPER_P, 0);
+      upperArmPIDController.setI(ArmConstants.UPPER_I, 0);
+      upperArmPIDController.setD(ArmConstants.UPPER_D, 0);
+      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 0);
       upperArmPIDController.setOutputRange(
       ArmConstants.UPPER_MIN_OUTPUT,
-      ArmConstants.UPPER_MAX_OUTPUT);
+      ArmConstants.UPPER_MAX_OUTPUT, 0);
+
+      upperArmPIDController.setP(ArmConstants.UPPER_P2, 1);
+      upperArmPIDController.setI(ArmConstants.UPPER_I2, 1);
+      upperArmPIDController.setD(ArmConstants.UPPER_D2, 1);
+      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 1);
+      upperArmPIDController.setOutputRange(
+      ArmConstants.UPPER_MIN_OUTPUT,
+      ArmConstants.UPPER_MAX_OUTPUT, 1);
 
       // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
       lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
@@ -133,10 +147,16 @@ public class Arm {
 
       armCalculations = new ArmCalculations();
       setBrakeMode();
+
+      trajectoryTimer = new Timer();
+      // This may not be necesary, but if we make our trajectory now it will be ready for later
+      // Trajectories take around 10ms to create, which may be 
+      currentTrajectory = PlacementConstants.HIGH_TRAJECTORY;
     }
 
     public void periodic() {
-        if (!operatorOverride) { indexPeriodic();}
+        if (!operatorOverride && !followingTrajectory) { indexPeriodic(); }
+        else if (followingTrajectory) { trajectoryPeriodic(); }
         setLowerArmPosition(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
         upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
@@ -144,6 +164,62 @@ public class Arm {
         // Use forward kinematics to get the x and y position of the end effector
         armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+    }
+
+    public void trajectoryPeriodic() {
+
+        boolean atDesiredFine = (
+            Math.abs(trajectoryFinalAngles[0] - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
+            Math.abs(trajectoryFinalAngles[1] - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
+
+        if (atDesiredFine) {
+            startedTransition = true;
+            armsAtDesiredPosition = true;
+            followingTrajectory = false;
+            trajectoryTimer.stop();
+            System.out.println(trajectoryTimer.get());
+            return;
+        }
+
+        this.drive(currentTrajectory.sample(trajectoryTimer.get()).poseMeters.getTranslation());
+
+    }
+
+    public void startTrajectory(Trajectory trajectory) {
+
+        this.currentTrajectory = trajectory;
+        this.followingTrajectory = true;
+        this.trajectoryTimer.restart();
+        
+        Translation2d finalPosition = currentTrajectory.sample(currentTrajectory.getTotalTimeSeconds()).poseMeters.getTranslation();
+        
+        double finalUpperAngle = armCalculations.getUpperAngle(finalPosition.getX(), finalPosition.getY());
+        double finalLowerAngle = armCalculations.getLowerAngle(finalPosition.getX(), finalPosition.getY(), finalUpperAngle);
+
+        // Add PI/2 to lowerArmAngle...
+        // because the calculated angle is relative to the ground,
+        // And the zero for the encoder is set to the direction of gravity
+        // Add PI to upperArmAngle...
+        // because armCalculations gives us the angle relative to the upper arm
+        finalLowerAngle += (Math.PI/2);
+        finalUpperAngle += Math.PI;
+
+        // Clamp the output angles as to not murder our precious hard stops
+        finalUpperAngle = MathUtil.clamp(
+            finalUpperAngle,
+          ArmConstants.UPPER_ARM_LOWER_LIMIT,
+          ArmConstants.UPPER_ARM_UPPER_LIMIT
+        );
+
+        // Clamp the output angles as to not murder our precious hard stops
+        finalLowerAngle = MathUtil.clamp(
+            finalLowerAngle,
+          ArmConstants.LOWER_ARM_LOWER_LIMIT,
+          ArmConstants.LOWER_ARM_UPPER_LIMIT
+        );
+        
+        this.trajectoryFinalAngles = new double[] { finalLowerAngle, finalUpperAngle };
+    
     }
 
     public void indexPeriodic() {
@@ -200,6 +276,8 @@ public class Arm {
      */
     public void setArmIndex(int index) {
 
+        this.followingTrajectory = false;
+
         index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
 
         // Check if we are already at the desired index, and if we are not operator overriding,
@@ -213,7 +291,7 @@ public class Arm {
             index != PlacementConstants.CONE_FLIP_INDEX &&
             index != PlacementConstants.CONE_INTAKE_INDEX &&
             index != PlacementConstants.CUBE_INTAKE_INDEX &&
-            !operatorOverride) 
+            !operatorOverride)
         {
           startedTransition = true;
           return;
@@ -228,7 +306,11 @@ public class Arm {
         if (index == PlacementConstants.CONE_HIGH_PREP_INDEX &&
                 armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
             index == PlacementConstants.CONE_MID_PREP_INDEX && 
-                armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX) 
+                armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
+            (index == PlacementConstants.STOWED_INDEX &&
+                armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_INTAKE_INDEX ||
+                armPosDimension1 == PlacementConstants.CUBE_INTAKE_INDEX)) 
         {
             armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length-1;
         }
@@ -261,12 +343,9 @@ public class Arm {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-          // If the robot is facing left, have left joystick be positive
-          // If the robot is facing right, have left joystick be negative
           this.armXReference += (position.getX());
           this.armYReference += (position.getY());
         } else {
-          // If the arm is mirrored, invert all incoming X values
           this.armXReference = position.getX();
           this.armYReference = position.getY();
         }
@@ -274,7 +353,7 @@ public class Arm {
         // Make sure armX and armY are within the range of 0 to infinity
         // Because we cannot reach below the ground.
         // Even though our arm starts 11 inches above the ground,
-        // the claw will be 11 inches from the arm end
+        // the claw is roughly 11 inches from the arm end
         armYReference = (armYReference < 0) ? 0 : armYReference;
 
         Translation2d armPosition = new Translation2d(armXReference, armYReference);
@@ -381,10 +460,10 @@ public class Arm {
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
         double FF = feedForward.calculate((angle), 0);
-        upperArmPIDController.setFF(FF);
+        upperArmPIDController.setFF(FF, followingTrajectory ? 1 : 0);
 
         // Set the position of the neo controlling the upper arm to
-        upperArmPIDController.setReference((angle), ControlType.kPosition);
+        upperArmPIDController.setReference((angle), ControlType.kPosition, followingTrajectory ? 1 : 0);
 
         upperRotation = upperArmEncoder.getPosition();
     }
@@ -427,6 +506,7 @@ public class Arm {
      * This unit is in rads
      */
     public double getUpperArmAngle() {
+        this.upperRotation = upperArmEncoder.getPosition();
         return upperArmEncoder.getPosition();
     }
 
@@ -437,6 +517,7 @@ public class Arm {
      * This unit is in rads
      */
     public double getLowerArmAngle() {
+        this.lowerRotation = lowerArmEncoder.getPosition();
         return lowerArmEncoder.getPosition();
     }
 
@@ -470,13 +551,15 @@ public class Arm {
     public boolean getAtPrepIndex() {
       return (armPosDimension1 == PlacementConstants.FLOOR_INTAKE_PREP_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_INDEX ||
-              armPosDimension1 == PlacementConstants.CONE_MID_PREP_INDEX);
+              armPosDimension1 == PlacementConstants.CONE_MID_PREP_INDEX || 
+              followingTrajectory);
     }
 
     // If we are at a prep index,
     // set the index to the prep_to_place equivelent
     public void finishPlacement() {
-      if (getAtPrepIndex()) {
+      if (getAtPrepIndex() && armsAtDesiredPosition) {
+        followingTrajectory = false;
         switch (armPosDimension1) {
           case PlacementConstants.CONE_HIGH_PREP_INDEX:
             setArmIndex(PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX);
