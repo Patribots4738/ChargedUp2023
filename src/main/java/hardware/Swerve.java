@@ -210,8 +210,8 @@ public class Swerve {
 
       var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getPose().getRotation())
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+            ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getPose().getRotation()))
+            : discretize(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered)));
 
       setModuleStates(swerveModuleStates);
 
@@ -223,12 +223,32 @@ public class Swerve {
 
       SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation())
-                : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
+                ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation()))
+                : discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)));
 
       setModuleStates(swerveModuleStates);
 
     }
+  }
+
+  /** Credit: WPIlib 2024
+   * Discretizes a continuous-time chassis speed.
+   *
+   * @param vx    Forward velocity.
+   * @param vy    Sideways velocity.
+   * @param omega Angular velocity.
+   */
+  public static ChassisSpeeds discretize(ChassisSpeeds speeds) {
+    double dt = 0.02;
+    var desiredDeltaPose = new Pose2d(
+      speeds.vxMetersPerSecond * dt, 
+      speeds.vyMetersPerSecond * dt, 
+      new Rotation2d(speeds.omegaRadiansPerSecond * dt)
+    );
+
+    var twist = new Pose2d().log(desiredDeltaPose);
+    
+    return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
   }
 
   /**
@@ -287,6 +307,7 @@ public class Swerve {
     // }
     // return (velocity / swerveModules.length);
 
+    // We update the UI at the end of the loop, so this is a way of looking into the past.
     return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
 
   }

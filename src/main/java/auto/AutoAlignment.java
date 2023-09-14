@@ -191,8 +191,8 @@ public class AutoAlignment implements Loggable{
       );
 
       swerve.drive(
-          comboSpeeds.vyMetersPerSecond,
           comboSpeeds.vxMetersPerSecond,
+          comboSpeeds.vyMetersPerSecond,
           comboSpeeds.omegaRadiansPerSecond,
           false,
           false

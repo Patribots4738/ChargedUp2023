@@ -15,6 +15,7 @@ public class DriverUI implements Loggable {
 
     @Log(name="Select Auto:", rowIndex = 0, columnIndex = 4, height = 1, width = 2)
     public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
+    
     @BooleanBox(name = "Fresh Code", rowIndex = 0, columnIndex = 10, height = 1, width = 1, colorWhenTrue = "lime")
     public static boolean freshCode = true;
 
@@ -36,6 +37,9 @@ public class DriverUI implements Loggable {
     @BooleanBox(name = "Cone Mode", rowIndex = 1, columnIndex = 10, height = 5, width = 3, 
                 colorWhenTrue = "yellow", colorWhenFalse = "purple")
     public static boolean coneMode = false;
+
+    @BooleanBox(name = "Spicy Claw", rowIndex = 5, columnIndex = 2, height = 1, width = 3)
+    public static boolean spicyClaw = false;
 
     public DriverUI() {}
 }

@@ -477,17 +477,24 @@ public class Robot extends TimedRobot {
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
         arm.startTrajectory(PlacementConstants.HIGH_TO_STOWED_TRAJECTORY);
 
-      }
-      else {
-        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-      }
+        } else if (arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
+                arm.getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX) 
+        {
 
-      claw.setStartedOuttakingBool(false);
-      claw.setFinishedOuttaking(false);
+            arm.setArmIndex(PlacementConstants.MID_TO_STOWED_INDEX);
 
-      claw.stopClaw();
+        } else {
 
-    }
+            arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+        
+        }
+
+        claw.setStartedOuttakingBool(false);
+        claw.setFinishedOuttaking(false);
+
+        claw.stopClaw();
+
+  }
 
     // Blink the lights red if we are flipped over
     if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
@@ -535,6 +542,10 @@ public class Robot extends TimedRobot {
       driver.setRumble(RumbleType.kBothRumble, 0.25);
       operator.setRumble(RumbleType.kBothRumble, 0.25);
     
+    }
+    
+    if (arm.halfwayFinishedWithConeFlip()) {
+       claw.setDesiredSpeed(1);
     }
   }
 
