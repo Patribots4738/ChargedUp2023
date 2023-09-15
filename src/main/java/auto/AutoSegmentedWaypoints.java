@@ -269,7 +269,7 @@ public class AutoSegmentedWaypoints {
     if ((currentWaypointNumber == chosenWaypoints.length - 1 && 
         (stateHasFinished)))
     {
-      System.out.println("Charging! " + swerve.getPitch().getDegrees());
+    //   System.out.println("Charging! " + swerve.getPitch().getDegrees());
       if (!startedChargePad) {
         // Set the timer for the charge pad leveing PID loop
         autoAlignment.startChargePad();

@@ -177,7 +177,7 @@ public class Arm {
             armsAtDesiredPosition = true;
             followingTrajectory = false;
             trajectoryTimer.stop();
-            System.out.println(trajectoryTimer.get());
+            // System.out.println(trajectoryTimer.get());
             return;
         }
 
