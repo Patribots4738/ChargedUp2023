@@ -248,8 +248,8 @@ public final class Constants {
 
       // The number of degrees that the upper arm can rotate from the base of the lower arm
       // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
-      public static final double UPPER_ARM_LOWER_LIMIT = 0.36;
-      public static final double UPPER_ARM_UPPER_LIMIT = 3.14;
+      public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(21);
+      public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(180);
 
       // The amount of error allowed for the arm's position, in Radians
       // This is primarily used in autonomous
