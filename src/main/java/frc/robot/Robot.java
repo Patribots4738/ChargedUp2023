@@ -550,17 +550,20 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {}
+  public void testInit() {
+    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+    arm.setBrakeMode();
+    DriverUI.enabled = true;
+    DriverUI.freshCode = false;
+    SwerveTrajectory.resetTrajectoryStatus();
+
+    //testinit special feature: turn off match timer
+    timer.reset();
+    timer.stop();
+  }
 
   @Override
   public void testPeriodic() {
-    if (operator.getXButton()) {
-      autoAlignment.setConeMode(false);
-      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
-    }
-    else if (operator.getYButton()) {
-      autoAlignment.setConeMode(true);
-      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
-    }
+    teleopPeriodic();
   }
 }
