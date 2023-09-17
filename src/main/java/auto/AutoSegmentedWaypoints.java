@@ -162,6 +162,7 @@ public class AutoSegmentedWaypoints {
           // If the next waypoint is a high cone placement, prepare the arm for a high cone placement
           case PlacementConstants.CONE_HIGH_PLACEMENT_INDEX:
             arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX);
+            arm.startTrajectory(PlacementConstants.HIGH_TRAJECTORY);
             break;
           // If the next waypoint is a mid cone placement, prepare the arm for a mid cone placement
           case PlacementConstants.CONE_MID_PLACEMENT_INDEX:
@@ -205,9 +206,9 @@ public class AutoSegmentedWaypoints {
         // If the arm is at a prep index, change the desired index to be the other half of that prep index...
         // Notice that the floor intake does not have a second half, 
         // this is because the first transition point is the prep index's end point
-        if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_INDEX)
+        if (arm.getAtPrepIndex())
         {
-          arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX);
+          arm.finishPlacement();
         }
         // The arm is not at a prep index...
         else {
@@ -295,6 +296,7 @@ public class AutoSegmentedWaypoints {
           arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX)
       { 
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+        arm.startTrajectory(PlacementConstants.HIGH_TO_STOWED_TRAJECTORY);
       }
       // If our path placed a cube, just stow if we are not placing at high_cube_launch
       // The transition point in stow is enough to stay away from the arena
