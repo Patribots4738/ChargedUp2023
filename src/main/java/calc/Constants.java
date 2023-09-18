@@ -679,6 +679,7 @@ public final class Constants {
       };
 
       public static final Trajectory HIGH_TRAJECTORY = ArmCalculations.generateHighTrajectory();
+      public static final Trajectory HIGH_PLACE_TRAJECTORY = ArmCalculations.generateHighPlacementTrajectory();
       public static final Trajectory HIGH_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();
   }
 }

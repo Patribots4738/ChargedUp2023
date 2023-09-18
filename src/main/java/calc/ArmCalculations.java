@@ -86,6 +86,27 @@ public class ArmCalculations {
         return trajectory;
     }
 
+    public static Trajectory generateHighPlacementTrajectory() {
+
+        var startPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(45));
+        var endPos = new Pose2d(PlacementConstants.HIGH_CONE_POSITION_2, Rotation2d.fromDegrees(180));
+    
+        var interiorWaypoints = new ArrayList<Translation2d>();
+        interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
+        interiorWaypoints.add(PlacementConstants.HIGH_CONE_PREP);
+        interiorWaypoints.add(PlacementConstants.HIGH_CONE_POSITION_0);
+    
+        TrajectoryConfig config = new TrajectoryConfig(800, 800);
+    
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+            startPos,
+            interiorWaypoints,
+            endPos,
+            config);
+
+        return trajectory;
+    }
+
     public static Trajectory generateHighToStowTrajectory() {
 
         var startPos = new Pose2d(PlacementConstants.HIGH_RETRACT, Rotation2d.fromDegrees(0));

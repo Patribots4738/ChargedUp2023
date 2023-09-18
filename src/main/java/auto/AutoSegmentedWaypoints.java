@@ -213,6 +213,10 @@ public class AutoSegmentedWaypoints {
         // The arm is not at a prep index...
         else {
           arm.setArmIndex(armIndex);
+          if (armIndex == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX && currentWaypointNumber == 0) {
+            arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX);
+            arm.startTrajectory(PlacementConstants.HIGH_PLACE_TRAJECTORY);
+          }
         }
         // Prevent the arm from setting the index again
         hasMovedArm = true;
