@@ -520,7 +520,7 @@ public final class Constants {
 
       public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
       public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(29, 32.88);
-      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(28, 21.00);
+      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(26, 21.00);
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 25);
