@@ -162,7 +162,7 @@ public class AutoSegmentedWaypoints {
           // If the next waypoint is a high cone placement, prepare the arm for a high cone placement
           case PlacementConstants.CONE_HIGH_PLACEMENT_INDEX:
             arm.setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX);
-            arm.startTrajectory(PlacementConstants.HIGH_TRAJECTORY);
+            arm.startTrajectory(PlacementConstants.HIGH_CONE_TRAJECTORY);
             break;
           // Tuen the high cube index into a traj
           case PlacementConstants.CUBE_HIGH_INDEX:
@@ -194,7 +194,7 @@ public class AutoSegmentedWaypoints {
         if (arm.getArmIndex() != PlacementConstants.CUBE_INTAKE_INDEX && 
             arm.getArmIndex() != PlacementConstants.AUTO_CUBE_INTAKE_INDEX)
         {
-          arm.setArmIndex(PlacementConstants.AUTO_CUBE_INTAKE_INDEX);
+          arm.setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX);
         }
         claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CUBE);
       }

@@ -67,7 +67,7 @@ public class ArmCalculations {
       return (a + f * (b - a));
     }
 
-    public static Trajectory generateHighTrajectory() {
+    public static Trajectory generateHighConeTrajectory() {
 
         var startPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(45));
         var endPos = new Pose2d(PlacementConstants.HIGH_CONE_PREP, Rotation2d.fromDegrees(180));
@@ -154,6 +154,25 @@ public class ArmCalculations {
         interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
     
         TrajectoryConfig config = new TrajectoryConfig(400, 400);
+    
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+            startPos,
+            interiorWaypoints,
+            endPos,
+            config);
+
+        return trajectory;
+    }
+
+    public static Trajectory generateMidConeTrajectory() {
+
+        var startPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(45));
+        var endPos = new Pose2d(PlacementConstants.MID_CONE_PREP, Rotation2d.fromDegrees(180));
+    
+        var interiorWaypoints = new ArrayList<Translation2d>();
+        interiorWaypoints.add(PlacementConstants.TRANSITION_POSITION);
+    
+        TrajectoryConfig config = new TrajectoryConfig(800, 800);
     
         var trajectory = TrajectoryGenerator.generateTrajectory(
             startPos,
