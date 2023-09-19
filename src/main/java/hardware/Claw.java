@@ -86,7 +86,7 @@ public class Claw implements Loggable {
                 finishedOuttaking = true;
             }
             // Slow down claw for cube mode
-            if (!AutoAlignment.coneMode && DriverStation.isTeleopEnabled()) {
+            if (!AutoAlignment.coneMode && (DriverStation.isTeleopEnabled() || DriverStation.isTestEnabled())) {
               desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.5);
             }
             // Speed up claw for cone mode
