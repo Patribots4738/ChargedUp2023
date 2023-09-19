@@ -408,9 +408,9 @@ public class Robot extends TimedRobot {
 
       // Clicking up
       case 0:
-        boolean hotReload = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
+        boolean hotReloadHigh = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
         arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
-        if (!hotReload) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CUBE_TRAJECTORY : PlacementConstants.HIGH_CONE_TRAJECTORY); }
+        if (!hotReloadHigh) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CUBE_TRAJECTORY : PlacementConstants.HIGH_CONE_TRAJECTORY); }
         break;
 
       // Clicking down
@@ -420,7 +420,9 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
+        boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
         arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
+        if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
         break;
 
       // Clicking right
