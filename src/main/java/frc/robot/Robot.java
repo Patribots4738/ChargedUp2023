@@ -455,7 +455,7 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || timer.get() < 0.1) {
+    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || (timer.get() < 0.1 && !DriverStation.isTestEnabled())) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
@@ -556,8 +556,10 @@ public class Robot extends TimedRobot {
     DriverUI.enabled = true;
     DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
-
-    //testinit special feature: turn off match timer
+    autoAlignment.setConeOffset(0);
+    // Stop the timer, since this is test mode
+    // we want to allow the robot to be enabled as much
+    // as we want.
     timer.reset();
     timer.stop();
   }
