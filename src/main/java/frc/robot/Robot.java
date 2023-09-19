@@ -144,6 +144,11 @@ public class Robot extends TimedRobot {
     // We had a issue where we needed to redeploy before restarting auto
     // So this gives us an indicator to know if we have enabled yet
     // (i lost my mind not knowing if i redeployed or not) - alexander hamilton
+
+    
+    // future alegamnder here, that issue has since been fixed, 
+    // but my dementia has not.
+    // enjoy your boolboxes :)
     DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
   }
