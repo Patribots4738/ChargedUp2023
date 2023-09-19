@@ -194,7 +194,8 @@ public class Robot extends TimedRobot {
     // If we are close to the grid, allow the camera to modify odometry
     // This is because the camera was getting inacurate at longer distances
     if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
-        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5 || autoSegmentedWaypoints.halfway) 
+        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5)// || autoSegmentedWaypoints.halfway) 
+        // commenting autoalign.halfway becuase we dont want the camera to interfere while we are way out far
     {
       autoAlignment.calibrateOdometry();
     }
@@ -409,7 +410,7 @@ public class Robot extends TimedRobot {
       case 0:
         boolean hotReload = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
         arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
-        if (!hotReload) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CUBE_TRAJECTORY : PlacementConstants.HIGH_TRAJECTORY); }
+        if (!hotReload) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CUBE_TRAJECTORY : PlacementConstants.HIGH_CONE_TRAJECTORY); }
         break;
 
       // Clicking down
