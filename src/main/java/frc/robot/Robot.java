@@ -404,7 +404,7 @@ public class Robot extends TimedRobot {
       case 0:
         boolean hotReload = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
         arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
-        if (AutoAlignment.coneMode && !hotReload) { arm.startTrajectory(PlacementConstants.HIGH_TRAJECTORY); }
+        if (!hotReload) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CUBE_TRAJECTORY : PlacementConstants.HIGH_TRAJECTORY); }
         break;
 
       // Clicking down
