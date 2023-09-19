@@ -85,6 +85,25 @@ public class ArmCalculations {
 
         return trajectory;
     }
+    
+    public static Trajectory generateHighCubeTrajectory() {
+
+        var startPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(45));
+        var endPos = new Pose2d(PlacementConstants.CUBE_HIGH, Rotation2d.fromDegrees(180));
+    
+        var interiorWaypoints = new ArrayList<Translation2d>();
+        interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
+    
+        TrajectoryConfig config = new TrajectoryConfig(800, 800);
+    
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+            startPos,
+            interiorWaypoints,
+            endPos,
+            config);
+
+        return trajectory;
+    }
 
     public static Trajectory generateHighPlacementTrajectory() {
 
@@ -104,6 +123,25 @@ public class ArmCalculations {
             endPos,
             config);
 
+        return trajectory;
+    }
+
+    public static Trajectory generateHighCubeToStowTrajectory() {
+
+        var startPos = new Pose2d(PlacementConstants.CUBE_HIGH, Rotation2d.fromDegrees(0));
+        var endPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(50));
+        
+        var interiorWaypoints = new ArrayList<Translation2d>();
+        interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
+        
+        TrajectoryConfig config = new TrajectoryConfig(400, 400);
+        
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+            startPos,
+            interiorWaypoints,
+            endPos,
+            config);
+    
         return trajectory;
     }
 
