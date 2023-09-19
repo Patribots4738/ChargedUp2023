@@ -151,7 +151,7 @@ public class Arm {
       trajectoryTimer = new Timer();
       // This may not be necesary, but if we make our trajectory now it will be ready for later
       // Trajectories take around 10ms to create, which may be 
-      currentTrajectory = PlacementConstants.HIGH_TRAJECTORY;
+      currentTrajectory = PlacementConstants.HIGH_CONE_TRAJECTORY;
     }
 
     public void periodic() {
