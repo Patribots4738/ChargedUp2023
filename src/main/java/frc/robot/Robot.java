@@ -144,6 +144,11 @@ public class Robot extends TimedRobot {
     // We had a issue where we needed to redeploy before restarting auto
     // So this gives us an indicator to know if we have enabled yet
     // (i lost my mind not knowing if i redeployed or not) - alexander hamilton
+
+    
+    // future alegamnder here, that issue has since been fixed, 
+    // but my dementia has not.
+    // enjoy your boolboxes :)
     DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
   }
@@ -455,7 +460,7 @@ public class Robot extends TimedRobot {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || timer.get() < 0.1) {
+    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || (timer.get() < 0.1 && !DriverStation.isTestEnabled())) {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
@@ -556,8 +561,10 @@ public class Robot extends TimedRobot {
     DriverUI.enabled = true;
     DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
-
-    //testinit special feature: turn off match timer
+    autoAlignment.setConeOffset(0);
+    // Stop the timer, since this is test mode
+    // we want to allow the robot to be enabled as much
+    // as we want.
     timer.reset();
     timer.stop();
   }
