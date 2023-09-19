@@ -2,7 +2,7 @@
 ![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/ChargedUp2023/gradle.yml?label=Gradle%20Build&logo=Gradle)
 
 
-![Robot Image](src\main\deploy\images\jerome.jpg)
+![Robot Image](images\jerome.jpg)
 
 ## Highlights
   - Field-Relative Swerve Drive 
