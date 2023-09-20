@@ -17,9 +17,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
-public class Arm {
+public class Arm implements Loggable{
 
     int armPosDimension1 = PlacementConstants.STOWED_INDEX;
     int armPosDimension2 = 1;
@@ -46,7 +48,9 @@ public class Arm {
 
     private boolean armsAtDesiredPosition = false;
     
+    @Log
     private double armXPos = 0;
+    @Log
     private double armYPos = 0;
 
     private final CANSparkMax lowerArmRight;
