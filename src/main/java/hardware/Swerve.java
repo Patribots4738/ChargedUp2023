@@ -231,15 +231,20 @@ public class Swerve {
     }
   }
 
-  /** Credit: WPIlib 2024
-   * Discretizes a continuous-time chassis speed.
-   *
-   * @param vx    Forward velocity.
-   * @param vy    Sideways velocity.
-   * @param omega Angular velocity.
+  
+  /**
+   * This is the most theoretical thing that is in the code. 
+   * It takes our current position and then adds an offset to it, knowing that the robot's estimated position
+   * is not following the exact position of the robot.
+   * @param speeds the speeds about to be inputted into the robot.
+   * @return the same thing as we input. 
+   *   Think of this method as an interceptor, 
+   *   not changing the parameter but using it for calculations.
    */
-  public static ChassisSpeeds discretize(ChassisSpeeds speeds) {
+  public ChassisSpeeds discretize(ChassisSpeeds speeds) {
+    
     double dt = 0.02;
+    
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
       speeds.vyMetersPerSecond * dt, 
@@ -248,8 +253,39 @@ public class Swerve {
 
     var twist = new Pose2d().log(desiredDeltaPose);
     
-    return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
+    poseEstimator.resetPosition(
+        getGyroAngle(), 
+        getModulePositions(), 
+        new Pose2d(
+            twist.dx - getPose().getX(), 
+            twist.dy - getPose().getY(), 
+            Rotation2d.fromRadians(twist.dtheta - getPose().getRotation().getRadians())
+            )
+    );
+    
+    return speeds;
   }
+
+//   /** Credit: WPIlib 2024
+//    * Discretizes a continuous-time chassis speed.
+//    *
+//    * @param vx    Forward velocity.
+//    * @param vy    Sideways velocity.
+//    * @param omega Angular velocity.
+//    */
+//   public static ChassisSpeeds discretize(ChassisSpeeds speeds) {
+//     double dt = 0.02;
+//     var desiredDeltaPose = new Pose2d(
+//       speeds.vxMetersPerSecond * dt, 
+//       speeds.vyMetersPerSecond * dt, 
+//       new Rotation2d(speeds.omegaRadiansPerSecond * dt)
+//     );
+
+//     var twist = new Pose2d().log(desiredDeltaPose);
+    
+//     return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
+//   }
+
 
   /**
    * Sets the wheels into an X formation to prevent movement.
