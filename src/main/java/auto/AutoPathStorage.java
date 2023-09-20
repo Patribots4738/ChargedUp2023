@@ -138,6 +138,8 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _POOF_1H_A_2H_B_2M;
   public static Waypoint[] _POOF_9H_D_8H_C_8M;
 
+  public static Waypoint[] _SPIN;
+
   public static PathPlannerTrajectory square1;
   public static PathPlannerTrajectory square2;
   public static PathPlannerTrajectory square3;
@@ -227,6 +229,7 @@ public class AutoPathStorage implements Loggable {
 
   public static PathPlannerTrajectory _9_D_REACH;
   public static PathPlannerTrajectory _D_REACH_7;
+  public static PathPlannerTrajectory _CCWSPIN;
   
   /**
    * Create all the waypoints needed for each path
@@ -314,6 +317,8 @@ public class AutoPathStorage implements Loggable {
     
     _POOF_9_D_8 = PathPlanner.loadPath("POOF_9_D_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _POOF_8_C_8 = PathPlanner.loadPath("POOF_8_C_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    
+    _CCWSPIN = PathPlanner.loadPath("SPIN", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     // Use the initial state of _1_A as the starting point for _1
     // This is so we can move our arm before we move the robot.
@@ -856,6 +861,9 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_POOF_8_C_8, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
     };
     
+    _SPIN = new Waypoint[] {
+        new Waypoint(_CCWSPIN, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
 
 
     myAutoContainer = new AutoPose[] {
@@ -953,6 +961,8 @@ public class AutoPathStorage implements Loggable {
       new AutoPose("9H_D_8H_CHARGE_RED_", _9H_D_8H_CHARGE_RED),
       new AutoPose("9H_D_8H_", _9H_D_8H),
       new AutoPose("9H_D_8H_C_", _9H_D_8H_C),
+
+      new AutoPose("SPINCCW", _SPIN),
 
     };
 
