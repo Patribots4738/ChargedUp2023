@@ -150,6 +150,7 @@ public class Robot extends TimedRobot {
     // enjoy your boolboxes :)
     DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
+    DriverUI.startingRotation = swerve.getPose().getRotation().getDegrees();
   }
 
   @Override
