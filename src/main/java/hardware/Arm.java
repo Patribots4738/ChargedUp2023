@@ -331,7 +331,7 @@ public class Arm implements Loggable{
 
     public boolean halfwayFinishedWithConeFlip() {
         return this.armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX && 
-                this.armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1;
+                this.armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1 && !armsAtDesiredPositions;
     }
 
     /**
