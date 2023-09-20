@@ -553,7 +553,7 @@ public class Robot extends TimedRobot {
     }
     
     if (arm.halfwayFinishedWithConeFlip()) {
-       claw.setDesiredSpeed(1);
+       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
     }
   }
 
