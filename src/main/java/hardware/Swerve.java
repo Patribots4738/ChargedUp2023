@@ -257,9 +257,9 @@ public class Swerve {
         getGyroAngle(), 
         getModulePositions(), 
         new Pose2d(
-            twist.dx - getPose().getX(), 
-            twist.dy - getPose().getY(), 
-            Rotation2d.fromRadians(twist.dtheta - getPose().getRotation().getRadians())
+            getPose().getX() - twist.dx, 
+            getPose().getY() - twist.dy, 
+            Rotation2d.fromRadians(getPose().getRotation().getRadians() - twist.dtheta)
             )
     );
     
