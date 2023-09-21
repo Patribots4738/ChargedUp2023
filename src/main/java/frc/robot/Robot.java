@@ -144,13 +144,13 @@ public class Robot extends TimedRobot {
     // We had a issue where we needed to redeploy before restarting auto
     // So this gives us an indicator to know if we have enabled yet
     // (i lost my mind not knowing if i redeployed or not) - alexander hamilton
+
     
     // future alegamnder here, that issue has since been fixed, 
     // but my dementia has not.
     // enjoy your boolboxes :)
     DriverUI.freshCode = false;
     SwerveTrajectory.resetTrajectoryStatus();
-    DriverUI.startingRotation = swerve.getPose().getRotation().getDegrees();
   }
 
   @Override
@@ -160,8 +160,8 @@ public class Robot extends TimedRobot {
     swerve.periodic();
     claw.periodic();
     // System.out.printf("Time Left %.1f\n s", Timer.getMatchTime());
-    // Force the claw to suck at the start of the match, for preload
-    if (timer.get() < 0.06) {
+    // Force the claw to spit at the start of the match, for preload
+    if (timer.get() < 0.15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
