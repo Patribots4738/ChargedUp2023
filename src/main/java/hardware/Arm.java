@@ -331,7 +331,7 @@ public class Arm implements Loggable{
 
     public boolean halfwayFinishedWithConeFlip() {
         return this.armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX && 
-                this.armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1 && !armsAtDesiredPositions;
+                this.armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1 && !armsAtDesiredPosition;
     }
 
     /**
@@ -464,7 +464,11 @@ public class Arm implements Loggable{
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
         double FF = feedForward.calculate((angle), 0);
-        upperArmPIDController.setFF(FF, followingTrajectory ? 1 : 0);
+        upperArmPIDController.setFF(
+            (followingTrajectory && trajectoryTimer.get() > currentTrajectory.getTotalTimeSeconds() - 0.08) 
+                ? 0 
+                : FF, 
+            followingTrajectory ? 1 : 0);
 
         // Set the position of the neo controlling the upper arm to
         upperArmPIDController.setReference((angle), ControlType.kPosition, followingTrajectory ? 1 : 0);
