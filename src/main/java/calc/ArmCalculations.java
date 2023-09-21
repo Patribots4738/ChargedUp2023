@@ -167,7 +167,7 @@ public class ArmCalculations {
     public static Trajectory generateMidConeTrajectory() {
 
         var startPos = new Pose2d(PlacementConstants.STOWED_POSITION, Rotation2d.fromDegrees(45));
-        var endPos = new Pose2d(PlacementConstants.MID_CONE_PREP, Rotation2d.fromDegrees(180));
+        var endPos = new Pose2d(PlacementConstants.MID_CONE_PREP, Rotation2d.fromDegrees(135));
     
         var interiorWaypoints = new ArrayList<Translation2d>();
         interiorWaypoints.add(PlacementConstants.TRANSITION_POSITION);

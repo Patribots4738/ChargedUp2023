@@ -467,7 +467,14 @@ public class Arm implements Loggable{
         upperArmPIDController.setFF(FF, followingTrajectory ? 1 : 0);
 
         // Set the position of the neo controlling the upper arm to
-        upperArmPIDController.setReference((angle), ControlType.kPosition, followingTrajectory ? 1 : 0);
+        upperArmPIDController.setReference(
+            angle, 
+            ControlType.kPosition, 
+            followingTrajectory 
+                && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX 
+                    ? 1 
+                    : 0
+        );
 
         upperRotation = upperArmEncoder.getPosition();
     }
