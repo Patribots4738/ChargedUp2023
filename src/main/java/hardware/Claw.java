@@ -12,9 +12,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Log.Graph;
-import io.github.oblarg.oblog.annotations.Log.Graphs;
 
 public class Claw implements Loggable {
 
@@ -29,14 +26,8 @@ public class Claw implements Loggable {
     private double outtakeSeconds = 0;
     private double startedIntakingTimestamp = 0;
     private double startedOuttakingTimestamp = 0;
-    @Log
     private boolean hasGameElement = false;
-    @Graph
     private double current = 0;
-    @Graph
-    private double voltage = 0;
-    @Graph
-    private double realSpeed = 0;
 
     public Claw() {
 
@@ -61,9 +52,12 @@ public class Claw implements Loggable {
 
     public void periodic() {
 
+        if (20 < current && current < 30 && 20 < claw.getOutputCurrent() && claw.getOutputCurrent() < 30) {
+            claw.set(0);
+            return;
+        }
+
         current = claw.getOutputCurrent();
-        voltage = claw.getBusVoltage();
-        realSpeed = claw.getAppliedOutput();
 
         if (claw.getMotorTemperature() > 60) {
             DriverUI.spicyClaw = true;

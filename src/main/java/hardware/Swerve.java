@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -23,10 +22,21 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
+import io.github.oblarg.oblog.annotations.Log.Graph;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
-public class Swerve {
+public class Swerve implements Loggable {
+
+  double Poofdx = 0;
+  double Poofdy = 0;
+  double Poofdtheta = 0;
+
+  double dx = 0;
+  double dy = 0;
+  double dtheta = 0;
 
   public double yaw = 0;
 
@@ -114,10 +124,19 @@ public class Swerve {
 
   public void periodic() {
     // Update the odometry in the periodic block
+    Rotation2d previousRotation = getPose().getRotation();
+    double previousX = getPose().getX();
+    double previousY = getPose().getY();
+
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
-    DriverUI.field.setRobotPose(getPose());
     getPitch();
     getRoll();
+    
+    this.dx = previousX - getPose().getX();
+    this.dy = previousY - getPose().getY();
+    this.dtheta = getPose().getRotation().minus(previousRotation).getRadians();
+
+    DriverUI.field.setRobotPose(getPose());
   }
 
   /**
@@ -241,10 +260,40 @@ public class Swerve {
    *   Think of this method as an interceptor, 
    *   not changing the parameter but using it for calculations.
    */
+//   public ChassisSpeeds discretize(ChassisSpeeds speeds) {
+    
+    // double dt = 0.02;
+    
+    // var desiredDeltaPose = new Pose2d(
+    //   speeds.vxMetersPerSecond * dt, 
+    //   speeds.vyMetersPerSecond * dt, 
+    //   new Rotation2d(speeds.omegaRadiansPerSecond * dt)
+    // );
+
+    // var twist = new Pose2d().log(desiredDeltaPose);
+    
+    // poseEstimator.resetPosition(
+    //     getYaw(), 
+    //     getModulePositions(), 
+    //     new Pose2d(
+    //         getPose().getX() - twist.dx, 
+    //         getPose().getY() - twist.dy, 
+    //         Rotation2d.fromRadians(getPose().getRotation().getRadians())
+    //         )
+    // );
+    
+//     return speeds;
+//   }
+
+  /** Credit: WPIlib 2024
+   * Discretizes a continuous-time chassis speed.
+   *
+   * @param vx    Forward velocity.
+   * @param vy    Sideways velocity.
+   * @param omega Angular velocity.
+   */
   public ChassisSpeeds discretize(ChassisSpeeds speeds) {
-    
     double dt = 0.02;
-    
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
       speeds.vyMetersPerSecond * dt, 
@@ -252,39 +301,13 @@ public class Swerve {
     );
 
     var twist = new Pose2d().log(desiredDeltaPose);
-    
-    poseEstimator.resetPosition(
-        getGyroAngle(), 
-        getModulePositions(), 
-        new Pose2d(
-            getPose().getX() - twist.dx, 
-            getPose().getY() - twist.dy, 
-            Rotation2d.fromRadians(getPose().getRotation().getRadians() - twist.dtheta)
-            )
-    );
-    
-    return speeds;
+
+    Poofdx = twist.dx;
+    Poofdy = twist.dy;
+    Poofdtheta = twist.dtheta;
+
+    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (twist.dtheta / dt));
   }
-
-//   /** Credit: WPIlib 2024
-//    * Discretizes a continuous-time chassis speed.
-//    *
-//    * @param vx    Forward velocity.
-//    * @param vy    Sideways velocity.
-//    * @param omega Angular velocity.
-//    */
-//   public static ChassisSpeeds discretize(ChassisSpeeds speeds) {
-//     double dt = 0.02;
-//     var desiredDeltaPose = new Pose2d(
-//       speeds.vxMetersPerSecond * dt, 
-//       speeds.vyMetersPerSecond * dt, 
-//       new Rotation2d(speeds.omegaRadiansPerSecond * dt)
-//     );
-
-//     var twist = new Pose2d().log(desiredDeltaPose);
-    
-//     return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
-//   }
 
 
   /**
