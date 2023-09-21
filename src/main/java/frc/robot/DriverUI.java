@@ -41,7 +41,7 @@ public class DriverUI implements Loggable {
     @BooleanBox(name = "Spicy Claw", rowIndex = 5, columnIndex = 2, height = 1, width = 3)
     public static boolean spicyClaw = false;
 
-    @Log(name = "Starting rotation", rowIndex = 5, columnIndex = 0, height = 1, width = 3)
+    @Log(name = "Starting rotation", rowIndex = 5, columnIndex = 0, height = 1, width = 1)
     public static double startingRotation = 0;
 
     public DriverUI() {}
