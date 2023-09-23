@@ -4,6 +4,10 @@
 
 ![Robot Image](images/Jerome.gif)
 
+## [See how we did!](https://www.statbotics.io/team/4738)
+
+***[Check out our release video!](https://www.youtube.com/watch?v=b3fmnyfDZ1o)***
+
 ## Highlights
   - Field-Centric Swerve Drive 
   - Two-link arm driven by Inverse Kinematics
