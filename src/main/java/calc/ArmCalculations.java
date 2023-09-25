@@ -153,7 +153,7 @@ public class ArmCalculations {
         var interiorWaypoints = new ArrayList<Translation2d>();
         interiorWaypoints.add(PlacementConstants.MID_CONE_PREP);
     
-        TrajectoryConfig config = new TrajectoryConfig(400, 400);
+        TrajectoryConfig config = new TrajectoryConfig(200, 200);
     
         var trajectory = TrajectoryGenerator.generateTrajectory(
             startPos,
