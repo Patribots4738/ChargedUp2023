@@ -19,12 +19,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import calc.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Log.Graph;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
@@ -275,33 +273,13 @@ public class Swerve implements Loggable {
         new Rotation2d(speeds.omegaRadiansPerSecond * dt)
       );
 
-      var twist = this.log(desiredDeltaPose);
+      var twist = new Pose2d().log(desiredDeltaPose);
 
       Poofdx = twist.dx;
       Poofdy = twist.dy;
       Poofdtheta = twist.dtheta;
 
       return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (twist.dtheta / dt));
-  }
-
-  public static Twist2d log(final Pose2d transform) {
-      final double dtheta = transform.getRotation().getRadians();
-      final double half_dtheta = 0.5 * dtheta;
-      final double cos_minus_one = Math.cos(transform.getRotation().getRadians()) - 1.0;
-      double halftheta_by_tan_of_halfdtheta;
-      
-      if (Math.abs(cos_minus_one) < kEps) {
-          halftheta_by_tan_of_halfdtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
-      } else {
-          halftheta_by_tan_of_halfdtheta =
-            -(half_dtheta * Math.sin(transform.getRotation().getRadians())) / cos_minus_one;
-      }
-      final Translation2d translation_part =
-          transform
-            .getTranslation()
-            .rotateBy(new Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));
-    
-      return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
   }
 
 
