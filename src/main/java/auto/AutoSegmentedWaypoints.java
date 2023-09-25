@@ -142,12 +142,12 @@ public class AutoSegmentedWaypoints {
       
       // This is where the arm will "prep" to go to placement locations
       // Very useful for saving time
-      if (((!chosenAutoPath.getName().contains("POOF") &&
-          (DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
-          (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90)) || 
+      if (((!(chosenAutoPath.getName().contains("POOF")) &&
+            ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && Math.abs(swerve.getYaw().getDegrees()) > 90) || 
+            (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) < 90))) ||
           (chosenAutoPath.getName().contains("POOF") && 
-            ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && swerve.getPose().getX() < 5) ||
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red && swerve.getPose().getX() > AlignmentConstants.FIELD_WIDTH_METERS - 5)))) &&     
+            ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && swerve.getPose().getX() < 3) ||
+            (DriverStation.getAlliance() == DriverStation.Alliance.Red && swerve.getPose().getX() > (AlignmentConstants.FIELD_WIDTH_METERS - 3))))) &&     
           halfway && 
           /*
            * Get if we are on a pickup -> charge path, 
@@ -191,7 +191,7 @@ public class AutoSegmentedWaypoints {
               (DriverStation.getAlliance() == DriverStation.Alliance.Red && Math.abs(swerve.getYaw().getDegrees()) > 90))) || 
               (chosenAutoPath.getName().contains("POOF") && 
                 ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && swerve.getPose().getX() > 5) ||
-                (DriverStation.getAlliance() == DriverStation.Alliance.Red && swerve.getPose().getX() < AlignmentConstants.FIELD_WIDTH_METERS - 5))))
+                (DriverStation.getAlliance() == DriverStation.Alliance.Red && swerve.getPose().getX() < (AlignmentConstants.FIELD_WIDTH_METERS - 5)))))
       {
         AutoAlignment.coneMode = false;
         halfway = true;
