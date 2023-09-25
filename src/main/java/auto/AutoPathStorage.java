@@ -314,7 +314,7 @@ public class AutoPathStorage implements Loggable {
 
     _POOF_2_B_2 = PathPlanner.loadPath("_POOF_2_B_2", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     
-    _POOF_9_D_8 = PathPlanner.loadPath("_POOF_9_D_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _POOF_9_D_8 = PathPlanner.loadPath("_POOF_9_D_8", 2.75, 3.3);
     _POOF_8_C_8 = PathPlanner.loadPath("_POOF_8_C_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     
     _CCWSPIN = PathPlanner.loadPath("SPIN", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -850,7 +850,7 @@ public class AutoPathStorage implements Loggable {
 
     _POOF_1H_A_2H_B_2M_BLUE = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_POOF_2_B_2, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
     };
 
@@ -863,7 +863,7 @@ public class AutoPathStorage implements Loggable {
     _POOF_9H_D_8H_C_8M = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_POOF_9_D_8, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_POOF_8_C_8, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_POOF_8_C_8, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE   ),
     };
     
     _SPIN = new Waypoint[] {
