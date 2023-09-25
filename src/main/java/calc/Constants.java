@@ -140,7 +140,7 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 2.5;//)3; // 2.5 has worked very well for us so far
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3; // 2.5 has worked very well for us so far
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 9;//Math.PI/1.7;
@@ -485,7 +485,7 @@ public final class Constants {
       public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
       public static final double CLAW_INTAKE_SPEED_CUBE = 0.5;
       public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
-      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE = -0.5;
+      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE = -0.3;
       public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST = -0.8;
 
       public static final double CLAW_STOPPED_SPEED = 0;
