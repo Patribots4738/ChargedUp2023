@@ -508,9 +508,9 @@ public final class Constants {
       public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(15, 7);
       public static final Translation2d CUBE_INTAKE_POSITION_AUTO_0 = new Translation2d(14, 8);
       public static final Translation2d CUBE_INTAKE_POSITION_AUTO_1 = new Translation2d(10, 8);
-      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 5);
+      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d(15.4, 3.78);
 
-      public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 8);
+      public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 5);
       // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
       
       public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
