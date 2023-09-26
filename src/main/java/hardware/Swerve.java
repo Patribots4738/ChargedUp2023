@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
@@ -293,6 +294,9 @@ public class Swerve implements Loggable {
    * @param omega Angular velocity.
    */
   public ChassisSpeeds discretize(ChassisSpeeds speeds) {
+    if (DriverStation.isTestEnabled()) {
+      return speeds;
+    }
     double dt = 0.02;
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
