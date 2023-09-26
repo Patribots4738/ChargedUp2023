@@ -283,7 +283,7 @@ public class Swerve implements Loggable {
       Poofdy = twist.dy;
       Poofdtheta = twist.dtheta;
 
-    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (twist.dtheta / dt));
+    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
   }
 
 
