@@ -283,7 +283,7 @@ public class Swerve implements Loggable {
     // );
     
 //     return speeds;
-//   }
+//   }S
 
   /** Credit: WPIlib 2024
    * Discretizes a continuous-time chassis speed.
@@ -297,7 +297,7 @@ public class Swerve implements Loggable {
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
       speeds.vyMetersPerSecond * dt, 
-      new Rotation2d(speeds.omegaRadiansPerSecond * dt)
+      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 2)
     );
 
     var twist = new Pose2d().log(desiredDeltaPose);
@@ -306,7 +306,7 @@ public class Swerve implements Loggable {
     Poofdy = twist.dy;
     Poofdtheta = twist.dtheta;
 
-    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (twist.dtheta / dt));
+    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
   }
 
 
