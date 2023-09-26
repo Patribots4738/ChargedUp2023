@@ -19,13 +19,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import calc.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Log.Graph;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
@@ -261,31 +259,6 @@ public class Swerve implements Loggable {
    *   Think of this method as an interceptor, 
    *   not changing the parameter but using it for calculations.
    */
-//   public ChassisSpeeds discretize(ChassisSpeeds speeds) {
-    
-    // double dt = 0.02;
-    
-    // var desiredDeltaPose = new Pose2d(
-    //   speeds.vxMetersPerSecond * dt, 
-    //   speeds.vyMetersPerSecond * dt, 
-    //   new Rotation2d(speeds.omegaRadiansPerSecond * dt)
-    // );
-
-    // var twist = new Pose2d().log(desiredDeltaPose);
-    
-    // poseEstimator.resetPosition(
-    //     getYaw(), 
-    //     getModulePositions(), 
-    //     new Pose2d(
-    //         getPose().getX() - twist.dx, 
-    //         getPose().getY() - twist.dy, 
-    //         Rotation2d.fromRadians(getPose().getRotation().getRadians())
-    //         )
-    // );
-    
-//     return speeds;
-//   }S
-
   /** Credit: WPIlib 2024
    * Discretizes a continuous-time chassis speed.
    *
@@ -301,16 +274,16 @@ public class Swerve implements Loggable {
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
       speeds.vyMetersPerSecond * dt, 
-      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 2)
+      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 1)
     );
 
-    var twist = new Pose2d().log(desiredDeltaPose);
+      var twist = new Pose2d().log(desiredDeltaPose);
 
-    Poofdx = twist.dx;
-    Poofdy = twist.dy;
-    Poofdtheta = twist.dtheta;
+      Poofdx = twist.dx;
+      Poofdy = twist.dy;
+      Poofdtheta = twist.dtheta;
 
-    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
+    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (twist.dtheta / dt));
   }
 
 

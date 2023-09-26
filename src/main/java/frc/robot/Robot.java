@@ -173,7 +173,7 @@ public class Robot extends TimedRobot {
 
     // Have the claw outtake at the end of the match,
     // This is for a last second score
-    if (timer.get() > 14.65) {
+    if (timer.get() > 14.8) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
     }
     // If we are in the last 100 ms of the match, set the wheels up
