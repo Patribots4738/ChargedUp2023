@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import calc.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
@@ -258,7 +259,7 @@ public class Swerve implements Loggable {
    *   Think of this method as an interceptor, 
    *   not changing the parameter but using it for calculations.
    */
-  /** Credit: 254 -> WPIlib 2024
+  /** Credit: WPIlib 2024
    * Discretizes a continuous-time chassis speed.
    *
    * @param vx    Forward velocity.
@@ -266,12 +267,15 @@ public class Swerve implements Loggable {
    * @param omega Angular velocity.
    */
   public ChassisSpeeds discretize(ChassisSpeeds speeds) {
-     double dt = 0.02;
-      var desiredDeltaPose = new Pose2d(
-        speeds.vxMetersPerSecond * dt, 
-        speeds.vyMetersPerSecond * dt, 
-        new Rotation2d(speeds.omegaRadiansPerSecond * dt)
-      );
+    if (DriverStation.isTestEnabled()) {
+      return speeds;
+    }
+    double dt = 0.02;
+    var desiredDeltaPose = new Pose2d(
+      speeds.vxMetersPerSecond * dt, 
+      speeds.vyMetersPerSecond * dt, 
+      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 1)
+    );
 
       var twist = new Pose2d().log(desiredDeltaPose);
 
@@ -279,7 +283,7 @@ public class Swerve implements Loggable {
       Poofdy = twist.dy;
       Poofdtheta = twist.dtheta;
 
-      return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (twist.dtheta / dt));
+    return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
   }
 
 
