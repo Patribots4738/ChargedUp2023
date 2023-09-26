@@ -24,10 +24,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
 public class Swerve implements Loggable {
+
+  @Config
+  public static double twistScalar = 4;
 
   double Poofdx = 0;
   double Poofdy = 0;
