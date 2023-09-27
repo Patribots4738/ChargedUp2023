@@ -16,6 +16,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -123,6 +124,10 @@ public class Arm implements Loggable{
       ArmConstants.UPPER_MIN_OUTPUT,
       ArmConstants.UPPER_MAX_OUTPUT, 0);
 
+      // This is something that is not done with a lot of teams,
+      // it is an additional PID gain set which is used in our
+      // arm trajectory folowings, so that we tell the arm to go 
+      // super fast, but also be controlled when we want.
       upperArmPIDController.setP(ArmConstants.UPPER_P2, 1);
       upperArmPIDController.setI(ArmConstants.UPPER_I2, 1);
       upperArmPIDController.setD(ArmConstants.UPPER_D2, 1);
@@ -130,6 +135,18 @@ public class Arm implements Loggable{
       upperArmPIDController.setOutputRange(
       ArmConstants.UPPER_MIN_OUTPUT,
       ArmConstants.UPPER_MAX_OUTPUT, 1);
+
+      // This is something that is not done with a lot of teams,
+      // it is an additional PID gain set which is used in our
+      // arm trajectory folowings, so that we tell the arm to go 
+      // super fast, but also be controlled when we want.
+      upperArmPIDController.setP(ArmConstants.UPPER_P3, 2);
+      upperArmPIDController.setI(ArmConstants.UPPER_I3, 2);
+      upperArmPIDController.setD(ArmConstants.UPPER_D3, 2);
+      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 2);
+      upperArmPIDController.setOutputRange(
+      ArmConstants.UPPER_MIN_OUTPUT,
+      ArmConstants.UPPER_MAX_OUTPUT, 2);
 
       // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
       lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
@@ -460,20 +477,45 @@ public class Arm implements Loggable{
             ArmConstants.G_UPPER,
             ArmConstants.V_UPPER,
             ArmConstants.A_UPPER);
-
+            
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
         double FF = feedForward.calculate((angle), 0);
-        upperArmPIDController.setFF(FF, followingTrajectory ? 1 : 0);
+
+        // Check if we want to use secondary PID gains
+        // Slot 1 is used to make the arm go super fast
+            // Slot 2 is an in-between gain set which 
+            // slows the arm down just enough to not overshoot
+        boolean usePIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
+        boolean usePIDSlot2 = DriverStation.isTeleop() && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+
+        upperArmPIDController.setFF(
+            FF,
+            // Toggle between slot 0, 1, or 2
+            // If we should use slot 1 and 2, use 2
+            // else, use 1
+            // else, use 0 (default)
+            usePIDSlot1 
+                ? usePIDSlot2
+                    ? 2
+                    : 1 
+                : 0
+        );
 
         // Set the position of the neo controlling the upper arm to
+        // Toggle between all PID slots 
         upperArmPIDController.setReference(
             angle, 
-            ControlType.kPosition, 
-            followingTrajectory 
-                && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX 
-                    ? 1 
-                    : 0
+            ControlType.kPosition,
+            // Toggle between slot 0,1, or 2
+            // If we should use slot 1 and 2, use 2
+            // else, use 1
+            // else, use 0 (default)
+            usePIDSlot1 
+                ? usePIDSlot2
+                    ? 2 
+                    : 1 
+                : 0
         );
 
         upperRotation = upperArmEncoder.getPosition();
