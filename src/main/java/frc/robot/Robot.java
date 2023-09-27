@@ -434,7 +434,12 @@ public class Robot extends TimedRobot {
       arm.setArmIndex(PlacementConstants.CONE_FLIP_INDEX);
     }
     if (operator.getRightStickButtonPressed()) {
-      arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+      if (arm.getAtPlacementPosition()) {
+        claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
+      }
+      else {
+        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+      }
     }
     if (operator.getAButton()) {
       arm.finishPlacement();
