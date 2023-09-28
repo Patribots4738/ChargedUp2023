@@ -210,7 +210,9 @@ public class AutoPathStorage implements Loggable {
   public static PathPlannerTrajectory _8_C_CH_BLUE;
 
   public static PathPlannerTrajectory _POOF_1_A_2;
+  public static PathPlannerTrajectory _POOF_1_A_2_RED;
   public static PathPlannerTrajectory _POOF_2_B_2;
+  public static PathPlannerTrajectory _POOF_2_B_2_RED;
   public static PathPlannerTrajectory _POOF_9_D_8;
   public static PathPlannerTrajectory _POOF_8_C_8;
 
@@ -315,7 +317,10 @@ public class AutoPathStorage implements Loggable {
 
     _POOF_1_A_2 = PathPlanner.loadPath("_POOF_1_A_2", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _POOF_2_B_2 = PathPlanner.loadPath("_POOF_2_B_2", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _POOF_1_A_2_RED = PathPlanner.loadPath("_POOF_1_A_2_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _POOF_2_B_2_RED = PathPlanner.loadPath("_POOF_2_B_2_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     
+
     _POOF_9_D_8 = PathPlanner.loadPath("_POOF_9_D_8", 2.75, 3.3);
     _POOF_8_C_8 = PathPlanner.loadPath("_POOF_8_C_8", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     
@@ -852,8 +857,8 @@ public class AutoPathStorage implements Loggable {
 
     _POOF_1H_A_2H_B_2M_RED = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_POOF_1_A_2, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_POOF_2_B_2, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_2_B_2_RED, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
     };
 
     _POOF_1H_A_2H_B_2M_BLUE = new Waypoint[] {
