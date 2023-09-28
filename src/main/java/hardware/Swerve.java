@@ -278,7 +278,7 @@ public class Swerve implements Loggable {
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
       speeds.vyMetersPerSecond * dt, 
-      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 1)
+      new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4)
     );
 
       var twist = new Pose2d().log(desiredDeltaPose);
