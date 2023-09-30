@@ -183,7 +183,7 @@ public class AutoSegmentedWaypoints {
       }
       // This is where the arm will "prep" to go to pickup locations
       // Very useful for saving time
-      else if (
+      else if (!halfway &&
                 ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && swerve.getPose().getX() > 5) ||
                 (DriverStation.getAlliance() == DriverStation.Alliance.Red && swerve.getPose().getX() < (AlignmentConstants.FIELD_WIDTH_METERS - 5))))
       {
@@ -298,6 +298,7 @@ public class AutoSegmentedWaypoints {
       stateHasFinished = false;
       clawHasStarted = false;
       hasMovedArm = false;
+      halfway = false;
 
       // If our arm was at a high-placement index,
       // send it to stow while staying away from the grid
@@ -398,7 +399,6 @@ public class AutoSegmentedWaypoints {
           // claw.stopClaw();
         }
       }
-      }
-
+    }
   }
 }
