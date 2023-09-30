@@ -529,7 +529,7 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 25);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 29.5);
-      public static final Translation2d CUBE_HIGH = new Translation2d(40, 34);
+      public static final Translation2d CUBE_HIGH = new Translation2d(40, 30);
       public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(44, 35);//41 on Y
       public static final Translation2d CUBE_MID = new Translation2d(20,25);
       public static final Translation2d CUBE_MID_AUTO = new Translation2d(23, 25);
