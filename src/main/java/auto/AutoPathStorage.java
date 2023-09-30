@@ -857,7 +857,7 @@ public class AutoPathStorage implements Loggable {
 
     _POOF_1H_A_2H_B_2M_RED = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_POOF_2_B_2_RED, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
     };
 
