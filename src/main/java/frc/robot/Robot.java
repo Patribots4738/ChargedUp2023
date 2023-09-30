@@ -161,7 +161,7 @@ public class Robot extends TimedRobot {
     claw.periodic();
     // System.out.printf("Time Left %.1f\n s", Timer.getMatchTime());
     // Force the claw to spit at the start of the match, for preload
-    if (timer.get() < 0.15) {
+    if (timer.get() < 0.08) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
