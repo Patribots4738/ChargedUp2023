@@ -121,6 +121,7 @@ public class AutoPathStorage implements Loggable {
   public static Waypoint[] _4H_MOBILITY;
   public static Waypoint[] _5H_MOBILITY;
   public static Waypoint[] _6H_MOBILITY;
+  public static Waypoint[] _6H_ONLY;
   public static Waypoint[] _4H_MOBILITY_CHARGE;
   public static Waypoint[] _5H_MOBILITY_CHARGE;
   public static Waypoint[] _6H_MOBILITY_CHARGE;
@@ -191,9 +192,9 @@ public class AutoPathStorage implements Loggable {
   public static PathPlannerTrajectory _8_CH;
   public static PathPlannerTrajectory _9_CH;
 
-  public static PathPlannerTrajectory _4_M;
+  public static PathPlannerTrajectory _4_M_CH;
   public static PathPlannerTrajectory _5_M;
-  public static PathPlannerTrajectory _6_M;
+  public static PathPlannerTrajectory _6_M_CH;
   public static PathPlannerTrajectory _M_CH;
 
   public static PathPlannerTrajectory _7_C;
@@ -254,12 +255,12 @@ public class AutoPathStorage implements Loggable {
     _3_A = PathPlanner.loadPath("_3_A", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _3_B = PathPlanner.loadPath("_3_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _4_B = PathPlanner.loadPath("_4_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _4_M = PathPlanner.loadPath("_4_M", 2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _4_M_CH = PathPlanner.loadPath("_4_M", 2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _5_B = PathPlanner.loadPath("_5_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _5_C = PathPlanner.loadPath("_5_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _5_M = PathPlanner.loadPath("_5_M", 2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _6_C = PathPlanner.loadPath("_6_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _6_M = PathPlanner.loadPath("_6_M", 2, 1);
+    _6_M_CH = PathPlanner.loadPath("_6_M", 2, 1);
     _7_C = PathPlanner.loadPath("_7_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _7_D = PathPlanner.loadPath("_7_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _8_C = PathPlanner.loadPath("_8_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -700,7 +701,7 @@ public class AutoPathStorage implements Loggable {
 
     _4H_MOBILITY = new Waypoint[] {
         new Waypoint(_4, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_4_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+        new Waypoint(_4_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _5H_MOBILITY = new Waypoint[] {
@@ -708,15 +709,19 @@ public class AutoPathStorage implements Loggable {
         new Waypoint(_5_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
+    _6H_ONLY = new Waypoint[] {
+        new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
+        new Waypoint(_6, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+    };
+
     _6H_MOBILITY = new Waypoint[] {
         new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_6_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+        new Waypoint(_6_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _4H_MOBILITY_CHARGE = new Waypoint[] {
         new Waypoint(_4, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_4_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-        new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+        new Waypoint(_4_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _5H_MOBILITY_CHARGE = new Waypoint[] {
@@ -727,8 +732,7 @@ public class AutoPathStorage implements Loggable {
 
     _6H_MOBILITY_CHARGE = new Waypoint[] {
         new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_6_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-        new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
+        new Waypoint(_6_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
     };
     
     _1H_A_CHARGE = new Waypoint[] {
@@ -889,7 +893,8 @@ public class AutoPathStorage implements Loggable {
     //   new AutoPose("9H_D_8H_C_8M_RED_", _9H_D_8H_C_8M_RED),
     //   new AutoPose("9H_D_8H_C_8M_BLUE_", _9H_D_8H_C_8M_BLUE),
 
-      new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
+    new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
+    new AutoPose("4H_ONLY", _6H_ONLY),
       
       new AutoPose("1H_A_2H_B_2M_BLUE_", _1H_A_2H_B_2M_BLUE),
       new AutoPose("1H_A_2H_B_2M_RED_", _1H_A_2H_B_2M_RED),
