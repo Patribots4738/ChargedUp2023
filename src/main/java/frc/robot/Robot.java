@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.revrobotics.CANSparkMax;
+
 import auto.AutoAlignment;
 import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
@@ -9,6 +11,7 @@ import calc.Constants.AlignmentConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.LEDConstants;
+import calc.Constants.NeoMotorConstants;
 import calc.Constants.OIConstants;
 import calc.Constants.PlacementConstants;
 import calc.OICalc;
@@ -78,6 +81,13 @@ public class Robot extends TimedRobot {
       arduinoController = new ArduinoController();
 
       timer = new Timer();
+
+      Timer.delay(0.25);
+      for (CANSparkMax neo : NeoMotorConstants.motors) {
+        neo.burnFlash();
+        Timer.delay(0.005);
+      }
+      Timer.delay(0.25);
 
       Logger.configureLoggingAndConfig(this, false);
 

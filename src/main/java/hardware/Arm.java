@@ -2,6 +2,7 @@ package hardware;
 
 import calc.ArmCalculations;
 import calc.Constants.ArmConstants;
+import calc.Constants.NeoMotorConstants;
 import calc.Constants.PlacementConstants;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -74,105 +75,107 @@ public class Arm implements Loggable{
      */
     public Arm() {
 
-      lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
-      lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
-      upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
+        lowerArmRight = new CANSparkMax(ArmConstants.LOWER_ARM_RIGHT_MOTOR_CAN_ID, MotorType.kBrushless);
+        lowerArmLeft = new CANSparkMax(ArmConstants.LOWER_ARM_LEFT_MOTOR_CAN_ID, MotorType.kBrushless);
+        upperArm = new CANSparkMax(ArmConstants.UPPER_ARM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-      lowerArmRight.setIdleMode(IdleMode.kBrake);
-      lowerArmLeft.setIdleMode(IdleMode.kBrake);
-      upperArm.setIdleMode(IdleMode.kCoast);
+        lowerArmRight.setIdleMode(IdleMode.kBrake);
+        lowerArmLeft.setIdleMode(IdleMode.kBrake);
+        upperArm.setIdleMode(IdleMode.kCoast);
 
-      // Factory reset, so we get the SPARK MAX to a known state before configuring
-      // them. This is useful in case a SPARK MAX is swapped out.
-      lowerArmRight.restoreFactoryDefaults();
-      lowerArmLeft.restoreFactoryDefaults();
-      upperArm.restoreFactoryDefaults();
+        // Factory reset, so we get the SPARK MAX to a known state before configuring
+        // them. This is useful in case a SPARK MAX is swapped out.
+        lowerArmRight.restoreFactoryDefaults();
+        lowerArmLeft.restoreFactoryDefaults();
+        upperArm.restoreFactoryDefaults();
 
-      lowerArmEncoder = lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
-      upperArmEncoder = upperArm.getAbsoluteEncoder(Type.kDutyCycle);
+        lowerArmEncoder = lowerArmRight.getAbsoluteEncoder(Type.kDutyCycle);
+        upperArmEncoder = upperArm.getAbsoluteEncoder(Type.kDutyCycle);
 
-      lowerArmPIDController = lowerArmRight.getPIDController();
-      upperArmPIDController = upperArm.getPIDController();
+        lowerArmPIDController = lowerArmRight.getPIDController();
+        upperArmPIDController = upperArm.getPIDController();
 
-      lowerArmPIDController.setFeedbackDevice(lowerArmEncoder);
-      upperArmPIDController.setFeedbackDevice(upperArmEncoder);
+        lowerArmPIDController.setFeedbackDevice(lowerArmEncoder);
+        upperArmPIDController.setFeedbackDevice(upperArmEncoder);
 
-      lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
-      lowerArmEncoder.setVelocityConversionFactor(ArmConstants.LOWER_ENCODER_VELOCITY_FACTOR);
+        lowerArmEncoder.setPositionConversionFactor(ArmConstants.LOWER_ENCODER_POSITION_FACTOR);
+        lowerArmEncoder.setVelocityConversionFactor(ArmConstants.LOWER_ENCODER_VELOCITY_FACTOR);
 
-      upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
-      upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
+        upperArmEncoder.setPositionConversionFactor(ArmConstants.UPPER_ENCODER_POSITION_FACTOR);
+        upperArmEncoder.setVelocityConversionFactor(ArmConstants.UPPER_ENCODER_VELOCITY_FACTOR);
 
-      lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
-      lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
-      upperArm.setSmartCurrentLimit(ArmConstants.UPPER_FREE_LIMIT);
+        lowerArmLeft.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
+        lowerArmRight.setSmartCurrentLimit(ArmConstants.LOWER_FREE_LIMIT);
+        upperArm.setSmartCurrentLimit(ArmConstants.UPPER_FREE_LIMIT);
 
-      // Set PID constants for the lower and upper SPARK MAX(s)
-      lowerArmPIDController.setP(ArmConstants.LOWER_P);
-      lowerArmPIDController.setI(ArmConstants.LOWER_I);
-      lowerArmPIDController.setD(ArmConstants.LOWER_D);
-      lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
-      lowerArmPIDController.setOutputRange(
-      ArmConstants.LOWER_MIN_OUTPUT,
-      ArmConstants.LOWER_MAX_OUTPUT);
+        // Set PID constants for the lower and upper SPARK MAX(s)
+        lowerArmPIDController.setP(ArmConstants.LOWER_P);
+        lowerArmPIDController.setI(ArmConstants.LOWER_I);
+        lowerArmPIDController.setD(ArmConstants.LOWER_D);
+        lowerArmPIDController.setFF(ArmConstants.LOWER_FF);
+        lowerArmPIDController.setOutputRange(
+                ArmConstants.LOWER_MIN_OUTPUT,
+                ArmConstants.LOWER_MAX_OUTPUT);
 
-      upperArmPIDController.setP(ArmConstants.UPPER_P, 0);
-      upperArmPIDController.setI(ArmConstants.UPPER_I, 0);
-      upperArmPIDController.setD(ArmConstants.UPPER_D, 0);
-      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 0);
-      upperArmPIDController.setOutputRange(
-      ArmConstants.UPPER_MIN_OUTPUT,
-      ArmConstants.UPPER_MAX_OUTPUT, 0);
+        upperArmPIDController.setP(ArmConstants.UPPER_P, 0);
+        upperArmPIDController.setI(ArmConstants.UPPER_I, 0);
+        upperArmPIDController.setD(ArmConstants.UPPER_D, 0);
+        upperArmPIDController.setFF(ArmConstants.UPPER_FF, 0);
+        upperArmPIDController.setOutputRange(
+                ArmConstants.UPPER_MIN_OUTPUT,
+                ArmConstants.UPPER_MAX_OUTPUT, 0);
 
-      // This is something that is not done with a lot of teams,
-      // it is an additional PID gain set which is used in our
-      // arm trajectory folowings, so that we tell the arm to go 
-      // super fast, but also be controlled when we want.
-      upperArmPIDController.setP(ArmConstants.UPPER_P2, 1);
-      upperArmPIDController.setI(ArmConstants.UPPER_I2, 1);
-      upperArmPIDController.setD(ArmConstants.UPPER_D2, 1);
-      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 1);
-      upperArmPIDController.setOutputRange(
-      ArmConstants.UPPER_MIN_OUTPUT,
-      ArmConstants.UPPER_MAX_OUTPUT, 1);
+        // This is something that is not done with a lot of teams,
+        // it is an additional PID gain set which is used in our
+        // arm trajectory folowings, so that we tell the arm to go
+        // super fast, but also be controlled when we want.
+        upperArmPIDController.setP(ArmConstants.UPPER_P2, 1);
+        upperArmPIDController.setI(ArmConstants.UPPER_I2, 1);
+        upperArmPIDController.setD(ArmConstants.UPPER_D2, 1);
+        upperArmPIDController.setFF(ArmConstants.UPPER_FF, 1);
+        upperArmPIDController.setOutputRange(
+                ArmConstants.UPPER_MIN_OUTPUT,
+                ArmConstants.UPPER_MAX_OUTPUT, 1);
 
-      // This is something that is not done with a lot of teams,
-      // it is an additional PID gain set which is used in our
-      // arm trajectory folowings, so that we tell the arm to go 
-      // super fast, but also be controlled when we want.
-      upperArmPIDController.setP(ArmConstants.UPPER_P3, 2);
-      upperArmPIDController.setI(ArmConstants.UPPER_I3, 2);
-      upperArmPIDController.setD(ArmConstants.UPPER_D3, 2);
-      upperArmPIDController.setFF(ArmConstants.UPPER_FF, 2);
-      upperArmPIDController.setOutputRange(
-      ArmConstants.UPPER_MIN_OUTPUT,
-      ArmConstants.UPPER_MAX_OUTPUT, 2);
+        // This is something that is not done with a lot of teams,
+        // it is an additional PID gain set which is used in our
+        // arm trajectory folowings, so that we tell the arm to go
+        // super fast, but also be controlled when we want.
+        upperArmPIDController.setP(ArmConstants.UPPER_P3, 2);
+        upperArmPIDController.setI(ArmConstants.UPPER_I3, 2);
+        upperArmPIDController.setD(ArmConstants.UPPER_D3, 2);
+        upperArmPIDController.setFF(ArmConstants.UPPER_FF, 2);
+        upperArmPIDController.setOutputRange(
+                ArmConstants.UPPER_MIN_OUTPUT,
+                ArmConstants.UPPER_MAX_OUTPUT, 2);
 
-      // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
-      lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-      lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-      upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-      upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+        // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+        lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+        lowerArmRight.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+        upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+        upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
 
-      // Save the SPARK MAX configuration. If a SPARK MAX
-      // browns out, it will retain the last configuration
-      lowerArmLeft.follow(lowerArmRight, true);
-      upperArmEncoder.setInverted(true);
+        // Save the SPARK MAX configuration. If a SPARK MAX
+        // browns out, it will retain the last configuration
+        lowerArmLeft.follow(lowerArmRight, true);
+        upperArmEncoder.setInverted(true);
 
-      // zeroUpperArmEncoder();
-      // zeroLowerArmEncoder();
+        // zeroUpperArmEncoder();
+        // zeroLowerArmEncoder();
 
-      lowerArmRight.burnFlash();
-      lowerArmLeft.burnFlash();
-      upperArm.burnFlash();
+        NeoMotorConstants.motors.add(lowerArmLeft);
+        NeoMotorConstants.motors.add(lowerArmRight);
+        NeoMotorConstants.motors.add(upperArm);
+        
+        armCalculations = new ArmCalculations();
+        setBrakeMode();
 
-      armCalculations = new ArmCalculations();
-      setBrakeMode();
+        trajectoryTimer = new Timer();
+        // This may not be necesary, but if we make our trajectory now it will be ready
+        // for later
+        // Trajectories take around 10ms to create, which may be
+        currentTrajectory = PlacementConstants.HIGH_CONE_TRAJECTORY;
 
-      trajectoryTimer = new Timer();
-      // This may not be necesary, but if we make our trajectory now it will be ready for later
-      // Trajectories take around 10ms to create, which may be 
-      currentTrajectory = PlacementConstants.HIGH_CONE_TRAJECTORY;
     }
 
     public void periodic() {

@@ -14,7 +14,9 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import calc.Constants.ModuleConstants;
+import calc.Constants.NeoMotorConstants;
 
 public class MAXSwerveModule {
     private final CANSparkMax drivingSparkMax;
@@ -106,8 +108,9 @@ public class MAXSwerveModule {
 
         // Save the SPARK MAX configurations. If a SPARK MAX browns out during
         // operation, it will maintain the above configurations.
-        drivingSparkMax.burnFlash();
-        turningSparkMax.burnFlash();
+
+        NeoMotorConstants.motors.add(drivingSparkMax);
+        NeoMotorConstants.motors.add(turningSparkMax);
 
         this.chassisAngularOffset = chassisAngularOffset;
         desiredState.angle = new Rotation2d(turningEncoder.getPosition());

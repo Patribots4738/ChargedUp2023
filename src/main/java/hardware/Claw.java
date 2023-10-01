@@ -2,6 +2,7 @@ package hardware;
 
 import auto.AutoAlignment;
 import calc.Constants.ClawConstants;
+import calc.Constants.NeoMotorConstants;
 import calc.Constants.PlacementConstants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -40,8 +41,11 @@ public class Claw implements Loggable {
         claw.setSmartCurrentLimit(ClawConstants.CLAW_CURRENT_LIMIT);
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
         claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        claw.setInverted(true);
-        claw.burnFlash();
+        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
+        claw.setInverted(false);
+
+        NeoMotorConstants.motors.add(claw);
+        
         setBrakeMode();
 
     }
@@ -100,7 +104,7 @@ public class Claw implements Loggable {
     }
 
     private void setSpeed(double speed) {
-        claw.set(speed);
+        claw.set(-speed);
     }
 
     public void setBrakeMode() {

@@ -4,6 +4,10 @@
 
 package calc;
 
+import java.util.ArrayList;
+
+import com.revrobotics.CANSparkMax;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -187,6 +191,8 @@ public final class Constants {
 
     public static final class NeoMotorConstants {
         public static final double FREE_SPEED_RPM = 5676;
+
+        public static ArrayList<CANSparkMax> motors = new ArrayList<>();
     }
 
     public static final class ArmConstants {
