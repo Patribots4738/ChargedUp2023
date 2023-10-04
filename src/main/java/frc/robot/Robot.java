@@ -133,11 +133,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
-      arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
-    }
-    else {
-      arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
+    if (DriverStation.isDSAttached() || DriverStation.isFMSAttached()) {
+        if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
+        }
+        else {
+        arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
+        }
     }
   }
 
