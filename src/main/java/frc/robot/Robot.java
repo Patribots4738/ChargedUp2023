@@ -120,8 +120,7 @@ public class Robot extends TimedRobot {
     operator.setRumble(RumbleType.kLeftRumble, 0);
     operator.setRumble(RumbleType.kRightRumble, 0);
     
-    arduinoController.setLEDState(LEDConstants.ARM_RAINBOW);
-    arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
+    arduinoController.setLEDState(LEDConstants.ARM_GREEN);
 
     swerve.setSpeedMultiplier(1);
 
@@ -135,10 +134,15 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     if (DriverStation.isDSAttached() || DriverStation.isFMSAttached()) {
         if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
-        arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
+            arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
         }
         else {
-        arduinoController.setLEDState(DriverStation.getAlliance() == Alliance.Blue ? LEDConstants.BELLY_PAN_BLUE : LEDConstants.BELLY_PAN_RED_ALLIANCE);
+            if (DriverStation.getAlliance() == Alliance.Blue) {
+                arduinoController.setLEDState(LEDConstants.BELLY_PAN_BLUE);
+            }
+            else if (DriverStation.getAlliance() == Alliance.Red) {
+                arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED_ALLIANCE);
+            }
         }
     }
   }
