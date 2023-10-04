@@ -13,10 +13,10 @@
 #define BRIGHTNESS 100
 
 #define BELLYPAN_START_INDEX 0
-#define BELLYPAN_END_INDEX 96
+#define BELLYPAN_END_INDEX 95
 #define SPONSOR_PANEL_START_INDEX 0
 #define SPONSOR_PANEL_END_INDEX 0
-#define ARM_START_INDEX 97
+#define ARM_START_INDEX 96
 #define ARM_END_INDEX 131
 #define CLAW_START_INDEX 30
 #define CLAW_END_INDEX 34
@@ -29,11 +29,20 @@ int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
 int bounceCenter = 0;
 
-int bellyPanPattern = 1;
+int bellyPanPattern = -1;
 int sponsorPanelPattern = 0;
 int armPattern = 20;
 int clawPattern = 0;
 int statusLED = false;
+int bellyLeftIDX = BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
+int bellyRightIDX = BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
+int armLeftIDX = ARM_START_INDEX + ((ARM_END_INDEX-ARM_START_INDEX)/2);
+int armRightIDX = ARM_START_INDEX + ((ARM_END_INDEX-ARM_START_INDEX)/2);
+
+int bellyPanMiddle = (BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2));
+int loadingIndex = bellyPanMiddle;
+
+unsigned long previousMillis = 0;
 
 void setup() {
   Wire.begin(8);
@@ -47,23 +56,64 @@ void setup() {
 }
 
 void loop() {
-  assignDataToSections();
-  setBellyPan(bellyPanPattern);
-//  setSponsorPanel(sponsorPanelPattern);
-  setArm(armPattern);
-//  setClaw(clawPattern);
-  
-}
+    assignDataToSections();
+
+    // check to see if it's time to blink the LED; that is, if the difference
+    // between the current time and last time you blinked the LED is bigger than
+    // the interval at which you want to blink the LED.
+    unsigned long currentMillis = millis();
+    
+    int selectedDelay = (bellyPanPattern == -1) ? 57000/bellyPanMiddle : MEDIUM/2;
+    
+    if (currentMillis - previousMillis >= selectedDelay) {
+        // save the last time you blinked the LED
+        previousMillis = currentMillis;
+
+        // set the LED with the ledState of the variable:
+
+        if (bellyPanPattern == -1) {
+            if (loadingIndex == 0) { 
+                data = 1;
+                loadingIndex = 0; 
+            }
+            greenNGold(BELLYPAN_END_INDEX, BELLYPAN_START_INDEX, bellyPanMiddle, loadingIndex--);
+        }
+        else {
+            setBellyPan(bellyPanPattern);
+        }
+
+        setArm(armPattern);
+        
+        //  setSponsorPanel(sponsorPanelPattern);
+        //  setClaw(clawPattern);
+        bellyLeftIDX = constrain(bellyLeftIDX - 3, BELLYPAN_START_INDEX, BELLYPAN_END_INDEX);
+        bellyRightIDX = constrain(bellyRightIDX + 3, BELLYPAN_START_INDEX, BELLYPAN_END_INDEX);
+
+        armLeftIDX = constrain(armLeftIDX - 1, ARM_START_INDEX, ARM_END_INDEX);
+        armRightIDX = constrain(armRightIDX + 1, ARM_START_INDEX, ARM_END_INDEX);
+    }
+    
+  }
+
 
 void assignDataToSections(){
   if (data >= 0 && data <= 9){
-    bellyPanPattern = data;
+    if (bellyPanPattern != data) {
+        bellyPanPattern = data;
+        bellyLeftIDX = BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
+        bellyRightIDX = BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
+    }
   }
   else if (data >= 10 && data <= 19){
     sponsorPanelPattern = data;
   }
   else if (data >= 20 && data <= 29){
-    armPattern = data;
+    if (armPattern != data) {
+        armPattern = data;
+        armLeftIDX = ARM_START_INDEX + ((ARM_END_INDEX-ARM_START_INDEX)/2);
+        armRightIDX = ARM_START_INDEX + ((ARM_END_INDEX-ARM_START_INDEX)/2);
+    }
+    
   }
   else if (data >= 30 && data <= 39){
     clawPattern = data;
@@ -73,26 +123,20 @@ void assignDataToSections(){
 
 // Changes all LEDS to given color
 void allColor(int startIndex, int endIndex, CRGB c){
+  
   for (int i = startIndex; i < endIndex; i++){
     leds[i] = c;
   }
-  /*
-  for (int i = middle; i >= 0; i--){
-    leds[i] = c;
-    leds[middle + (middle-i) +1] = c;
-  } 
-  delay(FAST/4);
-  */
   FastLED.show();
   
 }
 
 // Set the pattern of the LEDs to have a lighter color bounce left to right
 void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
-  if (bounceCenter < endIndex+20) {
+  if (bounceCenter < endIndex+((endIndex-startIndex)/2)) {
     for (int i = startIndex; i < endIndex; i++) {
       // Set the 2nd led to a lighter version of param c
-      if (i > bounceCenter - (20) && i < bounceCenter + (20))
+      if (i > bounceCenter - (((endIndex-startIndex)/2)) && i < bounceCenter + (((endIndex-startIndex)/2)))
       {
         double brightness = 255;
         if (i != bounceCenter) {
@@ -114,11 +158,11 @@ void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO direction
       }
     }
     FastLED.show();
-    delay(speed/4);
+    // delay(speed/4);
     bounceCenter += 1;
   }
   else {
-    bounceCenter = startIndex-20;
+    bounceCenter = startIndex-((endIndex-startIndex)/2);
   }
 
 }
@@ -133,7 +177,7 @@ void flash(int startIndex, int endIndex, CRGB c, int speed){
     else{
       allColor(startIndex, endIndex, randomColor());
     }
-    delay(speed);
+    // delay(speed);
     allColor(startIndex, endIndex, CRGB::Black);
   
 }
@@ -145,7 +189,7 @@ void rainbow(int startIndex, int endIndex, int cycles, int speed){ // TODO direc
       }
 //      fill_rainbow( leds, endIndex, rainbowIncrementer, 7);
       FastLED.show();
-      delay(speed);
+    //   delay(speed);
       rainbowIncrementer += 1;
     }
     else {
@@ -163,7 +207,7 @@ void theaterChase(int startIndex, int endIndex, CRGB c, int speed){ // TODO dire
     }
     FastLED.show();
 
-    delay(speed);
+    // delay(speed);
 
     for (int i=startIndex; i < endIndex; i=i+3) {
       leds[i+q] = CRGB::Black;        //turn every third pixel off
@@ -182,7 +226,7 @@ void theaterChaseRainbow(int startIndex, int endIndex, int speed){ // TODO direc
       }
       FastLED.show();
 
-      delay(speed);
+    //   delay(speed);
 
       for (int i=startIndex; i < endIndex; i=i+3) {
         leds[i+q] = CRGB::Black;  //turn every third pixel off
@@ -193,6 +237,23 @@ void theaterChaseRainbow(int startIndex, int endIndex, int speed){ // TODO direc
   else {
     theaterChaseRainbowIncrementer = 0;
   }
+}
+
+void greenNGold(int startIndex, int endIndex, int middle, int i) {
+    CRGB c = CRGB::Black;
+    if (i == 14) {
+      c = CRGB::Blue;
+    }
+    else if (i % 2 == 0) {
+      c = CRGB::Green;
+    }
+    else {
+      c = CRGB::Yellow;
+    }
+    leds[i] = c;
+    leds[middle + (middle-i) +1] = c;
+    FastLED.show();
+    // delay((57000/(middle)));
 }
 
 
@@ -252,43 +313,43 @@ void setBellyPan(int pattern){
       allColor(0, NUM_LEDS, CRGB::Black);
       
     case 0: // Rainbow
-      rainbow(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, 1, FAST);
+      rainbow(bellyLeftIDX, bellyRightIDX, 1, FAST);
       break;
 
     case 1: // Green+Gold Bounce
-      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green, MEDIUM);
+      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Green, MEDIUM);
       break;
 
     case 2: // Red Alliance
-      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, MEDIUM);
+      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Red, MEDIUM);
       break;
       
     case 3: // FlashRed
-      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red, SLOW);
+      flash(bellyLeftIDX, bellyRightIDX, CRGB::Red, SLOW);
       break;
       
     case 4: // Red
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red);
+      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Red);
       break;
       
     case 5: // Blue
-      bounce(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Blue, MEDIUM);
+      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Blue, MEDIUM);
       break;
       
     case 6: // Green
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green);
+      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Green);
       break;
       
     case 7: // Purple
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple);
+      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Purple);
       break;
       
     case 8: // Yellow
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow);
+      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Yellow);
       break;
 
     case 9: // Off
-      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Black);
+      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Black);
       break;
   }
 }
@@ -339,43 +400,43 @@ void setSponsorPanel(int pattern){
 void setArm(int pattern){
     switch(pattern){
     case 20: // Rainbow
-      rainbow(ARM_START_INDEX, ARM_END_INDEX, 1, FAST);
+      rainbow(armLeftIDX, armRightIDX, 1, FAST);
       break;
 
     case 21: //theaterChaseRainbow
-      theaterChaseRainbow(ARM_START_INDEX, ARM_END_INDEX, MEDIUM);
+      theaterChaseRainbow(armLeftIDX, armRightIDX, MEDIUM);
       break;
 
     case 22: //theaterChase
-      theaterChase(ARM_START_INDEX, ARM_END_INDEX, randomColor(), MEDIUM);
+      theaterChase(armLeftIDX, armRightIDX, randomColor(), MEDIUM);
       break;
       
     case 23: // NULL
-      flash(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red, SLOW);
+      flash(armLeftIDX, armRightIDX, CRGB::Red, SLOW);
       break;
       
     case 24: // Red
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red);
+      allColor(armLeftIDX, armRightIDX, CRGB::Red);
       break;
       
     case 25: // Blue
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Blue);
+      allColor(armLeftIDX, armRightIDX, CRGB::Blue);
       break;
       
     case 26: // Green
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Green);
+      bounce(armLeftIDX, armRightIDX, CRGB::Green, MEDIUM);
       break;
       
     case 27: // Purple
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Purple);
+      allColor(armLeftIDX, armRightIDX, CRGB::Purple);
       break;
       
     case 28: // Yellow
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Yellow);
+      allColor(armLeftIDX, armRightIDX, CRGB::Yellow);
       break;
 
     case 29: // Off
-      allColor(ARM_START_INDEX, ARM_END_INDEX, CRGB::Black);
+      allColor(armLeftIDX, armRightIDX, CRGB::Black);
       break;
   }
 }
