@@ -29,6 +29,9 @@ int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
 int bounceCenter = 0;
 
+int leftAllColorInc = -1;
+int rightAllColorInc = 1;
+
 int bellyPanPattern = -1;
 int sponsorPanelPattern = 0;
 int armPattern = 20;
@@ -86,11 +89,55 @@ void loop() {
         
         //  setSponsorPanel(sponsorPanelPattern);
         //  setClaw(clawPattern);
-        bellyLeftIDX = constrain(bellyLeftIDX - 3, BELLYPAN_START_INDEX, BELLYPAN_END_INDEX);
-        bellyRightIDX = constrain(bellyRightIDX + 3, BELLYPAN_START_INDEX, BELLYPAN_END_INDEX);
+        if (bellyPanPattern == 8 || bellyPanPattern == 7) {
+            bellyLeftIDX += leftAllColorInc;
+            bellyRightIDX += rightAllColorInc;
+
+            if (bellyLeftIDX < 0) {
+                bellyLeftIDX = 69;
+                leftAllColorInc = 1;
+            }
+            if (bellyLeftIDX > BELLYPAN_END_INDEX) {
+                bellyLeftIDX = BELLYPAN_END_INDEX;
+            }
+
+            if (bellyRightIDX > 45 && rightAllColorInc == 1) {
+                bellyRightIDX = 68;
+                rightAllColorInc = -1;
+            }
+            if (bellyRightIDX < 45 && rightAllColorInc == -1) {
+                bellyRightIDX = 45;
+            }
+
+        }
+        else {
+            bellyLeftIDX = constrain(bellyLeftIDX - 3, BELLYPAN_START_INDEX, BELLYPAN_END_INDEX);
+            bellyRightIDX = constrain(bellyRightIDX + 3, BELLYPAN_START_INDEX, BELLYPAN_END_INDEX);
+        }
 
         armLeftIDX = constrain(armLeftIDX - 1, ARM_START_INDEX, ARM_END_INDEX);
         armRightIDX = constrain(armRightIDX + 1, ARM_START_INDEX, ARM_END_INDEX);
+    }
+    else if (bellyPanPattern == 7 || bellyPanPattern == 8) {
+        setBellyPan(bellyPanPattern);
+        bellyLeftIDX += leftAllColorInc;
+        bellyRightIDX += rightAllColorInc;
+
+        if (bellyLeftIDX < 0) {
+            bellyLeftIDX = 69;
+            leftAllColorInc = 1;
+        }
+        if (bellyLeftIDX > BELLYPAN_END_INDEX) {
+            bellyLeftIDX = BELLYPAN_END_INDEX;
+        }
+
+        if (bellyRightIDX > 45 && rightAllColorInc == 1) {
+            bellyRightIDX = 68;
+            rightAllColorInc = -1;
+        }
+        if (bellyRightIDX < 45 && rightAllColorInc == -1) {
+            bellyRightIDX = 45;
+        }
     }
     
   }
@@ -100,8 +147,10 @@ void assignDataToSections(){
   if (data >= 0 && data <= 9){
     if (bellyPanPattern != data) {
         bellyPanPattern = data;
-        bellyLeftIDX = BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
-        bellyRightIDX = BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
+        bellyLeftIDX = (bellyPanPattern == 8 || bellyPanPattern == 7) ? 22 : BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
+        bellyRightIDX = (bellyPanPattern == 8 || bellyPanPattern == 7) ? 23 : BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START_INDEX)/2);
+        leftAllColorInc = -1;
+        rightAllColorInc = 1;
     }
   }
   else if (data >= 10 && data <= 19){
@@ -123,20 +172,25 @@ void assignDataToSections(){
 
 // Changes all LEDS to given color
 void allColor(int startIndex, int endIndex, CRGB c){
-  
   for (int i = startIndex; i < endIndex; i++){
     leds[i] = c;
   }
   FastLED.show();
-  
+}
+
+void twoAtAtime(int i, int j, CRGB c) {
+    leds[i] = c;
+    leds[j] = c;
+    
+    FastLED.show();
 }
 
 // Set the pattern of the LEDs to have a lighter color bounce left to right
 void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
-  if (bounceCenter < endIndex+((endIndex-startIndex)/2)) {
+  if (bounceCenter < endIndex+((endIndex-startIndex)/2.35)) {
     for (int i = startIndex; i < endIndex; i++) {
       // Set the 2nd led to a lighter version of param c
-      if (i > bounceCenter - (((endIndex-startIndex)/2)) && i < bounceCenter + (((endIndex-startIndex)/2)))
+      if (i > bounceCenter - (((endIndex-startIndex)/2.35)) && i < bounceCenter + (((endIndex-startIndex)/2)))
       {
         double brightness = 255;
         if (i != bounceCenter) {
@@ -341,11 +395,11 @@ void setBellyPan(int pattern){
       break;
       
     case 7: // Purple
-      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Purple);
+      twoAtAtime(bellyLeftIDX, bellyRightIDX, CRGB::Purple);
       break;
       
     case 8: // Yellow
-      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Yellow);
+      twoAtAtime(bellyLeftIDX, bellyRightIDX, CRGB::Yellow);
       break;
 
     case 9: // Off
