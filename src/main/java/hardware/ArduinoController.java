@@ -23,19 +23,19 @@ public class ArduinoController {
           if (nextRequest >= 20 && nextRequest <= 30) {
               // If the state is the same as the current state, don't send it
               // and remove it from the queue
-              if (currentArmState == nextRequest) {
-                  queue.remove();
-                  return;
-              }
+            //   if (currentArmState == nextRequest) {
+            //       queue.remove();
+            //       return;
+            //   }
               // Set the current state to our value
               currentArmState = nextRequest;
           } else {
               // If the state is the same as the current state, don't send it
               // and remove it from the queue
-              if (currentBellyPanState == nextRequest) {
-                  queue.remove();
-                  return;
-              }
+            //   if (currentBellyPanState == nextRequest) {
+            //       queue.remove();
+            //       return;
+            //   }
               // Set the current state to our value
               currentBellyPanState = nextRequest;
           }
