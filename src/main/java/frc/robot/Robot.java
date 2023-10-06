@@ -16,6 +16,7 @@ import calc.Constants.OIConstants;
 import calc.Constants.PlacementConstants;
 import calc.OICalc;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -278,6 +279,23 @@ public class Robot extends TimedRobot {
 
     if (SwerveTrajectory.trajectoryStatus.equals("setup") && !driver.getAButton()) {
       autoAlignment.setNearestValues();
+    }
+
+    // If the driver hits the start/back button, reset the ROTATION of the bot
+    // to assume that it is directly facing the driver.
+    // This is used in dire situations where we don't want to go as far as to find a tag to align to, 
+    // but something happened at some point which heavily messed up our alignment with the field
+    if (driver.getStartButtonPressed() || driver.getBackButtonPressed()) {
+        // When the robot is facing the red alliance driver station, 
+        // it is considered to be at 0 degrees
+        swerve.resetOdometry(
+            new Pose2d(
+                swerve.getPose().getTranslation(), 
+                Rotation2d.fromDegrees(
+                    DriverStation.getAlliance() == DriverStation.Alliance.Red 
+                    ? 0 
+                    : 180))
+        );
     }
 
     // When not aligning, reset the max speed to the teleop speed
