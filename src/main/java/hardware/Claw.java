@@ -27,6 +27,7 @@ public class Claw implements Loggable {
     private double outtakeSeconds = 0;
     private double startedOuttakingTimestamp = 0;
     public static boolean hasGameElement = false;
+    public boolean hasGameElementOneLoopBehind = false;
     // @Graph
     private double current = 0;
 
@@ -56,14 +57,20 @@ public class Claw implements Loggable {
 
     public void periodic() {
 
-        Claw.hasGameElement = (AutoAlignment.coneMode) ? (current > 30 && claw.getOutputCurrent() > 30) : (current > 10 && claw.getOutputCurrent() > 10);
+        Claw.hasGameElement = (AutoAlignment.coneMode) 
+            ? (current > 30 && claw.getOutputCurrent() > 30) 
+            : (current > 10 && claw.getOutputCurrent() > 10);
 
-        if (20 < current && current < 30 && 20 < claw.getOutputCurrent() && claw.getOutputCurrent() < 30) {
+        // Check if our current current and our current (one loop behind, hasn't updated yet)
+        // is in the range that happens when we have a game element, 
+        // but the claw is not yet in a stalled state.
+        if (20 < current && current < 30 && 
+            20 < claw.getOutputCurrent() && claw.getOutputCurrent() < 30) {
+            // Stop the claw temporarily
+            // It will be restarted in the next loop
             claw.set(0);
             return;
         }
-
-        current = claw.getOutputCurrent();
 
         if (claw.getMotorTemperature() > 60) {
             DriverUI.spicyClaw = true;
@@ -164,6 +171,15 @@ public class Claw implements Loggable {
 
     public void setFinishedOuttaking(boolean finishedOuttaking) {
         this.finishedOuttaking = finishedOuttaking;
+    }
+
+    public void updateOutputCurrent() {
+        current = claw.getOutputCurrent();
+        hasGameElementOneLoopBehind = hasGameElement;
+    }
+
+    public boolean justAquiredGameElement() {
+        return !hasGameElementOneLoopBehind && hasGameElement;
     }
 
 }

@@ -106,6 +106,7 @@ public class Robot extends TimedRobot {
     Logger.updateEntries();
     DriverUI.connected = DriverStation.isDSAttached() || DriverStation.isFMSAttached();
     arduinoController.periodic();
+    claw.updateOutputCurrent();
 
   }
 
@@ -500,6 +501,8 @@ public class Robot extends TimedRobot {
     if (operator.getRightStickButtonPressed()) {
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
+        // Attempt at making a small animation of the leds showcasing the event
+        // arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
       }
       else {
         arm.setArmIndex(PlacementConstants.STOWED_INDEX);
@@ -536,6 +539,8 @@ public class Robot extends TimedRobot {
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
+        // Attempt at making a small animation of the leds showcasing the event
+        // arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
       }
 
     } else if (operator.getLeftTriggerAxis() > 0) {
@@ -618,11 +623,14 @@ public class Robot extends TimedRobot {
     
         driver.setRumble(RumbleType.kBothRumble, 0.25);
         operator.setRumble(RumbleType.kBothRumble, 0.25);
-        arduinoController.setLEDState(
-        AutoAlignment.coneMode 
-            ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
-            : LEDConstants.BELLY_PAN_PURPLE_BLINK
-        );
+        
+        if (claw.justAquiredGameElement()) {
+            arduinoController.setLEDState(
+                AutoAlignment.coneMode 
+                    ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
+                    : LEDConstants.BELLY_PAN_PURPLE_BLINK, 
+                true);
+        }
     
     }
     
