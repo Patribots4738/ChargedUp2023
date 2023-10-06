@@ -94,7 +94,7 @@ void loop() {
         if (bellyPanPattern == -1) {
             if (loadingIndex == 0) { 
                 data = 1;
-                loadingIndex = 0; 
+                loadingIndex = 1; 
             }
             greenNGold(BELLYPAN_END_INDEX, BELLYPAN_START_INDEX, bellyPanMiddle, loadingIndex--);
         }
