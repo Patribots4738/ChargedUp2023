@@ -49,7 +49,8 @@ public class ArduinoController {
       // If the state is the same as the current state, don't send it
       if (!queue.contains(state) &&
               state != currentArmState &&
-              state != currentBellyPanState)
+              state != currentBellyPanState && 
+              state+100 != currentBellyPanState)
       {
         queue.offer(state);
       }

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log.Graph;
 
 public class Claw implements Loggable {
 
@@ -57,9 +58,10 @@ public class Claw implements Loggable {
 
     public void periodic() {
 
-        hasGameElement = (AutoAlignment.coneMode) 
-            ? (current > 30 && claw.getOutputCurrent() > 30) 
-            : (current > 10 && claw.getOutputCurrent() > 10);
+        hasGameElement = Math.abs(claw.getAppliedOutput()) < Math.abs(claw.get()/10) &&
+            (AutoAlignment.coneMode) 
+                ? (current > 30 && claw.getOutputCurrent() > 30) 
+                : (current > 10 && claw.getOutputCurrent() > 10);
 
         // Check if our current current and our current (one loop behind, hasn't updated yet)
         // is in the range that happens when we have a game element, 

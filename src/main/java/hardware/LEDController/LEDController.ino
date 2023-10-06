@@ -233,7 +233,7 @@ void bellyBounce(int startIndex, int endIndex, CRGB c) { // TODO directionk
         // Let's make the bounce become a nice orange
         if (c.r == 255)
         {
-          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 196), c.b)
+          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 75), c.b);
         }
       }
       else {
@@ -271,7 +271,7 @@ void armBounce(int startIndex, int endIndex, CRGB c) { // TODO directionk
         // Let's make the bounce become a nice orange
         if (c.r == 255)
         {
-          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 196), c.b)
+          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 196), c.b);
         }
       }
       else {

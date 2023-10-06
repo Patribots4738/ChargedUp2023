@@ -521,7 +521,7 @@ public class Robot extends TimedRobot {
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
         // Attempt at making a small animation of the leds showcasing the event
-        // arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
       }
       else {
         arm.setArmIndex(PlacementConstants.STOWED_INDEX);
@@ -559,7 +559,7 @@ public class Robot extends TimedRobot {
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
         // Attempt at making a small animation of the leds showcasing the event
-        // arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
       }
 
     } else if (operator.getLeftTriggerAxis() > 0) {
