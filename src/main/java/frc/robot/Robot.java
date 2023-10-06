@@ -619,7 +619,7 @@ public class Robot extends TimedRobot {
     }
 
     //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
-    if (Claw.hasGameElement) {
+    if (claw.getHasGameElement()) {
     
         driver.setRumble(RumbleType.kBothRumble, 0.25);
         operator.setRumble(RumbleType.kBothRumble, 0.25);

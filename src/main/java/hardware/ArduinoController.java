@@ -13,13 +13,8 @@ public class ArduinoController {
   private Queue<Integer> queue = new LinkedList<Integer>();
   private int currentBellyPanState = -1;
   private int currentArmState = -1;
-  private boolean previousHasElement = false;
-
 
   public void periodic() {
-      // this code runs after claw.periodic() and teleopPeriodic(), which means that when setLEDState is called,
-      // this variable should be a code loop behind.
-      previousHasElement = Claw.hasGameElement;
       // Write the latest byte in the queue to the arduino
       // If it exists
       if (queue.peek() != null) {
