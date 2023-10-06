@@ -571,7 +571,7 @@ public class Robot extends TimedRobot {
 
         claw.stopClaw();
 
-  }
+    }
 
     // Blink the lights red if we are flipped over
     if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
@@ -614,10 +614,15 @@ public class Robot extends TimedRobot {
     }
 
     //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
-    if (claw.getOutputCurrent() > 25) {
+    if (Claw.hasGameElement) {
     
-      driver.setRumble(RumbleType.kBothRumble, 0.25);
-      operator.setRumble(RumbleType.kBothRumble, 0.25);
+        driver.setRumble(RumbleType.kBothRumble, 0.25);
+        operator.setRumble(RumbleType.kBothRumble, 0.25);
+        arduinoController.setLEDState(
+        AutoAlignment.coneMode 
+            ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
+            : LEDConstants.BELLY_PAN_PURPLE_BLINK
+        );
     
     }
     

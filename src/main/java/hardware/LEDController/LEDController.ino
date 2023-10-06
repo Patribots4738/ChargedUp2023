@@ -20,6 +20,7 @@
 #define ARM_END_INDEX 131
 #define CLAW_START_INDEX 30
 #define CLAW_END_INDEX 34
+#define FLASH_LENGTH_MS 1500
 
 CRGB leds[NUM_LEDS];
 
@@ -28,6 +29,7 @@ int data = -1;
 int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
 int bounceCenter = 0;
+int globalFlashState = 0;
 
 int leftAllColorInc = -1;
 int rightAllColorInc = 1;
@@ -46,6 +48,7 @@ int bellyPanMiddle = (BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START
 int loadingIndex = bellyPanMiddle;
 
 unsigned long previousMillis = 0;
+unsigned long globalFlashStart = 0;
 
 void setup() {
   Wire.begin(8);
@@ -60,16 +63,29 @@ void setup() {
 
 void loop() {
     assignDataToSections();
-
+    globalFlashState = ((globalFlashState + 1) % 20);
+    // toggle our flash bool so that things update at the rate of the arduino.
+    
     // check to see if it's time to blink the LED; that is, if the difference
     // between the current time and last time you blinked the LED is bigger than
     // the interval at which you want to blink the LED.
     unsigned long currentMillis = millis();
     
     int selectedDelay = (bellyPanPattern == -1) ? 57000/bellyPanMiddle : MEDIUM/2;
-    
+
+    // We want to set the LEDs to green -> i.e. we are aligned and we should know immediatly.
+    // We only really are going to care for two seconds, so once that passes we can ignore this.
+    if (bellyPanPattern > 100 && currentMillis - globalFlashStart <= FLASH_LENGTH_MS) {
+        // Skip the allColor animation process, and just set all of the LEDs to flash
+        // The ardunio runs at the speed that the flashing should happen, so we don't have to worry about the delays.
+        setBellyPan(bellyPanPattern);
+    }
+    else if (bellyPanPattern > 100) {
+        data = bellyPanPattern - 100;
+    }
+
     if (currentMillis - previousMillis >= selectedDelay) {
-        // save the last time you blinked the LED
+        // save the last time you changed the state
         previousMillis = currentMillis;
 
         // set the LED with the ledState of the variable:
@@ -166,7 +182,16 @@ void assignDataToSections(){
   }
   else if (data >= 30 && data <= 39){
     clawPattern = data;
-  }  
+  } 
+  
+  // we wish to flash... Set the variables once and let loop re-assign
+  // then set the flashing delay, so that it flashes for a second or so,
+  // but after just stops and holds solid.
+  if (data > 100) { 
+    globalFlashStart = millis();
+    bellyPanPattern = data;
+    data = -1;
+  }
   
 }
 
@@ -186,7 +211,7 @@ void twoAtAtime(int i, int j, CRGB c) {
 }
 
 // Set the pattern of the LEDs to have a lighter color bounce left to right
-void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO directionk
+void bounce(int startIndex, int endIndex, CRGB c) { // TODO directionk
   if (bounceCenter < endIndex+((endIndex-startIndex)/2.35)) {
     for (int i = startIndex; i < endIndex; i++) {
       // Set the 2nd led to a lighter version of param c
@@ -224,19 +249,22 @@ void bounce(int startIndex, int endIndex, CRGB c, int speed) { // TODO direction
 
 // Flashes given color
 // If c==NULL, random color flash
-void flash(int startIndex, int endIndex, CRGB c, int speed){
-    if(c){
-      allColor(startIndex, endIndex, c);
+void flash(int startIndex, int endIndex, CRGB c){
+    if (globalFlashState < 10) {
+        if (c) {
+            allColor(startIndex, endIndex, c);
+        }
+        else{
+            allColor(startIndex, endIndex, randomColor());
+        }
     }
-    else{
-      allColor(startIndex, endIndex, randomColor());
+    else {
+        // delay(speed);
+        allColor(startIndex, endIndex, CRGB::Black);
     }
-    // delay(speed);
-    allColor(startIndex, endIndex, CRGB::Black);
-  
 }
 
-void rainbow(int startIndex, int endIndex, int cycles, int speed){ // TODO directionk
+void rainbow(int startIndex, int endIndex, int cycles){ // TODO directionk
     if (rainbowIncrementer < 256){
       for (int i = startIndex; i < endIndex; i++){
         leds[i] = CHSV(i-(rainbowIncrementer*2), 255, 255);
@@ -253,7 +281,7 @@ void rainbow(int startIndex, int endIndex, int cycles, int speed){ // TODO direc
 }
 
 // Theater-st+yle crawling lights
-void theaterChase(int startIndex, int endIndex, CRGB c, int speed){ // TODO direction
+void theaterChase(int startIndex, int endIndex, CRGB c){ // TODO direction
   for (int q=0; q < 3; q++) {
     for (int i=startIndex; i < endIndex; i=i+3) {
       int pos = i+q;
@@ -271,7 +299,7 @@ void theaterChase(int startIndex, int endIndex, CRGB c, int speed){ // TODO dire
 }
 
 // Theater-style crawling lights with rainbow effect
-void theaterChaseRainbow(int startIndex, int endIndex, int speed){ // TODO direction, duration
+void theaterChaseRainbow(int startIndex, int endIndex){ // TODO direction, duration
   if (theaterChaseRainbowIncrementer < 256) {
     for (int q=0; q < 3; q++) {
       for (int i=startIndex; i < endIndex; i=i+3) {
@@ -367,19 +395,19 @@ void setBellyPan(int pattern){
       allColor(0, NUM_LEDS, CRGB::Black);
       
     case 0: // Rainbow
-      rainbow(bellyLeftIDX, bellyRightIDX, 1, FAST);
+      rainbow(bellyLeftIDX, bellyRightIDX, 1);
       break;
 
     case 1: // Green+Gold Bounce
-      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Green, MEDIUM);
+      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Green);
       break;
 
     case 2: // Red Alliance
-      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Red, MEDIUM);
+      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Red);
       break;
       
     case 3: // FlashRed
-      flash(bellyLeftIDX, bellyRightIDX, CRGB::Red, SLOW);
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red);
       break;
       
     case 4: // Red
@@ -387,11 +415,13 @@ void setBellyPan(int pattern){
       break;
       
     case 5: // Blue
-      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Blue, MEDIUM);
+      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Blue);
       break;
       
     case 6: // Green
-      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Green);
+      // Whenever we go green it is right after a flash
+      // so exclude the animation
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green);
       break;
       
     case 7: // Purple
@@ -405,21 +435,33 @@ void setBellyPan(int pattern){
     case 9: // Off
       allColor(bellyLeftIDX, bellyRightIDX, CRGB::Black);
       break;
+
+    case 106: // Flash Green
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Green);
+      break;
+    
+    case 107: // Flash Purple
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Purple);
+      break;
+    
+    case 108: // Flash Yellow
+      flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow);
+      break;
   }
 }
 
 void setSponsorPanel(int pattern){
   switch(pattern){
     case 10: // Rainbow
-      rainbow(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, 1, FAST);
+      rainbow(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, 1);
       break;
 
     case 11: //theaterChaseRainbow
-      theaterChaseRainbow(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, MEDIUM);
+      theaterChaseRainbow(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX);
       break;
 
     case 12: //theaterChase
-      theaterChase(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, randomColor(), MEDIUM);
+      theaterChase(SPONSOR_PANEL_START_INDEX, SPONSOR_PANEL_END_INDEX, randomColor());
       break;
       
     case 13: // NULL
@@ -454,19 +496,19 @@ void setSponsorPanel(int pattern){
 void setArm(int pattern){
     switch(pattern){
     case 20: // Rainbow
-      rainbow(armLeftIDX, armRightIDX, 1, FAST);
+      rainbow(armLeftIDX, armRightIDX, 1);
       break;
 
     case 21: //theaterChaseRainbow
-      theaterChaseRainbow(armLeftIDX, armRightIDX, MEDIUM);
+      theaterChaseRainbow(armLeftIDX, armRightIDX);
       break;
 
     case 22: //theaterChase
-      theaterChase(armLeftIDX, armRightIDX, randomColor(), MEDIUM);
+      theaterChase(armLeftIDX, armRightIDX, randomColor());
       break;
       
     case 23: // NULL
-      flash(armLeftIDX, armRightIDX, CRGB::Red, SLOW);
+      flash(ARM_START_INDEX, ARM_END_INDEX, CRGB::Red);
       break;
       
     case 24: // Red
@@ -478,7 +520,7 @@ void setArm(int pattern){
       break;
       
     case 26: // Green
-      bounce(armLeftIDX, armRightIDX, CRGB::Green, MEDIUM);
+      bounce(armLeftIDX, armRightIDX, CRGB::Green);
       break;
       
     case 27: // Purple
@@ -497,15 +539,15 @@ void setArm(int pattern){
 void setClaw(int pattern){
     switch(pattern){
     case 30: // Rainbow
-      rainbow(CLAW_START_INDEX, CLAW_END_INDEX, 1, FAST);
+      rainbow(CLAW_START_INDEX, CLAW_END_INDEX, 1);
       break;
 
     case 31: //theaterChaseRainbow
-      theaterChaseRainbow(CLAW_START_INDEX, CLAW_END_INDEX, MEDIUM);
+      theaterChaseRainbow(CLAW_START_INDEX, CLAW_END_INDEX);
       break;
 
     case 32: //theaterChase
-      theaterChase(CLAW_START_INDEX, CLAW_END_INDEX, randomColor(), MEDIUM);
+      theaterChase(CLAW_START_INDEX, CLAW_END_INDEX, randomColor());
       break;
       
     case 33: // NULL
@@ -530,7 +572,7 @@ void setClaw(int pattern){
     case 38: // Yellow
       allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Yellow);
       break;
-
+    
     case 39: // Off
       allColor(CLAW_START_INDEX, CLAW_END_INDEX, CRGB::Black);
       break;

@@ -347,9 +347,11 @@ public final class Constants {
       public static final int BELLY_PAN_FLASH_RED = 3;
       public static final int BELLY_PAN_RED = 4;
       public static final int BELLY_PAN_BLUE = 5;
-      public static final int BELLY_PAN_GREEN = 6;
+      public static final int BELLY_PAN_GREEN = 106;
       public static final int BELLY_PAN_PURPLE = 7;
       public static final int BELLY_PAN_YELLOW = 8;
+      public static final int BELLY_PAN_PURPLE_BLINK = 107;
+      public static final int BELLY_PAN_YELLOW_BLINK = 108;
       public static final int BELLY_PAN_BLACK = 9;
 
 

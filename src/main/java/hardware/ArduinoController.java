@@ -13,55 +13,68 @@ public class ArduinoController {
   private Queue<Integer> queue = new LinkedList<Integer>();
   private int currentBellyPanState = -1;
   private int currentArmState = -1;
+  private boolean previousHasElement = false;
 
 
   public void periodic() {
-    // Write the latest byte in the queue to the arduino
-    // If it exists
-    if (queue.peek() != null) {
-      if (queue.peek() >= 20) {
-        // If the state is the same as the current state, don't send it
-        // and remove it from the queue
-        if (currentArmState == queue.peek()) {
-          queue.remove();
-          return;
-        }
-        // Set the current state to our value
-        currentArmState = queue.peek();
+      previousHasElement = Claw.hasGameElement;
+      // Write the latest byte in the queue to the arduino
+      // If it exists
+      if (queue.peek() != null) {
+          int nextRequest = queue.peek();
+          // All arm requests are within 20 and 30... for now.
+          if (nextRequest >= 20 && nextRequest <= 30) {
+              // If the state is the same as the current state, don't send it
+              // and remove it from the queue
+              if (currentArmState == nextRequest) {
+                  queue.remove();
+                  return;
+              }
+              // Set the current state to our value
+              currentArmState = nextRequest;
+          } else {
+              // If the state is the same as the current state, don't send it
+              // and remove it from the queue
+              if (currentBellyPanState == nextRequest) {
+                  queue.remove();
+                  return;
+              }
+              // Set the current state to our value
+              currentBellyPanState = nextRequest;
+          }
+          // Send the latest byte in the queue to the arduino
+          sendByte();
       }
-      else {
-        // If the state is the same as the current state, don't send it
-        // and remove it from the queue
-        if (currentBellyPanState == queue.peek()) {
-          queue.remove();
-          return;
-        }
-        // Set the current state to our value
-        currentBellyPanState = queue.peek();
-      }
-      // Send the latest byte in the queue to the arduino
-      sendByte();
-    }
   }
 
   public void setLEDState(int state) {
-    // Add the state to the queue
-    if (!queue.contains(state) && 
-        state != currentArmState && 
-        state != currentBellyPanState) 
-    {
-      queue.offer(state);
-    }
-    
+      // Add the state to the queue
+      if (!queue.contains(state) &&
+              state != currentArmState &&
+              state != currentBellyPanState || 
+                (Claw.hasGameElement && 
+                !previousHasElement && 
+                state > 100))
+      {
+        queue.offer(state);
+      }
+
   }
 
   public void sendByte() {
     // Send the latest queue value to the arduino,
     // Then, remove the latest value from the queue
     if (queue.peek() != null) {
-      // System.out.println("Sending byte: " + queue.peek());
-      arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
-    }
-    
+        // System.out.println("Sending byte: " + queue.peek());
+        arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
+    }    
+  }
+
+  public void setBellyPanState(int state) {
+    this.currentBellyPanState = state;
+  }
+
+  public void setArmState(int state) {
+    this.currentArmState = state;
   }
 }

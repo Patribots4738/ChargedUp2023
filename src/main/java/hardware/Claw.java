@@ -25,9 +25,9 @@ public class Claw implements Loggable {
     private boolean startedOuttakingBool = false;
     private boolean finishedOuttaking = false;
     private double outtakeSeconds = 0;
-    private double startedIntakingTimestamp = 0;
     private double startedOuttakingTimestamp = 0;
-    private boolean hasGameElement = false;
+    public static boolean hasGameElement = false;
+    // @Graph
     private double current = 0;
 
     public Claw() {
@@ -55,6 +55,8 @@ public class Claw implements Loggable {
     }
 
     public void periodic() {
+
+        Claw.hasGameElement = (AutoAlignment.coneMode) ? (current > 30 && claw.getOutputCurrent() > 30) : (current > 10 && claw.getOutputCurrent() > 10);
 
         if (20 < current && current < 30 && 20 < claw.getOutputCurrent() && claw.getOutputCurrent() < 30) {
             claw.set(0);
@@ -162,10 +164,6 @@ public class Claw implements Loggable {
 
     public void setFinishedOuttaking(boolean finishedOuttaking) {
         this.finishedOuttaking = finishedOuttaking;
-    }
-
-    public double getOutputCurrent() {
-        return claw.getOutputCurrent();
     }
 
 }
