@@ -17,6 +17,8 @@ public class ArduinoController {
 
 
   public void periodic() {
+      // this code runs after claw.periodic() and teleopPeriodic(), which means that when setLEDState is called,
+      // this variable should be a code loop behind.
       previousHasElement = Claw.hasGameElement;
       // Write the latest byte in the queue to the arduino
       // If it exists
@@ -51,14 +53,21 @@ public class ArduinoController {
       // Add the state to the queue
       if (!queue.contains(state) &&
               state != currentArmState &&
-              state != currentBellyPanState || 
-                (Claw.hasGameElement && 
-                !previousHasElement && 
-                state > 100))
+              state != currentBellyPanState)
       {
         queue.offer(state);
       }
 
+  }
+
+  public void setLEDState(int state, boolean override) {
+    // Add the state to the queue
+    if (override) {
+        queue.offer(state);
+    }
+    else {
+        setLEDState(state);
+    }
   }
 
   public void sendByte() {
