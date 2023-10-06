@@ -285,6 +285,7 @@ public class Robot extends TimedRobot {
     // to assume that it is directly facing the driver.
     // This is used in dire situations where we don't want to go as far as to find a tag to align to, 
     // but something happened at some point which heavily messed up our alignment with the field
+    // For obvious reasons, this should only be used when the robot is facing the driver
     if (driver.getStartButtonPressed() || driver.getBackButtonPressed()) {
         // When the robot is facing the red alliance driver station, 
         // it is considered to be at 0 degrees
