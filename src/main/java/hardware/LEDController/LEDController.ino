@@ -28,7 +28,8 @@ int data = -1;
 
 int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
-int bounceCenter = 0;
+int bellyBounceCenter = 0;
+int armBounceCenter = 0;
 int globalFlashState = 0;
 
 int leftAllColorInc = -1;
@@ -210,20 +211,17 @@ void twoAtAtime(int i, int j, CRGB c) {
     FastLED.show();
 }
 
+// https://www.desmos.com/calculator/rdmuzm0srz
 // Set the pattern of the LEDs to have a lighter color bounce left to right
-void bounce(int startIndex, int endIndex, CRGB c) { // TODO directionk
-  if (bounceCenter < endIndex+((endIndex-startIndex)/2.35)) {
+void bellyBounce(int startIndex, int endIndex, CRGB c) { // TODO directionk
+  if (bellyBounceCenter < endIndex+20) {
     for (int i = startIndex; i < endIndex; i++) {
       // Set the 2nd led to a lighter version of param c
-      if (i > bounceCenter - (((endIndex-startIndex)/2.35)) && i < bounceCenter + (((endIndex-startIndex)/2)))
+      if (i > bellyBounceCenter - (20) && i < bellyBounceCenter + (20))
       {
         double brightness = 255;
-        if (i != bounceCenter) {
-          brightness = 400/(abs(i - bounceCenter));
-        }
-        if (c.r == 255)
-        {
-          brightness = brightness * - 1;
+        if (i != bellyBounceCenter) {
+          brightness = 400/(abs(i - bellyBounceCenter));
         }
         if (c.g > 100) {
           leds[i] = CRGB::Yellow;
@@ -231,17 +229,60 @@ void bounce(int startIndex, int endIndex, CRGB c) { // TODO directionk
         else {
           leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 255), constrain(c.b + brightness, 0, 255));
         }
+        // If our red is 255, we are bouncing for red alliance
+        // Let's make the bounce become a nice orange
+        if (c.r == 255)
+        {
+          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 196), c.b)
+        }
       }
       else {
         leds[i] = c;
       }
     }
     FastLED.show();
-    // delay(speed/4);
-    bounceCenter += 1;
+    bellyBounceCenter += 1;
   }
   else {
-    bounceCenter = startIndex-((endIndex-startIndex)/2);
+    bellyBounceCenter = startIndex-20;
+  }
+
+}
+
+// https://www.desmos.com/calculator/rdmuzm0srz
+// Set the pattern of the LEDs to have a lighter color bounce left to right
+void armBounce(int startIndex, int endIndex, CRGB c) { // TODO directionk
+  if (armBounceCenter < endIndex+(10)) {
+    for (int i = startIndex; i < endIndex; i++) {
+      // Set the 2nd led to a lighter version of param c
+      if (i > armBounceCenter - 10 && i < armBounceCenter + 10)
+      {
+        double brightness = 255;
+        if (i != armBounceCenter) {
+          brightness = 200/(abs(i - armBounceCenter));
+        }
+        if (c.g > 100) {
+          leds[i] = CRGB::Yellow;
+        }
+        else {
+          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 255), constrain(c.b + brightness, 0, 255));
+        }
+        // If our red is 255, we are bouncing for red alliance
+        // Let's make the bounce become a nice orange
+        if (c.r == 255)
+        {
+          leds[i] = CRGB(constrain(c.r + brightness, 0, 255), constrain(c.g + brightness, 0, 196), c.b)
+        }
+      }
+      else {
+        leds[i] = c;
+      }
+    }
+    FastLED.show();
+    armBounceCenter += 1;
+  }
+  else {
+    armBounceCenter = startIndex-10;
   }
 
 }
@@ -399,11 +440,11 @@ void setBellyPan(int pattern){
       break;
 
     case 1: // Green+Gold Bounce
-      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Green);
+      bellyBounce(bellyLeftIDX, bellyRightIDX, CRGB::Green);
       break;
 
     case 2: // Red Alliance
-      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Red);
+      bellyBounce(bellyLeftIDX, bellyRightIDX, CRGB::Red);
       break;
       
     case 3: // FlashRed
@@ -415,7 +456,7 @@ void setBellyPan(int pattern){
       break;
       
     case 5: // Blue
-      bounce(bellyLeftIDX, bellyRightIDX, CRGB::Blue);
+      bellyBounce(bellyLeftIDX, bellyRightIDX, CRGB::Blue);
       break;
       
     case 6: // Green
@@ -520,7 +561,7 @@ void setArm(int pattern){
       break;
       
     case 26: // Green
-      bounce(armLeftIDX, armRightIDX, CRGB::Green);
+      armBounce(armLeftIDX, armRightIDX, CRGB::Green);
       break;
       
     case 27: // Purple
