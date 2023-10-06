@@ -46,6 +46,7 @@ public class ArduinoController {
 
   public void setLEDState(int state) {
       // Add the state to the queue
+      // If the state is the same as the current state, don't send it
       if (!queue.contains(state) &&
               state != currentArmState &&
               state != currentBellyPanState)
