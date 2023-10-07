@@ -517,15 +517,11 @@ public class Robot extends TimedRobot {
     if (operator.getBButtonPressed()){
       arm.setArmIndex(PlacementConstants.CONE_FLIP_INDEX);
     }
-    if (operator.getRightStickButtonPressed()) {
-      if (arm.getAtPlacementPosition()) {
-        claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
-        // Attempt at making a small animation of the leds showcasing the event
-        // arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
-      }
-      else {
-        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-      }
+    if (arm.halfwayFinishedWithConeFlip()) {
+        claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+    }
+    if (operator.getRightStickButtonPressed() && !arm.getAtPlacementPosition()) {
+      arm.setArmIndex(PlacementConstants.STOWED_INDEX);
     }
     if (operator.getAButton()) {
       arm.finishPlacement();
@@ -542,24 +538,30 @@ public class Robot extends TimedRobot {
 
     /* Claw speed controls:
      *   If the left bumper is pressed, e-stop the claw
-     *   If the right bumper is held, or if teleop just started,
-     *   outtake an object when the arm is at placement position
-     *   If the left trigger is held, intake an object:
+     *   If the right bumper is held, or if teleop just started, or right stick is pressed,
+     *   outtake an object if the arm is at placement position
+     *   If the left trigger is held, intake:
      *     Keep the fastest intake speed until the claw is e-stopped/reversed
      *     This is to allow the trigger to be fully pressed intake an object,
-     *   and then let go to keep the claw at the same speed
+     *     and then let go to keep the claw at the same speed
      *   If the right trigger is held, manually outtake an object (try to use the right bumper instead)
      */
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || (timer.get() < 0.1 && !DriverStation.isTestEnabled())) {
+    } else if (
+		(operator.getRightBumper() || operator.getRightStickButtonPressed()) && 
+		!claw.getStartedOuttakingBool() ||
+		(timer.get() < 0.1 && !DriverStation.isTestEnabled())) 
+	{
+
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
         // Attempt at making a small animation of the leds showcasing the event
-        // arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_BLACK);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
 
     } else if (operator.getLeftTriggerAxis() > 0) {
@@ -596,7 +598,7 @@ public class Robot extends TimedRobot {
         claw.stopClaw();
 
     }
-
+    
     // Blink the lights red if we are flipped over
     if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
 
@@ -612,12 +614,11 @@ public class Robot extends TimedRobot {
       driver.setRumble(RumbleType.kBothRumble, 1);
       operator.setRumble(RumbleType.kBothRumble, 1);
 
-      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN_BLINK);
 
       DriverUI.aligned = true;
     
-    }
-    else {
+    } else {
     
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
       
@@ -626,35 +627,29 @@ public class Robot extends TimedRobot {
         DriverUI.aligned = false;
     
       }
-      else {
-    
-        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+      //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
+      else if (claw.getHasGameElement()) {
       
+        driver.setRumble(RumbleType.kBothRumble, 0.25);
+        operator.setRumble(RumbleType.kBothRumble, 0.25);
+      
+      } 
+	  
+	  if (claw.justAquiredGameElement()) {
+		arduinoController.setLEDState(
+			AutoAlignment.coneMode 
+				? LEDConstants.BELLY_PAN_YELLOW_BLINK 
+				: LEDConstants.BELLY_PAN_PURPLE_BLINK, 
+			true);
+	  } else {
+        // We are not aligned, nor are we close to any alignment area
+        // So default the LEDs to represent the cone/cube mode of the robot
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
-    
+
       driver.setRumble(RumbleType.kBothRumble, 0);
       operator.setRumble(RumbleType.kBothRumble, 0);
     
-    }
-
-    //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
-    if (claw.getHasGameElement()) {
-    
-        driver.setRumble(RumbleType.kBothRumble, 0.25);
-        operator.setRumble(RumbleType.kBothRumble, 0.25);
-        
-        if (claw.justAquiredGameElement()) {
-            arduinoController.setLEDState(
-                AutoAlignment.coneMode 
-                    ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
-                    : LEDConstants.BELLY_PAN_PURPLE_BLINK, 
-                true);
-        }
-    
-    }
-    
-    if (arm.halfwayFinishedWithConeFlip()) {
-       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
     }
   }
 
