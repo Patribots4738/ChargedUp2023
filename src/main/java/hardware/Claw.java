@@ -26,6 +26,7 @@ public class Claw implements Loggable {
     private boolean finishedOuttaking = false;
     private double outtakeSeconds = 0;
     private double startedOuttakingTimestamp = 0;
+    private double startedIntakingTimestamp = 0;
     private boolean hasGameElement = false;
     private boolean hasGameElementOneLoopBehind = false;
     // @Graph
@@ -57,15 +58,39 @@ public class Claw implements Loggable {
 
     public void periodic() {
 
-        hasGameElement = (AutoAlignment.coneMode) 
-            ? (current > 30 && claw.getOutputCurrent() > 30) 
-            : (current > 10 && claw.getOutputCurrent() > 10);
+        /**
+         * Output generally is -0.25 < appliedOutput < 0 
+         * When grabbygrab
+         * Current is generally 15 < current < 30
+         * Which is a big range unfortunatly. 
+         * I am not sure where the curernt > 30 came from
+         * I am having a hard time getting that read again on the graph anymore
+         * Let's just go with > 15 for now
+         * 
+         * Laslty, desiredSpeed is ALWAYS > 0.45 when we are intaking
+         * Which is a good indicator of finding if the claw is just getting up
+         * to speed or if it is stalled
+         *
+         * The problem with having a boolean this sophisticated 
+         * Is that there are too many independant variables to check
+         * And if a single one is off, the boolean will be false
+         *
+         * Idea: use a startedIntakingTimestamp to check 
+         * if the claw has been intaking for a while
+         * i.e. is finished getting up to speed.
+         */
+        hasGameElement = 
+            (-0.25 < claw.getAppliedOutput() && claw.getAppliedOutput() < 0) && 
+            (current > 15 && claw.getOutputCurrent() > 15) &&
+            (Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25);
 
         // Check if our current current and our current (one loop behind, hasn't updated yet)
         // is in the range that happens when we have a game element, 
         // but the claw is not yet in a stalled state.
         if (20 < current && current < 30 && 
-            20 < claw.getOutputCurrent() && claw.getOutputCurrent() < 30) {
+            20 < claw.getOutputCurrent() && claw.getOutputCurrent() < 30 && 
+            desiredSpeed > 0.45) 
+        {
             // Stop the claw temporarily
             // It will be restarted in the next loop
             claw.set(0);
@@ -127,11 +152,18 @@ public class Claw implements Loggable {
     
     public void setDesiredSpeed(double speed) {
 
-        if (speed > 0) { intakeMode = true; }
+        if      (speed > 0) { intakeMode = true;  }
         else if (speed < 0) { intakeMode = false; }
 
         if (intakeMode) {
             if (speed > this.desiredSpeed) {
+                // If our desiredSpeed is <= 0, that means that we just started intaking
+                // So start a timer so that we can check if we have stalled
+                //   without taking into account the time it takes to speed up
+                if (this.desiredSpeed <= 0) {
+                    this.startedIntakingTimestamp = Timer.getFPGATimestamp();
+                }
+
                 // To prevent damage to game elements, the claw will not intake at full speed
                 this.desiredSpeed = speed;
             }
