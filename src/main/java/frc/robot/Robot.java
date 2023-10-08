@@ -456,36 +456,26 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        /*
-         * If we are on blue alliance, make it so that the left and right buttons set the arm to human tag
-         *   when the robot is halfway across the field
-         * this code is in place due to our operator confusing the buttons and clicking the wrong one.
-         */
-        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                if (swerve.getPose().getTranslation().getX() > AlignmentConstants.FIELD_WIDTH_METERS/2) {
-                    arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-                }
-                else {
-                    boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
-                    arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
-                    if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
-                }
+        // If we are on testMode, then use legacy inputs 
+        // (https://github.com/Patribots4738/ChargedUp2023/commit/6d640d17cdd5799006ab146fca5c94b3ae5fd274)
+        // If not, use below (case 90) logic
+        if (DriverStation.isTestEnabled()) {
+            boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
+            arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
+            if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
+            // Notice that we only break in this if case
+            break;
         }
-        // we are on red alliance,
-        else {
-            if (swerve.getPose().getTranslation().getX() < AlignmentConstants.FIELD_WIDTH_METERS/2) {
-                arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-            }
-            else {
-                boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
-                arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
-                if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
-            }
-        }
-        break;
-
       // Clicking right
       case 90:
+        // If we are on testMode, then use legacy inputs 
+        // (https://github.com/Patribots4738/ChargedUp2023/commit/6d640d17cdd5799006ab146fca5c94b3ae5fd274)
+        // If not, use below logic
+        if (DriverStation.isTestEnabled()) {
+            arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+            // Notice that we only break in this if case
+            break;
+        }
         /*
          * If we are on blue alliance, make it so that the left and right buttons set the arm to human tag
          *   when the robot is halfway across the field
