@@ -473,17 +473,10 @@ public class Arm implements Loggable{
             ArmConstants.UPPER_ARM_LOWER_LIMIT,
             ArmConstants.UPPER_ARM_UPPER_LIMIT
         );
-
-        // Description of FF in Constants :D
-        ArmFeedforward feedForward = new ArmFeedforward(
-            ArmConstants.S_UPPER,
-            ArmConstants.G_UPPER,
-            ArmConstants.V_UPPER,
-            ArmConstants.A_UPPER);
             
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((angle), 0);
+        double FF = ArmConstants.upperfeedForward.calculate((angle), 0);
 
         // Check if we want to use secondary PID gains
         // Slot 1 is used to make the arm go super fast
@@ -538,15 +531,9 @@ public class Arm implements Loggable{
             ArmConstants.LOWER_ARM_UPPER_LIMIT
         );
 
-        ArmFeedforward feedForward = new ArmFeedforward(
-            ArmConstants.S_LOWER,
-            ArmConstants.G_LOWER,
-            ArmConstants.V_LOWER,
-            ArmConstants.A_LOWER);
-
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((position), 0);
+        double FF = ArmConstants.lowerfeedForward.calculate((position), 0);
         lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition

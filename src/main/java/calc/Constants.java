@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -329,10 +330,26 @@ public final class Constants {
       public static final double V_LOWER = 10.914;
       public static final double A_LOWER = 1.7823;
 
+      public static final ArmFeedforward lowerfeedForward = new ArmFeedforward(
+        ArmConstants.S_LOWER,
+        ArmConstants.G_LOWER,
+        ArmConstants.V_LOWER,
+        ArmConstants.A_LOWER
+      );
+
       public static final double S_UPPER = 0.1382;
       public static final double G_UPPER = 0; //1.0051; // (We don't like gravity)
       public static final double V_UPPER = 1.7457;
       public static final double A_UPPER = 0.6718;
+
+        public static final ArmFeedforward upperfeedForward = new ArmFeedforward(
+            ArmConstants.S_UPPER,
+            ArmConstants.G_UPPER,
+            ArmConstants.V_UPPER,
+            ArmConstants.A_UPPER
+        );
+
+      
     }
 
     public static final class LEDConstants {
