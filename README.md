@@ -9,11 +9,11 @@
 ***[Check out our release video!](https://www.youtube.com/watch?v=b3fmnyfDZ1o)***
 
 ## Highlights
-  - Field-Centric Swerve Drive 
-  - Two-link arm driven by Inverse Kinematics
+  - Field-centric swerve drive 
+  - Two-link arm driven by inverse kinematics
   - Modular autonomous routines
   - Auto balance for Charge Pad using gyroscope
-  - Auto placement for cubes and cones
+  - Auto alignment and placement for cubes and cones
   - April Tag interpretation using PhotonVision
 
 ## Major Package Functions
@@ -27,7 +27,7 @@
   - [`src.math.java.hardware`](src/main/java/hardware)
 	
     - The source of our subsystems, where motors are driven. This include the [Arm](src/main/java/hardware/Arm.java), [Claw](src/main/java/hardware/Claw.java), and [Swerve](src/main/java/hardware/Swerve.java) drive (which is made up of [MAXSwerveModules](src/main/java/hardware/MAXSwerveModule.java)).
-    - You can also find our [LEDController](main/src/main/java/hardware/LEDController) and [calibration](main/src/main/java/hardware/LEDCallibration) tool, which communicates with an Arduino Nano for our [LEDs](main/src/main/java/hardware/LEDController/LEDController.ino).
+    - You can also find our [LEDController](main/src/main/java/hardware/LEDController) and [calibration](main/src/main/java/hardware/LEDCallibration) tool, which communicates with an Arduino Uno for our [LEDs](main/src/main/java/hardware/LEDController/LEDController.ino).
 
 Want to find out more?
 [`Jump into the code!`](src/main/java/)
