@@ -5,15 +5,11 @@
 package hardware;
 
 import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -24,28 +20,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Config;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
 public class Swerve implements Loggable {
 
-  @Config
   public static double twistScalar = 4;
 
-  double Poofdx = 0;
-  double Poofdy = 0;
-  double Poofdtheta = 0;
-
-  double dx = 0;
-  double dy = 0;
-  double dtheta = 0;
-
-  public double yaw = 0;
-
-  public double pitch = 0;
-
-  public double roll = 0;
 
   private double speedMultiplier = 1;
 
@@ -126,18 +107,8 @@ public class Swerve implements Loggable {
   }
 
   public void periodic() {
-    // Update the odometry in the periodic block
-    Rotation2d previousRotation = getPose().getRotation();
-    double previousX = getPose().getX();
-    double previousY = getPose().getY();
 
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
-    getPitch();
-    getRoll();
-    
-    this.dx = previousX - getPose().getX();
-    this.dy = previousY - getPose().getY();
-    this.dtheta = getPose().getRotation().minus(previousRotation).getRadians();
 
     DriverUI.field.setRobotPose(getPose());
   }
@@ -274,18 +245,16 @@ public class Swerve implements Loggable {
     if (DriverStation.isTestEnabled()) {
       return speeds;
     }
+    
     double dt = 0.02;
+    
     var desiredDeltaPose = new Pose2d(
       speeds.vxMetersPerSecond * dt, 
       speeds.vyMetersPerSecond * dt, 
       new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4)
     );
 
-      var twist = new Pose2d().log(desiredDeltaPose);
-
-      Poofdx = twist.dx;
-      Poofdy = twist.dy;
-      Poofdtheta = twist.dtheta;
+    var twist = new Pose2d().log(desiredDeltaPose);
 
     return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
   }
@@ -380,8 +349,6 @@ public class Swerve implements Loggable {
       yawRotation2d = yawRotation2d.unaryMinus();
     }
 
-    this.yaw = yawRotation2d.getDegrees();
-
     return yawRotation2d;
   }
 
@@ -394,8 +361,6 @@ public class Swerve implements Loggable {
     Rotation2d pitchRotation2d = Rotation2d
         .fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
 
-    this.pitch = pitchRotation2d.unaryMinus().getDegrees();
-
     return pitchRotation2d;
 
   }
@@ -405,49 +370,8 @@ public class Swerve implements Loggable {
     Rotation2d rollRotation2d = Rotation2d
         .fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));
 
-    this.roll = rollRotation2d.unaryMinus().getDegrees();
-
     return rollRotation2d;
 
-  }
-
-  public double getTilt() {
-
-    Rotation3d gyroRotation3d = new Rotation3d(getRoll().getRadians(), getPitch().getRadians(),
-        getGyroAngle().getRadians());
-
-    Quaternion gyroQuaternion = gyroRotation3d.getQuaternion();
-    // Multiply the quaternion by the UP direction as a vector to normalize it to UP
-    // In english: this basically converts the angles to be relative to the charging
-    // station
-    double num = gyroQuaternion.getW() + gyroQuaternion.getW();
-    double num2 = gyroQuaternion.getX() + gyroQuaternion.getX();
-    double num3 = gyroQuaternion.getY() + gyroQuaternion.getY();
-    double num4 = gyroQuaternion.getZ() * num;
-    double num5 = gyroQuaternion.getZ() * num2;
-    double num6 = gyroQuaternion.getZ() * num3;
-    double num7 = gyroQuaternion.getW() * num;
-    double num8 = gyroQuaternion.getW() * num2;
-    double num9 = gyroQuaternion.getW() * num3;
-    double num10 = gyroQuaternion.getX() * num2;
-    double num11 = gyroQuaternion.getX() * num3;
-    double num12 = gyroQuaternion.getY() * num3;
-    double num13 = 1.0 - num10 - num12;
-    double num14 = num8 - num6;
-    double num15 = num9 + num5;
-    double num16 = num8 + num6;
-    double num17 = 1.0 - num7 - num12;
-    double num18 = num11 - num4;
-    double num19 = num9 - num5;
-    double num20 = num11 + num4;
-    double num21 = 1.0 - num7 - num10;
-
-    var multiplyOutput = VecBuilder.fill(0 * num13 + 1 * num14 + 0 * num15, 0 * num16 + 1 * num17 + 0 * num18,
-        0 * num19 + 1 * num20 + 0 * num21);
-
-    double dotProduct = multiplyOutput.dot(VecBuilder.fill(0, 1, 0));
-
-    return (Math.acos(MathUtil.clamp(dotProduct, -1, 1))) * Math.signum(getPitch().getRadians());
   }
 
   public void resetEncoders() {
