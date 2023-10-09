@@ -12,9 +12,8 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import frc.robot.DriverUI;
-import io.github.oblarg.oblog.Loggable;
 
-public class AutoPathStorage implements Loggable {
+public class AutoPathStorage {
 
   public static Waypoint[] chosenWaypoints;
 

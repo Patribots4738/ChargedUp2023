@@ -473,8 +473,8 @@ void setBellyPan(int pattern){
       twoAtAtime(bellyLeftIDX, bellyRightIDX, CRGB::Yellow);
       break;
 
-    case 9: // Off
-      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Black);
+    case 9: // Off | Black
+      allColor(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Black);
       break;
 
     case 106: // Flash Green

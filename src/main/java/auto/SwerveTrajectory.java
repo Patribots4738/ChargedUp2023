@@ -13,11 +13,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
-import io.github.oblarg.oblog.Loggable;
 import calc.Constants;
 import calc.Constants.AlignmentConstants;
 
-public class SwerveTrajectory implements Loggable {
+public class SwerveTrajectory {
 
   // Create config for trajectory
   public static double timeTrajectoryStarted;

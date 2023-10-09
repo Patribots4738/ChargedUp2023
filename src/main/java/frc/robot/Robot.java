@@ -261,12 +261,12 @@ public class Robot extends TimedRobot {
     double driverLeftX = MathUtil.applyDeadband(-driver.getLeftX(), OIConstants.DRIVER_DEADBAND);
     double driverLeftY = MathUtil.applyDeadband(-driver.getLeftY(), OIConstants.DRIVER_DEADBAND);
     double driverRightX = MathUtil.applyDeadband(driver.getRightX(), OIConstants.DRIVER_DEADBAND);
-    double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
+    // double driverRightY = MathUtil.applyDeadband(driver.getRightY(), OIConstants.DRIVER_DEADBAND);
 
     double operatorLeftX = MathUtil.applyDeadband(operator.getLeftX(), OIConstants.OPERATOR_DEADBAND);
     double operatorLeftY = MathUtil.applyDeadband(operator.getLeftY(), OIConstants.OPERATOR_DEADBAND);
-    double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.OPERATOR_DEADBAND);
-    double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.OPERATOR_DEADBAND);
+    // double operatorRightX = MathUtil.applyDeadband(operator.getRightX(), OIConstants.OPERATOR_DEADBAND);
+    // double operatorRightY = MathUtil.applyDeadband(operator.getRightY(), OIConstants.OPERATOR_DEADBAND);
 
     Translation2d operatorLeftAxis = OICalc.toCircle(operatorLeftX, operatorLeftY);
 
@@ -456,36 +456,26 @@ public class Robot extends TimedRobot {
 
       // Clicking left
       case 270:
-        /*
-         * If we are on blue alliance, make it so that the left and right buttons set the arm to human tag
-         *   when the robot is halfway across the field
-         * this code is in place due to our operator confusing the buttons and clicking the wrong one.
-         */
-        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                if (swerve.getPose().getTranslation().getX() > AlignmentConstants.FIELD_WIDTH_METERS/2) {
-                    arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-                }
-                else {
-                    boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
-                    arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
-                    if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
-                }
+        // If we are on testMode, then use legacy inputs 
+        // (https://github.com/Patribots4738/ChargedUp2023/commit/6d640d17cdd5799006ab146fca5c94b3ae5fd274)
+        // If not, use below (case 90) logic
+        if (DriverStation.isTestEnabled()) {
+            boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
+            arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
+            if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
+            // Notice that we only break in this if case
+            break;
         }
-        // we are on red alliance,
-        else {
-            if (swerve.getPose().getTranslation().getX() < AlignmentConstants.FIELD_WIDTH_METERS/2) {
-                arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
-            }
-            else {
-                boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
-                arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
-                if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
-            }
-        }
-        break;
-
       // Clicking right
       case 90:
+        // If we are on testMode, then use legacy inputs 
+        // (https://github.com/Patribots4738/ChargedUp2023/commit/6d640d17cdd5799006ab146fca5c94b3ae5fd274)
+        // If not, use below logic
+        if (DriverStation.isTestEnabled()) {
+            arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+            // Notice that we only break in this if case
+            break;
+        }
         /*
          * If we are on blue alliance, make it so that the left and right buttons set the arm to human tag
          *   when the robot is halfway across the field
@@ -517,15 +507,11 @@ public class Robot extends TimedRobot {
     if (operator.getBButtonPressed()){
       arm.setArmIndex(PlacementConstants.CONE_FLIP_INDEX);
     }
-    if (operator.getRightStickButtonPressed()) {
-      if (arm.getAtPlacementPosition()) {
-        claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
-        // Attempt at making a small animation of the leds showcasing the event
-        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
-      }
-      else {
-        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
-      }
+    if (arm.halfwayFinishedWithConeFlip()) {
+        claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
+    }
+    if (operator.getRightStickButtonPressed() && !arm.getAtPlacementPosition()) {
+      arm.setArmIndex(PlacementConstants.STOWED_INDEX);
     }
     if (operator.getAButton()) {
       arm.finishPlacement();
@@ -542,24 +528,30 @@ public class Robot extends TimedRobot {
 
     /* Claw speed controls:
      *   If the left bumper is pressed, e-stop the claw
-     *   If the right bumper is held, or if teleop just started,
-     *   outtake an object when the arm is at placement position
-     *   If the left trigger is held, intake an object:
+     *   If the right bumper is held, or if teleop just started, or right stick is pressed,
+     *   outtake an object if the arm is at placement position
+     *   If the left trigger is held, intake:
      *     Keep the fastest intake speed until the claw is e-stopped/reversed
      *     This is to allow the trigger to be fully pressed intake an object,
-     *   and then let go to keep the claw at the same speed
+     *     and then let go to keep the claw at the same speed
      *   If the right trigger is held, manually outtake an object (try to use the right bumper instead)
      */
     if (operator.getLeftBumper()) {
 
       claw.stopClaw();
 
-    } else if ((operator.getRightBumper()) && !claw.getStartedOuttakingBool() || (timer.get() < 0.1 && !DriverStation.isTestEnabled())) {
+    } else if (
+		(operator.getRightBumper() || operator.getRightStickButtonPressed()) && 
+		!claw.getStartedOuttakingBool() ||
+		(timer.get() < 0.1 && !DriverStation.isTestEnabled())) 
+	{
+
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
         // Attempt at making a small animation of the leds showcasing the event
-        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_RED, true);
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_BLACK);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
 
     } else if (operator.getLeftTriggerAxis() > 0) {
@@ -596,7 +588,7 @@ public class Robot extends TimedRobot {
         claw.stopClaw();
 
     }
-
+    
     // Blink the lights red if we are flipped over
     if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
 
@@ -612,12 +604,11 @@ public class Robot extends TimedRobot {
       driver.setRumble(RumbleType.kBothRumble, 1);
       operator.setRumble(RumbleType.kBothRumble, 1);
 
-      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN);
+      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN_BLINK);
 
       DriverUI.aligned = true;
     
-    }
-    else {
+    } else {
     
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
       
@@ -626,35 +617,29 @@ public class Robot extends TimedRobot {
         DriverUI.aligned = false;
     
       }
-      else {
-    
-        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+      //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
+      else if (claw.getHasGameElement()) {
       
+        driver.setRumble(RumbleType.kBothRumble, 0.25);
+        operator.setRumble(RumbleType.kBothRumble, 0.25);
+      
+      } 
+	  
+	  if (claw.justAquiredGameElement()) {
+		arduinoController.setLEDState(
+			AutoAlignment.coneMode 
+				? LEDConstants.BELLY_PAN_YELLOW_BLINK 
+				: LEDConstants.BELLY_PAN_PURPLE_BLINK, 
+			true);
+	  } else {
+        // We are not aligned, nor are we close to any alignment area
+        // So default the LEDs to represent the cone/cube mode of the robot
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
       }
-    
+
       driver.setRumble(RumbleType.kBothRumble, 0);
       operator.setRumble(RumbleType.kBothRumble, 0);
     
-    }
-
-    //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
-    if (claw.getHasGameElement()) {
-    
-        driver.setRumble(RumbleType.kBothRumble, 0.25);
-        operator.setRumble(RumbleType.kBothRumble, 0.25);
-        
-        if (claw.justAquiredGameElement()) {
-            arduinoController.setLEDState(
-                AutoAlignment.coneMode 
-                    ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
-                    : LEDConstants.BELLY_PAN_PURPLE_BLINK, 
-                true);
-        }
-    
-    }
-    
-    if (arm.halfwayFinishedWithConeFlip()) {
-       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
     }
   }
 

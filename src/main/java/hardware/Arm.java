@@ -13,17 +13,18 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
+
+// Uncomment the following lines to enable logging
+// Mainly used for creating/editing arm position constants
+// import io.github.oblarg.oblog.Loggable;
+// import io.github.oblarg.oblog.annotations.Log;
 
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
-public class Arm implements Loggable{
+public class Arm /* implements Loggable */ {
 
     int armPosDimension1 = PlacementConstants.STOWED_INDEX;
     int armPosDimension2 = 1;
@@ -50,9 +51,9 @@ public class Arm implements Loggable{
 
     private boolean armsAtDesiredPosition = false;
     
-    @Log
+    // @Log
     private double armXPos = 0;
-    @Log
+    // @Log
     private double armYPos = 0;
 
     private final CANSparkMax lowerArmRight;
@@ -183,11 +184,14 @@ public class Arm implements Loggable{
         else if (followingTrajectory) { trajectoryPeriodic(); }
         setLowerArmPosition(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
-        upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
-        lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
-        // Use forward kinematics to get the x and y position of the end effector
-        armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
-        armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+        
+        // Below is things that are used for logging n such:
+        
+        // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
+        // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
+        // // Use forward kinematics to get the x and y position of the end effector
+        // armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+        // armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
     }
 
     public void trajectoryPeriodic() {
@@ -473,17 +477,10 @@ public class Arm implements Loggable{
             ArmConstants.UPPER_ARM_LOWER_LIMIT,
             ArmConstants.UPPER_ARM_UPPER_LIMIT
         );
-
-        // Description of FF in Constants :D
-        ArmFeedforward feedForward = new ArmFeedforward(
-            ArmConstants.S_UPPER,
-            ArmConstants.G_UPPER,
-            ArmConstants.V_UPPER,
-            ArmConstants.A_UPPER);
             
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((angle), 0);
+        double FF = ArmConstants.upperfeedForward.calculate((angle), 0);
 
         // Check if we want to use secondary PID gains
         // Slot 1 is used to make the arm go super fast
@@ -538,15 +535,9 @@ public class Arm implements Loggable{
             ArmConstants.LOWER_ARM_UPPER_LIMIT
         );
 
-        ArmFeedforward feedForward = new ArmFeedforward(
-            ArmConstants.S_LOWER,
-            ArmConstants.G_LOWER,
-            ArmConstants.V_LOWER,
-            ArmConstants.A_LOWER);
-
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = feedForward.calculate((position), 0);
+        double FF = ArmConstants.lowerfeedForward.calculate((position), 0);
         lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
