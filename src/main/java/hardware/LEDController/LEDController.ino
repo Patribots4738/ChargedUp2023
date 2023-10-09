@@ -49,6 +49,7 @@ int bellyPanMiddle = (BELLYPAN_START_INDEX + ((BELLYPAN_END_INDEX-BELLYPAN_START
 int loadingIndex = bellyPanMiddle;
 
 unsigned long previousMillis = 0;
+unsigned long previousArmMillis = 0;
 unsigned long globalFlashStart = 0;
 
 void setup() {
@@ -73,7 +74,11 @@ void loop() {
     unsigned long currentMillis = millis();
     
     int selectedDelay = (bellyPanPattern == -1) ? 57000/bellyPanMiddle : MEDIUM/2;
-
+    
+    if (bellyPanPattern == -1 && currentMillis - previousArmMillis >= MEDIUM/2) {
+        previousArmMillis = currentMillis;
+        setArm(armPattern);
+    }
     // We want to set the LEDs to green -> i.e. we are aligned and we should know immediatly.
     // We only really are going to care for two seconds, so once that passes we can ignore this.
     if (bellyPanPattern > 100 && currentMillis - globalFlashStart <= FLASH_LENGTH_MS) {
@@ -106,7 +111,7 @@ void loop() {
         
         //  setSponsorPanel(sponsorPanelPattern);
         //  setClaw(clawPattern);
-        if (bellyPanPattern == 8 || bellyPanPattern == 7) {
+        if (bellyPanPattern == 8 || bellyPanPattern == 7 || bellyPanPattern == 4) {
             bellyLeftIDX += leftAllColorInc;
             bellyRightIDX += rightAllColorInc;
 
@@ -135,7 +140,7 @@ void loop() {
         armLeftIDX = constrain(armLeftIDX - 1, ARM_START_INDEX, ARM_END_INDEX);
         armRightIDX = constrain(armRightIDX + 1, ARM_START_INDEX, ARM_END_INDEX);
     }
-    else if (bellyPanPattern == 7 || bellyPanPattern == 8) {
+    else if (bellyPanPattern == 8 || bellyPanPattern == 7 || bellyPanPattern == 4) {
         setBellyPan(bellyPanPattern);
         bellyLeftIDX += leftAllColorInc;
         bellyRightIDX += rightAllColorInc;
@@ -452,7 +457,7 @@ void setBellyPan(int pattern){
       break;
       
     case 4: // Red
-      allColor(bellyLeftIDX, bellyRightIDX, CRGB::Red);
+      twoAtAtime(bellyLeftIDX, bellyRightIDX, CRGB::Red);
       break;
       
     case 5: // Blue
