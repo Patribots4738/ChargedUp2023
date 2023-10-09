@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class Claw implements Loggable {
 
@@ -79,11 +80,16 @@ public class Claw implements Loggable {
          * if the claw has been intaking for a while
          * i.e. is finished getting up to speed.
          */
-        hasGameElement = 
-            (-0.25 < claw.getAppliedOutput() && claw.getAppliedOutput() < 0) && 
-            (current > 15 && claw.getOutputCurrent() > 15) &&
-            (desiredSpeed > 0.45) &&
-            (Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25);
+        if (hasGameElement) {
+            hasGameElement = desiredSpeed > 0;
+        }
+        else {
+            hasGameElement = 
+                (-0.25 < claw.getAppliedOutput() && claw.getAppliedOutput() < 0) && 
+                (current > 15 && claw.getOutputCurrent() > 15) &&
+                (desiredSpeed > 0.45) &&
+                (Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25);
+        }
 
         // Check if our current current and our current (one loop behind, hasn't updated yet)
         // is in the range that happens when we have a game element, 
