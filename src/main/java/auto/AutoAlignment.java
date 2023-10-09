@@ -11,7 +11,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
 import hardware.Claw;
-import io.github.oblarg.oblog.Loggable;
 import calc.Constants.AlignmentConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.VisionConstants;
@@ -19,7 +18,7 @@ import calc.Constants.ClawConstants;
 import frc.robot.DriverUI;
 import calc.PhotonCameraUtil;
 
-public class AutoAlignment implements Loggable{
+public class AutoAlignment {
 
     /**
      * A visual representation of the apriltag positions

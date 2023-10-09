@@ -19,11 +19,10 @@ import calc.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
-import io.github.oblarg.oblog.Loggable;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 
-public class Swerve implements Loggable {
+public class Swerve {
 
   public static double twistScalar = 4;
 

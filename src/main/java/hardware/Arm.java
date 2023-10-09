@@ -13,17 +13,18 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
+
+// Uncomment the following lines to enable logging
+// Mainly used for creating/editing arm position constants
+// import io.github.oblarg.oblog.Loggable;
+// import io.github.oblarg.oblog.annotations.Log;
 
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
-public class Arm implements Loggable{
+public class Arm /* implements Loggable */ {
 
     int armPosDimension1 = PlacementConstants.STOWED_INDEX;
     int armPosDimension2 = 1;
@@ -50,9 +51,9 @@ public class Arm implements Loggable{
 
     private boolean armsAtDesiredPosition = false;
     
-    @Log
+    // @Log
     private double armXPos = 0;
-    @Log
+    // @Log
     private double armYPos = 0;
 
     private final CANSparkMax lowerArmRight;
