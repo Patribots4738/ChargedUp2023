@@ -13,8 +13,11 @@ public class ArduinoController {
   private Queue<Integer> queue = new LinkedList<Integer>();
   private int currentBellyPanState = -1;
   private int currentArmState = -1;
+  private boolean everyOtherLoop = false;
 
   public void periodic() {
+      // Toggle our boolean to not overload the arduino with requests
+      everyOtherLoop = !everyOtherLoop;
       // Write the latest byte in the queue to the arduino
       // If it exists
       if (queue.peek() != null) {
@@ -68,12 +71,15 @@ public class ArduinoController {
   }
 
   public void sendByte() {
-    // Send the latest queue value to the arduino,
-    // Then, remove the latest value from the queue
-    if (queue.peek() != null) {
-        // System.out.println("Sending byte: " + queue.peek());
-        arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
-    }    
+    // Only send bytes every other loop to not overload arduino
+    if (everyOtherLoop) {
+        // Send the latest queue value to the arduino,
+        // Then, remove the latest value from the queue
+        if (queue.peek() != null) {
+            System.out.println("Sending byte: " + queue.peek());
+            arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
+        }    
+    }
   }
 
   public void setBellyPanState(int state) {
