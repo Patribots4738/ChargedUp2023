@@ -27,7 +27,7 @@
   - [`src.math.java.hardware`](src/main/java/hardware)
 	
     - The source of our subsystems, where motors are driven. This include the [Arm](src/main/java/hardware/Arm.java), [Claw](src/main/java/hardware/Claw.java), and [Swerve](src/main/java/hardware/Swerve.java) drive (which is made up of [MAXSwerveModules](src/main/java/hardware/MAXSwerveModule.java)).
-    - You can also find our [LEDController](src/main/java/hardware/LEDController) and [calibration](src/main/java/hardware/LEDCallibration) tool, which communicates with an Arduino Uno for our [LEDs](src/main/java/hardware/LEDController/LEDController.ino).
+    - You can also find our [LEDController](src/main/java/hardware/LEDController/LEDController.ino) and [calibration](src/main/java/hardware/LEDCallibration/LEDCallibration.ino) tool, which communicates with an Arduino Uno for our [LEDs](src/main/java/hardware/LEDController/LEDController.ino).
 
 Want to find out more?
 [`Jump into the code!`](src/main/java/)
