@@ -541,8 +541,8 @@ public class Robot extends TimedRobot {
       claw.stopClaw();
 
     } else if (
-		(operator.getRightBumper() || operator.getRightStickButtonPressed()) && 
-		!claw.getStartedOuttakingBool() ||
+		((operator.getRightBumper() || operator.getRightStickButton()) && 
+		!claw.getStartedOuttakingBool()) ||
 		(timer.get() < 0.1 && !DriverStation.isTestEnabled())) 
 	{
 
@@ -623,14 +623,13 @@ public class Robot extends TimedRobot {
         driver.setRumble(RumbleType.kBothRumble, 0.25);
         operator.setRumble(RumbleType.kBothRumble, 0.25);
       
-      } 
-	  
-	  if (claw.justAquiredGameElement()) {
-		arduinoController.setLEDState(
-			AutoAlignment.coneMode 
-				? LEDConstants.BELLY_PAN_YELLOW_BLINK 
-				: LEDConstants.BELLY_PAN_PURPLE_BLINK, 
-			true);
+        if (claw.justAquiredGameElement()) {
+            arduinoController.setLEDState(
+                AutoAlignment.coneMode 
+                    ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
+                    : LEDConstants.BELLY_PAN_PURPLE_BLINK, 
+                true);
+          }
 	  } else {
         // We are not aligned, nor are we close to any alignment area
         // So default the LEDs to represent the cone/cube mode of the robot
