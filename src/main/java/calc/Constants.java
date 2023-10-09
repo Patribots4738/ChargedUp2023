@@ -712,7 +712,7 @@ public final class Constants {
       public static final Trajectory MID_CONE_TRAJECTORY = ArmCalculations.generateMidConeTrajectory();
       public static final Trajectory HIGH_CUBE_TRAJECTORY = ArmCalculations.generateHighCubeTrajectory();
       public static final Trajectory HIGH_PLACE_TRAJECTORY = ArmCalculations.generateHighPlacementTrajectory();
-      public static final Trajectory HIGH_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();
+      public static final Trajectory HIGH_CONE_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();
       public static final Trajectory HIGH_CUBE_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighCubeToStowTrajectory();
   }
 }

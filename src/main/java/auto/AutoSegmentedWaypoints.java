@@ -310,7 +310,7 @@ public class AutoSegmentedWaypoints {
         arm.startTrajectory(
             (arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX)
                 ? PlacementConstants.HIGH_CUBE_TO_STOWED_TRAJECTORY 
-                : PlacementConstants.HIGH_TO_STOWED_TRAJECTORY
+                : PlacementConstants.HIGH_CONE_TO_STOWED_TRAJECTORY
         );
       }
       // If our path placed a cube, just stow if we are not placing at high_cube_launch

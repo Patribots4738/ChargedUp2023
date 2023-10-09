@@ -545,15 +545,13 @@ public class Robot extends TimedRobot {
 		!claw.getStartedOuttakingBool()) ||
 		(timer.get() < 0.1 && !DriverStation.isTestEnabled())) 
 	{
-
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
         claw.outTakeforXSeconds(AutoAlignment.coneMode ? 0.1 : 0.3);
         // Attempt at making a small animation of the leds showcasing the event
-        arduinoController.setLEDState(LEDConstants.BELLY_PAN_BLACK);
-        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_BLACK, true);
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE, true);
       }
-
     } else if (operator.getLeftTriggerAxis() > 0) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
@@ -565,13 +563,20 @@ public class Robot extends TimedRobot {
     } else if (claw.getFinishedOuttaking() && arm.getAtPlacementPosition()) {
 
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
-            arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX) {
+            arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
+            arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX) 
+        {
       
-        arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
-        arm.startTrajectory(PlacementConstants.HIGH_TO_STOWED_TRAJECTORY);
+            arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+            arm.startTrajectory(
+                AutoAlignment.coneMode 
+                    ? PlacementConstants.HIGH_CONE_TO_STOWED_TRAJECTORY
+                    : PlacementConstants.HIGH_CUBE_TO_STOWED_TRAJECTORY
+            );
 
         } else if (arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
-                arm.getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX) 
+                arm.getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
+                arm.getArmIndex() == PlacementConstants.CUBE_MID_INDEX) 
         {
 
             arm.setArmIndex(PlacementConstants.MID_TO_STOWED_INDEX);
@@ -599,11 +604,13 @@ public class Robot extends TimedRobot {
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) && (autoAlignment.getCurrentNorm() != -1)) {
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) 
+        && (autoAlignment.getCurrentNorm() != -1)) 
+    {
     
       driver.setRumble(RumbleType.kBothRumble, 1);
       operator.setRumble(RumbleType.kBothRumble, 1);
-
+      
       arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN_BLINK);
 
       DriverUI.aligned = true;
