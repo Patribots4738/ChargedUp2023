@@ -604,7 +604,7 @@ public class Robot extends TimedRobot {
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_RADIUS/2) 
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_RADIUS) 
         && (autoAlignment.getCurrentNorm() != -1)) 
     {
     
@@ -627,7 +627,7 @@ public class Robot extends TimedRobot {
     
       }
       //Rumble the claw if it is stalling, judged by whether the claw is drawing more amps than a preset limit.
-      else if (claw.getHasGameElement()) {
+      else if (claw.hasGameElement()) {
       
         driver.setRumble(RumbleType.kBothRumble, 0.25);
         operator.setRumble(RumbleType.kBothRumble, 0.25);

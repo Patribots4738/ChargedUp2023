@@ -217,7 +217,7 @@ public class Claw implements Loggable {
         hasGameElementOneLoopBehind = hasGameElement;
     }
 
-    public boolean getHasGameElement() {
+    public boolean hasGameElement() {
         return hasGameElement;
     }
 

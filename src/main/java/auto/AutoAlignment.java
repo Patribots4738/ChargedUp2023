@@ -160,7 +160,7 @@ public class AutoAlignment {
       
       double adjustedY = targetPose.getY() - swerve.getPose().getY();
       
-      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_DIAMETER));
+      MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_RADIUS));
       
       adjustedY += swerve.getPose().getY();
       
