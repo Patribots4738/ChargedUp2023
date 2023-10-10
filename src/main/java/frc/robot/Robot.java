@@ -604,7 +604,7 @@ public class Robot extends TimedRobot {
     // If the robot is close to the desired grid index, rumble both controllers
     // This is to help the driver know when to stop moving the robot if manually aligning
     // Or as a confirmation for auto alignment
-    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_DIAMETER/2) 
+    else if (autoAlignment.getCurrentNorm() < (PlacementConstants.CONE_BASE_RADIUS/2) 
         && (autoAlignment.getCurrentNorm() != -1)) 
     {
     
@@ -619,8 +619,9 @@ public class Robot extends TimedRobot {
     } else {
     
       if (autoAlignment.getCurrentNorm() < 1 && (autoAlignment.getCurrentNorm() != -1)) {
-      
-        arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
+        
+        if (claw.hasGameElement())
+          arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
 
         DriverUI.aligned = false;
     
