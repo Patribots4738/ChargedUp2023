@@ -611,7 +611,8 @@ public class Robot extends TimedRobot {
       driver.setRumble(RumbleType.kBothRumble, 1);
       operator.setRumble(RumbleType.kBothRumble, 1);
       
-      arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN_BLINK);
+      if (claw.hasGameElement())
+        arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN_BLINK);
 
       DriverUI.aligned = true;
     
