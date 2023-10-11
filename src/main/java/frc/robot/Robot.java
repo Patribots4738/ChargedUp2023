@@ -613,6 +613,8 @@ public class Robot extends TimedRobot {
       
       if (claw.hasGameElement())
         arduinoController.setLEDState(LEDConstants.BELLY_PAN_GREEN_BLINK);
+      else 
+        arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
 
       DriverUI.aligned = true;
     
@@ -622,6 +624,8 @@ public class Robot extends TimedRobot {
         
         if (claw.hasGameElement())
           arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED);
+        else 
+          arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE);
 
         DriverUI.aligned = false;
     
