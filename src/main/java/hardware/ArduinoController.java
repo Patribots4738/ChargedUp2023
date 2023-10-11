@@ -76,7 +76,7 @@ public class ArduinoController {
         // Send the latest queue value to the arduino,
         // Then, remove the latest value from the queue
         if (queue.peek() != null) {
-            System.out.println("Sending byte: " + queue.peek());
+            // System.out.println("Sending byte: " + queue.peek());
             arduino.write(LEDConstants.ARDUINO_ADDRESS, queue.poll());
         }    
     }
