@@ -24,7 +24,7 @@
 
 CRGB leds[NUM_LEDS];
 
-int data = 109;
+int data = -1;
 
 int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
