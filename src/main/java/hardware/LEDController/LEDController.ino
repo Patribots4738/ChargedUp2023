@@ -2,7 +2,7 @@
 #include "Wire.h"
 
 // How many leds in your strip?
-#define NUM_LEDS 150
+#define NUM_LEDS 131
 #define DATA_PIN 7 
 
 #define FORWARD 0
@@ -10,7 +10,7 @@
 #define SLOW 250
 #define MEDIUM 50
 #define FAST 1
-#define BRIGHTNESS 100
+#define BRIGHTNESS 255
 
 #define BELLYPAN_START_INDEX 0
 #define BELLYPAN_END_INDEX 94
@@ -24,7 +24,7 @@
 
 CRGB leds[NUM_LEDS];
 
-int data = -1;
+int data = 109;
 
 int theaterChaseRainbowIncrementer = 0;
 int rainbowIncrementer = 0;
@@ -81,9 +81,9 @@ void loop() {
     }
     // We want to set the LEDs to green -> i.e. we are aligned and we should know immediatly.
     // We only really are going to care for two seconds, so once that passes we can ignore this.
-    if (bellyPanPattern > 100 && currentMillis - globalFlashStart <= FLASH_LENGTH_MS) {
+    if ((bellyPanPattern > 100 && currentMillis - globalFlashStart <= FLASH_LENGTH_MS) || data == 3 || bellyPanPattern == 109) {
         // Skip the allColor animation process, and just set all of the LEDs to flash
-        // The ardunio runs at the speed that the flashing should happen, so we don't have to worry about the delays.
+        // We handle delays with globalFlashState
         setBellyPan(bellyPanPattern);
     }
     else if (bellyPanPattern > 100) {
@@ -326,6 +326,19 @@ void rainbow(int startIndex, int endIndex, int cycles){ // TODO directionk
   
 }
 
+void noiseFill(int amount) {
+  uint8_t octaves = 1;
+  uint16_t x = 0;
+  int scale = 100;
+  uint8_t hue_octaves = 1;
+  uint16_t hue_x = 1;
+  int hue_scale = 50;
+  uint16_t ntime = millis() / 3;
+  uint8_t hue_shift = 5;
+  
+  fill_noise16 (leds, amount, octaves, x, scale, hue_octaves, hue_x, hue_scale, ntime, hue_shift);
+}
+
 // Theater-st+yle crawling lights
 void theaterChase(int startIndex, int endIndex, CRGB c){ // TODO direction
   for (int q=0; q < 3; q++) {
@@ -441,7 +454,7 @@ void setBellyPan(int pattern){
       allColor(0, NUM_LEDS, CRGB::Black);
       
     case 0: // Rainbow
-      rainbow(bellyLeftIDX, bellyRightIDX, 1);
+      noiseFill(BELLYPAN_END_INDEX);
       break;
 
     case 1: // Green+Gold Bounce
@@ -452,7 +465,7 @@ void setBellyPan(int pattern){
       bellyBounce(bellyLeftIDX, bellyRightIDX, CRGB::Red);
       break;
       
-    case 3: // FlashRed
+    case 3: // Fallen Over
       flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Red);
       break;
       
@@ -492,6 +505,9 @@ void setBellyPan(int pattern){
     
     case 108: // Flash Yellow
       flash(BELLYPAN_START_INDEX, BELLYPAN_END_INDEX, CRGB::Yellow);
+      break;
+    case 109: // Chroma
+      noiseFill(BELLYPAN_END_INDEX);
       break;
   }
 }

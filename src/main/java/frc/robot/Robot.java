@@ -136,7 +136,7 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     if (DriverStation.isDSAttached() || DriverStation.isFMSAttached()) {
         if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
-            arduinoController.setLEDState(LEDConstants.BELLY_PAN_FLASH_RED);
+            arduinoController.setLEDState(LEDConstants.BELLY_PAN_CHROMA);
         }
         else {
             if (DriverStation.getAlliance() == Alliance.Blue) {
@@ -201,7 +201,7 @@ public class Robot extends TimedRobot {
       return;
     }
     // Auto is over, stop the claw
-    // If we enabled in autonomous, this will stop stuff 
+    // If we enabled in autonomous, this will stop stuff
     // to give you an indicator of timing
     if (timer.get() > 15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
