@@ -12,10 +12,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
-public class Claw implements Loggable {
+public class Claw {
 
     private final CANSparkMax claw;
     private final RelativeEncoder clawEncoder;
