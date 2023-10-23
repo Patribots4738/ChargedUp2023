@@ -899,10 +899,10 @@ public class AutoPathStorage {
       new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
       new AutoPose("4H_ONLY", _6H_ONLY),
       
-      new AutoPose("POOF 9D8 C CHARGE", _POOF_9H_D_8H_C_CHARGE),
-      
       new AutoPose("POOF 1A2 B CHARGE RED", _POOF_1H_A_2H_B_CHARGE_RED),
       new AutoPose("POOF 1A2 B CHARGE BLUE", _POOF_1H_A_2H_B_CHARGE_BLUE),
+
+      new AutoPose("POOF 9D8 C CHARGE", _POOF_9H_D_8H_C_CHARGE),
 
       new AutoPose("1H_A_2H_B_2M_BLUE_", _1H_A_2H_B_2M_BLUE),
       new AutoPose("1H_A_2H_B_2M_RED_", _1H_A_2H_B_2M_RED),
@@ -1000,7 +1000,7 @@ public class AutoPathStorage {
       DriverUI.autoChooser.addOption(AutoPose.getName(), AutoPose);
 
       // Every third index, add a spacer option for simplicity
-      if ((i == 1 || i == 3 || i == 5) || ((i + 1) % 3 == 0 && i > 9) && (i != myAutoContainer.length - 1)) {
+      if ((i == 1 || i == 3 || i == 5 || i == 9 || i == 10) || ((i+2) % 3 == 0 && i > 10) && (i != myAutoContainer.length - 1)) {
         DriverUI.autoChooser.addOption(" " + " ".repeat(i), AutoPose);
       }
     }
