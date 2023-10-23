@@ -18,6 +18,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import calc.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.DriverUI;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
@@ -57,6 +58,8 @@ public class Swerve {
       DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
       DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
       DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
+
+  private double[] desiredModuleStates = new double[6];
 
   // The gyro sensor
   private final ADIS16470_IMU gyro = new ADIS16470_IMU();
@@ -103,6 +106,15 @@ public class Swerve {
     zeroHeading();
     setBrakeMode();
 
+    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
+        frontLeft.getState().angle.getDegrees(), frontLeft.getState().speedMetersPerSecond,
+        frontRight.getState().angle.getDegrees(), frontRight.getState().speedMetersPerSecond,
+        rearLeft.getState().angle.getDegrees(), rearLeft.getState().speedMetersPerSecond,
+        rearRight.getState().angle.getDegrees(), rearRight.getState().speedMetersPerSecond
+    });
+    SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
+    SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
+
   }
 
   public void periodic() {
@@ -110,6 +122,16 @@ public class Swerve {
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
 
     DriverUI.field.setRobotPose(getPose());
+
+    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
+        frontLeft.getState().angle.getDegrees(), frontLeft.getState().speedMetersPerSecond,
+        frontRight.getState().angle.getDegrees(), frontRight.getState().speedMetersPerSecond,
+        rearLeft.getState().angle.getDegrees(), rearLeft.getState().speedMetersPerSecond,
+        rearRight.getState().angle.getDegrees(), rearRight.getState().speedMetersPerSecond
+    });
+
+    SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
+    SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
   }
 
   /**
@@ -288,6 +310,13 @@ public class Swerve {
     frontRight.setDesiredState(desiredStates[1]);
     rearLeft.setDesiredState(desiredStates[2]);
     rearRight.setDesiredState(desiredStates[3]);
+
+    desiredModuleStates = new double[] {
+        desiredStates[0].angle.getRadians(), desiredStates[0].speedMetersPerSecond,
+        desiredStates[1].angle.getRadians(), desiredStates[1].speedMetersPerSecond,
+        desiredStates[2].angle.getRadians(), desiredStates[2].speedMetersPerSecond,
+        desiredStates[3].angle.getRadians(), desiredStates[3].speedMetersPerSecond
+    };
   }
 
   public void resetOdometry(Pose2d pose) {
