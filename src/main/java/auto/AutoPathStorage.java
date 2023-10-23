@@ -109,7 +109,7 @@ public class AutoPathStorage {
   public static Waypoint[] _9H_D_8H_C_CHARGE_RED;
 
   public static Waypoint[] _9H_D_8H_C_8M_BLUE;
-  public static Waypoint[] _POOF_9H_D_8H_C_CHARGE_BLUE;
+  public static Waypoint[] _POOF_9H_D_8H_C_CHARGE;
   
   public static Waypoint[] _1H_A_2H_B_2M_RED;
   public static Waypoint[] _POOF_1H_A_2H_B_CHARGE_RED;
@@ -815,22 +815,22 @@ public class AutoPathStorage {
         new Waypoint(_8_C_CH_RED, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
-    _POOF_9H_D_8H_C_CHARGE_BLUE = new Waypoint[] {
+    _POOF_9H_D_8H_C_CHARGE = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_POOF_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_POOF_8_C_CH, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_8_C_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
     _POOF_1H_A_2H_B_CHARGE_BLUE = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_POOF_2_B_CH_BLUE, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_2_B_CH_BLUE, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
     _POOF_1H_A_2H_B_CHARGE_RED = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_POOF_2_B_CH_RED, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_2_B_CH_RED, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
     _MOBILITY_CHARGE_TEST_ONLY = new Waypoint[] {
@@ -899,8 +899,7 @@ public class AutoPathStorage {
       new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
       new AutoPose("4H_ONLY", _6H_ONLY),
       
-      new AutoPose("POOF 9D8 C CHARGE RED", _9H_D_8H_C_CHARGE_RED),
-      new AutoPose("POOF 9D8 C CHARGE BLUE", _POOF_9H_D_8H_C_CHARGE_BLUE),
+      new AutoPose("POOF 9D8 C CHARGE", _POOF_9H_D_8H_C_CHARGE),
       
       new AutoPose("POOF 1A2 B CHARGE RED", _POOF_1H_A_2H_B_CHARGE_RED),
       new AutoPose("POOF 1A2 B CHARGE BLUE", _POOF_1H_A_2H_B_CHARGE_BLUE),
