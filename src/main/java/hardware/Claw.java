@@ -102,12 +102,7 @@ public class Claw {
             return;
         }
 
-        if (claw.getMotorTemperature() > 60) {
-            DriverUI.spicyClaw = true;
-        }
-        else {
-            DriverUI.spicyClaw = false;
-        }
+        DriverUI.spicyClaw = claw.getMotorTemperature() > 60;
 
         // current = getOutputCurrent();
 
