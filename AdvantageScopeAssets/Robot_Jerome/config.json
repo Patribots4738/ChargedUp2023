@@ -1,0 +1,72 @@
+{
+  "name": "Jerome",
+  "sourceUrl": "https://cad.onshape.com/documents/e2640ecd59ddb735182e226e/w/1d342dc4a6c12f9768adf91c/e/66c4e324ec2ffdfa627a490e",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0.04
+  ],
+  "cameras": [
+    {
+      "name": "FrontCam",
+      "position": [
+        0.0508,
+        -0.1524,
+        0.2604
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 100
+    }
+  ],
+  "components": [
+    {
+      "zeroedRotations": [
+        {
+          "axis": "z",
+          "degrees": -90
+        },
+        {
+          "axis": "x",
+          "degrees": 180
+        },
+        {
+          "axis": "y",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "z",
+          "degrees": -90
+        },
+        {
+          "axis": "y",
+          "degrees": 270
+        }
+      ],
+      "zeroedPosition": [
+        0, 0, 0
+      ]
+    }
+  ]
+}
