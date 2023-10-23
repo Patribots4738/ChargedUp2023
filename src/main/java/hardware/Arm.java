@@ -203,7 +203,7 @@ public class Arm /* implements Loggable */ {
     public void periodic() {
         if (!operatorOverride && !followingTrajectory) { indexPeriodic(); }
         else if (followingTrajectory) { trajectoryPeriodic(); }
-        setLowerArmPosition(lowerReferenceAngle);
+        setLowerArmAngle(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
         
         // Below is things that are used for logging n such:
@@ -499,7 +499,7 @@ public class Arm /* implements Loggable */ {
      * @param angle the position to set the upper arm to
      *                This unit is in rads
      */
-    public void setUpperArmAngle(double angle) {
+    private void setUpperArmAngle(double angle) {
 
         angle = MathUtil.clamp(
             angle,
@@ -554,7 +554,7 @@ public class Arm /* implements Loggable */ {
      * @param position the position to set the lower arm to
      *                 This unit is in rads
      */
-    public void setLowerArmPosition(double position) {
+    private void setLowerArmAngle(double position) {
 
         position = MathUtil.clamp(
             position,
