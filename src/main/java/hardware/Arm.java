@@ -13,10 +13,19 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Uncomment the following lines to enable logging
 // Mainly used for creating/editing arm position constants
@@ -36,18 +45,9 @@ public class Arm /* implements Loggable */ {
     private double armXReference = 0;
     private double armYReference = 0;
 
-    // The current rotation of the upper arm
-    private double upperRotation = 0;
-
-    // The current rotation of the lower arm
-    private double lowerRotation = 0;
-
     // The DESIRED rotation of the arms
     private double upperReferenceAngle = 0;
     private double lowerReferenceAngle = 0;
-
-    private double lowerDiff = 0;
-    private double upperDiff = 0;
 
     private boolean armsAtDesiredPosition = false;
     
@@ -70,6 +70,22 @@ public class Arm /* implements Loggable */ {
     private double[] trajectoryFinalAngles;
     private Timer trajectoryTimer;
     private boolean followingTrajectory;
+
+    private final Mechanism2d armDesiredMechanism = new Mechanism2d(Units.inchesToMeters(ArmConstants.MAX_REACH)*2, Units.inchesToMeters(ArmConstants.MAX_REACH));
+    private final MechanismRoot2d armRoot = armDesiredMechanism.getRoot("Arm", Units.inchesToMeters(ArmConstants.MAX_REACH), Units.inchesToMeters(6));
+    private final MechanismLigament2d lowerArmMechanism = 
+        armRoot.append(
+            new MechanismLigament2d(
+                "lowerArm", 
+                Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH*1.25), 
+                lowerReferenceAngle));
+
+    private final MechanismLigament2d upperArmMechanism = 
+        lowerArmMechanism.append(
+            new MechanismLigament2d(
+                "upperArm", 
+                Units.inchesToMeters(ArmConstants.UPPER_ARM_LENGTH*1.25), 
+                upperReferenceAngle));
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -176,6 +192,11 @@ public class Arm /* implements Loggable */ {
         // for later
         // Trajectories take around 10ms to create, which may be
         currentTrajectory = PlacementConstants.HIGH_CONE_TRAJECTORY;
+        
+        SmartDashboard.putData("ArmDesired2D", armDesiredMechanism);
+        SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
+
+        SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
 
     }
 
@@ -186,12 +207,16 @@ public class Arm /* implements Loggable */ {
         setUpperArmAngle(upperReferenceAngle);
         
         // Below is things that are used for logging n such:
+        SmartDashboard.putData("ArmDesired2D", armDesiredMechanism);
+        SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
+
+        SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
         
         // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // // Use forward kinematics to get the x and y position of the end effector
-        // armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
-        // armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+        armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+        armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
     }
 
     public void trajectoryPeriodic() {
@@ -424,6 +449,10 @@ public class Arm /* implements Loggable */ {
           return;
         }
 
+        
+        upperArmMechanism.setAngle(Units.radiansToDegrees(upperArmAngle));
+        lowerArmMechanism.setAngle(Units.radiansToDegrees(lowerArmAngle));
+
         // Add PI/2 to lowerArmAngle...
         // because the calculated angle is relative to the ground,
         // And the zero for the encoder is set to the direction of gravity
@@ -517,8 +546,6 @@ public class Arm /* implements Loggable */ {
                     : 1 
                 : 0
         );
-
-        upperRotation = upperArmEncoder.getPosition();
     }
 
     /**
@@ -542,8 +569,6 @@ public class Arm /* implements Loggable */ {
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
         lowerArmPIDController.setReference((position), ControlType.kPosition);
-
-        lowerRotation = lowerArmEncoder.getPosition();
     }
 
     /**
@@ -553,7 +578,6 @@ public class Arm /* implements Loggable */ {
      * This unit is in rads
      */
     public double getUpperArmAngle() {
-        this.upperRotation = upperArmEncoder.getPosition();
         return upperArmEncoder.getPosition();
     }
 
@@ -564,7 +588,6 @@ public class Arm /* implements Loggable */ {
      * This unit is in rads
      */
     public double getLowerArmAngle() {
-        this.lowerRotation = lowerArmEncoder.getPosition();
         return lowerArmEncoder.getPosition();
     }
 
@@ -671,5 +694,36 @@ public class Arm /* implements Loggable */ {
       // Then, depending on if the value is more or less than PI,
       // Add or subtract PI to the value
       upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
+    }
+
+    private double[] getPoseData(double lowerArmAngle, double upperArmAngle) {
+        var lowerPose =
+            new Pose3d(
+                0.0,
+                0.0,
+                0.29,
+                new Rotation3d(0.0, -lowerArmAngle, 0.0));
+
+        var upperPose =
+            lowerPose.transformBy(
+                new Transform3d(
+                    new Translation3d(0.0, 0.0, -Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH)),
+                    new Rotation3d(0.0, -upperArmAngle, 0.0)));
+
+        return composePose3ds(lowerPose, upperPose);
+    }
+
+    private double[] composePose3ds(Pose3d... value) {
+        double[] data = new double[value.length * 7];
+        for (int i = 0; i < value.length; i++) {
+            data[i * 7] = value[i].getX();
+            data[i * 7 + 1] = value[i].getY();
+            data[i * 7 + 2] = value[i].getZ();
+            data[i * 7 + 3] = value[i].getRotation().getQuaternion().getW();
+            data[i * 7 + 4] = value[i].getRotation().getQuaternion().getX();
+            data[i * 7 + 5] = value[i].getRotation().getQuaternion().getY();
+            data[i * 7 + 6] = value[i].getRotation().getQuaternion().getZ();
+        }
+        return data;
     }
 }
