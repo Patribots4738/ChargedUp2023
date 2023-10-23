@@ -328,3 +328,6 @@ bin/
 simgui-ds.json
 simgui.json
 networktables.json
+
+# RobotLogs folder contents
+robotLogs/
