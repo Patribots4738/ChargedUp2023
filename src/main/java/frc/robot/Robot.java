@@ -19,6 +19,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -63,18 +64,31 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+      
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
+
+      // Initialize oblarg, which is mainly used in DriverUI
+      Logger.configureLoggingAndConfig(this, false);
+      // Set out log file to be in its own folder
+      DataLogManager.start("./robotLogs/");
+      // Log data that is being put to shuffleboard
+      DataLogManager.logNetworkTables(true);
+      // Log the DS data and joysticks
+      DriverStation.startDataLog(DataLogManager.getLog(), true);
+      
       // Drivetrain instantiation
       swerve = new Swerve();
-
+      
+      // Controllers!
       driver = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
       operator = new XboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
+      // Mechanisms
       arm = new Arm();
       claw = new Claw();
 
       armCalculations = new ArmCalculations();
-      autoAlignment = new AutoAlignment(swerve, claw);// Configure the logger for shuffleboard
+      autoAlignment = new AutoAlignment(swerve, claw);
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();
@@ -89,9 +103,6 @@ public class Robot extends TimedRobot {
         Timer.delay(0.005);
       }
       Timer.delay(0.25);
-
-      Logger.configureLoggingAndConfig(this, false);
-
   }
 
   /**
