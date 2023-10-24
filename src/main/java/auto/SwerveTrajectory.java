@@ -148,7 +148,7 @@ public class SwerveTrajectory {
 
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
-          if ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) {
+          if ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)) {
 
             mirroredState.timeSeconds                       = state.timeSeconds;
             mirroredState.velocityMetersPerSecond           = state.velocityMetersPerSecond;
@@ -171,10 +171,10 @@ public class SwerveTrajectory {
           ChassisSpeeds speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) 
+              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)) 
                   ? mirroredState
                   : state,
-              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) 
+              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)) 
                   ? mirroredState.holonomicRotation 
                   : state.holonomicRotation);
 
