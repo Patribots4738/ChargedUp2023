@@ -1,7 +1,5 @@
 package frc.robot;
 
-import java.lang.reflect.Field;
-
 import com.revrobotics.CANSparkMax;
 
 import auto.AutoAlignment;
