@@ -10,11 +10,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import calc.Constants;
-import calc.Constants.AlignmentConstants;
+import calc.Constants.FieldConstants;
 
 public class SwerveTrajectory {
 
@@ -139,7 +139,7 @@ public class SwerveTrajectory {
       case "execute":
 
         // If the path has not completed time wise
-        if (elapsedTime < (pathTraj.getTotalTimeSeconds() + (DriverStation.getAlliance() == DriverStation.Alliance.Red || longWait ? 1 : 0.6)))
+        if (elapsedTime < (pathTraj.getTotalTimeSeconds() + (FieldConstants.ALLIANCE == Alliance.Red || longWait ? 1 : 0.6)))
         {
           // System.out.printf("Elapsed Time %.3f\n", elapsedTime - pathTraj.getTotalTimeSeconds());
 
@@ -148,13 +148,13 @@ public class SwerveTrajectory {
 
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
-          if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
+          if ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) {
 
             mirroredState.timeSeconds                       = state.timeSeconds;
             mirroredState.velocityMetersPerSecond           = state.velocityMetersPerSecond;
             mirroredState.accelerationMetersPerSecondSq     = state.accelerationMetersPerSecondSq;
             mirroredState.poseMeters                        = new Pose2d(
-              (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
+              (FieldConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
                 state.poseMeters.getTranslation().getY(),
                 state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI))
               );
@@ -171,10 +171,10 @@ public class SwerveTrajectory {
           ChassisSpeeds speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) 
+              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) 
                   ? mirroredState
                   : state,
-              ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) 
+              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) 
                   ? mirroredState.holonomicRotation 
                   : state.holonomicRotation);
 

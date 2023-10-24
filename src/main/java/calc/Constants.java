@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -40,7 +41,7 @@ public final class Constants {
         // NEEDS TO BE TESTED vvv
         public static final double MAX_ANGULAR_SPEED = 8 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(16.75);
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(14.61);
 
         public static final double DIRECTION_SLEW_RATE = 6.28; // radians per second
         public static final double MAGNITUDE_SLEW_RATE = 80.0; // percent per second (1 = 100%)
@@ -85,7 +86,7 @@ public final class Constants {
         // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
         // This changes the drive speed of the module (a pinion gear with more teeth will result in a
         // robot that drives faster).
-        public static final int DRIVING_MOTOR_PINION_TEETH = 14;
+        public static final int DRIVING_MOTOR_PINION_TEETH = 13;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite direction of
         // the steering motor in the MAXSwerve Module.
@@ -445,13 +446,11 @@ public final class Constants {
               0));
     }
 
-    public static final class AlignmentConstants {
+    public static final class FieldConstants {
 
-
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
         
-
         public static final double CONE_OFFSET_METERS = 0.542615;
         public static final double GRID_BARRIER_METERS = Units.inchesToMeters(12); // real is 14-15
         public static final double SUBSTATION_OFFSET_METERS = 0.7;
@@ -459,6 +458,15 @@ public final class Constants {
         public static final double FIELD_WIDTH_METERS = 16.53;
 
         public static final double CHARGE_PAD_CORRECTION_P = 0.05;
+
+        public static Alliance ALLIANCE = Alliance.Invalid;
+        public static enum GameMode {
+            DISABLED,
+            AUTONOMOUS,
+            TELEOP,
+            TEST
+        };
+        public static GameMode GAME_MODE;
 
         // The below code is not used, and is only here for reference...
         // We instead use PhotonCameraPose.AprilTagFieldLayout

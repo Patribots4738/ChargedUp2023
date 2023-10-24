@@ -109,13 +109,13 @@ public class AutoPathStorage {
   public static Waypoint[] _9H_D_8H_C_CHARGE_RED;
 
   public static Waypoint[] _9H_D_8H_C_8M_BLUE;
-  public static Waypoint[] _9H_D_8H_C_CHARGE_BLUE;
+  public static Waypoint[] _POOF_9H_D_8H_C_CHARGE;
   
   public static Waypoint[] _1H_A_2H_B_2M_RED;
-  public static Waypoint[] _1H_A_2H_B_CHARGE_RED;
+  public static Waypoint[] _POOF_1H_A_2H_B_CHARGE_RED;
 
   public static Waypoint[] _1H_A_2H_B_2M_BLUE;
-  public static Waypoint[] _1H_A_2H_B_CHARGE_BLUE;
+  public static Waypoint[] _POOF_1H_A_2H_B_CHARGE_BLUE;
 
   public static Waypoint[] _4H_MOBILITY;
   public static Waypoint[] _5H_MOBILITY;
@@ -210,8 +210,7 @@ public class AutoPathStorage {
   public static PathPlannerTrajectory _8_C_8_RED;
   public static PathPlannerTrajectory _8_C_8_BLUE;
   public static PathPlannerTrajectory _8_C_CH_RED;
-  public static PathPlannerTrajectory _8_C_CH_BLUE;
-
+  
   public static PathPlannerTrajectory _POOF_1_A_2;
   public static PathPlannerTrajectory _POOF_1_A_2_RED;
   public static PathPlannerTrajectory _POOF_2_B_2;
@@ -223,9 +222,10 @@ public class AutoPathStorage {
   public static PathPlannerTrajectory _1_A_2_RED;
   public static PathPlannerTrajectory _2_B_2_BLUE;
   public static PathPlannerTrajectory _2_B_2_RED;
-
-  public static PathPlannerTrajectory _2_B_CH_BLUE;
-  public static PathPlannerTrajectory _2_B_CH_RED;
+  
+  public static PathPlannerTrajectory _POOF_2_B_CH_BLUE;
+  public static PathPlannerTrajectory _POOF_2_B_CH_RED;
+  public static PathPlannerTrajectory _POOF_8_C_CH;
 
   public static PathPlannerTrajectory _D_6;
   public static PathPlannerTrajectory _D_7;
@@ -311,10 +311,10 @@ public class AutoPathStorage {
     _2_B_2_RED = PathPlanner.loadPath("2_B_2_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     _8_C_8_BLUE = PathPlanner.loadPath("8_C_8_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_C_CH_BLUE = PathPlanner.loadPath("8_C_CH_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _8_C_CH_RED = PathPlanner.loadPath("8_C_CH_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _2_B_CH_RED = PathPlanner.loadPath("2_B_CH_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _2_B_CH_BLUE = PathPlanner.loadPath("2_B_CH_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _POOF_2_B_CH_RED = PathPlanner.loadPath("_POOF_2_B_CH_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _POOF_2_B_CH_BLUE = PathPlanner.loadPath("_POOF_2_B_CH_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _POOF_8_C_CH = PathPlanner.loadPath("_POOF_8_C_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     _D_REACH_7 = PathPlanner.loadPath("_D_REACH_7", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
@@ -809,52 +809,28 @@ public class AutoPathStorage {
         new Waypoint(_8_C, PlacementConstants.CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
-    _9H_D_8H_C_8M_RED = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_8_C_8_RED, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
-    };
-
     _9H_D_8H_C_CHARGE_RED = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_8_C_CH_RED, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
-    _9H_D_8H_C_8M_BLUE = new Waypoint[] {
+    _POOF_9H_D_8H_C_CHARGE = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8_BLUE, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_8_C_8_BLUE, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_POOF_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_8_C_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
-    _9H_D_8H_C_CHARGE_BLUE = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8_BLUE, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_8_C_CH_BLUE, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-    };
-
-    _1H_A_2H_B_2M_BLUE = new Waypoint[] {
+    _POOF_1H_A_2H_B_CHARGE_BLUE = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_2_B_2_BLUE, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_POOF_2_B_CH_BLUE, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
-    _1H_A_2H_B_2M_RED = new Waypoint[] {
+    _POOF_1H_A_2H_B_CHARGE_RED = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_2_B_2_RED, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
-    };
-
-    _1H_A_2H_B_CHARGE_BLUE = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_2_B_CH_BLUE, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-    };
-
-    _1H_A_2H_B_CHARGE_RED = new Waypoint[] {
-        new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_2_B_CH_RED, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_POOF_2_B_CH_RED, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
     _MOBILITY_CHARGE_TEST_ONLY = new Waypoint[] {
@@ -865,36 +841,42 @@ public class AutoPathStorage {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_POOF_2_B_2_RED, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _POOF_1H_A_2H_B_2MID_BLUE = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_POOF_2_B_2, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _POOF_9H_D_8H_C_8MID = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_POOF_9_D_8, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_POOF_8_C_8, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE   ),
+        new Waypoint(_POOF_8_C_8, PlacementConstants.AUTO_CUBE_MID_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_8_D, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _POOF_1H_A_2H_B_2LOW_RED = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_POOF_2_B_2_RED, PlacementConstants.STOWED_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _POOF_1H_A_2H_B_2LOW_BLUE = new Waypoint[] {
         new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
         new Waypoint(_POOF_2_B_2, PlacementConstants.STOWED_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
+        new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _POOF_9H_D_8H_C_8LOW = new Waypoint[] {
         new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_POOF_9_D_8, PlacementConstants.CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_POOF_8_C_8, PlacementConstants.STOWED_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE   ),
+        new Waypoint(_POOF_8_C_8, PlacementConstants.STOWED_INDEX, PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
+        new Waypoint(_8_D, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
     
     _SPIN = new Waypoint[] {
@@ -917,14 +899,13 @@ public class AutoPathStorage {
       new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
       new AutoPose("4H_ONLY", _6H_ONLY),
       
+      new AutoPose("POOF 1A2 B CHARGE RED", _POOF_1H_A_2H_B_CHARGE_RED),
+      new AutoPose("POOF 1A2 B CHARGE BLUE", _POOF_1H_A_2H_B_CHARGE_BLUE),
+
+      new AutoPose("POOF 9D8 C CHARGE", _POOF_9H_D_8H_C_CHARGE),
+
       new AutoPose("1H_A_2H_B_2M_BLUE_", _1H_A_2H_B_2M_BLUE),
       new AutoPose("1H_A_2H_B_2M_RED_", _1H_A_2H_B_2M_RED),
-      
-      new AutoPose("9H_D_8H_C_CHARGE_RED_", _9H_D_8H_C_CHARGE_RED),
-      new AutoPose("9H_D_8H_C_CHARGE_BLUE_", _9H_D_8H_C_CHARGE_BLUE),
-
-      new AutoPose("1H_A_2H_B_CHARGE_RED_", _1H_A_2H_B_CHARGE_RED),
-      new AutoPose("1H_A_2H_B_CHARGE_BLUE_", _1H_A_2H_B_CHARGE_BLUE),
       
       // AutoPoses for the bottom of the field:
       new AutoPose("1H_A_2H_CHARGE_RED_", _1H_A_2H_CHARGE_RED),
@@ -1019,7 +1000,7 @@ public class AutoPathStorage {
       DriverUI.autoChooser.addOption(AutoPose.getName(), AutoPose);
 
       // Every third index, add a spacer option for simplicity
-      if ((i == 1 || i == 3 || i == 5) || ((i + 1) % 3 == 0 && i > 9) && (i != myAutoContainer.length - 1)) {
+      if ((i == 1 || i == 3 || i == 5 || i == 9 || i == 10) || ((i+2) % 3 == 0 && i > 10) && (i != myAutoContainer.length - 1)) {
         DriverUI.autoChooser.addOption(" " + " ".repeat(i), AutoPose);
       }
     }
