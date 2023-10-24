@@ -290,6 +290,7 @@ public class AutoSegmentedWaypoints {
       }
       // Run the charge pad leveling PID loop
       autoAlignment.chargeAlign();
+      arm.setArmIndex(PlacementConstants.STOWED_INDEX);
     }
     // We are not done with all of our auto segments,
     // but we are done with one...
