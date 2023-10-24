@@ -41,7 +41,7 @@ public final class Constants {
         // NEEDS TO BE TESTED vvv
         public static final double MAX_ANGULAR_SPEED = 8 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(16.75);
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(14.61);
 
         public static final double DIRECTION_SLEW_RATE = 6.28; // radians per second
         public static final double MAGNITUDE_SLEW_RATE = 80.0; // percent per second (1 = 100%)
@@ -86,7 +86,7 @@ public final class Constants {
         // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
         // This changes the drive speed of the module (a pinion gear with more teeth will result in a
         // robot that drives faster).
-        public static final int DRIVING_MOTOR_PINION_TEETH = 14;
+        public static final int DRIVING_MOTOR_PINION_TEETH = 13;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite direction of
         // the steering motor in the MAXSwerve Module.
