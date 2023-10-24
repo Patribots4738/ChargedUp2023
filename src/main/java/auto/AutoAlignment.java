@@ -4,14 +4,14 @@ import java.util.Optional;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import hardware.Swerve;
 import hardware.Claw;
-import calc.Constants.AlignmentConstants;
+import calc.Constants.FieldConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.VisionConstants;
 import calc.Constants.ClawConstants;
@@ -116,7 +116,7 @@ public class AutoAlignment {
           if (tagID == 4 || tagID == 5) {
             this.substationOffset = -1;
           } else {
-            this.coneOffset = -1 * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+            this.coneOffset = -1 * ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1);
           }
         } else /* (positiveOffsetNorm < negativeOffsetNorm) */ {
 
@@ -125,7 +125,7 @@ public class AutoAlignment {
           if (tagID == 4 || tagID == 5) {
             this.substationOffset = 1;
           } else {
-            this.coneOffset = ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+            this.coneOffset = ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1);
           }
         }
       }
@@ -218,7 +218,7 @@ public class AutoAlignment {
       Translation2d currentPosition = swerve.getPose().getTranslation();
 
       // If we are on the blue alliance, only look at positions of tags 8,7,6 and 4
-      if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+      if (FieldConstants.ALLIANCE == Alliance.Blue) {
         for (int i = 8; i > 4; i--) {
           // Tag 5 is for the red alliance's substation, not ours
           // Skip over to our substation
@@ -263,14 +263,14 @@ public class AutoAlignment {
           // since it is on the right side of the field
           (Units.inchesToMeters(PlacementConstants.HUMAN_TAG_PICKUP.getX() - ClawConstants.CLAW_LENGTH_INCHES)) :
           // Otherwise, we need to add the grid barrier
-          (AlignmentConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS);
+          (FieldConstants.GRID_BARRIER_METERS + (PlacementConstants.ROBOT_LENGTH_METERS / 2) + PlacementConstants.BUMPER_LENGTH_METERS);
   }
 
   private double getTagYOffset() {
     // Check if we are applying a substation offset or a cone offset
     return (tagID == 4 || tagID == 5) ?
-        AlignmentConstants.SUBSTATION_OFFSET_METERS :
-        AlignmentConstants.CONE_OFFSET_METERS;
+        FieldConstants.SUBSTATION_OFFSET_METERS :
+        FieldConstants.CONE_OFFSET_METERS;
   }
 
     /**
@@ -283,8 +283,8 @@ public class AutoAlignment {
         new Translation2d(
             getTagXOffset(),
             (tagID == 4 || tagID == 5) ?
-                (AlignmentConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                (AlignmentConstants.CONE_OFFSET_METERS * this.coneOffset) * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1)),
+                (FieldConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
+                (FieldConstants.CONE_OFFSET_METERS * this.coneOffset) * ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1)),
         Rotation2d.fromDegrees(180)));
       return targetPose;
     }
@@ -434,14 +434,24 @@ public class AutoAlignment {
 
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 10 : 20))), 0.055, 0.20),
+            MathUtil.clamp(
+                (
+                    (FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
+                    /
+                    (elapsedTime /
+                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), 0.055, 0.20),
             0, 
-            0, 
+            0,
             true, false);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 10 : 20))), -0.20, -0.055),
+            MathUtil.clamp(
+                (
+                    (FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
+                    /
+                    (elapsedTime / 
+                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), -0.20, -0.055),
             0, 
             0, 
             true, false);

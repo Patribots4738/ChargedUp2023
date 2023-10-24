@@ -2,6 +2,7 @@ package hardware;
 
 import auto.AutoAlignment;
 import calc.Constants.ClawConstants;
+import calc.Constants.FieldConstants;
 import calc.Constants.NeoMotorConstants;
 import calc.Constants.PlacementConstants;
 import com.revrobotics.CANSparkMax;
@@ -9,7 +10,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 
@@ -104,29 +104,16 @@ public class Claw {
 
         DriverUI.spicyClaw = claw.getMotorTemperature() > 60;
 
-        // current = getOutputCurrent();
-
-        // if (getOutputCurrent() > 30 && !hasGameElement && AutoAlignment.coneMode) {
-        //     startedIntakingTimestamp = Timer.getFPGATimestamp();
-        //     hasGameElement = true;
-        //     claw.setSmartCurrentLimit(25);
-        //     superIntake = true;
-        // }
-
-        // if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
-        //     if (getOutputCurrent() < 2) { hasGameElement = false; }
-        //     claw.setSmartCurrentLimit(15);
-        //     superIntake = false;
-        // }
-
-        if (DriverStation.isTeleop()) {
+        if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) {
 
             // This is for automatically outtaking the game piece
             if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
                 finishedOuttaking = true;
             }
             // Slow down claw for cube mode
-            if (!AutoAlignment.coneMode && (DriverStation.isTeleopEnabled() || DriverStation.isTestEnabled())) {
+            if (!AutoAlignment.coneMode && 
+                (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP || FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) 
+            {
               desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.5);
             }
             // Speed up claw for cone mode

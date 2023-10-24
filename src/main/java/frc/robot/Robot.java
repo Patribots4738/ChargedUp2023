@@ -7,7 +7,7 @@ import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
-import calc.Constants.AlignmentConstants;
+import calc.Constants.FieldConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.LEDConstants;
@@ -103,6 +103,14 @@ public class Robot extends TimedRobot {
         Timer.delay(0.005);
       }
       Timer.delay(0.25);
+
+      // Wait wait wait wait for the DS to connect
+      // then assign our alliance color
+      while (DriverStation.getAlliance() == Alliance.Invalid) {
+        DriverStation.refreshData();
+      }
+
+      FieldConstants.ALLIANCE = DriverStation.getAlliance();
   }
 
   /**
@@ -116,7 +124,6 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
         
     Logger.updateEntries();
-    DriverUI.connected = DriverStation.isDSAttached() || DriverStation.isFMSAttached();
     arduinoController.periodic();
     claw.updateOutputCurrent();
 
@@ -124,6 +131,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    FieldConstants.GAME_MODE = FieldConstants.GameMode.DISABLED;
     // arm.setUpperArmCoastMode();
     claw.stopClaw();
 
@@ -140,20 +148,19 @@ public class Robot extends TimedRobot {
     DriverUI.enabled = false;
 
     System.out.println(swerve.getPose().getTranslation());
-
   }
 
   @Override
   public void disabledPeriodic() {
-    if (DriverStation.isDSAttached() || DriverStation.isFMSAttached()) {
+    if (FieldConstants.ALLIANCE != Alliance.Invalid) {
         if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
             arduinoController.setLEDState(LEDConstants.BELLY_PAN_CHROMA);
         }
         else {
-            if (DriverStation.getAlliance() == Alliance.Blue) {
+            if (FieldConstants.ALLIANCE == Alliance.Blue) {
                 arduinoController.setLEDState(LEDConstants.BELLY_PAN_BLUE);
             }
-            else if (DriverStation.getAlliance() == Alliance.Red) {
+            else if (FieldConstants.ALLIANCE == Alliance.Red) {
                 arduinoController.setLEDState(LEDConstants.BELLY_PAN_RED_ALLIANCE);
             }
         }
@@ -162,6 +169,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    FieldConstants.GAME_MODE = FieldConstants.GameMode.AUTONOMOUS;
     // Restart the timer to use at the end of auto
     timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
@@ -174,7 +182,6 @@ public class Robot extends TimedRobot {
     // So this gives us an indicator to know if we have enabled yet
     // (i lost my mind not knowing if i redeployed or not) - alexander hamilton
 
-    
     // future alegamnder here, that issue has since been fixed, 
     // but my dementia has not.
     // enjoy your boolboxes :)
@@ -222,8 +229,8 @@ public class Robot extends TimedRobot {
     autoSegmentedWaypoints.periodic();
     // If we are close to the grid, allow the camera to modify odometry
     // This is because the camera was getting inacurate at longer distances
-    if ((DriverStation.getAlliance() == Alliance.Red && swerve.getPose().getX() > 13) ||
-        DriverStation.getAlliance() == Alliance.Blue && swerve.getPose().getX() < 3.5)// || autoSegmentedWaypoints.halfway) 
+    if ((FieldConstants.ALLIANCE == Alliance.Red && swerve.getPose().getX() > 13) ||
+        FieldConstants.ALLIANCE == Alliance.Blue && swerve.getPose().getX() < 3.5)// || autoSegmentedWaypoints.halfway) 
         // commenting autoalign.halfway becuase we dont want the camera to interfere while we are way out far
     {
       autoAlignment.calibrateOdometry();
@@ -232,6 +239,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    FieldConstants.GAME_MODE = FieldConstants.GameMode.TELEOP;
     // Reset the timer for teleopinit 
     timer.restart();
     autoAlignment.setConeMode(true);
@@ -284,7 +292,7 @@ public class Robot extends TimedRobot {
     Translation2d driverLeftAxis = OICalc.toCircle(driverLeftX, driverLeftY);
 
     // If we are on blue alliance, flip the driverLeftAxis
-    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+    if (FieldConstants.ALLIANCE == Alliance.Red) {
       driverLeftAxis = driverLeftAxis.unaryMinus();
     }
 
@@ -304,7 +312,7 @@ public class Robot extends TimedRobot {
             new Pose2d(
                 swerve.getPose().getTranslation(), 
                 Rotation2d.fromDegrees(
-                    DriverStation.getAlliance() == DriverStation.Alliance.Red 
+                    FieldConstants.ALLIANCE == Alliance.Red 
                     ? 0 
                     : 180))
         );
@@ -321,7 +329,7 @@ public class Robot extends TimedRobot {
 
       if (driver.getAButtonPressed()) {
         // Slow the drive down for consistency
-        DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
+        DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
         // This resets the "momentum" of the path
         SwerveTrajectory.resetTrajectoryStatus();
         // This resets the "rotational momentum" of the integerals
@@ -370,7 +378,7 @@ public class Robot extends TimedRobot {
       // If the driver holds the Y button, the robot will drive relative to itself
       // This is useful for driving in a straight line (backwards to intake!)
       else if (driver.getYButton()) {
-        if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+        if (FieldConstants.ALLIANCE == Alliance.Red) {
           swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, false);
         }
         else {
@@ -428,10 +436,10 @@ public class Robot extends TimedRobot {
       case 270:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
         if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+          autoAlignment.setSubstationOffset((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1);
         }
         else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() + ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1));
         }
         break;
 
@@ -439,10 +447,10 @@ public class Robot extends TimedRobot {
       case 90:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
         if (autoAlignment.getTagID() == 4 || autoAlignment.getTagID() == 5) {
-          autoAlignment.setSubstationOffset((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+          autoAlignment.setSubstationOffset((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1);
         }
         else {
-          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1));
+          autoAlignment.setConeOffset(autoAlignment.getConeOffset() - ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1));
         }
         break;
     }
@@ -470,7 +478,7 @@ public class Robot extends TimedRobot {
         // If we are on testMode, then use legacy inputs 
         // (https://github.com/Patribots4738/ChargedUp2023/commit/6d640d17cdd5799006ab146fca5c94b3ae5fd274)
         // If not, use below (case 90) logic
-        if (DriverStation.isTestEnabled()) {
+        if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST) {
             boolean hotReloadMid = arm.getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
             arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
             if (!hotReloadMid && AutoAlignment.coneMode) { arm.startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
@@ -482,7 +490,7 @@ public class Robot extends TimedRobot {
         // If we are on testMode, then use legacy inputs 
         // (https://github.com/Patribots4738/ChargedUp2023/commit/6d640d17cdd5799006ab146fca5c94b3ae5fd274)
         // If not, use below logic
-        if (DriverStation.isTestEnabled()) {
+        if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST) {
             arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
             // Notice that we only break in this if case
             break;
@@ -492,8 +500,8 @@ public class Robot extends TimedRobot {
          *   when the robot is halfway across the field
          * this code is in place due to our operator confusing the buttons and clicking the wrong one.
          */
-        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                if (swerve.getPose().getTranslation().getX() > AlignmentConstants.FIELD_WIDTH_METERS/2) {
+        if (FieldConstants.ALLIANCE == Alliance.Blue) {
+                if (swerve.getPose().getTranslation().getX() > FieldConstants.FIELD_WIDTH_METERS/2) {
                     arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
                 }
                 else {
@@ -504,7 +512,7 @@ public class Robot extends TimedRobot {
         }
         // we are on red alliance,
         else {
-            if (swerve.getPose().getTranslation().getX() < AlignmentConstants.FIELD_WIDTH_METERS/2) {
+            if (swerve.getPose().getTranslation().getX() < FieldConstants.FIELD_WIDTH_METERS/2) {
                 arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
             }
             else {
@@ -554,7 +562,7 @@ public class Robot extends TimedRobot {
     } else if (
 		((operator.getRightBumper() || operator.getRightStickButton()) && 
 		!claw.getStartedOuttakingBool()) ||
-		(timer.get() < 0.1 && !DriverStation.isTestEnabled())) 
+		(timer.get() < 0.1 && !(FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST))) 
 	{
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
@@ -668,6 +676,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    FieldConstants.GAME_MODE = FieldConstants.GameMode.TEST;
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     arm.setBrakeMode();
     DriverUI.enabled = true;

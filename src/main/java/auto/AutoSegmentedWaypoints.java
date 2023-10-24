@@ -3,12 +3,12 @@ package auto;
 
 import auto.AutoPathStorage.AutoPose;
 import auto.AutoPathStorage.Waypoint;
-import calc.Constants.AlignmentConstants;
+import calc.Constants.FieldConstants;
 import calc.Constants.PlacementConstants;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import hardware.Arm;
@@ -71,7 +71,7 @@ public class AutoSegmentedWaypoints {
 
     // Create a new pathplannerstate based on the mirrored state's position
     // and taking the mirrored state's rotation and adding 180 degrees
-    if ((DriverStation.getAlliance() == DriverStation.Alliance.Red) && DriverStation.isAutonomous()) {
+    if ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) {
 
         mirrored = true;
 
@@ -79,7 +79,7 @@ public class AutoSegmentedWaypoints {
         mirroredInitialPathPose.velocityMetersPerSecond           = initialPathPose.velocityMetersPerSecond;
         mirroredInitialPathPose.accelerationMetersPerSecondSq     = initialPathPose.accelerationMetersPerSecondSq;
         mirroredInitialPathPose.poseMeters                        = new Pose2d(
-          (AlignmentConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()),
+          (FieldConstants.FIELD_WIDTH_METERS - initialPathPose.poseMeters.getTranslation().getX()),
             initialPathPose.poseMeters.getTranslation().getY(),
             initialPathPose.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI))
           );
@@ -143,8 +143,8 @@ public class AutoSegmentedWaypoints {
       // This is where the arm will "prep" to go to placement locations
       // Very useful for saving time
       if (( 
-            ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && swerve.getPose().getX() < 4) ||
-            (DriverStation.getAlliance() == DriverStation.Alliance.Red && swerve.getPose().getX() > (AlignmentConstants.FIELD_WIDTH_METERS - 3)))) &&     
+            ((FieldConstants.ALLIANCE == Alliance.Blue && swerve.getPose().getX() < 4) ||
+            (FieldConstants.ALLIANCE == Alliance.Red && swerve.getPose().getX() > (FieldConstants.FIELD_WIDTH_METERS - 3)))) &&     
           halfway && 
           /*
            * Get if we are on a pickup -> charge path, 
@@ -184,8 +184,8 @@ public class AutoSegmentedWaypoints {
       // This is where the arm will "prep" to go to pickup locations
       // Very useful for saving time
       else if (
-                ((DriverStation.getAlliance() == DriverStation.Alliance.Blue && swerve.getPose().getX() > 5) ||
-                (DriverStation.getAlliance() == DriverStation.Alliance.Red && swerve.getPose().getX() < (AlignmentConstants.FIELD_WIDTH_METERS - 5))))
+                ((FieldConstants.ALLIANCE == Alliance.Blue && swerve.getPose().getX() > 5) ||
+                (FieldConstants.ALLIANCE == Alliance.Red && swerve.getPose().getX() < (FieldConstants.FIELD_WIDTH_METERS - 5))))
       {
         AutoAlignment.coneMode = false;
         halfway = true;
