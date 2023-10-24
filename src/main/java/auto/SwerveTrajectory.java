@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import hardware.Swerve;
 import calc.Constants;
-import calc.Constants.AlignmentConstants;
+import calc.Constants.FieldConstants;
 
 public class SwerveTrajectory {
 
@@ -154,7 +154,7 @@ public class SwerveTrajectory {
             mirroredState.velocityMetersPerSecond           = state.velocityMetersPerSecond;
             mirroredState.accelerationMetersPerSecondSq     = state.accelerationMetersPerSecondSq;
             mirroredState.poseMeters                        = new Pose2d(
-              (AlignmentConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
+              (FieldConstants.FIELD_WIDTH_METERS - state.poseMeters.getTranslation().getX()),
                 state.poseMeters.getTranslation().getY(),
                 state.poseMeters.getRotation().unaryMinus().plus(Rotation2d.fromDegrees(Math.PI))
               );

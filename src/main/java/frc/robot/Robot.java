@@ -7,7 +7,7 @@ import auto.AutoPathStorage;
 import auto.AutoSegmentedWaypoints;
 import auto.SwerveTrajectory;
 import calc.ArmCalculations;
-import calc.Constants.AlignmentConstants;
+import calc.Constants.FieldConstants;
 import calc.Constants.AutoConstants;
 import calc.Constants.DriveConstants;
 import calc.Constants.LEDConstants;
@@ -103,6 +103,7 @@ public class Robot extends TimedRobot {
         Timer.delay(0.005);
       }
       Timer.delay(0.25);
+
   }
 
   /**
@@ -321,7 +322,7 @@ public class Robot extends TimedRobot {
 
       if (driver.getAButtonPressed()) {
         // Slow the drive down for consistency
-        DriveConstants.MAX_SPEED_METERS_PER_SECOND = AlignmentConstants.MAX_SPEED_METERS_PER_SECOND;
+        DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
         // This resets the "momentum" of the path
         SwerveTrajectory.resetTrajectoryStatus();
         // This resets the "rotational momentum" of the integerals
@@ -493,7 +494,7 @@ public class Robot extends TimedRobot {
          * this code is in place due to our operator confusing the buttons and clicking the wrong one.
          */
         if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                if (swerve.getPose().getTranslation().getX() > AlignmentConstants.FIELD_WIDTH_METERS/2) {
+                if (swerve.getPose().getTranslation().getX() > FieldConstants.FIELD_WIDTH_METERS/2) {
                     arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
                 }
                 else {
@@ -504,7 +505,7 @@ public class Robot extends TimedRobot {
         }
         // we are on red alliance,
         else {
-            if (swerve.getPose().getTranslation().getX() < AlignmentConstants.FIELD_WIDTH_METERS/2) {
+            if (swerve.getPose().getTranslation().getX() < FieldConstants.FIELD_WIDTH_METERS/2) {
                 arm.setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
             }
             else {
