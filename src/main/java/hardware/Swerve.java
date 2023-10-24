@@ -133,14 +133,14 @@ public class Swerve {
     DriverUI.field.setRobotPose(getPose());
 
     SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getState().angle.getDegrees(), frontLeft.getState().speedMetersPerSecond,
-        frontRight.getState().angle.getDegrees(), frontRight.getState().speedMetersPerSecond,
-        rearLeft.getState().angle.getDegrees(), rearLeft.getState().speedMetersPerSecond,
-        rearRight.getState().angle.getDegrees(), rearRight.getState().speedMetersPerSecond
+        frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
+        frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
+        rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
+        rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
     });
 
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
-    SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("Swerve/RobotRotation", getYaw().getRadians());
 
     SmartDashboard.putNumberArray("RobotPose3d", 
         Pose3dLogger.composePose3ds(
