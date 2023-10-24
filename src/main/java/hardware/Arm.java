@@ -5,6 +5,8 @@ import calc.Constants.ArmConstants;
 import calc.Constants.FieldConstants;
 import calc.Constants.NeoMotorConstants;
 import calc.Constants.PlacementConstants;
+import calc.Pose3dLogger;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -71,8 +73,14 @@ public class Arm /* implements Loggable */ {
     private Timer trajectoryTimer;
     private boolean followingTrajectory;
 
-    private final Mechanism2d armDesiredMechanism = new Mechanism2d(Units.inchesToMeters(ArmConstants.MAX_REACH)*2, Units.inchesToMeters(ArmConstants.MAX_REACH));
-    private final MechanismRoot2d armRoot = armDesiredMechanism.getRoot("Arm", Units.inchesToMeters(ArmConstants.MAX_REACH), Units.inchesToMeters(6));
+    private final Mechanism2d armDesiredMechanism = new Mechanism2d(
+        Units.inchesToMeters(ArmConstants.MAX_REACH)*2, Units.inchesToMeters(ArmConstants.MAX_REACH)
+    );
+    private final MechanismRoot2d armRoot = armDesiredMechanism.getRoot(
+        "Arm", 
+        Units.inchesToMeters(ArmConstants.MAX_REACH), 
+        Units.inchesToMeters(6)
+    );
     private final MechanismLigament2d lowerArmMechanism = 
         armRoot.append(
             new MechanismLigament2d(
@@ -193,10 +201,7 @@ public class Arm /* implements Loggable */ {
         // Trajectories take around 10ms to create, which may be
         currentTrajectory = PlacementConstants.HIGH_CONE_TRAJECTORY;
         
-        SmartDashboard.putData("ArmDesired2D", armDesiredMechanism);
-        SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
-
-        SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
+        logArmData();
 
     }
 
@@ -205,12 +210,6 @@ public class Arm /* implements Loggable */ {
         else if (followingTrajectory) { trajectoryPeriodic(); }
         setLowerArmAngle(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
-        
-        // Below is things that are used for logging n such:
-        SmartDashboard.putData("ArmDesired2D", armDesiredMechanism);
-        SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
-
-        SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
         
         // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
@@ -448,7 +447,6 @@ public class Arm /* implements Loggable */ {
           System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
           return;
         }
-
         
         upperArmMechanism.setAngle(Units.radiansToDegrees(upperArmAngle));
         lowerArmMechanism.setAngle(Units.radiansToDegrees(lowerArmAngle));
@@ -696,6 +694,13 @@ public class Arm /* implements Loggable */ {
       upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
     }
 
+    public void logArmData() {
+        SmartDashboard.putData("ArmDesired2D", armDesiredMechanism);
+        SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
+
+        SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
+    }
+
     private double[] getPoseData(double lowerArmAngle, double upperArmAngle) {
         var lowerPose =
             new Pose3d(
@@ -710,20 +715,6 @@ public class Arm /* implements Loggable */ {
                     new Translation3d(0.0, 0.0, -Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH)),
                     new Rotation3d(0.0, -upperArmAngle, 0.0)));
 
-        return composePose3ds(lowerPose, upperPose);
-    }
-
-    private double[] composePose3ds(Pose3d... value) {
-        double[] data = new double[value.length * 7];
-        for (int i = 0; i < value.length; i++) {
-            data[i * 7] = value[i].getX();
-            data[i * 7 + 1] = value[i].getY();
-            data[i * 7 + 2] = value[i].getZ();
-            data[i * 7 + 3] = value[i].getRotation().getQuaternion().getW();
-            data[i * 7 + 4] = value[i].getRotation().getQuaternion().getX();
-            data[i * 7 + 5] = value[i].getRotation().getQuaternion().getY();
-            data[i * 7 + 6] = value[i].getRotation().getQuaternion().getZ();
-        }
-        return data;
+        return Pose3dLogger.composePose3ds(lowerPose, upperPose);
     }
 }

@@ -126,12 +126,19 @@ public class Robot extends TimedRobot {
     Logger.updateEntries();
     arduinoController.periodic();
     claw.updateOutputCurrent();
+    arm.logArmData();
+    swerve.logPositions();
 
   }
 
   @Override
   public void disabledInit() {
     FieldConstants.GAME_MODE = FieldConstants.GameMode.DISABLED;
+    while (DriverStation.getAlliance() == Alliance.Invalid) {
+        DriverStation.refreshData();
+    }
+
+    FieldConstants.ALLIANCE = DriverStation.getAlliance();
     // arm.setUpperArmCoastMode();
     claw.stopClaw();
 

@@ -9,19 +9,25 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import calc.ADIS16470_IMU;
+import calc.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.DriverUI;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 import calc.Constants.FieldConstants;
+import calc.Constants.PlacementConstants;
 
 public class Swerve {
 
@@ -121,6 +127,9 @@ public class Swerve {
 
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
 
+  }
+
+  public void logPositions() {
     DriverUI.field.setRobotPose(getPose());
 
     SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
@@ -132,6 +141,23 @@ public class Swerve {
 
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
+
+    SmartDashboard.putNumberArray("RobotPose3d", 
+        Pose3dLogger.composePose3ds(
+            new Pose3d(
+                new Translation3d(
+                    getPose().getX(), 
+                    getPose().getY(), 
+                    Math.hypot(
+                        getRoll().getSin()
+                        * PlacementConstants.ROBOT_LENGTH_METERS/2.0
+                    , 
+                        getPitch().getSin() *
+                        PlacementConstants.ROBOT_LENGTH_METERS/2.0
+                    )), 
+                new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians()))
+        )
+    );
   }
 
   /**
