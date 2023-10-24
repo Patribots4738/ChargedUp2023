@@ -71,7 +71,7 @@ public class AutoSegmentedWaypoints {
 
     // Create a new pathplannerstate based on the mirrored state's position
     // and taking the mirrored state's rotation and adding 180 degrees
-    if ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) {
+    if ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)) {
 
         mirrored = true;
 
