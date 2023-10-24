@@ -134,11 +134,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     FieldConstants.GAME_MODE = FieldConstants.GameMode.DISABLED;
-    while (DriverStation.getAlliance() == Alliance.Invalid) {
-        DriverStation.refreshData();
-    }
-
-    FieldConstants.ALLIANCE = DriverStation.getAlliance();
     // arm.setUpperArmCoastMode();
     claw.stopClaw();
 
@@ -159,6 +154,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    FieldConstants.ALLIANCE = DriverStation.getAlliance();
     if (FieldConstants.ALLIANCE != Alliance.Invalid) {
         if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
             arduinoController.setLEDState(LEDConstants.BELLY_PAN_CHROMA);
