@@ -141,6 +141,7 @@ public class SwerveTrajectory {
         // If the path has not completed time wise
         if (elapsedTime < (pathTraj.getTotalTimeSeconds() + (FieldConstants.ALLIANCE == Alliance.Red || longWait ? 1 : 0.6)))
         {
+          boolean shouldMirror = (FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS);
           // System.out.printf("Elapsed Time %.3f\n", elapsedTime - pathTraj.getTotalTimeSeconds());
 
           PathPlannerState state = (PathPlannerState) pathTraj.sample(elapsedTime);
@@ -148,7 +149,7 @@ public class SwerveTrajectory {
 
           // Create a new pathplannerstate based on the mirrored state's position
           // and taking the mirrored state's rotation and adding 180 degrees
-          if ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)) {
+          if (shouldMirror) {
 
             mirroredState.timeSeconds                       = state.timeSeconds;
             mirroredState.velocityMetersPerSecond           = state.velocityMetersPerSecond;
@@ -171,10 +172,10 @@ public class SwerveTrajectory {
           ChassisSpeeds speeds = HDC.calculate(
               swerve.getPose(),
               // Pass in the alliance to flip on the Y if on red alliance
-              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)) 
+              (shouldMirror) 
                   ? mirroredState
                   : state,
-              ((FieldConstants.ALLIANCE == Alliance.Red) && (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)) 
+              (shouldMirror) 
                   ? mirroredState.holonomicRotation 
                   : state.holonomicRotation);
 
