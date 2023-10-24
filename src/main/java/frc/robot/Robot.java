@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
       // Initialize oblarg, which is mainly used in DriverUI
       Logger.configureLoggingAndConfig(this, false);
       // Set out log file to be in its own folder
-      DataLogManager.start("./robotLogs/");
+      DataLogManager.start();
       // Log data that is being put to shuffleboard
       DataLogManager.logNetworkTables(true);
       // Log the DS data and joysticks
