@@ -104,21 +104,6 @@ public class Claw {
 
         DriverUI.spicyClaw = claw.getMotorTemperature() > 60;
 
-        // current = getOutputCurrent();
-
-        // if (getOutputCurrent() > 30 && !hasGameElement && AutoAlignment.coneMode) {
-        //     startedIntakingTimestamp = Timer.getFPGATimestamp();
-        //     hasGameElement = true;
-        //     claw.setSmartCurrentLimit(25);
-        //     superIntake = true;
-        // }
-
-        // if ((Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25) && hasGameElement) {
-        //     if (getOutputCurrent() < 2) { hasGameElement = false; }
-        //     claw.setSmartCurrentLimit(15);
-        //     superIntake = false;
-        // }
-
         if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) {
 
             // This is for automatically outtaking the game piece
