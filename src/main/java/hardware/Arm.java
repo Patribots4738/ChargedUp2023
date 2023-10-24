@@ -2,6 +2,7 @@ package hardware;
 
 import calc.ArmCalculations;
 import calc.Constants.ArmConstants;
+import calc.Constants.FieldConstants;
 import calc.Constants.NeoMotorConstants;
 import calc.Constants.PlacementConstants;
 import com.revrobotics.AbsoluteEncoder;
@@ -20,7 +21,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -516,7 +516,7 @@ public class Arm /* implements Loggable */ {
             // Slot 2 is an in-between gain set which 
             // slows the arm down just enough to not overshoot
         boolean usePIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
-        boolean usePIDSlot2 = DriverStation.isTeleop() && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+        boolean usePIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
 
         upperArmPIDController.setFF(
             FF,

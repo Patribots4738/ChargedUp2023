@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.math.MathUtil;
@@ -116,7 +116,7 @@ public class AutoAlignment {
           if (tagID == 4 || tagID == 5) {
             this.substationOffset = -1;
           } else {
-            this.coneOffset = -1 * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+            this.coneOffset = -1 * ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1);
           }
         } else /* (positiveOffsetNorm < negativeOffsetNorm) */ {
 
@@ -125,7 +125,7 @@ public class AutoAlignment {
           if (tagID == 4 || tagID == 5) {
             this.substationOffset = 1;
           } else {
-            this.coneOffset = ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1);
+            this.coneOffset = ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1);
           }
         }
       }
@@ -218,7 +218,7 @@ public class AutoAlignment {
       Translation2d currentPosition = swerve.getPose().getTranslation();
 
       // If we are on the blue alliance, only look at positions of tags 8,7,6 and 4
-      if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+      if (FieldConstants.ALLIANCE == Alliance.Blue) {
         for (int i = 8; i > 4; i--) {
           // Tag 5 is for the red alliance's substation, not ours
           // Skip over to our substation
@@ -284,7 +284,7 @@ public class AutoAlignment {
             getTagXOffset(),
             (tagID == 4 || tagID == 5) ?
                 (FieldConstants.SUBSTATION_OFFSET_METERS * this.substationOffset) :
-                (FieldConstants.CONE_OFFSET_METERS * this.coneOffset) * ((DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 1 : -1)),
+                (FieldConstants.CONE_OFFSET_METERS * this.coneOffset) * ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1)),
         Rotation2d.fromDegrees(180)));
       return targetPose;
     }
@@ -434,14 +434,24 @@ public class AutoAlignment {
 
       if (tilt > Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 10 : 20))), 0.055, 0.20),
+            MathUtil.clamp(
+                (
+                    (FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
+                    /
+                    (elapsedTime /
+                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), 0.055, 0.20),
             0, 
-            0, 
+            0,
             true, false);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
-            MathUtil.clamp(((FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/(DriverStation.isAutonomous() ? 10 : 20))), -0.20, -0.055),
+            MathUtil.clamp(
+                (
+                    (FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
+                    /
+                    (elapsedTime / 
+                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), -0.20, -0.055),
             0, 
             0, 
             true, false);

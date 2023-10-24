@@ -459,7 +459,14 @@ public final class Constants {
 
         public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
-        public static Alliance ALLIANCE;
+        public static Alliance ALLIANCE = Alliance.Invalid;
+        public static enum GameMode {
+            DISABLED,
+            AUTONOMOUS,
+            TELEOP,
+            TEST
+        };
+        public static GameMode GAME_MODE;
 
         // The below code is not used, and is only here for reference...
         // We instead use PhotonCameraPose.AprilTagFieldLayout

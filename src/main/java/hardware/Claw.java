@@ -2,6 +2,7 @@ package hardware;
 
 import auto.AutoAlignment;
 import calc.Constants.ClawConstants;
+import calc.Constants.FieldConstants;
 import calc.Constants.NeoMotorConstants;
 import calc.Constants.PlacementConstants;
 import com.revrobotics.CANSparkMax;
@@ -119,14 +120,16 @@ public class Claw {
         //     superIntake = false;
         // }
 
-        if (DriverStation.isTeleop()) {
+        if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) {
 
             // This is for automatically outtaking the game piece
             if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
                 finishedOuttaking = true;
             }
             // Slow down claw for cube mode
-            if (!AutoAlignment.coneMode && (DriverStation.isTeleopEnabled() || DriverStation.isTestEnabled())) {
+            if (!AutoAlignment.coneMode && 
+                (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP || FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)) 
+            {
               desiredSpeed = MathUtil.clamp(desiredSpeed, -0.3, 0.5);
             }
             // Speed up claw for cone mode

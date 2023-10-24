@@ -19,9 +19,6 @@ public class DriverUI implements Loggable {
     @BooleanBox(name = "Fresh Code", rowIndex = 0, columnIndex = 10, height = 1, width = 1, colorWhenTrue = "lime")
     public static boolean freshCode = true;
 
-    @BooleanBox(name = "FMS?", rowIndex = 0, columnIndex = 11, height = 1, width = 1, colorWhenTrue = "lime")
-    public static boolean connected = false;
-
     @BooleanBox(name = "Enabled?", rowIndex = 0, columnIndex = 12, height = 1, width = 1, colorWhenTrue = "lime")
     public static boolean enabled = false;
 
