@@ -7,11 +7,12 @@ package auto;
 
 import calc.Constants.AutoConstants;
 import calc.Constants.PlacementConstants;
+import frc.robot.util.DriverUI;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
-import frc.robot.DriverUI;
 
 public class AutoPathStorage {
 
