@@ -113,10 +113,7 @@ public class Swerve {
     setBrakeMode();
 
     SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getState().angle.getDegrees(), frontLeft.getState().speedMetersPerSecond,
-        frontRight.getState().angle.getDegrees(), frontRight.getState().speedMetersPerSecond,
-        rearLeft.getState().angle.getDegrees(), rearLeft.getState().speedMetersPerSecond,
-        rearRight.getState().angle.getDegrees(), rearRight.getState().speedMetersPerSecond
+        0, 0, 0, 0, 0, 0, 0, 0
     });
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
