@@ -120,6 +120,14 @@ public class MAXSwerveModule {
                 new Rotation2d(turningEncoder.getPosition() - chassisAngularOffset));
     }
 
+    public SwerveModuleState getSimState() {
+        // Apply chassis angular offset to the encoder position to get the position
+        // relative to the chassis.
+        return new SwerveModuleState(drivingSparkMax.getVelocity(),
+                new Rotation2d(turningSparkMax.getPosition() - chassisAngularOffset));
+
+    }
+
     /**
      * Returns the current position of the module.
      *
@@ -131,6 +139,14 @@ public class MAXSwerveModule {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
                 new Rotation2d(turningEncoder.getPosition() - chassisAngularOffset));
+    }
+
+    public SwerveModulePosition getSimPosition() {
+        // Apply chassis angular offset to the encoder position to get the position
+        // relative to the chassis.
+        return new SwerveModulePosition(
+                drivingSparkMax.getPosition(),
+                new Rotation2d(turningSparkMax.getPosition() - chassisAngularOffset));
     }
 
     /**
@@ -150,9 +166,9 @@ public class MAXSwerveModule {
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
         // drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
-        drivingSparkMax.setTargetVelocity(optimizedDesiredState.speedMetersPerSecond);
+        drivingSparkMax.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
         // turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
-        turningSparkMax.setTargetPosition(optimizedDesiredState.angle.getRadians());
+        turningSparkMax.setTargetPosition(correctedDesiredState.angle.getRadians());
 
         this.desiredState = desiredState;
     }

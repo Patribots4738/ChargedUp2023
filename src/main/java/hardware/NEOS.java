@@ -54,8 +54,8 @@ public class NEOS extends CANSparkMax {
     public NEOS(int id, boolean reversed, CANSparkMax.IdleMode mode) {
         super(id, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        restoreFactoryDefaults();
-        Timer.delay(0.050);
+        // restoreFactoryDefaults();
+        // Timer.delay(0.050);
 
         // If a parameter set fails, this will add more time to alleviate any bus traffic
         // default is 20ms
@@ -114,7 +114,7 @@ public class NEOS extends CANSparkMax {
         if (velocity == 0) {
             setVoltage(0);
         } else {
-            pidController.setReference(velocity, ControlType.kVelocity, slot, arbitraryFeedForward, SparkMaxPIDController.ArbFFUnits.kVoltage);
+            pidController.setReference(velocity, ControlType.kVelocity);
         }
         targetVelocity = velocity;
         controlType = ControlLoopType.VELOCITY;

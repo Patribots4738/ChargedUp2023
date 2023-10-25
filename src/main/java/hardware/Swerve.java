@@ -113,10 +113,7 @@ public class Swerve {
     setBrakeMode();
 
     SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getState().angle.getDegrees(), frontLeft.getState().speedMetersPerSecond,
-        frontRight.getState().angle.getDegrees(), frontRight.getState().speedMetersPerSecond,
-        rearLeft.getState().angle.getDegrees(), rearLeft.getState().speedMetersPerSecond,
-        rearRight.getState().angle.getDegrees(), rearRight.getState().speedMetersPerSecond
+        0, 0, 0, 0, 0, 0, 0, 0
     });
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
@@ -137,10 +134,10 @@ public class Swerve {
     DriverUI.field.setRobotPose(getPose());
 
     SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
-        frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
-        rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
-        rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
+        frontLeft.getSimState().angle.getRadians(), frontLeft.getSimState().speedMetersPerSecond,
+        frontRight.getSimState().angle.getRadians(), frontRight.getSimState().speedMetersPerSecond,
+        rearLeft.getSimState().angle.getRadians(), rearLeft.getSimState().speedMetersPerSecond,
+        rearRight.getSimState().angle.getRadians(), rearRight.getSimState().speedMetersPerSecond
     });
 
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
@@ -384,7 +381,7 @@ public class Swerve {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
 
     for (int modNum = 0; modNum < swerveModules.length; modNum++) {
-      positions[modNum] = swerveModules[modNum].getPosition();
+      positions[modNum] = swerveModules[modNum].getSimPosition();
     }
     return positions;
 

@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 
 // Uncomment the following lines to enable logging
 // Mainly used for creating/editing arm position constants
@@ -214,7 +215,8 @@ public class Arm /* implements Loggable */ {
         else if (followingTrajectory) { trajectoryPeriodic(); }
         setLowerArmAngle(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
-        
+        if (Robot.isSimulation()) 
+            armsAtDesiredPosition = true;
         // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // // Use forward kinematics to get the x and y position of the end effector
