@@ -23,7 +23,9 @@ import calc.ADIS16470_IMU;
 import calc.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.DriverUI;
+import frc.robot.util.DriverUI;
+import frc.robot.util.SwerveLogger;
+import frc.robot.util.SwerveLogger.SwerveLogs;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 import calc.Constants.FieldConstants;
@@ -103,24 +105,20 @@ public class Swerve {
   // standard deviations
   // X, Y, theta
   );
+  
+  SwerveLogger swerveLogger = new SwerveLogger();
 
   /**
    * Creates a new DriveSu1stem.
    */
+
+
   public Swerve() {
     resetEncoders();
     zeroHeading();
     setBrakeMode();
 
-    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getState().angle.getDegrees(), frontLeft.getState().speedMetersPerSecond,
-        frontRight.getState().angle.getDegrees(), frontRight.getState().speedMetersPerSecond,
-        rearLeft.getState().angle.getDegrees(), rearLeft.getState().speedMetersPerSecond,
-        rearRight.getState().angle.getDegrees(), rearRight.getState().speedMetersPerSecond
-    });
-    SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
-    SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
-
+    swerveLogger.makeFeild();
   }
 
   public void periodic() {
@@ -130,19 +128,16 @@ public class Swerve {
   }
 
   public void logPositions() {
-    DriverUI.field.setRobotPose(getPose());
-
-    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
-        frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
-        rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
-        rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
-    });
-
-    SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
-    SmartDashboard.putNumber("Swerve/RobotRotation", getYaw().getRadians());
-
-    SmartDashboard.putNumberArray("RobotPose3d", 
+    SwerveLogs logs = new SwerveLogs(
+        getPose(), 
+        getYaw().getRadians(), 
+        desiredModuleStates, 
+        new double[] {
+            frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
+            frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
+            rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
+            rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
+        }, 
         Pose3dLogger.composePose3ds(
             new Pose3d(
                 new Translation3d(
@@ -150,14 +145,17 @@ public class Swerve {
                     getPose().getY(), 
                     Math.hypot(
                         getRoll().getSin()
-                        * PlacementConstants.ROBOT_LENGTH_METERS/2.0
-                    , 
+                        * PlacementConstants.ROBOT_LENGTH_METERS/2.0,
+
                         getPitch().getSin() *
                         PlacementConstants.ROBOT_LENGTH_METERS/2.0
                     )), 
                 new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians()))
         )
     );
+
+    swerveLogger.update(logs);
+
   }
 
   /**
