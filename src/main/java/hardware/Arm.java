@@ -180,6 +180,10 @@ public class Arm /* implements Loggable */ {
         upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
         upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
 
+        
+        lowerArmRight.setCANTimeout(50);
+        upperArm.setCANTimeout(50);
+
         // Save the SPARK MAX configuration. If a SPARK MAX
         // browns out, it will retain the last configuration
         lowerArmLeft.follow(lowerArmRight, true);

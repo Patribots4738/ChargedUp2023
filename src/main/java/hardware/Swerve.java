@@ -126,6 +126,10 @@ public class Swerve {
   public void periodic() {
 
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+    
+    for (MAXSwerveModule mod : swerveModules) {
+      mod.tick();
+    }
 
   }
 

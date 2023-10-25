@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 
 import auto.AutoAlignment;
 import auto.AutoPathStorage;
@@ -261,7 +262,7 @@ public class Robot extends TimedRobot {
     swerve.periodic();
     arm.periodic();
     claw.periodic();
-    autoAlignment.calibrateOdometry();
+    // autoAlignment.calibrateOdometry();
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
@@ -696,5 +697,10 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     teleopPeriodic();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    REVPhysicsSim.getInstance().run();
   }
 }
