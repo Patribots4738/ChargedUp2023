@@ -1,7 +1,5 @@
 # ChargedUp 2023
-![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/ChargedUp2023/gradle.yml?label=Gradle%20Build&logo=Gradle)
-
-[`src/main/java`](src/main/java/) shortcut
+![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/ChargedUp2023/gradle.yml?label=Gradle%20Build&logo=Gradle) | [`src/main/java`](src/main/java/) shortcut
  
 ![Robot Image](images/Jerome.gif)
 ____
@@ -48,5 +46,5 @@ Want to find out more?
 
 ____
 # ***Controls***
-![Driver Controller](images\driverController.png)
-![Operator Controller](images\operatorController.png)
+![Driver Controller](images/driverController.png)
+![Operator Controller](images/operatorController.png)
