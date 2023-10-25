@@ -45,6 +45,6 @@ Want to find out more?
 [`Jump into the code!`](src/main/java/)
 
 ____
-# ***Controls***
+# ***Controls, courtesy of 3255 <3***
 ![Driver Controller](images/driverController.png)
 ![Operator Controller](images/operatorController.png)
