@@ -176,6 +176,7 @@ public class Robot extends TimedRobot {
     // Restart the timer to use at the end of auto
     timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+    DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.PI;
     autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     // initialize variables for auto
