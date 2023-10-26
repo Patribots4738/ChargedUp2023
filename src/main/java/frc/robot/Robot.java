@@ -177,6 +177,7 @@ public class Robot extends TimedRobot {
     // Restart the timer to use at the end of auto
     timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+    DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
     autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     // initialize variables for auto
@@ -262,7 +263,7 @@ public class Robot extends TimedRobot {
     swerve.periodic();
     arm.periodic();
     claw.periodic();
-    // autoAlignment.calibrateOdometry();
+    autoAlignment.calibrateOdometry();
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
