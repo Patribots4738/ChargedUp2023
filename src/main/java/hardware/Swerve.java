@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -24,6 +25,7 @@ import calc.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.DriverUI;
+import frc.robot.Robot;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 import calc.Constants.FieldConstants;
@@ -65,7 +67,8 @@ public class Swerve {
       DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
       DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-  private double[] desiredModuleStates = new double[6];
+      private double[] desiredModuleStates = new double[6];
+      private double[] realModuleStates = new double[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
   // The gyro sensor
   private final ADIS16470_IMU gyro = new ADIS16470_IMU();
@@ -112,9 +115,7 @@ public class Swerve {
     zeroHeading();
     setBrakeMode();
 
-    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        0, 0, 0, 0, 0, 0, 0, 0
-    });
+    SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
 
@@ -128,17 +129,34 @@ public class Swerve {
       mod.tick();
     }
 
+    realModuleStates = new double[] {
+        frontLeft.getSimState().angle.getRadians(), frontLeft.getSimState().speedMetersPerSecond,
+        frontRight.getSimState().angle.getRadians(), frontRight.getSimState().speedMetersPerSecond,
+        rearLeft.getSimState().angle.getRadians(), rearLeft.getSimState().speedMetersPerSecond,
+        rearRight.getSimState().angle.getRadians(), rearRight.getSimState().speedMetersPerSecond
+    };
+
+    if (Robot.isSimulation()) {
+
+        SwerveModuleState[] measuredStates =
+        new SwerveModuleState[] {
+          frontLeft.getSimState(), frontRight.getSimState(), rearLeft.getSimState(), rearRight.getSimState()
+        };
+        
+        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(measuredStates);
+        resetOdometry(
+            getPose().exp(
+                new Twist2d(
+                    0, 0,
+                    speeds.omegaRadiansPerSecond * .02)));
+    }
+
   }
 
   public void logPositions() {
     DriverUI.field.setRobotPose(getPose());
 
-    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getSimState().angle.getRadians(), frontLeft.getSimState().speedMetersPerSecond,
-        frontRight.getSimState().angle.getRadians(), frontRight.getSimState().speedMetersPerSecond,
-        rearLeft.getSimState().angle.getRadians(), rearLeft.getSimState().speedMetersPerSecond,
-        rearRight.getSimState().angle.getRadians(), rearRight.getSimState().speedMetersPerSecond
-    });
+    SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
 
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getYaw().getRadians());
