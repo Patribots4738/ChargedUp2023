@@ -49,8 +49,9 @@ public class Arm /* implements Loggable */ {
     private double armYReference = 0;
 
     // The DESIRED rotation of the arms
-    private double upperReferenceAngle = 0;
-    private double lowerReferenceAngle = 0;
+    // These starting values are purely for log visualization, and serve no other purpose
+    private double lowerReferenceAngle = Units.degreesToRadians(193);
+    private double upperReferenceAngle = Units.degreesToRadians(22);
 
     private boolean armsAtDesiredPosition = false;
     
