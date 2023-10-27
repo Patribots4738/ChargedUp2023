@@ -699,6 +699,7 @@ public class Arm /* implements Loggable */ {
         SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
 
         SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
+        SmartDashboard.putNumberArray("ArmREALXY", new double[] {this.armXPos, this.armYPos});
     }
 
     private double[] getPoseData(double lowerArmAngle, double upperArmAngle) {
