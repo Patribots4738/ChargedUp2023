@@ -369,7 +369,7 @@ public class Swerve {
     // return (velocity / swerveModules.length);
 
     // We update the UI at the end of the loop, so this is a way of looking into the past.
-    return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
+    return ((swerveLogger.getFieldRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
 
   }
 

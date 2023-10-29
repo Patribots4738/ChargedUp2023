@@ -73,4 +73,8 @@ public class SwerveLogger {
         SmartDashboard.putData(root+"/"+"Field", field);
     }
 
+    public Pose2d getFieldRobotPose() {
+        return field.getRobotPose();
+    }
+
 }
