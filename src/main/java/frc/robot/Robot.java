@@ -339,6 +339,7 @@ public class Robot extends TimedRobot {
         SwerveTrajectory.resetTrajectoryStatus();
         // This resets the "rotational momentum" of the integerals
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+
       }
       
       autoAlignment.alignToTag(driverLeftAxis.getY());
@@ -441,6 +442,7 @@ public class Robot extends TimedRobot {
         }
         break;
 
+
       // Clicking right
       case 90:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
@@ -462,7 +464,7 @@ public class Robot extends TimedRobot {
       // Clicking up
       case 0:
         boolean hotReloadHigh = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX);
         if (!hotReloadHigh) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_TRAJECTORY : PlacementConstants.HIGH_CUBE_TRAJECTORY); }
         break;
 
@@ -581,7 +583,7 @@ public class Robot extends TimedRobot {
 
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
             arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-            arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX) 
+            arm.getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX) 
         {
       
             arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);

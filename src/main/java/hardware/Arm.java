@@ -604,7 +604,7 @@ public class Arm /* implements Loggable */ {
     // Check if the arm is at its desired position and that position is a placement index,
     // Note that the stowed position is not a placement index, but can be used as hybrid placement
     public boolean getAtPlacementPosition() {
-      return (armPosDimension1 == PlacementConstants.CUBE_HIGH_INDEX ||
+      return (armPosDimension1 == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX ||
               armPosDimension1 == PlacementConstants.AUTO_CUBE_HIGH_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
