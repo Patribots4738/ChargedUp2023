@@ -402,21 +402,19 @@ public class Robot extends TimedRobot {
 
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
-    if (operator.getXButton()) {
-      autoAlignment.setConeMode(false);
-      if (arm.getArmIndex() == PlacementConstants.CONE_INTAKE_INDEX) {
-        arm.setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX);
-      }
-      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
+    // Note that this stuff only runs if we actually
+    // change our mode, so we don't have to worry about
+    // handleConeMode calling twice if a button was spammed
+    if (operator.getXButtonPressed() && AutoAlignment.coneMode) {
+        arm.handleConeModeChange();
+        autoAlignment.setConeMode(false);
+        arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
-    else if (operator.getYButton()) {
-      autoAlignment.setConeMode(true);
-      if (arm.getArmIndex() == PlacementConstants.CUBE_INTAKE_INDEX) {
-        arm.setArmIndex(PlacementConstants.CONE_INTAKE_INDEX);
-      }
-      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
+    else if (operator.getYButtonPressed() && !AutoAlignment.coneMode) {
+        arm.handleConeModeChange();
+        autoAlignment.setConeMode(true);
+        arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
-
     // POV = D-Pad...
     switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
