@@ -218,7 +218,7 @@ public class Robot extends TimedRobot {
     }
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CHARGE")) {
+    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CH")) {
       swerve.setWheelsUp();
       return;
     }
@@ -229,6 +229,7 @@ public class Robot extends TimedRobot {
       claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
+
     // Keep the autonomous states updated
     autoSegmentedWaypoints.periodic();
     // If we are close to the grid, allow the camera to modify odometry
@@ -338,22 +339,9 @@ public class Robot extends TimedRobot {
         SwerveTrajectory.resetTrajectoryStatus();
         // This resets the "rotational momentum" of the integerals
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
-        // Reset the autoAlignment timer
-        // This is so that the robot can change its "closest" node 
-        // in the first second of aligning
-        autoAlignment.resetTimer();
-        
       }
       
       autoAlignment.alignToTag(driverLeftAxis.getY());
-      
-      // Since we reset the timer when AButtonPressed(), for the first one second of alignment, 
-      // correct for any error in the odometry by resetting the nearest alignment offset. 
-      // This will work since the robot will be rotating, 
-      // and the camera will be writing the actual position of the robot.
-      if (autoAlignment.getAlignmentTimer() < 1) {
-        autoAlignment.setNearestAlignmentOffset();
-      }
 
     } else if (driver.getRightBumper()) {
 
@@ -415,10 +403,16 @@ public class Robot extends TimedRobot {
     // The operator can set the robot into the desired mode
     if (operator.getXButton()) {
       autoAlignment.setConeMode(false);
+      if (arm.getArmIndex() == PlacementConstants.CONE_INTAKE_INDEX) {
+        arm.setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX);
+      }
       arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
     else if (operator.getYButton()) {
       autoAlignment.setConeMode(true);
+      if (arm.getArmIndex() == PlacementConstants.CUBE_INTAKE_INDEX) {
+        arm.setArmIndex(PlacementConstants.CONE_INTAKE_INDEX);
+      }
       arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
 
