@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import frc.robot.util.Logger.ArmLogger;
-import frc.robot.util.Logger.ArmLogs;
+import frc.robot.util.Logger.ArmLogBuilder;
 
 // Uncomment the following lines to enable logging
 // Mainly used for creating/editing arm position constants
@@ -696,13 +696,13 @@ public class Arm /* implements Loggable */ {
     }
 
     public void logArmData() {
-        ArmLogs armLogs = new ArmLogs(
-            armDesiredMechanism,
-            getPoseData(lowerReferenceAngle, upperReferenceAngle),
-            getPoseData(getLowerArmAngle(), getUpperArmAngle())
-        );
+        ArmLogBuilder armLogs = new ArmLogBuilder();
+        
+        armLogs.addArmActual3D(getPoseData(getLowerArmAngle(), getUpperArmAngle()));
+        armLogs.addArmDesired3D(getPoseData(lowerReferenceAngle, upperReferenceAngle));
+        armLogs.addArmDesired2D(armDesiredMechanism);
 
-        ArmLogger.update(armLogs);
+        ArmLogger.update(armLogs.build());
     }
 
     private double[] getPoseData(double lowerArmAngle, double upperArmAngle) {
