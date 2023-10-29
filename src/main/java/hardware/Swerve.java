@@ -24,8 +24,8 @@ import calc.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.util.DriverUI;
-import frc.robot.util.SwerveLogger;
-import frc.robot.util.SwerveLogger.SwerveLogs;
+import frc.robot.util.Logger.SwerveLogger;
+import frc.robot.util.Logger.SwerveLogs;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 import calc.Constants.FieldConstants;
@@ -105,8 +105,6 @@ public class Swerve {
   // standard deviations
   // X, Y, theta
   );
-  
-  SwerveLogger swerveLogger = new SwerveLogger();
 
   /**
    * Creates a new DriveSu1stem.
@@ -118,7 +116,7 @@ public class Swerve {
     zeroHeading();
     setBrakeMode();
 
-    swerveLogger.makeFeild();
+    SwerveLogger.makeFeild();
   }
 
   public void periodic() {
@@ -154,7 +152,7 @@ public class Swerve {
         )
     );
 
-    swerveLogger.update(logs);
+    SwerveLogger.update(logs);
 
   }
 
@@ -369,7 +367,7 @@ public class Swerve {
     // return (velocity / swerveModules.length);
 
     // We update the UI at the end of the loop, so this is a way of looking into the past.
-    return ((swerveLogger.getFieldRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
+    return ((SwerveLogger.getFieldRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
 
   }
 
