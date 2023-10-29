@@ -724,13 +724,13 @@ public class Arm /* implements Loggable */ {
                 0.0,
                 0.0,
                 0.29,
-                new Rotation3d(0.0, lowerArmAngle, 0.0));
+                new Rotation3d(0.0, -lowerArmAngle, 0.0));
 
         var upperPose =
             lowerPose.transformBy(
                 new Transform3d(
                     new Translation3d(0.0, 0.0, -Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH)),
-                    new Rotation3d(0.0, upperArmAngle, 0.0)));
+                    new Rotation3d(0.0, -upperArmAngle, 0.0)));
 
         return Pose3dLogger.composePose3ds(lowerPose, upperPose);
     }
