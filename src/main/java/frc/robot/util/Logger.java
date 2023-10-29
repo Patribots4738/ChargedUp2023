@@ -81,14 +81,12 @@ public class Logger {
     
     // Swerve Logging stuff
     public static class SwerveLog {
-        public Pose2d robotPose = new Pose2d();
         public double robotRotation;
         public double[] desiredModuleStates;
         public double[] realModuleStates;
         public double[] pose3d;
     
         public SwerveLog(SwerveLogBuilder swerveLogBuilder) {
-            this.robotPose = swerveLogBuilder.robotPose;
             this.robotRotation = swerveLogBuilder.robotRotation;
             this.desiredModuleStates = swerveLogBuilder.desiredModuleStates;
             this.realModuleStates = swerveLogBuilder.realModuleStates;
@@ -97,18 +95,12 @@ public class Logger {
     }
     public static class SwerveLogBuilder {
             
-            public Pose2d robotPose = new Pose2d();
             public double robotRotation;
             public double[] desiredModuleStates = new double[4];
             public double[] realModuleStates = new double[4];
             public double[] pose3d = new double[3];
     
             public SwerveLogBuilder() { }
-    
-            public SwerveLogBuilder addRobotPose(Pose2d robotPose) {
-                this.robotPose = robotPose;
-                return this;
-            }
     
             public SwerveLogBuilder addRobotRotation(double robotRotation) {
                 this.robotRotation = robotRotation;
@@ -137,16 +129,12 @@ public class Logger {
     }
     public static class SwerveLogger {
     
-        private static Field2d field = new Field2d();
-    
-        private static Pose2d robotPose = new Pose2d();
         private static double robotRotation = 0;
         private static double[] desiredModuleStates = new double[4];
         private static double[] realModuleStates = new double[4];
         private static double[] pose3d = new double[3];
     
         public static void update(SwerveLog logs) {
-            robotPose = logs.robotPose;
             robotRotation = logs.robotRotation;
             desiredModuleStates = logs.desiredModuleStates;
             realModuleStates = logs.realModuleStates;
@@ -156,7 +144,6 @@ public class Logger {
         }
     
         public static void log() {
-            logField();
             logRealStates();
             logDesiredStates();
             logRobotRotation();
@@ -174,17 +161,6 @@ public class Logger {
         }
         private static void logRealStates() {
             SmartDashboard.putNumberArray("RealStates", realModuleStates);
-        }
-        private static void logField() {
-            field.setRobotPose(robotPose);
-        }
-    
-        public static void makeFeild() {
-            SmartDashboard.putData("Field", field);
-        }
-    
-        public static Pose2d getFieldRobotPose() {
-            return field.getRobotPose();
         }
     
     }

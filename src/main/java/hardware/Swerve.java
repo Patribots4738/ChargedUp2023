@@ -21,6 +21,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import calc.ADIS16470_IMU;
 import calc.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.util.DriverUI;
 import frc.robot.util.Logger.SwerveLogBuilder;
 import frc.robot.util.Logger.SwerveLogger;
 import calc.SwerveUtils;
@@ -113,7 +114,6 @@ public class Swerve {
     zeroHeading();
     setBrakeMode();
 
-    SwerveLogger.makeFeild();
   }
 
   public void periodic() {
@@ -124,9 +124,7 @@ public class Swerve {
 
   public void logPositions() {
     SwerveLogBuilder logs = new SwerveLogBuilder();
-    // Pose2d robotPose, double robotRotaion, double[] desiredModuleStates,
-    //             double[] realModuleStates, double[] pose3d
-    logs.addRobotPose(getPose());
+    DriverUI.field.setRobotPose(getPose());
     logs.addRobotRotation(getYaw().getRadians());
     logs.addDesiredModuleStates(desiredModuleStates);
     logs.addRealModuleStates(new double[] {
@@ -364,7 +362,7 @@ public class Swerve {
     // return (velocity / swerveModules.length);
 
     // We update the UI at the end of the loop, so this is a way of looking into the past.
-    return ((SwerveLogger.getFieldRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
+    return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
 
   }
 
