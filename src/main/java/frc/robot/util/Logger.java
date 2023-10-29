@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Logger {
     
     public Logger() { }
-    
+
     public static final class ArmLogs {
         public Mechanism2d armDesired2D;
         public double[] armDesired3D;
@@ -57,7 +57,7 @@ public class Logger {
             SmartDashboard.putNumberArray(root+"/"+"ArmActual3D", armActual3D);
         }
     }
-
+    
     public static class SwerveLogs {
             Pose2d robotPose = new Pose2d();
             double robotRotation;
