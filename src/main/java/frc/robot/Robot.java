@@ -51,13 +51,21 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() { }
     
     @Override
-    public void teleopInit() { }
+    public void teleopInit() {
+        // Stop our autonomous command if it is still running.
+        if (autonomousCommand != null) {
+            autonomousCommand.cancel();
+        }
+    }
 
     @Override
     public void teleopPeriodic() { }
     
     @Override
-    public void testInit() { }
+    public void testInit() { 
+        // Cancels all running commands at the start of test mode.
+        CommandScheduler.getInstance().cancelAll();
+    }
 
     @Override
     public void testPeriodic() { }
