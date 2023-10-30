@@ -219,6 +219,12 @@ public class Arm /* implements Loggable */ {
         boolean upperPIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
         boolean upperPIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
         
+        // If by chance our desired PID slot for the upper arm changes,
+        // update our upper arm's desired PID inputs
+        if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
+            setUpperArmAngle(upperReferenceAngle);
+        }
+
         // On either PID slot boolean change
         // update both, then ask the SparkMAX to change its ff
         // We do this becuase we want to limit our communications with the spark 
@@ -508,16 +514,16 @@ public class Arm /* implements Loggable */ {
         // Finally, set the reference values for the lower and upper arm:
         setLowerArmReference(lowerArmAngle);
         setUpperArmReference(upperArmAngle);
-        setLowerArmAngle(lowerReferenceAngle);
-        setUpperArmAngle(upperReferenceAngle);
     }
 
     public void setLowerArmReference(double reference) {
       this.lowerReferenceAngle = reference;
+      setLowerArmAngle(lowerReferenceAngle);
     }
 
     public void setUpperArmReference(double reference) {
       this.upperReferenceAngle = reference;
+      setUpperArmAngle(upperReferenceAngle);
     }
 
     /**
@@ -536,37 +542,20 @@ public class Arm /* implements Loggable */ {
             
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = ArmConstants.upperfeedForward.calculate((angle), 0);
+        double FF = ArmConstants.upperfeedForward.calculate(angle, 0);
 
-        // Check if we want to use secondary PID gains
-        // Slot 1 is used to make the arm go super fast
-            // Slot 2 is an in-between gain set which 
-            // slows the arm down just enough to not overshoot
-        boolean upperPIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
-        boolean upperPIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
-        
-        // On either PID slot boolean change
-        // update both, then ask the SparkMAX to change its ff
-        // We do this becuase we want to limit our communications with the spark 
-        // as much as possible, to reduce loop overruns.
-        if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
-            
-            this.upperPIDSlot1 = upperPIDSlot1;
-            this.upperPIDSlot2 = upperPIDSlot2;
-
-            upperArmPIDController.setFF(
-                FF,
-                // Toggle between slot 0, 1, or 2
-                // If we should use slot 1 and 2, use 2
-                // else, use 1
-                // else, use 0 (default)
-                this.upperPIDSlot1 
-                    ? this.upperPIDSlot2
-                        ? 2
-                        : 1 
-                    : 0
-            );
-        }
+        upperArmPIDController.setFF(
+            FF,
+            // Toggle between slot 0, 1, or 2
+            // If we should use slot 1 and 2, use 2
+            // else, use 1
+            // else, use 0 (default)
+            upperPIDSlot1 
+                ? upperPIDSlot2
+                    ? 2
+                    : 1 
+                : 0
+        );
 
         // Set the position of the neo controlling the upper arm to
         // Toggle between all PID slots 
@@ -601,11 +590,11 @@ public class Arm /* implements Loggable */ {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = ArmConstants.lowerfeedForward.calculate((position), 0);
+        double FF = ArmConstants.lowerfeedForward.calculate(position, 0);
         lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
-        lowerArmPIDController.setReference((position), ControlType.kPosition);
+        lowerArmPIDController.setReference(position, ControlType.kPosition);
     }
 
     /**
