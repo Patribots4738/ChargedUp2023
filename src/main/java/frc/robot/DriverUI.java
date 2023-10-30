@@ -43,6 +43,7 @@ public class DriverUI implements Loggable {
 
     public static double currentTimestamp = 0;
     public static double modeStartTimestamp = 0;
+    public static int overrunCount = 0;
 
     public DriverUI() {}
 }

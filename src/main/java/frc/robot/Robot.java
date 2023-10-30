@@ -119,12 +119,21 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    double dt = Timer.getFPGATimestamp() - DriverUI.currentTimestamp;
+    SmartDashboard.putNumber("Timer/dTPrelog", dt);
         
     Logger.updateEntries();
     arduinoController.periodic();
     claw.updateOutputCurrent();
     arm.logArmData();
     swerve.logPositions();
+    
+    dt = Timer.getFPGATimestamp() - DriverUI.currentTimestamp;
+    
+    if (dt > 0.02) DriverUI.overrunCount++;
+    
+    SmartDashboard.putNumber("Timer/dTPostlog", dt);
     DriverUI.currentTimestamp = Timer.getFPGATimestamp();
 
   }
@@ -260,7 +269,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    double startOfPeriodic = Timer.getFPGATimestamp();
     swerve.periodic();
     arm.periodic();
     claw.periodic();
@@ -672,8 +680,6 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kBothRumble, 0);
     
     }
-
-    SmartDashboard.putNumber("Timer/dT", Timer.getFPGATimestamp() - startOfPeriodic);
   }
 
   @Override
