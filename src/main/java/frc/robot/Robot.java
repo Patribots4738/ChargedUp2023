@@ -267,7 +267,7 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 134.9) {
+    if (timer.get() > 134.9 && timer.get() < 136) {
       swerve.setWheelsUp();
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
       return;
