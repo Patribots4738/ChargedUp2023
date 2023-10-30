@@ -57,18 +57,18 @@ public final class Constants {
         public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
 
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                           // Front Positive,   Left Positive
-            new Translation2d( WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Front Left
-            new Translation2d( WHEEL_BASE / 2, -TRACK_WIDTH / 2),  // Front Right
-            new Translation2d(-WHEEL_BASE / 2,  TRACK_WIDTH / 2),  // Rear  Left
-            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear  Right
+                // Front Positive, Left Positive
+                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // Front Left
+                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // Front Right
+                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // Rear Left
+                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
 
         // Angular offsets of the modules relative to the chassis in radians
         // add 90 degrees to change the X and Y axis
-        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180+90);
-        public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90+90);
-        public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90+90);
-        public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0+90);
+        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(180 + 90);
+        public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(-90 + 90);
+        public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(90 + 90);
+        public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.toRadians(0 + 90);
 
         // Driving motors CAN IDs (EVEN)
         public static final int FRONT_LEFT_DRIVING_CAN_ID = 3;
@@ -86,12 +86,15 @@ public final class Constants {
     }
 
     public static final class ModuleConstants {
-        // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
-        // This changes the drive speed of the module (a pinion gear with more teeth will result in a
+        // The MAXSwerve module can be configured with one of three pinion gears: 12T,
+        // 13T, or 14T.
+        // This changes the drive speed of the module (a pinion gear with more teeth
+        // will result in a
         // robot that drives faster).
         public static final int DRIVING_MOTOR_PINION_TEETH = 13;
 
-        // Invert the turning encoder, since the output shaft rotates in the opposite direction of
+        // Invert the turning encoder, since the output shaft rotates in the opposite
+        // direction of
         // the steering motor in the MAXSwerve Module.
         public static final boolean TURNING_ENCODER_INVERTED = true;
 
@@ -99,9 +102,11 @@ public final class Constants {
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.FREE_SPEED_RPM / 60;
         public static final double WHEEL_DIAMETER_METERS = 0.0762;
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-        // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
+        // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
+        // teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (DRIVING_MOTOR_PINION_TEETH * 15);
-        public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE_METERS)
+        public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
+                * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION;
 
         public static final double DRIVING_ENCODER_POSITION_FACTOR = (WHEEL_DIAMETER_METERS * Math.PI)
@@ -142,7 +147,8 @@ public final class Constants {
         public static final double OPERATOR_DEADBAND = 0.15;
 
         // See https://www.desmos.com/calculator/e07raajzh5
-        // And https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
+        // And
+        // https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
     }
@@ -150,19 +156,20 @@ public final class Constants {
     public static final class AutoConstants {
 
         public static final double MAX_SPEED_METERS_PER_SECOND = 3; // 2.5 has worked very well for us so far
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5; // 2.5; (2.5vel and 2.5accel output
+                                                                                     // 3s runtime on _1_A)
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 9;//Math.PI/1.7;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 9;// Math.PI/1.7;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 2.5;//7;
+        public static final double X_CORRECTION_P = 2.5;// 7;
         public static final double X_CORRECTION_I = 0;
         public static final double X_CORRECTION_D = 0.2;
 
-        public static final double Y_CORRECTION_P = 2.5;//6.03;
+        public static final double Y_CORRECTION_P = 2.5;// 6.03;
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0.2;
 
@@ -175,21 +182,21 @@ public final class Constants {
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
         public static final HolonomicDriveController HDC = new HolonomicDriveController(
-            new PIDController(
-                AutoConstants.X_CORRECTION_P,
-                AutoConstants.X_CORRECTION_I,
-                AutoConstants.X_CORRECTION_D),
-            new PIDController(
-                AutoConstants.Y_CORRECTION_P,
-                AutoConstants.Y_CORRECTION_I,
-                AutoConstants.Y_CORRECTION_D),
-            new ProfiledPIDController(
-                AutoConstants.ROTATION_CORRECTION_P,
-                AutoConstants.ROTATION_CORRECTION_I,
-                AutoConstants.ROTATION_CORRECTION_D,
-                new TrapezoidProfile.Constraints(
-                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
+                new PIDController(
+                        AutoConstants.X_CORRECTION_P,
+                        AutoConstants.X_CORRECTION_I,
+                        AutoConstants.X_CORRECTION_D),
+                new PIDController(
+                        AutoConstants.Y_CORRECTION_P,
+                        AutoConstants.Y_CORRECTION_I,
+                        AutoConstants.Y_CORRECTION_D),
+                new ProfiledPIDController(
+                        AutoConstants.ROTATION_CORRECTION_P,
+                        AutoConstants.ROTATION_CORRECTION_I,
+                        AutoConstants.ROTATION_CORRECTION_D,
+                        new TrapezoidProfile.Constraints(
+                                AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                                AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
     }
 
     public static final class ClawConstants {
@@ -219,258 +226,269 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-      public static final int LOWER_ARM_LEFT_MOTOR_CAN_ID = 10;
-      public static final int LOWER_ARM_RIGHT_MOTOR_CAN_ID = 9;
-      public static final int UPPER_ARM_MOTOR_CAN_ID = 11;
+        public static final int LOWER_ARM_LEFT_MOTOR_CAN_ID = 10;
+        public static final int LOWER_ARM_RIGHT_MOTOR_CAN_ID = 9;
+        public static final int UPPER_ARM_MOTOR_CAN_ID = 11;
 
-      // The gear ratio of the lower arm is 84:1
-      public static final double LOWER_ARM_GEAR_RATIO = (84);
+        // The gear ratio of the lower arm is 84:1
+        public static final double LOWER_ARM_GEAR_RATIO = (84);
 
-      // The gear ratio of the upper arm is 115:1
-      public static final double UPPER_ARM_GEAR_RATIO = (115);
+        // The gear ratio of the upper arm is 115:1
+        public static final double UPPER_ARM_GEAR_RATIO = (115);
 
-      // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
-      public static final int LOWER_FREE_LIMIT = 50;
-      public static final int LOWER_STALL_LIMIT = 50;
-      // Make the max RPM equal to 1/4 rotations per second
-      public static final int LOWER_MAX_RPM = ((int) (LOWER_ARM_GEAR_RATIO) * 15);
+        // UNFINISHED, CURRENT LIMITS TO SLOW MOTORS
+        public static final int LOWER_FREE_LIMIT = 50;
+        public static final int LOWER_STALL_LIMIT = 50;
+        // Make the max RPM equal to 1/4 rotations per second
+        public static final int LOWER_MAX_RPM = ((int) (LOWER_ARM_GEAR_RATIO) * 15);
 
-      public static final int UPPER_FREE_LIMIT = 50;
-      public static final int UPPER_STALL_LIMIT = 50;
-      // Make the max RPM equal to 1/4 rotations per second
+        public static final int UPPER_FREE_LIMIT = 50;
+        public static final int UPPER_STALL_LIMIT = 50;
+        // Make the max RPM equal to 1/4 rotations per second
 
-      public static final int UPPER_MAX_RPM = ((int) (UPPER_ARM_GEAR_RATIO) * 15);
+        public static final int UPPER_MAX_RPM = ((int) (UPPER_ARM_GEAR_RATIO) * 15);
 
-      // The length of the first pivot point to the second pivot point, in inches
-      public static final double LOWER_ARM_LENGTH = 34.096;
+        // The length of the first pivot point to the second pivot point, in inches
+        public static final double LOWER_ARM_LENGTH = 34.096;
 
-      // The length of the second pivot point to the claw, in inches
-      public static final double UPPER_ARM_LENGTH = 23;
+        // The length of the second pivot point to the claw, in inches
+        public static final double UPPER_ARM_LENGTH = 23;
 
-      // The max reach of the bot horizontally, in inches
-      // This is not taking into account the claw length, and is only for IK
-      public static final double MAX_REACH = LOWER_ARM_LENGTH + UPPER_ARM_LENGTH;
+        // The max reach of the bot horizontally, in inches
+        // This is not taking into account the claw length, and is only for IK
+        public static final double MAX_REACH = LOWER_ARM_LENGTH + UPPER_ARM_LENGTH;
 
-      public static final double MIN_REACH = LOWER_ARM_LENGTH - UPPER_ARM_LENGTH;
+        public static final double MIN_REACH = LOWER_ARM_LENGTH - UPPER_ARM_LENGTH;
 
-      // Limit the max Y reach of the arm, due to the rules stating we cannot be over 6'6"
-      // 78 inches is the rule, 11 inches is the base of the pivot of the arm to the ground
-      public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_INCHES;
-      public static final double MAX_REACH_X = 48 + (Units.metersToInches(PlacementConstants.ROBOT_LENGTH_METERS) / 2.0) - ClawConstants.CLAW_LENGTH_INCHES;
+        // Limit the max Y reach of the arm, due to the rules stating we cannot be over
+        // 6'6"
+        // 78 inches is the rule, 11 inches is the base of the pivot of the arm to the
+        // ground
+        public static final double MAX_REACH_Y = 78 - 11 - ClawConstants.CLAW_LENGTH_INCHES;
+        public static final double MAX_REACH_X = 48
+                + (Units.metersToInches(PlacementConstants.ROBOT_LENGTH_METERS) / 2.0)
+                - ClawConstants.CLAW_LENGTH_INCHES;
 
-      // When the arm is near the top of the limit, the arm will flip to the other solution
-      // This is to prevent the upper arm from going above the limit when that happens.
-      public static final double ARM_FLIP_X = 6.5;
+        // When the arm is near the top of the limit, the arm will flip to the other
+        // solution
+        // This is to prevent the upper arm from going above the limit when that
+        // happens.
+        public static final double ARM_FLIP_X = 6.5;
 
-      // Multiply the absolute encoder output to get radians instead of rotations
-      public static final double LOWER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
-      public static final double UPPER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
+        // Multiply the absolute encoder output to get radians instead of rotations
+        public static final double LOWER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
+        public static final double UPPER_ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
 
-      public static final double LOWER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
-      public static final double UPPER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
+        public static final double LOWER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
+        public static final double UPPER_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60; // Radians per second
 
-      // The number of degrees that the upper arm can rotate from parallel to the front of the bot
-      // Add 90 to lower arm's upper limit b/c the zero is perpendicular to chassis
-      public static final double LOWER_ARM_LOWER_LIMIT = 1.6;
-      public static final double LOWER_ARM_UPPER_LIMIT = 4.3;
+        // The number of degrees that the upper arm can rotate from parallel to the
+        // front of the bot
+        // Add 90 to lower arm's upper limit b/c the zero is perpendicular to chassis
+        public static final double LOWER_ARM_LOWER_LIMIT = 1.6;
+        public static final double LOWER_ARM_UPPER_LIMIT = 4.3;
 
-      // The number of degrees that the upper arm can rotate from the base of the lower arm
-      // Add 23 to the lower limit because the upper arm can only start 23* from the lower arm
-      public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(21);
-      public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(180);
+        // The number of degrees that the upper arm can rotate from the base of the
+        // lower arm
+        // Add 23 to the lower limit because the upper arm can only start 23* from the
+        // lower arm
+        public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(21);
+        public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(180);
 
-      // The amount of error allowed for the arm's position, in Radians
-      // This is primarily used in autonomous
-      public static final double LOWER_ARM_DEADBAND_COARSE = Math.toRadians(15);
-      public static final double UPPER_ARM_DEADBAND_COARSE = Math.toRadians(20);
+        // The amount of error allowed for the arm's position, in Radians
+        // This is primarily used in autonomous
+        public static final double LOWER_ARM_DEADBAND_COARSE = Math.toRadians(15);
+        public static final double UPPER_ARM_DEADBAND_COARSE = Math.toRadians(20);
 
-      public static final double LOWER_ARM_DEADBAND_FINE = Math.toRadians(7);
-      public static final double UPPER_ARM_DEADBAND_FINE = Math.toRadians(15);
+        public static final double LOWER_ARM_DEADBAND_FINE = Math.toRadians(7);
+        public static final double UPPER_ARM_DEADBAND_FINE = Math.toRadians(15);
 
+        // The outputs used in the output range for the lower and upper arms
+        public static final double LOWER_MAX_OUTPUT = 0.85;
+        public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
 
-      // The outputs used in the output range for the lower and upper arms
-      public static final double LOWER_MAX_OUTPUT = 0.85;
-      public static final double LOWER_MIN_OUTPUT = -LOWER_MAX_OUTPUT;
+        public static final double UPPER_MAX_OUTPUT = 0.95;
+        public static final double UPPER_MIN_OUTPUT = -0.4;
 
-      public static final double UPPER_MAX_OUTPUT = 0.95;
-      public static final double UPPER_MIN_OUTPUT = -0.4;
+        /**
+         * SysID values:
+         * <p>
+         * Lower:
+         * P = 0.0032326
+         * D = 0.0012612
+         * <p>
+         */
+        // PID values for the lower and upper arm
+        public static final double LOWER_P = 0.8;// 0.25;
+        public static final double LOWER_I = 0.0001;
+        public static final double LOWER_D = 0.1;
+        public static final double LOWER_FF = 1;
 
-      /**
-       * SysID values:
-       * <p>
-       * Lower:
-       * P = 0.0032326
-       * D = 0.0012612
-       * <p>
-       */
-      // PID values for the lower and upper arm
-      public static final double LOWER_P = 0.8;//0.25;
-      public static final double LOWER_I = 0.0001;
-      public static final double LOWER_D = 0.1;
-      public static final double LOWER_FF = 1;
+        public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
+        public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double LOWER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
-      public static final double LOWER_ENCODER_POSITION_PID_MAX_INPUT = LOWER_ENCODER_POSITION_FACTOR; // radians
+        public static final double UPPER_P = 0.8;// .25;
+        public static final double UPPER_I = 0.0001;
+        public static final double UPPER_D = 0.3;
+        public static final double UPPER_FF = 1;
 
-      public static final double UPPER_P = 0.8;//.25;
-      public static final double UPPER_I = 0.0001;
-      public static final double UPPER_D = 0.3;
-      public static final double UPPER_FF = 1;
+        public static final double UPPER_P2 = 8;
+        public static final double UPPER_I2 = 0;
+        public static final double UPPER_D2 = 0.4;
 
-      public static final double UPPER_P2 = 8;
-      public static final double UPPER_I2 = 0;
-      public static final double UPPER_D2 = 0.4;
+        public static final double UPPER_P3 = 2;
+        public static final double UPPER_I3 = 0;
+        public static final double UPPER_D3 = 0.4;
 
-      public static final double UPPER_P3 = 2;
-      public static final double UPPER_I3 = 0;
-      public static final double UPPER_D3 = 0.4;
+        public static final boolean UPPER_PID_SLOT_MAIN = true;
+        public static final boolean UPPER_PID_SLOT_ALTERNATE = false;
 
-      public static final boolean UPPER_PID_SLOT_MAIN = true;
-      public static final boolean UPPER_PID_SLOT_ALTERNATE = false;
+        public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
+        public static final double UPPER_ENCODER_POSITION_PID_MAX_INPUT = UPPER_ENCODER_POSITION_FACTOR; // radians
 
-      public static final double UPPER_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
-      public static final double UPPER_ENCODER_POSITION_PID_MAX_INPUT = UPPER_ENCODER_POSITION_FACTOR; // radians
+        /**
+         * FF is a predictive formula that uses the input of where we want to be to
+         * predict the path required to get there
+         * This is an open loop, and thus unable to react to the effects of disturbances
+         * / unknown disturbances.
+         * Because of this, we need to give it disturbance data, which is why we use
+         * sysID
+         * It then uses the data to predict the output of the motor, creating a more
+         * accurate prediction
+         * <p>
+         * In contrast, a closed loop is commonly used as PID, looking and reacting to
+         * the current position
+         * in opposition to the desired position, taking note of any disturbance that
+         * affected the motor.
+         * Since weight, and more importantly, the things connected to the arm are
+         * changing,
+         * making it difficult to perfectly tune
+         * <p>
+         * We are using a very small combination of both, using the FF to predict the
+         * path, and PID to correct for error
+         * FF will be doing the heavy lifting, and PID will only be small finishing
+         * touches for perfection.
+         * 👌
+         */
+        public static final double S_LOWER = -0.10452;
+        public static final double G_LOWER = 0;
+        public static final double V_LOWER = 10.914;
+        public static final double A_LOWER = 1.7823;
 
-      /**
-       * FF is a predictive formula that uses the input of where we want to be to predict the path required to get there
-       * This is an open loop, and thus unable to react to the effects of disturbances / unknown disturbances.
-       * Because of this, we need to give it disturbance data, which is why we use sysID
-       * It then uses the data to predict the output of the motor, creating a more accurate prediction
-       * <p>
-       * In contrast, a closed loop is commonly used as PID, looking and reacting to the current position
-       * in opposition to the desired position, taking note of any disturbance that affected the motor.
-       * Since weight, and more importantly, the things connected to the arm are changing,
-       * making it difficult to perfectly tune
-       * <p>
-       * We are using a very small combination of both, using the FF to predict the path, and PID to correct for error
-       * FF will be doing the heavy lifting, and PID will only be small finishing touches for perfection.
-       * 👌
-       */
-      public static final double S_LOWER = -0.10452;
-      public static final double G_LOWER = 0;
-      public static final double V_LOWER = 10.914;
-      public static final double A_LOWER = 1.7823;
+        public static final ArmFeedforward lowerfeedForward = new ArmFeedforward(
+                ArmConstants.S_LOWER,
+                ArmConstants.G_LOWER,
+                ArmConstants.V_LOWER,
+                ArmConstants.A_LOWER);
 
-      public static final ArmFeedforward lowerfeedForward = new ArmFeedforward(
-        ArmConstants.S_LOWER,
-        ArmConstants.G_LOWER,
-        ArmConstants.V_LOWER,
-        ArmConstants.A_LOWER
-      );
-
-      public static final double S_UPPER = 0.1382;
-      public static final double G_UPPER = 0; //1.0051; // (We don't like gravity)
-      public static final double V_UPPER = 1.7457;
-      public static final double A_UPPER = 0.6718;
+        public static final double S_UPPER = 0.1382;
+        public static final double G_UPPER = 0; // 1.0051; // (We don't like gravity)
+        public static final double V_UPPER = 1.7457;
+        public static final double A_UPPER = 0.6718;
 
         public static final ArmFeedforward upperfeedForward = new ArmFeedforward(
-            ArmConstants.S_UPPER,
-            ArmConstants.G_UPPER,
-            ArmConstants.V_UPPER,
-            ArmConstants.A_UPPER
-        );
+                ArmConstants.S_UPPER,
+                ArmConstants.G_UPPER,
+                ArmConstants.V_UPPER,
+                ArmConstants.A_UPPER);
 
-      
     }
 
     public static final class LEDConstants {
 
-      public static final int ARDUINO_ADDRESS = 8;
+        public static final int ARDUINO_ADDRESS = 8;
 
-      public static final int BELLY_PAN_RAINBOW = 0;
-      public static final int BELLY_PAN_RED_ALLIANCE = 2;
-      public static final int BELLY_PAN_FLASH_RED = 3;
-      public static final int BELLY_PAN_RED = 4;
-      public static final int BELLY_PAN_BLUE = 5;
-      public static final int BELLY_PAN_GREEN = 6;
-      public static final int BELLY_PAN_PURPLE = 7;
-      public static final int BELLY_PAN_YELLOW = 8;
-      public static final int BELLY_PAN_BLACK = 9;
-      public static final int BELLY_PAN_GREEN_BLINK = 106;
-      public static final int BELLY_PAN_PURPLE_BLINK = 107;
-      public static final int BELLY_PAN_YELLOW_BLINK = 108;
-      public static final int BELLY_PAN_CHROMA = 109;
+        public static final int BELLY_PAN_RAINBOW = 0;
+        public static final int BELLY_PAN_RED_ALLIANCE = 2;
+        public static final int BELLY_PAN_FLASH_RED = 3;
+        public static final int BELLY_PAN_RED = 4;
+        public static final int BELLY_PAN_BLUE = 5;
+        public static final int BELLY_PAN_GREEN = 6;
+        public static final int BELLY_PAN_PURPLE = 7;
+        public static final int BELLY_PAN_YELLOW = 8;
+        public static final int BELLY_PAN_BLACK = 9;
+        public static final int BELLY_PAN_GREEN_BLINK = 106;
+        public static final int BELLY_PAN_PURPLE_BLINK = 107;
+        public static final int BELLY_PAN_YELLOW_BLINK = 108;
+        public static final int BELLY_PAN_CHROMA = 109;
 
+        public static final int SPONSOR_PANEL_RAINBOW = 10;
+        public static final int SPONSOR_PANEL_THEATER_CHASE_RAINBOW = 11;
+        public static final int SPONSOR_PANEL_THEATER_CHASE = 12;
+        public static final int SPONSOR_PANEL_FLASH_RED = 13;
+        public static final int SPONSOR_PANEL_RED = 14;
+        public static final int SPONSOR_PANEL_BLUE = 15;
+        public static final int SPONSOR_PANEL_GREEN = 16;
+        public static final int SPONSOR_PANEL_PURPLE = 17;
+        public static final int SPONSOR_PANEL_YELLOW = 18;
+        public static final int SPONSOR_PANEL_BLACK = 19;
 
-      public static final int SPONSOR_PANEL_RAINBOW = 10;
-      public static final int SPONSOR_PANEL_THEATER_CHASE_RAINBOW = 11;
-      public static final int SPONSOR_PANEL_THEATER_CHASE = 12;
-      public static final int SPONSOR_PANEL_FLASH_RED = 13;
-      public static final int SPONSOR_PANEL_RED = 14;
-      public static final int SPONSOR_PANEL_BLUE = 15;
-      public static final int SPONSOR_PANEL_GREEN = 16;
-      public static final int SPONSOR_PANEL_PURPLE = 17;
-      public static final int SPONSOR_PANEL_YELLOW = 18;
-      public static final int SPONSOR_PANEL_BLACK = 19;
+        public static final int ARM_RAINBOW = 20;
+        public static final int ARM_THEATER_CHASE_RAINBOW = 21;
+        public static final int ARM_THEATER_CHASE = 22;
+        public static final int PROGRAM_23 = 23;
+        public static final int ARM_RED = 24;
+        public static final int ARM_BLUE = 25;
+        public static final int ARM_GREEN = 26;
+        public static final int ARM_PURPLE = 27;
+        public static final int ARM_YELLOW = 28;
+        public static final int ARM_BLACK = 29;
 
-
-      public static final int ARM_RAINBOW = 20;
-      public static final int ARM_THEATER_CHASE_RAINBOW = 21;
-      public static final int ARM_THEATER_CHASE = 22;
-      public static final int PROGRAM_23 = 23;
-      public static final int ARM_RED = 24;
-      public static final int ARM_BLUE = 25;
-      public static final int ARM_GREEN = 26;
-      public static final int ARM_PURPLE = 27;
-      public static final int ARM_YELLOW = 28;
-      public static final int ARM_BLACK = 29;
-
-
-      public static final int CLAW_RAINBOW = 30;
-      public static final int CLAW_THEATER_CHASE_RAINBOW = 31;
-      public static final int CLAW_THEATER_CHASE = 32;
-      public static final int PROGRAM_33 = 33;
-      public static final int CLAW_RED = 34;
-      public static final int CLAW_BLUE = 35;
-      public static final int CLAW_GREEN = 36;
-      public static final int CLAW_PURPLE = 37;
-      public static final int CLAW_YELLOW = 38;
-      public static final int CLAW_BLACK = 39;
+        public static final int CLAW_RAINBOW = 30;
+        public static final int CLAW_THEATER_CHASE_RAINBOW = 31;
+        public static final int CLAW_THEATER_CHASE = 32;
+        public static final int PROGRAM_33 = 33;
+        public static final int CLAW_RED = 34;
+        public static final int CLAW_BLUE = 35;
+        public static final int CLAW_GREEN = 36;
+        public static final int CLAW_PURPLE = 37;
+        public static final int CLAW_YELLOW = 38;
+        public static final int CLAW_BLACK = 39;
     }
 
     public static final class VisionConstants {
 
-      public static final String CAMERA_1_NAME = "FrontCam";
-      public static final String CAMERA_2_NAME = "BackCam";
-      public static final double AMBIGUITY_THRESHOLD = 0.04;
-      // The latency of the camera, in seconds
-      // divide by 1000 since it is in milliseconds.
-      public static final double LATENCY = 13.0/1000.0;
+        public static final String CAMERA_1_NAME = "FrontCam";
+        public static final String CAMERA_2_NAME = "BackCam";
+        public static final double AMBIGUITY_THRESHOLD = 0.04;
+        // The latency of the camera, in seconds
+        // divide by 1000 since it is in milliseconds.
+        public static final double LATENCY = 13.0 / 1000.0;
 
-      // Distance from the camera to the center
-      public static final Transform3d CAMERA_1_POSITION = new Transform3d(
-          new Translation3d(
-              // Forward
-              Units.inchesToMeters(2),
-              // Left (neg because it's right)
-              Units.inchesToMeters(-6),
-              // Up
-              Units.inchesToMeters(10.25)),
-          new Rotation3d(
-              0,
-              0,
-              0));
+        // Distance from the camera to the center
+        public static final Transform3d CAMERA_1_POSITION = new Transform3d(
+                new Translation3d(
+                        // Forward
+                        Units.inchesToMeters(2),
+                        // Left (neg because it's right)
+                        Units.inchesToMeters(-6),
+                        // Up
+                        Units.inchesToMeters(10.25)),
+                new Rotation3d(
+                        0,
+                        0,
+                        0));
 
-      // Distance from the camera to the center
-      public static final Transform3d CAMERA_2_POSITION = new Transform3d(
-          new Translation3d(
-              // Forward (neg because it's backwards)
-              Units.inchesToMeters(-10),
-              // Left 
-              Units.inchesToMeters(-6.125),
-              // Up
-              Units.inchesToMeters(9.438)),
-          new Rotation3d(
-              0,
-              180,
-              0));
+        // Distance from the camera to the center
+        public static final Transform3d CAMERA_2_POSITION = new Transform3d(
+                new Translation3d(
+                        // Forward (neg because it's backwards)
+                        Units.inchesToMeters(-10),
+                        // Left
+                        Units.inchesToMeters(-6.125),
+                        // Up
+                        Units.inchesToMeters(9.438)),
+                new Rotation3d(
+                        0,
+                        180,
+                        0));
     }
 
     public static final class FieldConstants {
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
-        
+
         public static final double CONE_OFFSET_METERS = 0.542615;
         public static final double GRID_BARRIER_METERS = Units.inchesToMeters(12); // real is 14-15
         public static final double SUBSTATION_OFFSET_METERS = 0.7;
@@ -480,265 +498,291 @@ public final class Constants {
         public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
         public static Alliance ALLIANCE = Alliance.Invalid;
+
         public static enum GameMode {
             DISABLED,
             AUTONOMOUS,
             TELEOP,
             TEST
         };
+
         public static GameMode GAME_MODE;
 
         // The below code is not used, and is only here for reference...
         // We instead use PhotonCameraPose.AprilTagFieldLayout
         // private final Pose3d TAG_0_POSE = null;
-        // private final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        // private final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.91), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        // private final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        // private final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, 0));
-        // private final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25), Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        // private final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        // private final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-        // private final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+        // private final Pose3d TAG_1_POSE = new Pose3d(Units.inchesToMeters(610.77),
+        // Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // 0));
+        // private final Pose3d TAG_2_POSE = new Pose3d(Units.inchesToMeters(610.77),
+        // Units.inchesToMeters(108.91), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // 0));
+        // private final Pose3d TAG_3_POSE = new Pose3d(Units.inchesToMeters(610.77),
+        // Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // 0));
+        // private final Pose3d TAG_4_POSE = new Pose3d(Units.inchesToMeters(636.96),
+        // Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // 0));
+        // private final Pose3d TAG_5_POSE = new Pose3d(Units.inchesToMeters(14.25),
+        // Units.inchesToMeters(265.74), HUMAN_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // Units.degreesToRadians(180)));
+        // private final Pose3d TAG_6_POSE = new Pose3d(Units.inchesToMeters(40.45),
+        // Units.inchesToMeters(174.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // Units.degreesToRadians(180)));
+        // private final Pose3d TAG_7_POSE = new Pose3d(Units.inchesToMeters(40.45),
+        // Units.inchesToMeters(108.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // Units.degreesToRadians(180)));
+        // private final Pose3d TAG_8_POSE = new Pose3d(Units.inchesToMeters(40.45),
+        // Units.inchesToMeters(42.19), GRID_TAG_HEIGHT_METERS, new Rotation3d(0, 0,
+        // Units.degreesToRadians(180)));
     }
 
     public static final class PlacementConstants {
 
-      // The length of the robot
-      public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
-      // Length of the bumpers on the robot
-      public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
+        public static boolean CONE_MODE = true;
 
-      public static final double CONE_BASE_RADIUS = Units.inchesToMeters(6.629+2)/2;
+        // The length of the robot
+        public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
+        // Length of the bumpers on the robot
+        public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
 
-      public static final int STOWED_INDEX = 0;
-      public static final int HYBRID_PLACEMENT_INDEX = 1;
-      public static final int CONE_MID_PLACEMENT_INDEX = 2;
-      public static final int CONE_HIGH_PLACEMENT_INDEX = 3;
-      public static final int HUMAN_TAG_PICKUP_INDEX = 4;
-      public static final int CUBE_MID_INDEX = 5;
-      public static final int CUBE_HIGH_PLACEMENT_INDEX = 6;
-      public static final int FLOOR_INTAKE_INDEX = 7;
-      @Deprecated // Please use ARM_FLIP_INDEX instead...
-      public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
-      public static final int ARM_FLIP_INDEX = 9;
-      public static final int HIGH_TO_STOWED_INDEX = 10;
-      public static final int LONG_ARM_REACH_INDEX = 11;
-      public static final int FLOOR_INTAKE_PREP_INDEX = 12;
-      public static final int CONE_HIGH_PREP_INDEX = 13;
-      public static final int CONE_HIGH_PREP_TO_PLACE_INDEX = 14;
-      public static final int CONE_INTAKE_INDEX = 15;
-      public static final int CUBE_INTAKE_INDEX = 16;
-      public static final int CONE_FLIP_INDEX = 17;
-      public static final int CONE_MID_PREP_INDEX = 18;
-      public static final int CONE_MID_PREP_TO_PLACE_INDEX = 19;
-      public static final int AUTO_INIT_INDEX = 20;
-      public static final int AUTO_CUBE_INTAKE_INDEX = 21;
-      public static final int AUTO_CUBE_HIGH_INDEX = 22;
-      public static final int AUTO_CUBE_MID_INDEX = 23;
-      public static final int MID_TO_STOWED_INDEX = 24;
+        public static final double CONE_BASE_RADIUS = Units.inchesToMeters(6.629 + 2) / 2;
 
-      public static final double CLAW_INTAKE_SPEED_CONE = 1;
-      public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
-      public static final double CLAW_INTAKE_SPEED_CUBE = 0.5;
-      public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
-      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE = -0.3;
-      public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST = -0.8;
+        public static final int STOWED_INDEX = 0;
+        public static final int HYBRID_PLACEMENT_INDEX = 1;
+        public static final int CONE_MID_PLACEMENT_INDEX = 2;
+        public static final int CONE_HIGH_PLACEMENT_INDEX = 3;
+        public static final int HUMAN_TAG_PICKUP_INDEX = 4;
+        public static final int CUBE_MID_INDEX = 5;
+        public static final int CUBE_HIGH_PLACEMENT_INDEX = 6;
+        public static final int FLOOR_INTAKE_INDEX = 7;
+        @Deprecated // Please use ARM_FLIP_INDEX instead...
+        public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
+        public static final int ARM_FLIP_INDEX = 9;
+        public static final int HIGH_TO_STOWED_INDEX = 10;
+        public static final int LONG_ARM_REACH_INDEX = 11;
+        public static final int FLOOR_INTAKE_PREP_INDEX = 12;
+        public static final int CONE_HIGH_PREP_INDEX = 13;
+        public static final int CONE_HIGH_PREP_TO_PLACE_INDEX = 14;
+        public static final int CONE_INTAKE_INDEX = 15;
+        public static final int CUBE_INTAKE_INDEX = 16;
+        public static final int CONE_FLIP_INDEX = 17;
+        public static final int CONE_MID_PREP_INDEX = 18;
+        public static final int CONE_MID_PREP_TO_PLACE_INDEX = 19;
+        public static final int AUTO_INIT_INDEX = 20;
+        public static final int AUTO_CUBE_INTAKE_INDEX = 21;
+        public static final int AUTO_CUBE_HIGH_INDEX = 22;
+        public static final int AUTO_CUBE_MID_INDEX = 23;
+        public static final int MID_TO_STOWED_INDEX = 24;
 
-      public static final double CLAW_STOPPED_SPEED = 0;
-      
-      public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0,20);
-      //@Deprecated Please use ARM_FLIP_POSITION instead...
-      // public static final Translation2d SOLUTION_FLIP_POSITION_POSITIVE = new Translation2d(28, 45);
-      //@Deprecated Please use ARM_FLIP_POSITION instead...
-      // public static final Translation2d SOLUTION_FLIP_POSITION_NEGATIVE = new Translation2d(-28,45);
-      public static final Translation2d ARM_FLIP_POSITION_1 = new Translation2d(-40, 30);
-      public static final Translation2d ARM_FLIP_POSITION_2 = new Translation2d(-23, 22);
-      public static final Translation2d ARM_FLIP_POSITION_3 = new Translation2d(-9.45, 7.4);
+        public static final double CLAW_INTAKE_SPEED_CONE = 1;
+        public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
+        public static final double CLAW_INTAKE_SPEED_CUBE = 0.5;
+        public static final double CLAW_OUTTAKE_SPEED_CUBE = -0.3;
+        public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE = -0.3;
+        public static final double AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST = -0.8;
 
+        public static final double CLAW_STOPPED_SPEED = 0;
 
-      // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new Translation2d(19, 10);
-      // public static final Translation2d FLOOR_INTAKE_POSITION = new Translation2d(19, 2);
+        public static final Translation2d SOLUTION_FLIP_TRANSITION_POINT = new Translation2d(0, 20);
+        // @Deprecated Please use ARM_FLIP_POSITION instead...
+        // public static final Translation2d SOLUTION_FLIP_POSITION_POSITIVE = new
+        // Translation2d(28, 45);
+        // @Deprecated Please use ARM_FLIP_POSITION instead...
+        // public static final Translation2d SOLUTION_FLIP_POSITION_NEGATIVE = new
+        // Translation2d(-28,45);
+        public static final Translation2d ARM_FLIP_POSITION_1 = new Translation2d(-40, 30);
+        public static final Translation2d ARM_FLIP_POSITION_2 = new Translation2d(-23, 22);
+        public static final Translation2d ARM_FLIP_POSITION_3 = new Translation2d(-9.45, 7.4);
 
-      public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d((((Units.metersToInches(ROBOT_LENGTH_METERS)/2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
-      public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
-      public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(15, 7);
-      public static final Translation2d CUBE_INTAKE_POSITION_AUTO_0 = new Translation2d(14, 8);
-      public static final Translation2d CUBE_INTAKE_POSITION_AUTO_1 = new Translation2d(10, 8);
-      public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d(15.4, 3.78);
+        // public static final Translation2d FLOOR_INTAKE_PREP_POSITION = new
+        // Translation2d(19, 10);
+        // public static final Translation2d FLOOR_INTAKE_POSITION = new
+        // Translation2d(19, 2);
 
-      public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 5);
-      // public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(25, 5);
-      
-      public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
-      public static final Translation2d STOWED_HALFWAY = new Translation2d(9.4, 20.8);
-      public static final Translation2d STOWED_POSITION = new Translation2d(3.5, 14);
-      public static final Translation2d AUTO_INIT_PICKUP = new Translation2d(12.43, 8);
+        public static final Translation2d CUBE_INTAKE_POSITION_PREP = new Translation2d(
+                (((Units.metersToInches(ROBOT_LENGTH_METERS) / 2.0) + Units.metersToInches(BUMPER_LENGTH_METERS))), 15);
+        public static final Translation2d CONE_INTAKE_POSITION_PREP = new Translation2d(30, 5);
+        public static final Translation2d CUBE_INTAKE_POSITION = new Translation2d(15, 7);
+        public static final Translation2d CUBE_INTAKE_POSITION_AUTO_0 = new Translation2d(14, 8);
+        public static final Translation2d CUBE_INTAKE_POSITION_AUTO_1 = new Translation2d(10, 8);
+        public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d(15.4, 3.78);
 
-      public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
-      public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(29, 32.88);
-      public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(26, 21.00);
-      public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
-      public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
-      public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 25);
-      public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 26.75);
-      public static final Translation2d CUBE_HIGH = new Translation2d(40, 34);
-      public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(44, 35);//41 on Y
-      public static final Translation2d CUBE_MID = new Translation2d(20,25);
-      public static final Translation2d CUBE_MID_AUTO = new Translation2d(23, 25);
+        public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 5);
+        // public static final Translation2d CONE_FLIP_POSITION_0 = new
+        // Translation2d(25, 5);
 
-      public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
-      public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
-      public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
+        public static final Translation2d TRANSITION_POSITION = new Translation2d(10, 37);
+        public static final Translation2d STOWED_HALFWAY = new Translation2d(9.4, 20.8);
+        public static final Translation2d STOWED_POSITION = new Translation2d(3.5, 14);
+        public static final Translation2d AUTO_INIT_PICKUP = new Translation2d(12.43, 8);
 
-      public static final Translation2d HIGH_CONE_PREP = new Translation2d(38.92, 39.73);
-      public static final Translation2d MID_CONE_PREP = new Translation2d(24,35);
-      public static final Translation2d HIGH_RETRACT = new Translation2d(26.35, 33);
+        public static final Translation2d HYBRID_POSITION = new Translation2d(14, 13);
+        public static final Translation2d MID_CONE_POSITION_0 = new Translation2d(29, 32.88);
+        public static final Translation2d MID_CONE_POSITION_1 = new Translation2d(26, 21.00);
+        public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
+        public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
+        public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 25);
+        public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 26.75);
+        public static final Translation2d CUBE_HIGH = new Translation2d(40, 34);
+        public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(44, 35);// 41 on Y
+        public static final Translation2d CUBE_MID = new Translation2d(20, 25);
+        public static final Translation2d CUBE_MID_AUTO = new Translation2d(23, 25);
 
-      public static final Translation2d[][] ARM_POSITIONS = {
-        // Index 0 | Stowed
-        {
-          TRANSITION_POSITION,
-        //   STOWED_HALFWAY,
-          STOWED_POSITION
-        },
-        // Index 1 | Hybrid
-        {
-          HYBRID_POSITION
-        },
-        // Index 2 | Mid Cone
-        {
-          TRANSITION_POSITION,
-          MID_CONE_POSITION_0,
-          MID_CONE_POSITION_1
-        },
-        // Index 3 | High Cone
-        {
-          TRANSITION_POSITION,
-          HIGH_CONE_POSITION_0,
-          // HIGH_CONE_POSITION_1,
-          HIGH_CONE_POSITION_2
-        },
-        // Index 4 | Human Tag
-        {
-          HUMAN_TAG_PICKUP
-        },
-        // Index 5 | Cube Mid
-        {
-          TRANSITION_POSITION,
-          CUBE_MID
-        },
-        // Index 6 | Cube High
-        {
-          TRANSITION_POSITION,
-          CUBE_HIGH
-        },
-        // Index 7 | Floor Intake
-        {
-          CUBE_INTAKE_POSITION_PREP,
-          CUBE_INTAKE_POSITION
-        },
-        /*
-         * @Deprecated!
-         * Index 8 | Solution Flip Positive
-         */
-        {
-          // SOLUTION_FLIP_TRANSITION_POINT_START,
-          // SOLUTION_FLIP_POSIITON_POSITIVE,
-          // SOLUTION_FLIP_TRANSITION_POINT_FINISH
-        },
-        // Index 9 | Robot Un-Flip
-        {
-          // SOLUTION_FLIP_TRANSITION_POINT,
-          // ARM_FLIP_POSITION_1,
-          // ARM_FLIP_POSITION_2,
-          ARM_FLIP_POSITION_3,
-          // SOLUTION_FLIP_TRANSITION_POINT,
-          STOWED_POSITION
-        },
-        // Index 10 | High To Stowed
-        {
-          HIGH_RETRACT,
-          TRANSITION_POSITION,
-          STOWED_POSITION
-        },
-        // Index 11 | Long Arm Reach
-        {
-          LONG_ARM_REACH_0,
-          LONG_ARM_REACH_1,
-          LONG_ARM_REACH_2
-        },
-        // Index 12 | Floor Intake Prep
-        {
-          CUBE_INTAKE_POSITION_PREP
-        },
-        // Index 13 | High Cone Prep
-        {
-          TRANSITION_POSITION,
-          HIGH_CONE_POSITION_0,
-          HIGH_CONE_PREP
-        },
-        // Index 14 | High Cone Prep to Place
-        {
-          HIGH_CONE_PREP,
-          HIGH_CONE_POSITION_1,
-          HIGH_CONE_POSITION_2
-        },
-        // Index 15 | Cone Intake
-        {
-          CONE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
-        },
-        // Index 16 | Cube Intake
-        {
-          CUBE_INTAKE_POSITION_PREP,
-          CUBE_INTAKE_POSITION
-        },
-        // Index 17 | Cone Flip
-        {
-          CONE_FLIP_POSITION_0,
-          CONE_INTAKE_POSITION_PREP,
-          BUMPER_INTAKE_POSITION
-        },
-        // Index 18 | Mid Cone Prep
-        {
-          MID_CONE_PREP
-        },
-        // Index 19 | Mid Cone Prep to Place
-        {
-          MID_CONE_POSITION_0,
-          MID_CONE_POSITION_1
-        },
-        // Index 20 | Auto Init Pickup
-        {
-          AUTO_INIT_PICKUP
-        },
-        // Index 21 | Cube Intake Auto
-        {
-          CONE_INTAKE_POSITION_PREP,
-          CUBE_INTAKE_POSITION_AUTO_0,
-          CUBE_INTAKE_POSITION_AUTO_1
-        },
-        // Index 22 | Cube High Auto
-        {
-          TRANSITION_POSITION,
-          CUBE_HIGH_AUTO
-        },
-        // Index 23 | Cube Mid Auto
-        {
-          TRANSITION_POSITION,
-          CUBE_MID_AUTO
-        },
-        // Index 24 | Mid to Stow
-        {
-            STOWED_POSITION
-        }
-      };
+        public static final Translation2d LONG_ARM_REACH_0 = new Translation2d(-ArmConstants.MAX_REACH_X, 30);
+        public static final Translation2d LONG_ARM_REACH_1 = new Translation2d(-ArmConstants.MAX_REACH_X, 15);
+        public static final Translation2d LONG_ARM_REACH_2 = new Translation2d(-ArmConstants.MAX_REACH_X, 5);
 
-      public static final Trajectory HIGH_CONE_TRAJECTORY = ArmCalculations.generateHighConeTrajectory();
-      public static final Trajectory MID_CONE_TRAJECTORY = ArmCalculations.generateMidConeTrajectory();
-      public static final Trajectory HIGH_CUBE_TRAJECTORY = ArmCalculations.generateHighCubeTrajectory();
-      public static final Trajectory HIGH_PLACE_TRAJECTORY = ArmCalculations.generateHighPlacementTrajectory();
-      public static final Trajectory HIGH_CONE_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();
-      public static final Trajectory HIGH_CUBE_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighCubeToStowTrajectory();
-  }
+        public static final Translation2d HIGH_CONE_PREP = new Translation2d(38.92, 39.73);
+        public static final Translation2d MID_CONE_PREP = new Translation2d(24, 35);
+        public static final Translation2d HIGH_RETRACT = new Translation2d(26.35, 33);
+
+        public static final Translation2d[][] ARM_POSITIONS = {
+                // Index 0 | Stowed
+                {
+                        TRANSITION_POSITION,
+                        // STOWED_HALFWAY,
+                        STOWED_POSITION
+                },
+                // Index 1 | Hybrid
+                {
+                        HYBRID_POSITION
+                },
+                // Index 2 | Mid Cone
+                {
+                        TRANSITION_POSITION,
+                        MID_CONE_POSITION_0,
+                        MID_CONE_POSITION_1
+                },
+                // Index 3 | High Cone
+                {
+                        TRANSITION_POSITION,
+                        HIGH_CONE_POSITION_0,
+                        // HIGH_CONE_POSITION_1,
+                        HIGH_CONE_POSITION_2
+                },
+                // Index 4 | Human Tag
+                {
+                        HUMAN_TAG_PICKUP
+                },
+                // Index 5 | Cube Mid
+                {
+                        TRANSITION_POSITION,
+                        CUBE_MID
+                },
+                // Index 6 | Cube High
+                {
+                        TRANSITION_POSITION,
+                        CUBE_HIGH
+                },
+                // Index 7 | Floor Intake
+                {
+                        CUBE_INTAKE_POSITION_PREP,
+                        CUBE_INTAKE_POSITION
+                },
+                /*
+                 * @Deprecated!
+                 * Index 8 | Solution Flip Positive
+                 */
+                {
+                // SOLUTION_FLIP_TRANSITION_POINT_START,
+                // SOLUTION_FLIP_POSIITON_POSITIVE,
+                // SOLUTION_FLIP_TRANSITION_POINT_FINISH
+                },
+                // Index 9 | Robot Un-Flip
+                {
+                        // SOLUTION_FLIP_TRANSITION_POINT,
+                        // ARM_FLIP_POSITION_1,
+                        // ARM_FLIP_POSITION_2,
+                        ARM_FLIP_POSITION_3,
+                        // SOLUTION_FLIP_TRANSITION_POINT,
+                        STOWED_POSITION
+                },
+                // Index 10 | High To Stowed
+                {
+                        HIGH_RETRACT,
+                        TRANSITION_POSITION,
+                        STOWED_POSITION
+                },
+                // Index 11 | Long Arm Reach
+                {
+                        LONG_ARM_REACH_0,
+                        LONG_ARM_REACH_1,
+                        LONG_ARM_REACH_2
+                },
+                // Index 12 | Floor Intake Prep
+                {
+                        CUBE_INTAKE_POSITION_PREP
+                },
+                // Index 13 | High Cone Prep
+                {
+                        TRANSITION_POSITION,
+                        HIGH_CONE_POSITION_0,
+                        HIGH_CONE_PREP
+                },
+                // Index 14 | High Cone Prep to Place
+                {
+                        HIGH_CONE_PREP,
+                        HIGH_CONE_POSITION_1,
+                        HIGH_CONE_POSITION_2
+                },
+                // Index 15 | Cone Intake
+                {
+                        CONE_INTAKE_POSITION_PREP,
+                        BUMPER_INTAKE_POSITION
+                },
+                // Index 16 | Cube Intake
+                {
+                        CUBE_INTAKE_POSITION_PREP,
+                        CUBE_INTAKE_POSITION
+                },
+                // Index 17 | Cone Flip
+                {
+                        CONE_FLIP_POSITION_0,
+                        CONE_INTAKE_POSITION_PREP,
+                        BUMPER_INTAKE_POSITION
+                },
+                // Index 18 | Mid Cone Prep
+                {
+                        MID_CONE_PREP
+                },
+                // Index 19 | Mid Cone Prep to Place
+                {
+                        MID_CONE_POSITION_0,
+                        MID_CONE_POSITION_1
+                },
+                // Index 20 | Auto Init Pickup
+                {
+                        AUTO_INIT_PICKUP
+                },
+                // Index 21 | Cube Intake Auto
+                {
+                        CONE_INTAKE_POSITION_PREP,
+                        CUBE_INTAKE_POSITION_AUTO_0,
+                        CUBE_INTAKE_POSITION_AUTO_1
+                },
+                // Index 22 | Cube High Auto
+                {
+                        TRANSITION_POSITION,
+                        CUBE_HIGH_AUTO
+                },
+                // Index 23 | Cube Mid Auto
+                {
+                        TRANSITION_POSITION,
+                        CUBE_MID_AUTO
+                },
+                // Index 24 | Mid to Stow
+                {
+                        STOWED_POSITION
+                }
+        };
+
+        public static final Trajectory HIGH_CONE_TRAJECTORY = ArmCalculations.generateHighConeTrajectory();
+        public static final Trajectory MID_CONE_TRAJECTORY = ArmCalculations.generateMidConeTrajectory();
+        public static final Trajectory HIGH_CUBE_TRAJECTORY = ArmCalculations.generateHighCubeTrajectory();
+        public static final Trajectory HIGH_PLACE_TRAJECTORY = ArmCalculations.generateHighPlacementTrajectory();
+        public static final Trajectory HIGH_CONE_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();
+        public static final Trajectory HIGH_CUBE_TO_STOWED_TRAJECTORY = ArmCalculations
+                .generateHighCubeToStowTrajectory();
+    }
 }

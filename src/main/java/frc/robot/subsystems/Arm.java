@@ -52,7 +52,7 @@ public class Arm extends SubsystemBase {
     private double lowerReferenceAngle = Units.degreesToRadians(122);
 
     private boolean armsAtDesiredPosition = false;
-    
+
     // @Log
     private double armXPos = 0;
     // @Log
@@ -74,26 +74,22 @@ public class Arm extends SubsystemBase {
     private boolean followingTrajectory;
 
     private final Mechanism2d armDesiredMechanism = new Mechanism2d(
-        Units.inchesToMeters(ArmConstants.MAX_REACH)*2, Units.inchesToMeters(ArmConstants.MAX_REACH)
-    );
+            Units.inchesToMeters(ArmConstants.MAX_REACH) * 2, Units.inchesToMeters(ArmConstants.MAX_REACH));
     private final MechanismRoot2d armRoot = armDesiredMechanism.getRoot(
-        "Arm", 
-        Units.inchesToMeters(ArmConstants.MAX_REACH), 
-        Units.inchesToMeters(6)
-    );
-    private final MechanismLigament2d lowerArmMechanism = 
-        armRoot.append(
+            "Arm",
+            Units.inchesToMeters(ArmConstants.MAX_REACH),
+            Units.inchesToMeters(6));
+    private final MechanismLigament2d lowerArmMechanism = armRoot.append(
             new MechanismLigament2d(
-                "lowerArm", 
-                Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH*1.25), 
-                lowerReferenceAngle));
+                    "lowerArm",
+                    Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH * 1.25),
+                    lowerReferenceAngle));
 
-    private final MechanismLigament2d upperArmMechanism = 
-        lowerArmMechanism.append(
+    private final MechanismLigament2d upperArmMechanism = lowerArmMechanism.append(
             new MechanismLigament2d(
-                "upperArm", 
-                Units.inchesToMeters(ArmConstants.UPPER_ARM_LENGTH*1.25), 
-                upperReferenceAngle));
+                    "upperArm",
+                    Units.inchesToMeters(ArmConstants.UPPER_ARM_LENGTH * 1.25),
+                    upperReferenceAngle));
 
     /**
      * Constructs a new Arm and configures the encoders and PID controllers.
@@ -191,7 +187,7 @@ public class Arm extends SubsystemBase {
         NeoMotorConstants.motors.add(lowerArmLeft);
         NeoMotorConstants.motors.add(lowerArmRight);
         NeoMotorConstants.motors.add(upperArm);
-        
+
         armCalculations = new ArmCalculations();
         setBrakeMode();
 
@@ -200,32 +196,41 @@ public class Arm extends SubsystemBase {
         // for later
         // Trajectories take around 10ms to create, which may be
         currentTrajectory = PlacementConstants.HIGH_CONE_TRAJECTORY;
-        
+
         logArmData();
 
     }
 
     @Override
     public void periodic() {
-        if (!operatorOverride && !followingTrajectory) { indexPeriodic(); }
-        else if (followingTrajectory) { trajectoryPeriodic(); }
+        if (!operatorOverride && !followingTrajectory) {
+            indexPeriodic();
+        } else if (followingTrajectory) {
+            trajectoryPeriodic();
+        }
         setLowerArmAngle(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
 
-        // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
-        // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
+        // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) -
+        // Units.radiansToDegrees(getUpperArmAngle()));
+        // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) -
+        // Units.radiansToDegrees(getLowerArmAngle()));
         // // Use forward kinematics to get the x and y position of the end effector
-        armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
-        armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+        armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI / 2))))
+                + (ArmConstants.UPPER_ARM_LENGTH
+                        * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI / 2)))));
+        armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI / 2))))
+                + (ArmConstants.UPPER_ARM_LENGTH
+                        * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI / 2)))));
 
         logArmData();
     }
 
     public void trajectoryPeriodic() {
 
-        boolean atDesiredFine = (
-            Math.abs(trajectoryFinalAngles[0] - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
-            Math.abs(trajectoryFinalAngles[1] - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
+        boolean atDesiredFine = (Math
+                .abs(trajectoryFinalAngles[0] - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
+                Math.abs(trajectoryFinalAngles[1] - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
 
         if (atDesiredFine) {
             startedTransition = true;
@@ -245,83 +250,82 @@ public class Arm extends SubsystemBase {
         this.currentTrajectory = trajectory;
         this.followingTrajectory = true;
         this.trajectoryTimer.restart();
-        
-        Translation2d finalPosition = currentTrajectory.sample(currentTrajectory.getTotalTimeSeconds()).poseMeters.getTranslation();
-        
+
+        Translation2d finalPosition = currentTrajectory.sample(currentTrajectory.getTotalTimeSeconds()).poseMeters
+                .getTranslation();
+
         double finalUpperAngle = armCalculations.getUpperAngle(finalPosition.getX(), finalPosition.getY());
-        double finalLowerAngle = armCalculations.getLowerAngle(finalPosition.getX(), finalPosition.getY(), finalUpperAngle);
+        double finalLowerAngle = armCalculations.getLowerAngle(finalPosition.getX(), finalPosition.getY(),
+                finalUpperAngle);
 
         // Add PI/2 to lowerArmAngle...
         // because the calculated angle is relative to the ground,
         // And the zero for the encoder is set to the direction of gravity
         // Add PI to upperArmAngle...
         // because armCalculations gives us the angle relative to the upper arm
-        finalLowerAngle += (Math.PI/2);
+        finalLowerAngle += (Math.PI / 2);
         finalUpperAngle += Math.PI;
 
         // Clamp the output angles as to not murder our precious hard stops
         finalUpperAngle = MathUtil.clamp(
-            finalUpperAngle,
-          ArmConstants.UPPER_ARM_LOWER_LIMIT,
-          ArmConstants.UPPER_ARM_UPPER_LIMIT
-        );
+                finalUpperAngle,
+                ArmConstants.UPPER_ARM_LOWER_LIMIT,
+                ArmConstants.UPPER_ARM_UPPER_LIMIT);
 
         // Clamp the output angles as to not murder our precious hard stops
         finalLowerAngle = MathUtil.clamp(
-            finalLowerAngle,
-          ArmConstants.LOWER_ARM_LOWER_LIMIT,
-          ArmConstants.LOWER_ARM_UPPER_LIMIT
-        );
-        
+                finalLowerAngle,
+                ArmConstants.LOWER_ARM_LOWER_LIMIT,
+                ArmConstants.LOWER_ARM_UPPER_LIMIT);
+
         this.trajectoryFinalAngles = new double[] { finalLowerAngle, finalUpperAngle };
-    
+
     }
 
     public void indexPeriodic() {
 
-      boolean atDesiredCoarse = (
-          Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE &&
-          Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_COARSE);
+        boolean atDesiredCoarse = (Math
+                .abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE &&
+                Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_COARSE);
 
-      boolean atDesiredFine = (
-          Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
-          Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
+        boolean atDesiredFine = (Math
+                .abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
+                Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
 
-      boolean finalDeadband =
-          (armPosDimension2 < PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1)
-          ? atDesiredCoarse : atDesiredFine;
+        boolean finalDeadband = (armPosDimension2 < PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1)
+                ? atDesiredCoarse
+                : atDesiredFine;
 
-      // Syntax example: PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]
-      if (!startedTransition)
-      {
-        startedTransition = true;
-        drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
-        return;
-      }
-      
-      // Notice that this code is getting the difference in angle between the arms.
-      // It might be better to instead use the difference in position, but I'm not sure. - Hamilton
-      if (finalDeadband && !armsAtDesiredPosition)
-      {
-        armPosDimension2++;
-
-        // This line isn't strictly necessary, but could be included...
-        // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0, PlacementConstants.ARM_POSITIONS[armPosDimension1].length);
-        
-        if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length)
-        {
-            armsAtDesiredPosition = true;
-            if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX || 
-                armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX || 
-                armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX) 
-            {
-                armPosDimension1 = PlacementConstants.STOWED_INDEX;
-                armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length-1;
-            }
+        // Syntax example:
+        // PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]
+        if (!startedTransition) {
+            startedTransition = true;
+            drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
             return;
         }
-        drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
-      }
+
+        // Notice that this code is getting the difference in angle between the arms.
+        // It might be better to instead use the difference in position, but I'm not
+        // sure. - Hamilton
+        if (finalDeadband && !armsAtDesiredPosition) {
+            armPosDimension2++;
+
+            // This line isn't strictly necessary, but could be included...
+            // armPosDimension2 = MathUtil.clamp(armPosDimension2, 0,
+            // PlacementConstants.ARM_POSITIONS[armPosDimension1].length);
+
+            if (armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length) {
+                armsAtDesiredPosition = true;
+                if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX ||
+                        armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX ||
+                        armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX) {
+                    armPosDimension1 = PlacementConstants.STOWED_INDEX;
+                    armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length - 1;
+                }
+                return;
+            }
+            drive(PlacementConstants.ARM_POSITIONS[armPosDimension1][armPosDimension2]);
+        }
     }
 
     /**
@@ -333,41 +337,43 @@ public class Arm extends SubsystemBase {
 
         this.followingTrajectory = false;
 
-        index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length-1);
+        index = MathUtil.clamp(index, 0, PlacementConstants.ARM_POSITIONS.length - 1);
 
-        // Check if we are already at the desired index, and if we are not operator overriding,
-        // This is because, if we are operator overriding, we want to be able to go to any index
+        // Check if we are already at the desired index, and if we are not operator
+        // overriding,
+        // This is because, if we are operator overriding, we want to be able to go to
+        // any index
         // If we are trying to go to a floor index, allow it to restart itself
-        if ((index == armPosDimension1 || 
-              (index == PlacementConstants.STOWED_INDEX && 
-              (armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX ||
-              (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX ||
-               armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX && armsAtDesiredPosition)))) &&
-            index != PlacementConstants.CONE_FLIP_INDEX &&
-            index != PlacementConstants.CONE_INTAKE_INDEX &&
-            index != PlacementConstants.CUBE_INTAKE_INDEX &&
-            !operatorOverride)
-        {
-          startedTransition = true;
-          return;
-        }
-        else {
-          startedTransition = false;
-          armsAtDesiredPosition = false;
+        if ((index == armPosDimension1 ||
+                (index == PlacementConstants.STOWED_INDEX &&
+                        (armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX ||
+                                (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX ||
+                                        armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX
+                                                && armsAtDesiredPosition))))
+                &&
+                index != PlacementConstants.CONE_FLIP_INDEX &&
+                index != PlacementConstants.CONE_INTAKE_INDEX &&
+                index != PlacementConstants.CUBE_INTAKE_INDEX &&
+                !operatorOverride) {
+            startedTransition = true;
+            return;
+        } else {
+            startedTransition = false;
+            armsAtDesiredPosition = false;
         }
 
         armPosDimension2 = 0;
 
         if (index == PlacementConstants.CONE_HIGH_PREP_INDEX &&
                 armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-            index == PlacementConstants.CONE_MID_PREP_INDEX && 
-                armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
-            (index == PlacementConstants.STOWED_INDEX &&
-                armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX ||
-                armPosDimension1 == PlacementConstants.CONE_INTAKE_INDEX ||
-                armPosDimension1 == PlacementConstants.CUBE_INTAKE_INDEX)) 
-        {
-            armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length-1;
+                index == PlacementConstants.CONE_MID_PREP_INDEX &&
+                        armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX
+                ||
+                (index == PlacementConstants.STOWED_INDEX &&
+                        armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX ||
+                        armPosDimension1 == PlacementConstants.CONE_INTAKE_INDEX ||
+                        armPosDimension1 == PlacementConstants.CUBE_INTAKE_INDEX)) {
+            armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length - 1;
         }
 
         armPosDimension1 = index;
@@ -382,7 +388,7 @@ public class Arm extends SubsystemBase {
 
         if (jumpToEnd) {
             armPosDimension1 = index;
-            armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length-1;
+            armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length - 1;
         }
 
     }
@@ -392,8 +398,9 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean halfwayFinishedWithConeFlip() {
-        return this.armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX && 
-                this.armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length-1 && !armsAtDesiredPosition;
+        return this.armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX &&
+                this.armPosDimension2 >= PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1
+                && !armsAtDesiredPosition;
     }
 
     /**
@@ -409,11 +416,11 @@ public class Arm extends SubsystemBase {
         // If operatorOverride is true, add the joystick input to the current position
         // recall that this value is in inches
         if (operatorOverride) {
-          this.armXReference += (position.getX());
-          this.armYReference += (position.getY());
+            this.armXReference += (position.getX());
+            this.armYReference += (position.getY());
         } else {
-          this.armXReference = position.getX();
-          this.armYReference = position.getY();
+            this.armXReference = position.getX();
+            this.armYReference = position.getY();
         }
 
         // Make sure armX and armY are within the range of 0 to infinity
@@ -425,29 +432,30 @@ public class Arm extends SubsystemBase {
         Translation2d armPosition = new Translation2d(armXReference, armYReference);
 
         // Proof: https://www.desmos.com/calculator/ppsa3db9fa
-        // If the distance from zero is greater than the max reach, cap it at the max reach
+        // If the distance from zero is greater than the max reach, cap it at the max
+        // reach
         if (armPosition.getNorm() > ArmConstants.MAX_REACH) {
-          armPosition = armPosition.times((ArmConstants.MAX_REACH - 0.1) / armPosition.getNorm());
+            armPosition = armPosition.times((ArmConstants.MAX_REACH - 0.1) / armPosition.getNorm());
         }
 
         // If the distance from zero is less than the min reach, cap it at the min reach
         // This min reach is the lower arm length - the upper arm length
         else if (armPosition.getNorm() < ArmConstants.MIN_REACH) {
-          armPosition = armPosition.times((ArmConstants.MIN_REACH + 0.1) / armPosition.getNorm());
+            armPosition = armPosition.times((ArmConstants.MIN_REACH + 0.1) / armPosition.getNorm());
         }
 
         // If the arm is trying to reach higher than 6'6", cap it at 6'6"
         // The field gives us this limit.
         if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
-          armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
+            armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
         }
-        // If the arm is trying to reach further than 48" out from the chassis, cap it at 48"
+        // If the arm is trying to reach further than 48" out from the chassis, cap it
+        // at 48"
         // The field gives us this limit.
         if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
-          armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
-        }
-        else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
-          armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
+            armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
+        } else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
+            armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
         }
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
@@ -458,10 +466,10 @@ public class Arm extends SubsystemBase {
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
         if (Double.isNaN(upperArmAngle)) {
-          System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
-          return;
+            System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
+            return;
         }
-        
+
         upperArmMechanism.setAngle(Units.radiansToDegrees(upperArmAngle));
         lowerArmMechanism.setAngle(Units.radiansToDegrees(lowerArmAngle));
 
@@ -470,22 +478,20 @@ public class Arm extends SubsystemBase {
         // And the zero for the encoder is set to the direction of gravity
         // Add PI to upperArmAngle...
         // because armCalculations gives us the angle relative to the upper arm
-        lowerArmAngle += (Math.PI/2);
+        lowerArmAngle += (Math.PI / 2);
         upperArmAngle += Math.PI;
 
         // Clamp the output angles as to not murder our precious hard stops
         upperArmAngle = MathUtil.clamp(
-          upperArmAngle,
-          ArmConstants.UPPER_ARM_LOWER_LIMIT,
-          ArmConstants.UPPER_ARM_UPPER_LIMIT
-        );
+                upperArmAngle,
+                ArmConstants.UPPER_ARM_LOWER_LIMIT,
+                ArmConstants.UPPER_ARM_UPPER_LIMIT);
 
         // Clamp the output angles as to not murder our precious hard stops
         lowerArmAngle = MathUtil.clamp(
-          lowerArmAngle,
-          ArmConstants.LOWER_ARM_LOWER_LIMIT,
-          ArmConstants.LOWER_ARM_UPPER_LIMIT
-        );
+                lowerArmAngle,
+                ArmConstants.LOWER_ARM_LOWER_LIMIT,
+                ArmConstants.LOWER_ARM_UPPER_LIMIT);
 
         // Set the reference values to the modified X and Y values
         // This is especially important for the operatorOverride going OOB
@@ -498,66 +504,64 @@ public class Arm extends SubsystemBase {
     }
 
     public void setLowerArmReference(double reference) {
-      this.lowerReferenceAngle = reference;
+        this.lowerReferenceAngle = reference;
     }
 
     public void setUpperArmReference(double reference) {
-      this.upperReferenceAngle = reference;
+        this.upperReferenceAngle = reference;
     }
 
     /**
      * Set the position of an arm
      *
      * @param angle the position to set the upper arm to
-     *                This unit is in rads
+     *              This unit is in rads
      */
     private void setUpperArmAngle(double angle) {
 
         angle = MathUtil.clamp(
-            angle,
-            ArmConstants.UPPER_ARM_LOWER_LIMIT,
-            ArmConstants.UPPER_ARM_UPPER_LIMIT
-        );
-            
+                angle,
+                ArmConstants.UPPER_ARM_LOWER_LIMIT,
+                ArmConstants.UPPER_ARM_UPPER_LIMIT);
+
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
         double FF = ArmConstants.upperfeedForward.calculate((angle), 0);
 
         // Check if we want to use secondary PID gains
         // Slot 1 is used to make the arm go super fast
-            // Slot 2 is an in-between gain set which 
-            // slows the arm down just enough to not overshoot
+        // Slot 2 is an in-between gain set which
+        // slows the arm down just enough to not overshoot
         boolean usePIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
-        boolean usePIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+        boolean usePIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP)
+                && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
 
         upperArmPIDController.setFF(
-            FF,
-            // Toggle between slot 0, 1, or 2
-            // If we should use slot 1 and 2, use 2
-            // else, use 1
-            // else, use 0 (default)
-            usePIDSlot1 
-                ? usePIDSlot2
-                    ? 2
-                    : 1 
-                : 0
-        );
+                FF,
+                // Toggle between slot 0, 1, or 2
+                // If we should use slot 1 and 2, use 2
+                // else, use 1
+                // else, use 0 (default)
+                usePIDSlot1
+                        ? usePIDSlot2
+                                ? 2
+                                : 1
+                        : 0);
 
         // Set the position of the neo controlling the upper arm to
-        // Toggle between all PID slots 
+        // Toggle between all PID slots
         upperArmPIDController.setReference(
-            angle, 
-            ControlType.kPosition,
-            // Toggle between slot 0,1, or 2
-            // If we should use slot 1 and 2, use 2
-            // else, use 1
-            // else, use 0 (default)
-            usePIDSlot1 
-                ? usePIDSlot2
-                    ? 2 
-                    : 1 
-                : 0
-        );
+                angle,
+                ControlType.kPosition,
+                // Toggle between slot 0,1, or 2
+                // If we should use slot 1 and 2, use 2
+                // else, use 1
+                // else, use 0 (default)
+                usePIDSlot1
+                        ? usePIDSlot2
+                                ? 2
+                                : 1
+                        : 0);
     }
 
     /**
@@ -569,10 +573,9 @@ public class Arm extends SubsystemBase {
     private void setLowerArmAngle(double position) {
 
         position = MathUtil.clamp(
-            position,
-            ArmConstants.LOWER_ARM_LOWER_LIMIT,
-            ArmConstants.LOWER_ARM_UPPER_LIMIT
-        );
+                position,
+                ArmConstants.LOWER_ARM_LOWER_LIMIT,
+                ArmConstants.LOWER_ARM_UPPER_LIMIT);
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
@@ -587,7 +590,7 @@ public class Arm extends SubsystemBase {
      * Get the current position of the upper arm
      *
      * @return the current position of the upper arm
-     * This unit is in rads
+     *         This unit is in rads
      */
     public double getUpperArmAngle() {
         return upperArmEncoder.getPosition();
@@ -597,7 +600,7 @@ public class Arm extends SubsystemBase {
      * Get the current position of the lower arm
      *
      * @return the current position of the lower arm
-     * This unit is in rads
+     *         This unit is in rads
      */
     public double getLowerArmAngle() {
         return lowerArmEncoder.getPosition();
@@ -610,47 +613,49 @@ public class Arm extends SubsystemBase {
     public double getXPosition() {
         return this.armXPos;
     }
-    
+
     public double getYPosition() {
-      return this.armYPos;
+        return this.armYPos;
     }
 
-    // Check if the arm is at its desired position and that position is a placement index,
-    // Note that the stowed position is not a placement index, but can be used as hybrid placement
+    // Check if the arm is at its desired position and that position is a placement
+    // index,
+    // Note that the stowed position is not a placement index, but can be used as
+    // hybrid placement
     public boolean getAtPlacementPosition() {
-      return (armPosDimension1 == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX ||
-              armPosDimension1 == PlacementConstants.AUTO_CUBE_HIGH_INDEX ||
-              armPosDimension1 == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
-              armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-              armPosDimension1 == PlacementConstants.CUBE_MID_INDEX ||
-              armPosDimension1 == PlacementConstants.AUTO_CUBE_MID_INDEX ||
-              armPosDimension1 == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
-              armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
-              armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
-              armsAtDesiredPosition;
+        return (armPosDimension1 == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX ||
+                armPosDimension1 == PlacementConstants.AUTO_CUBE_HIGH_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
+                armPosDimension1 == PlacementConstants.CUBE_MID_INDEX ||
+                armPosDimension1 == PlacementConstants.AUTO_CUBE_MID_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
+                armPosDimension1 == PlacementConstants.HYBRID_PLACEMENT_INDEX) &&
+                armsAtDesiredPosition;
     }
 
     public boolean getAtPrepIndex() {
-      return (armPosDimension1 == PlacementConstants.FLOOR_INTAKE_PREP_INDEX ||
-              armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_INDEX ||
-              armPosDimension1 == PlacementConstants.CONE_MID_PREP_INDEX || 
-              followingTrajectory);
+        return (armPosDimension1 == PlacementConstants.FLOOR_INTAKE_PREP_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_MID_PREP_INDEX ||
+                followingTrajectory);
     }
 
     // If we are at a prep index,
     // set the index to the prep_to_place equivelent
     public void finishPlacement() {
-      if (getAtPrepIndex() && armsAtDesiredPosition) {
-        followingTrajectory = false;
-        switch (armPosDimension1) {
-          case PlacementConstants.CONE_HIGH_PREP_INDEX:
-            setArmIndex(PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX);
-            break;
-          case PlacementConstants.CONE_MID_PREP_INDEX:
-            setArmIndex(PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX);
-            break;
+        if (getAtPrepIndex() && armsAtDesiredPosition) {
+            followingTrajectory = false;
+            switch (armPosDimension1) {
+                case PlacementConstants.CONE_HIGH_PREP_INDEX:
+                    setArmIndex(PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX);
+                    break;
+                case PlacementConstants.CONE_MID_PREP_INDEX:
+                    setArmIndex(PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX);
+                    break;
+            }
         }
-      }
     }
 
     /**
@@ -687,11 +692,11 @@ public class Arm extends SubsystemBase {
     }
 
     public void toggleOperatorOverride() {
-      this.operatorOverride = !operatorOverride;
+        this.operatorOverride = !operatorOverride;
     }
 
     public boolean getOperatorOverride() {
-      return this.operatorOverride;
+        return this.operatorOverride;
     }
 
     // Set the motors to coast mode
@@ -701,44 +706,47 @@ public class Arm extends SubsystemBase {
         upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
-    // This exists for the purpose of being able to manually move the upper arm easier.
+    // This exists for the purpose of being able to manually move the upper arm
+    // easier.
     public void setUpperArmCoastMode() {
-      upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        upperArm.setIdleMode(CANSparkMax.IdleMode.kCoast);
     }
 
     // Set the motors to brake mode
     public void setBrakeMode() {
-      lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
-      lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
-      upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        lowerArmLeft.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        lowerArmRight.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        upperArm.setIdleMode(CANSparkMax.IdleMode.kBrake);
     }
 
     // Very rough code below: this method is meant to take an encoder
     // and zero it with the knowledge that it is at the hard stop
     // when the method is called
     public void zeroLowerArmEncoder() {
-      // The constant found here can be found in 
-      // REV Hardware client when the arm is pointed straight up
-      // Then, depending on if the value is more or less than PI,
-      // Add or subtract PI to the value
-      
-      // Note, that this value must be within the range of 0-2PI
-      // absolutePosition = lowerArmEncoder.getPosition() + lowerArmEncoder.getZeroOffset();
-      // test that 2024 friends :) ^^ itll be kinda nice to just do
-      // lowerArmEncoder.setZeroOffset(absolutePosition + (absolutePosition > Math.PI) ? -Math.PI : Math.PI);
-      
-      lowerArmEncoder.setZeroOffset(5.4559006-Math.PI);
+        // The constant found here can be found in
+        // REV Hardware client when the arm is pointed straight up
+        // Then, depending on if the value is more or less than PI,
+        // Add or subtract PI to the value
+
+        // Note, that this value must be within the range of 0-2PI
+        // absolutePosition = lowerArmEncoder.getPosition() +
+        // lowerArmEncoder.getZeroOffset();
+        // test that 2024 friends :) ^^ itll be kinda nice to just do
+        // lowerArmEncoder.setZeroOffset(absolutePosition + (absolutePosition > Math.PI)
+        // ? -Math.PI : Math.PI);
+
+        lowerArmEncoder.setZeroOffset(5.4559006 - Math.PI);
     }
 
     // Very rough code below: this method is meant to take an encoder
     // and zero it with the knowledge that it is at the hard stop
     // when the method is called
     public void zeroUpperArmEncoder() {
-      // The constant found here can be found in 
-      // REV Hardware client when the arm is pointed straight up
-      // Then, depending on if the value is more or less than PI,
-      // Add or subtract PI to the value
-      upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
+        // The constant found here can be found in
+        // REV Hardware client when the arm is pointed straight up
+        // Then, depending on if the value is more or less than PI,
+        // Add or subtract PI to the value
+        upperArmEncoder.setZeroOffset(2.7098798 + Math.PI);
     }
 
     public void logArmData() {
@@ -746,22 +754,20 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
 
         SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
-        SmartDashboard.putNumberArray("ArmREALXY", new double[] {this.armXPos, this.armYPos});
+        SmartDashboard.putNumberArray("ArmREALXY", new double[] { this.armXPos, this.armYPos });
     }
 
     private double[] getPoseData(double lowerArmAngle, double upperArmAngle) {
-        var lowerPose =
-            new Pose3d(
+        var lowerPose = new Pose3d(
                 0.0,
                 0.0,
                 0.29,
                 new Rotation3d(0.0, -lowerArmAngle, 0.0));
 
-        var upperPose =
-            lowerPose.transformBy(
+        var upperPose = lowerPose.transformBy(
                 new Transform3d(
-                    new Translation3d(0.0, 0.0, -Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH)),
-                    new Rotation3d(0.0, -upperArmAngle, 0.0)));
+                        new Translation3d(0.0, 0.0, -Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH)),
+                        new Rotation3d(0.0, -upperArmAngle, 0.0)));
 
         return Pose3dLogger.composePose3ds(lowerPose, upperPose);
     }

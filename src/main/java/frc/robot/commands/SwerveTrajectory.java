@@ -87,7 +87,7 @@ public class SwerveTrajectory extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        swerve.drive(0, 0, 0, false, true);
+        swerve.drive(0, 0, 0, false, false);
     }
 
     @Override
