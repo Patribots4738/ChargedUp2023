@@ -116,7 +116,9 @@ public class Swerve {
     zeroHeading();
     setBrakeMode();
 
-    SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
+    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
+        0, 0, 0, 0, 0, 0, 0, 0
+    });
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
 
