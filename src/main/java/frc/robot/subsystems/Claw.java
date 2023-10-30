@@ -1,19 +1,19 @@
-package hardware;
+package frc.robot.subsystems;
 
-import auto.AutoAlignment;
-import calc.Constants.ClawConstants;
-import calc.Constants.FieldConstants;
-import calc.Constants.NeoMotorConstants;
-import calc.Constants.PlacementConstants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriverUI;
+import frc.robot.util.Constants.ClawConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.PlacementConstants;
 
-public class Claw {
+public class Claw extends SubsystemBase {
 
     private final CANSparkMax claw;
     private final RelativeEncoder clawEncoder;
@@ -55,6 +55,7 @@ public class Claw {
         clawEncoder.setPosition(0);
     }
 
+    @Override
     public void periodic() {
 
         /**
@@ -122,6 +123,7 @@ public class Claw {
             }
         }
         setSpeed(desiredSpeed);
+        updateOutputCurrent();
     }
 
     private void setSpeed(double speed) {

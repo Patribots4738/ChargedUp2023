@@ -1,16 +1,16 @@
 // Kudos to https://youtu.be/IKOGwoJ2HLk for the theory!
-package calc;
+package frc.robot.util;
 
 import java.util.ArrayList;
 
-import calc.Constants.ArmConstants;
-import calc.Constants.PlacementConstants;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import frc.robot.util.Constants.ArmConstants;
+import frc.robot.util.Constants.PlacementConstants;
 
 public class ArmCalculations {
 
@@ -23,8 +23,7 @@ public class ArmCalculations {
      *          Due to an axis controlling the range, they will not go over
      * @return the angle to set the motor to, in radians
      */
-    public double getUpperAngle(double x, double y)
-    {
+    public double getUpperAngle(double x, double y) {
         double upperAngle =
                 (Math.acos(
                         (((Math.pow(x, 2)) + (Math.pow(y, 2))) - 
@@ -44,8 +43,7 @@ public class ArmCalculations {
      *          Please keep in mind the x and y value must be under Constants.kMaxReachX,Y respectivly
      *          Due to an axis controlling the range, they will not go over
      */
-    public double getLowerAngle(double x, double y, double q2)
-    {
+    public double getLowerAngle(double x, double y, double q2) {
         double alpha = Math.atan2(
                 (ArmConstants.UPPER_ARM_LENGTH * Math.sin(q2)) ,
                 (ArmConstants.LOWER_ARM_LENGTH + (ArmConstants.UPPER_ARM_LENGTH * Math.cos(q2))));

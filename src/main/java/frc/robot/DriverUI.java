@@ -1,6 +1,6 @@
 package frc.robot;
 
-import auto.AutoPathStorage.AutoPose;
+import frc.robot.commands.auto.AutoPathStorage.AutoPose;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package hardware;
+package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -14,8 +14,8 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import calc.Constants.ModuleConstants;
-import calc.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.ModuleConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
 
 public class MAXSwerveModule {
     private final CANSparkMax drivingSparkMax;

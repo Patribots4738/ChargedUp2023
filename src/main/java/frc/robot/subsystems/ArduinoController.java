@@ -1,12 +1,13 @@
-package hardware;
+package frc.robot.subsystems;
 
-import calc.Constants.LEDConstants;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Constants.LEDConstants;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ArduinoController {
+public class ArduinoController extends SubsystemBase {
 
   //Sets up the Arduino over I2C on port 8
   private final I2C arduino = new I2C(I2C.Port.kOnboard, LEDConstants.ARDUINO_ADDRESS);
@@ -15,6 +16,7 @@ public class ArduinoController {
   private int currentArmState = -1;
   private boolean everyOtherLoop = false;
 
+  @Override
   public void periodic() {
       // Toggle our boolean to not overload the arduino with requests
       everyOtherLoop = !everyOtherLoop;

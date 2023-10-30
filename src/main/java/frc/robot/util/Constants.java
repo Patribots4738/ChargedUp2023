@@ -2,13 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package calc;
+package frc.robot.util;
 
 import java.util.ArrayList;
 
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -170,6 +173,23 @@ public final class Constants {
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+
+        public static final HolonomicDriveController HDC = new HolonomicDriveController(
+            new PIDController(
+                AutoConstants.X_CORRECTION_P,
+                AutoConstants.X_CORRECTION_I,
+                AutoConstants.X_CORRECTION_D),
+            new PIDController(
+                AutoConstants.Y_CORRECTION_P,
+                AutoConstants.Y_CORRECTION_I,
+                AutoConstants.Y_CORRECTION_D),
+            new ProfiledPIDController(
+                AutoConstants.ROTATION_CORRECTION_P,
+                AutoConstants.ROTATION_CORRECTION_I,
+                AutoConstants.ROTATION_CORRECTION_D,
+                new TrapezoidProfile.Constraints(
+                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
     }
 
     public static final class ClawConstants {

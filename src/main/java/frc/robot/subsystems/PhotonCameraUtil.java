@@ -1,7 +1,8 @@
-package calc;
+package frc.robot.subsystems;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriverUI;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -9,9 +10,9 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
 import java.io.IOException;
 import java.util.Optional;
-import calc.Constants.VisionConstants;
+import frc.robot.util.Constants.VisionConstants;
 
-public class PhotonCameraUtil {
+public class PhotonCameraUtil extends SubsystemBase {
 
   public PhotonCamera cam1;
   public PhotonCamera cam2;
@@ -81,37 +82,38 @@ public class PhotonCameraUtil {
           }
         }
       }
-
-    //   if (cam2.isPresent()) {
-    //     PhotonPipelineResult result = cam2.get().getLatestResult();
-    //     if (result.hasTargets()) {
-    //       cam2Ambiguity = result.getBestTarget().getPoseAmbiguity();
-    //       DriverUI.hasTargets = true;
-    //     }
-    //   }
+    /*
+      if (cam2.isPresent()) {
+        PhotonPipelineResult result = cam2.get().getLatestResult();
+        if (result.hasTargets()) {
+          cam2Ambiguity = result.getBestTarget().getPoseAmbiguity();
+          DriverUI.hasTargets = true;
+        }
+      }
       
-    //   // If both cameras have results, and both cameras can see a target, compare them
-    //   if (cam1Pose.isPresent() && cam2Pose.isPresent()) {
-    //     // Return the camera with the lower ambiguity (only if under the minimum threshold)
-    //     // Recall that the lower the ambiguity, the more confident we are in the pose
-    //     if (cam1Ambiguity < cam2Ambiguity && cam1Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
-    //       return cam1Pose;
-    //     } else if (cam2Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
-    //       return cam2Pose;
-    //     }
-    //   }
+      // If both cameras have results, and both cameras can see a target, compare them
+      if (cam1Pose.isPresent() && cam2Pose.isPresent()) {
+        // Return the camera with the lower ambiguity (only if under the minimum threshold)
+        // Recall that the lower the ambiguity, the more confident we are in the pose
+        if (cam1Ambiguity < cam2Ambiguity && cam1Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
+          return cam1Pose;
+        } else if (cam2Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
+          return cam2Pose;
+        }
+      }
 
-    //   // If only the front camera has a result, and it can see a target, return it
-    //   // * if it has low ambiguity
-    //   if (cam1Pose.isPresent() && cam1Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
-    //     return cam1Pose;
-    //   } 
+      // If only the front camera has a result, and it can see a target, return it
+      // * if it has low ambiguity
+      if (cam1Pose.isPresent() && cam1Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
+        return cam1Pose;
+      } 
 
-    //   // If only the back camera has a result, and it can see a target, return it
-    //   // * if it has low ambiguity
-    //   if (cam2Pose.isPresent() && cam2Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
-    //     return cam2Pose;
-    //   }
+      // If only the back camera has a result, and it can see a target, return it
+      // * if it has low ambiguity
+      if (cam2Pose.isPresent() && cam2Ambiguity < VisionConstants.AMBIGUITY_THRESHOLD) {
+        return cam2Pose;
+      }
+    */
       DriverUI.hasTargets = false;
       // return a null Optional<EstimatedRobotPose> if no camera can see a target
       return Optional.empty();
@@ -124,4 +126,8 @@ public class PhotonCameraUtil {
     public Optional<PhotonCamera> getCam2() {
       return Optional.ofNullable(cam2);
     }
+
+    @Override
+    public void periodic() {}
+
 }

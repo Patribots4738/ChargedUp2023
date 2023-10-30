@@ -1,29 +1,33 @@
-package auto;
+package frc.robot.commands;
 
 import java.util.Optional;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.DriverUI;
+import frc.robot.subsystems.PhotonCameraUtil;
+import frc.robot.subsystems.Swerve;
+import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.ClawConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.PlacementConstants;
+import frc.robot.util.Constants.VisionConstants;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.*;
-import hardware.Swerve;
-import hardware.Claw;
-import calc.Constants.FieldConstants;
-import calc.Constants.PlacementConstants;
-import calc.Constants.VisionConstants;
-import calc.Constants.ClawConstants;
-import frc.robot.DriverUI;
-import calc.PhotonCameraUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
-public class AutoAlignment {
+public class AutoAlignment extends CommandBase {
 
     /**
      * A visual representation of the apriltag positions
      * / --------------------------------------------- \
-     * 5                     |                       4
+     * 5                     |                         4
      * |                      |                        |
      * |                      |                        |
      * 6                      |                        3
@@ -35,7 +39,7 @@ public class AutoAlignment {
      */
 
     Swerve swerve;
-    PhotonCameraUtil photonCameraPose;
+    PhotonCameraUtil photonVision;
 
     private int tagID;
     private int coneOffset = 0;
@@ -48,9 +52,11 @@ public class AutoAlignment {
 
     public static boolean coneMode = false;
 
-    public AutoAlignment(Swerve swerve, Claw claw) {
+    public AutoAlignment(Swerve swerve, PhotonCameraUtil photonVision) {
         this.swerve = swerve;
-        photonCameraPose = new PhotonCameraUtil();
+        this.photonVision = photonVision;
+
+        addRequirements(swerve, photonVision);
     }
 
     /**
@@ -60,7 +66,7 @@ public class AutoAlignment {
 
       // Create an "Optional" object that contains the estimated pose of the robot
       // This can be present (see's tag) or not present (does not see tag)
-      Optional<EstimatedRobotPose> result = photonCameraPose.getEstimatedRobotPose();
+      Optional<EstimatedRobotPose> result = photonVision.getEstimatedRobotPose();
 
       // If the result of the estimatedRobotPose exists, and the skew of the tag is less than 3 degrees (to prevent false results)
       if (result.isPresent()) {
@@ -71,9 +77,9 @@ public class AutoAlignment {
           Timer.getFPGATimestamp() - VisionConstants.LATENCY);
       }
 
-      if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+      if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
         // Get the target pose (the pose of the tag we want to go to)
-        Pose2d targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+        Pose2d targetPose = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         targetPose = getModifiedTargetPose(targetPose);
         currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
       }
@@ -86,9 +92,9 @@ public class AutoAlignment {
         return; 
       }
 
-      if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+      if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
 
-        Pose2d aprilTagPose2d = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+        Pose2d aprilTagPose2d = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         double tagXOffset = getTagXOffset();
         double tagYOffset = getTagYOffset();
 
@@ -145,9 +151,9 @@ public class AutoAlignment {
       Pose2d targetPose = swerve.getPose();
 
       // Check if our tagID is valid... (Assume it is for logic purposes)
-      if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+      if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
           // Get the target pose (the pose of the tag we want to go to)
-          targetPose = photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+          targetPose = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
       }
 
       // If we are on the left side of the field: we need to add the grid offset + cone/substation offset
@@ -164,7 +170,7 @@ public class AutoAlignment {
       
       adjustedY += swerve.getPose().getY();
       
-      ChassisSpeeds alignmentSpeeds = SwerveTrajectory.HDC.calculate(
+      ChassisSpeeds alignmentSpeeds = AutoConstants.HDC.calculate(
           swerve.getPose(),
           new Pose2d(
               swerve.getPose().getX(),
@@ -226,8 +232,8 @@ public class AutoAlignment {
 
           // This if a statement prevents the robot from crashing if we input an absurd tag ID,
           // but it should be assumed that the tag location is present.
-          if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
-            currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
+          if (photonVision.aprilTagFieldLayout.getTagPose(i).isPresent()) {
+            currentDistance = currentPosition.getDistance(photonVision.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
           }
           if (currentDistance < nearestDistance) {
             nearestDistance = currentDistance;
@@ -244,8 +250,8 @@ public class AutoAlignment {
 
           // This if a statement prevents the robot from crashing if we input an absurd tag ID,
           // but it should be assumed that the tag location is present.
-          if (photonCameraPose.aprilTagFieldLayout.getTagPose(i).isPresent()) {
-            currentDistance = currentPosition.getDistance(photonCameraPose.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
+          if (photonVision.aprilTagFieldLayout.getTagPose(i).isPresent()) {
+            currentDistance = currentPosition.getDistance(photonVision.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
           }
           if (currentDistance < nearestDistance) {
             nearestDistance = currentDistance;
@@ -410,7 +416,7 @@ public class AutoAlignment {
 
       double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
       // boolean setWheelsUp = false;
-      double tilt = 0;
+      double tilt = 0;  
 
       // If our heading is within -45 to 45 degrees or within -135 and -180 or within 135 to 180, use the pitch
       // Otherwise, use the roll
@@ -468,7 +474,7 @@ public class AutoAlignment {
     public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
     
       // Use a Holonomic Drive Controller to calculate the speeds for the robot
-      double thetaSpeed = SwerveTrajectory.HDC.getThetaController().calculate(swerve.getYaw().getRadians(), desiredAngle.getRadians());
+      double thetaSpeed = AutoConstants.HDC.getThetaController().calculate(swerve.getYaw().getRadians(), desiredAngle.getRadians());
 
       // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,

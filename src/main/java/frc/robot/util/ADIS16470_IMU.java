@@ -9,7 +9,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package calc;
+package frc.robot.util;
 
 // import java.lang.FdLibm.Pow;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;

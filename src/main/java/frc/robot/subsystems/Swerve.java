@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package hardware;
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -18,17 +18,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import calc.ADIS16470_IMU;
-import calc.Pose3dLogger;
+import frc.robot.util.ADIS16470_IMU;
+import frc.robot.util.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriverUI;
-import calc.SwerveUtils;
-import calc.Constants.DriveConstants;
-import calc.Constants.FieldConstants;
-import calc.Constants.PlacementConstants;
+import frc.robot.util.SwerveUtils;
+import frc.robot.util.Constants.DriveConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.PlacementConstants;
 
-public class Swerve {
+public class Swerve extends SubsystemBase {
 
   public static double twistScalar = 4;
 
@@ -119,9 +120,11 @@ public class Swerve {
 
   }
 
+  @Override
   public void periodic() {
 
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+    logPositions();
 
   }
 

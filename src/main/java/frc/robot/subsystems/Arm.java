@@ -1,11 +1,4 @@
-package hardware;
-
-import calc.ArmCalculations;
-import calc.Constants.ArmConstants;
-import calc.Constants.FieldConstants;
-import calc.Constants.NeoMotorConstants;
-import calc.Constants.PlacementConstants;
-import calc.Pose3dLogger;
+package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -28,6 +21,13 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.ArmCalculations;
+import frc.robot.util.Constants.ArmConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.PlacementConstants;
+import frc.robot.util.Pose3dLogger;
 
 // Uncomment the following lines to enable logging
 // Mainly used for creating/editing arm position constants
@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import io.github.oblarg.oblog.annotations.Log;
 
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
-public class Arm /* implements Loggable */ {
+public class Arm extends SubsystemBase {
 
     int armPosDimension1 = PlacementConstants.STOWED_INDEX;
     int armPosDimension2 = 1;
@@ -205,6 +205,7 @@ public class Arm /* implements Loggable */ {
 
     }
 
+    @Override
     public void periodic() {
         if (!operatorOverride && !followingTrajectory) { indexPeriodic(); }
         else if (followingTrajectory) { trajectoryPeriodic(); }
@@ -216,6 +217,8 @@ public class Arm /* implements Loggable */ {
         // // Use forward kinematics to get the x and y position of the end effector
         armXPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.cos((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.cos((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI/2)))) + (ArmConstants.UPPER_ARM_LENGTH * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI/2)))));
+
+        logArmData();
     }
 
     public void trajectoryPeriodic() {

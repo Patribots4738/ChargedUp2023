@@ -1,26 +1,28 @@
 // Referenced from https://github.com/Stampede3630/2022-Code/blob/0ad2aa434f50d8f5dc93e965809255f697dadffe/src/main/java/frc/robot/AutoSegmentedWaypoints.java#L81
-package auto;
+package frc.robot.commands.auto;
 
-import auto.AutoPathStorage.AutoPose;
-import auto.AutoPathStorage.Waypoint;
-import calc.Constants.FieldConstants;
-import calc.Constants.PlacementConstants;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
-import hardware.Arm;
-import hardware.Claw;
-import hardware.Swerve;
+import frc.robot.commands.AutoAlignment;
+import frc.robot.commands.SwerveTrajectory;
+import frc.robot.commands.auto.AutoPathStorage.AutoPose;
+import frc.robot.commands.auto.AutoPathStorage.Waypoint;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Claw;
+import frc.robot.subsystems.Swerve;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.PlacementConstants;
 
-public class AutoSegmentedWaypoints {
+public class AutoSegmentedWaypoints extends CommandBase {
 
   Swerve swerve;
   Arm arm;
   Claw claw;
-  AutoAlignment autoAlignment;
 
   public Waypoint[] chosenWaypoints;
   public AutoPose chosenAutoPath;
@@ -37,31 +39,21 @@ public class AutoSegmentedWaypoints {
   public boolean armInit = false;
   public boolean halfway = false;
 
-  public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoAlignment autoAlignment) {
+  public AutoSegmentedWaypoints(Swerve swerve, Arm arm, Claw claw, AutoPose chosenAutoPath) {
     // Good ol' references to subsystems :>
     this.swerve = swerve;
     this.arm = arm;
     this.claw = claw;
-    this.autoAlignment = autoAlignment;
+    this.chosenAutoPath = chosenAutoPath;
+    chosenWaypoints = this.chosenAutoPath.getWaypointSet();
+
+    addRequirements(swerve, arm, claw);
   }
 
-  public void init() {
+  @Override
+  public void initialize() {
 
     boolean mirrored = false;
-
-    if (DriverUI.autoChooser.getSelected() == null) {
-
-      chosenAutoPath = AutoPathStorage.myAutoContainer[0];
-
-    } else {
-    
-      // If we have already ran an auto path, 
-      // but without redeploying we changed the path...
-      chosenAutoPath = DriverUI.autoChooser.getSelected();
-
-    }
-
-    chosenWaypoints = chosenAutoPath.getWaypointSet();
 
     currentWaypointNumber = 0;
 
@@ -106,7 +98,8 @@ public class AutoSegmentedWaypoints {
 
   }
 
-  public void periodic() {
+  @Override
+  public void execute() {
     waypointRunner(chosenWaypoints);
   }
 
@@ -257,6 +250,8 @@ public class AutoSegmentedWaypoints {
         SwerveTrajectory.trajectoryStatus = "done";
       }
       else {
+        //TODO: Maybe make a swerveTrajectoryCommand variable
+        // that gets reset on this line
         SwerveTrajectory.resetTrajectoryStatus();
       }
       stateHasInitialized = true;
@@ -284,6 +279,8 @@ public class AutoSegmentedWaypoints {
     //   System.out.println("Charging! " + swerve.getPitch().getDegrees());
       if (!startedChargePad) {
         // Set the timer for the charge pad leveing PID loop
+        //TODO: make autoAlignment its own command, not nested in here.
+        //Things to think about at not one am
         autoAlignment.startChargePad();
         // Prevent startChargePad from being called again
         startedChargePad = true;
