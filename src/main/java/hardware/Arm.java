@@ -390,6 +390,17 @@ public class Arm /* implements Loggable */ {
 
     }
 
+    public void setArmIndex(int index, boolean jumpToEnd) {
+
+        setArmIndex(index);
+
+        if (jumpToEnd) {
+            armPosDimension1 = index;
+            armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length-1;
+        }
+
+    }
+
     public int getArmIndex() {
         return this.armPosDimension1;
     }
@@ -621,7 +632,7 @@ public class Arm /* implements Loggable */ {
     // Check if the arm is at its desired position and that position is a placement index,
     // Note that the stowed position is not a placement index, but can be used as hybrid placement
     public boolean getAtPlacementPosition() {
-      return (armPosDimension1 == PlacementConstants.CUBE_HIGH_INDEX ||
+      return (armPosDimension1 == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX ||
               armPosDimension1 == PlacementConstants.AUTO_CUBE_HIGH_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
               armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
@@ -654,6 +665,39 @@ public class Arm /* implements Loggable */ {
             break;
         }
       }
+    }
+
+    /**
+     * If we are at some placement index,
+     * (or intake index)
+     * and we change coneMode (to cone or cube mode)
+     * set the index to the equivelent index in the new mode
+     * to reduce the need to input another button
+     */
+    public void handleConeModeChange() {
+        // Notice all of the trues here,
+        // These make sure that the arm doesn't go back to the transition position
+        // which speeds up the process of changing modes
+        switch (armPosDimension1) {
+            case PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX:
+                setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX, true);
+                break;
+            case PlacementConstants.CUBE_MID_INDEX:
+                setArmIndex(PlacementConstants.CONE_MID_PREP_INDEX, true);
+                break;
+            case PlacementConstants.CONE_HIGH_PREP_INDEX:
+                setArmIndex(PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX, true);
+                break;
+            case PlacementConstants.CONE_MID_PREP_INDEX:
+                setArmIndex(PlacementConstants.CUBE_MID_INDEX, true);
+                break;
+            case PlacementConstants.CONE_INTAKE_INDEX:
+                setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX, true);
+                break;
+            case PlacementConstants.CUBE_INTAKE_INDEX:
+                setArmIndex(PlacementConstants.CONE_INTAKE_INDEX, true);
+                break;
+        }
     }
 
     public void toggleOperatorOverride() {
@@ -716,6 +760,7 @@ public class Arm /* implements Loggable */ {
         SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
 
         SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
+        SmartDashboard.putNumberArray("ArmREALXY", new double[] {this.armXPos, this.armYPos});
     }
 
     private double[] getPoseData(double lowerArmAngle, double upperArmAngle) {

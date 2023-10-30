@@ -177,7 +177,7 @@ public class Robot extends TimedRobot {
     // Restart the timer to use at the end of auto
     timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
-    DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+    DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.PI;
     autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     // initialize variables for auto
@@ -219,7 +219,7 @@ public class Robot extends TimedRobot {
     }
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CHARGE")) {
+    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CH")) {
       swerve.setWheelsUp();
       return;
     }
@@ -230,6 +230,7 @@ public class Robot extends TimedRobot {
       claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
+
     // Keep the autonomous states updated
     autoSegmentedWaypoints.periodic();
     // If we are close to the grid, allow the camera to modify odometry
@@ -339,22 +340,10 @@ public class Robot extends TimedRobot {
         SwerveTrajectory.resetTrajectoryStatus();
         // This resets the "rotational momentum" of the integerals
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
-        // Reset the autoAlignment timer
-        // This is so that the robot can change its "closest" node 
-        // in the first second of aligning
-        autoAlignment.resetTimer();
-        
+
       }
       
       autoAlignment.alignToTag(driverLeftAxis.getY());
-      
-      // Since we reset the timer when AButtonPressed(), for the first one second of alignment, 
-      // correct for any error in the odometry by resetting the nearest alignment offset. 
-      // This will work since the robot will be rotating, 
-      // and the camera will be writing the actual position of the robot.
-      if (autoAlignment.getAlignmentTimer() < 1) {
-        autoAlignment.setNearestAlignmentOffset();
-      }
 
     } else if (driver.getRightBumper()) {
 
@@ -414,15 +403,19 @@ public class Robot extends TimedRobot {
 
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
-    if (operator.getXButton()) {
-      autoAlignment.setConeMode(false);
-      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
+    // Note that this stuff only runs if we actually
+    // change our mode, so we don't have to worry about
+    // handleConeMode calling twice if a button was spammed
+    if (operator.getXButtonPressed() && AutoAlignment.coneMode) {
+        arm.handleConeModeChange();
+        autoAlignment.setConeMode(false);
+        arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
-    else if (operator.getYButton()) {
-      autoAlignment.setConeMode(true);
-      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
+    else if (operator.getYButtonPressed() && !AutoAlignment.coneMode) {
+        arm.handleConeModeChange();
+        autoAlignment.setConeMode(true);
+        arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
-
     // POV = D-Pad...
     switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
@@ -448,6 +441,7 @@ public class Robot extends TimedRobot {
         }
         break;
 
+
       // Clicking right
       case 90:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
@@ -469,7 +463,7 @@ public class Robot extends TimedRobot {
       // Clicking up
       case 0:
         boolean hotReloadHigh = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX);
         if (!hotReloadHigh) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_TRAJECTORY : PlacementConstants.HIGH_CUBE_TRAJECTORY); }
         break;
 
@@ -588,7 +582,7 @@ public class Robot extends TimedRobot {
 
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
             arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-            arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX) 
+            arm.getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX) 
         {
       
             arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);

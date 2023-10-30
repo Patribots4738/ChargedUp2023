@@ -439,7 +439,7 @@ public class AutoAlignment {
                     (FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
                     /
                     (elapsedTime /
-                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), 0.055, 0.20),
+                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), 0.1, 0.35),
             0, 
             0,
             true, false);
@@ -451,7 +451,7 @@ public class AutoAlignment {
                     (FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
                     /
                     (elapsedTime / 
-                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), -0.20, -0.055),
+                        (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), -0.35, -0.1),
             0, 
             0, 
             true, false);
