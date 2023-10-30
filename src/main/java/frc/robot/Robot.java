@@ -120,11 +120,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
         
-    // Logger.updateEntries();
+    Logger.updateEntries();
     arduinoController.periodic();
     claw.updateOutputCurrent();
-    // arm.logArmData();
-    // swerve.logPositions();
+    arm.logArmData();
+    swerve.logPositions();
     DriverUI.currentTimestamp = Timer.getFPGATimestamp();
 
   }
@@ -691,38 +691,6 @@ public class Robot extends TimedRobot {
     DriverUI.modeStartTimestamp = DriverUI.currentTimestamp;
   }
 
-  private int index = 0;
-  private double miniTimer = 0;
   @Override
-  public void testPeriodic() {
-    double startOfPeriodic = Timer.getFPGATimestamp();
-    if (Math.round(Timer.getFPGATimestamp()) % 1 == 0 && Timer.getFPGATimestamp() - miniTimer > 1) {
-        index = ((index+1) % 6);
-        miniTimer = Timer.getFPGATimestamp();
-        SmartDashboard.putNumber("Timer/switchCaseIndex", index);
-    }
-    index = 3;
-    switch (index) {
-        case 0:
-            swerve.periodic();
-            break;
-        case 1:
-            arm.periodic();
-            break;
-        case 2:
-            claw.periodic();
-            break;
-        case 3:
-            autoAlignment.calibrateOdometry();
-            break;
-        case 4:
-            swerve.periodic();
-            arm.periodic();
-            claw.periodic();
-            autoAlignment.calibrateOdometry();
-            break;
-
-    }
-    SmartDashboard.putNumber("Timer/dT", Timer.getFPGATimestamp() - startOfPeriodic);
-  }
+  public void testPeriodic() {}
 }
