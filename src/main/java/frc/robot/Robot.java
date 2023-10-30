@@ -268,7 +268,7 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 134.9) {
+    if (timer.get() > 134.9 && timer.get() < 136) {
       swerve.setWheelsUp();
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
       return;
@@ -674,25 +674,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
-    FieldConstants.GAME_MODE = FieldConstants.GameMode.TEST;
-    DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
-    arm.setBrakeMode();
-    DriverUI.enabled = true;
-    DriverUI.freshCode = false;
-    SwerveTrajectory.resetTrajectoryStatus();
-    autoAlignment.setConeOffset(0);
-    // Stop the timer, since this is test mode
-    // we want to allow the robot to be enabled as much
-    // as we want.
-    timer.reset();
-    timer.stop();
-  }
+  public void testInit() {}
 
   @Override
-  public void testPeriodic() {
-    teleopPeriodic();
-  }
+  public void testPeriodic() {}
 
   @Override
   public void simulationPeriodic() {
