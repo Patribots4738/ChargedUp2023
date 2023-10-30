@@ -467,6 +467,8 @@ public final class Constants {
             TEST
         };
         public static GameMode GAME_MODE;
+        
+        public static boolean IS_SIMULATION = false;
 
         // The below code is not used, and is only here for reference...
         // We instead use PhotonCameraPose.AprilTagFieldLayout

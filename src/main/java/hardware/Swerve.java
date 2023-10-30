@@ -129,7 +129,7 @@ public class Swerve {
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
     
 
-    if (Robot.isSimulation()) {
+    if ((FieldConstants.IS_SIMULATION)) {
         
         for (MAXSwerveModule mod : swerveModules) {
             mod.tick();
@@ -469,7 +469,7 @@ public class Swerve {
 
     Rotation2d pitchRotation2d;
 
-    if (Robot.isReal()) {
+    if (!FieldConstants.IS_SIMULATION) {
 
         pitchRotation2d = Rotation2d
             .fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
@@ -487,7 +487,7 @@ public class Swerve {
 
     Rotation2d rollRotation2d;
 
-    if (Robot.isReal()) {
+    if (!FieldConstants.IS_SIMULATION) {
 
         rollRotation2d = Rotation2d
             .fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));

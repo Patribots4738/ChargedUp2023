@@ -4,6 +4,7 @@ package hardware;
 
 import com.revrobotics.*;
 
+import calc.Constants.FieldConstants;
 import calc.Constants.NeoMotorConstants;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
@@ -81,7 +82,7 @@ public class NEOS extends CANSparkMax {
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
     public synchronized void setTargetPosition(double position, double arbitraryFeedForward, int slot) {
-        if (Robot.isReal()) {
+        if (!FieldConstants.IS_SIMULATION) {
             pidController.setReference(position, ControlType.kPosition, slot, arbitraryFeedForward, SparkMaxPIDController.ArbFFUnits.kVoltage);
         }
         targetPosition = position;
@@ -134,7 +135,7 @@ public class NEOS extends CANSparkMax {
             velo = encoder.getVelocity();
         }
 
-        if (Robot.isSimulation() && controlType == ControlLoopType.POSITION) {
+        if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
             setVoltage(pidController.getP() * (targetPosition - getPosition()));
         }
     }
@@ -156,7 +157,7 @@ public class NEOS extends CANSparkMax {
             pos = encoder.getPosition();
         }
 
-        if (Robot.isSimulation() && controlType == ControlLoopType.VELOCITY) {
+        if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.VELOCITY) {
             pos /= encoder.getVelocityConversionFactor();
         }
 

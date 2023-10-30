@@ -67,11 +67,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
       
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
+      FieldConstants.IS_SIMULATION = (Robot.isSimulation());
 
       // Initialize oblarg, which is mainly used in DriverUI
       Logger.configureLoggingAndConfig(this, false);
       // Set out log file to be in its own folder
-      DataLogManager.start(Robot.isSimulation() ? "./robotLogs/" : "");
+      DataLogManager.start((FieldConstants.IS_SIMULATION) ? "./robotLogs/" : "");
       // Log data that is being put to shuffleboard
       DataLogManager.logNetworkTables(true);
       // Log the DS data and joysticks

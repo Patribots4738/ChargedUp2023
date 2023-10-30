@@ -220,7 +220,7 @@ public class Arm /* implements Loggable */ {
         setLowerArmAngle(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
         
-        if (Robot.isSimulation()) {
+        if ((FieldConstants.IS_SIMULATION)) {
             if (Math.abs(lowerReferenceAngle - lowerArmEncoderSimPosition) > Units.degreesToRadians(3)) {
                 lowerArmEncoderSimPosition += (lowerReferenceAngle - lowerArmEncoderSimPosition)/10;
             }
@@ -604,7 +604,7 @@ public class Arm /* implements Loggable */ {
      * This unit is in rads
      */
     public double getUpperArmAngle() {
-        return Robot.isReal() ? upperArmEncoder.getPosition() : upperArmEncoderSimPosition;
+        return (!FieldConstants.IS_SIMULATION) ? upperArmEncoder.getPosition() : upperArmEncoderSimPosition;
     }
 
     /**
@@ -614,7 +614,7 @@ public class Arm /* implements Loggable */ {
      * This unit is in rads
      */
     public double getLowerArmAngle() {
-        return Robot.isReal() ? lowerArmEncoder.getPosition() : lowerArmEncoderSimPosition;
+        return (!FieldConstants.IS_SIMULATION) ? lowerArmEncoder.getPosition() : lowerArmEncoderSimPosition;
     }
 
     public boolean getAtDesiredPositions() {
