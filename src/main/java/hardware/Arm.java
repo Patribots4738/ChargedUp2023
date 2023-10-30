@@ -67,6 +67,9 @@ public class Arm /* implements Loggable */ {
     private final SparkMaxPIDController lowerArmPIDController;
     private final SparkMaxPIDController upperArmPIDController;
 
+    private boolean upperPIDSlot1;
+    private boolean upperPIDSlot2;
+
     private final ArmCalculations armCalculations;
     private Trajectory currentTrajectory;
     private double[] trajectoryFinalAngles;
@@ -208,8 +211,21 @@ public class Arm /* implements Loggable */ {
     public void periodic() {
         if (!operatorOverride && !followingTrajectory) { indexPeriodic(); }
         else if (followingTrajectory) { trajectoryPeriodic(); }
-        setLowerArmAngle(lowerReferenceAngle);
-        setUpperArmAngle(upperReferenceAngle);
+
+        // Check if we want to use secondary PID gains
+        // Slot 1 is used to make the arm go super fast
+        // Slot 2 is an in-between gain set which 
+        // slows the arm down just enough to not overshoot
+        boolean upperPIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
+        boolean upperPIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+        
+        // On either PID slot boolean change
+        // update both, then ask the SparkMAX to change its ff
+        // We do this becuase we want to limit our communications with the spark 
+        // as much as possible, to reduce loop overruns.
+        if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
+            setUpperArmAngle(upperReferenceAngle);
+        }
         
         // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
@@ -481,6 +497,8 @@ public class Arm /* implements Loggable */ {
         // Finally, set the reference values for the lower and upper arm:
         setLowerArmReference(lowerArmAngle);
         setUpperArmReference(upperArmAngle);
+        setLowerArmAngle(lowerReferenceAngle);
+        setUpperArmAngle(upperReferenceAngle);
     }
 
     public void setLowerArmReference(double reference) {
@@ -513,21 +531,31 @@ public class Arm /* implements Loggable */ {
         // Slot 1 is used to make the arm go super fast
             // Slot 2 is an in-between gain set which 
             // slows the arm down just enough to not overshoot
-        boolean usePIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
-        boolean usePIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+        boolean upperPIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
+        boolean upperPIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+        
+        // On either PID slot boolean change
+        // update both, then ask the SparkMAX to change its ff
+        // We do this becuase we want to limit our communications with the spark 
+        // as much as possible, to reduce loop overruns.
+        if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
+            
+            this.upperPIDSlot1 = upperPIDSlot1;
+            this.upperPIDSlot2 = upperPIDSlot2;
 
-        upperArmPIDController.setFF(
-            FF,
-            // Toggle between slot 0, 1, or 2
-            // If we should use slot 1 and 2, use 2
-            // else, use 1
-            // else, use 0 (default)
-            usePIDSlot1 
-                ? usePIDSlot2
-                    ? 2
-                    : 1 
-                : 0
-        );
+            upperArmPIDController.setFF(
+                FF,
+                // Toggle between slot 0, 1, or 2
+                // If we should use slot 1 and 2, use 2
+                // else, use 1
+                // else, use 0 (default)
+                this.upperPIDSlot1 
+                    ? this.upperPIDSlot2
+                        ? 2
+                        : 1 
+                    : 0
+            );
+        }
 
         // Set the position of the neo controlling the upper arm to
         // Toggle between all PID slots 
@@ -538,8 +566,8 @@ public class Arm /* implements Loggable */ {
             // If we should use slot 1 and 2, use 2
             // else, use 1
             // else, use 0 (default)
-            usePIDSlot1 
-                ? usePIDSlot2
+            upperPIDSlot1 
+                ? upperPIDSlot2
                     ? 2 
                     : 1 
                 : 0

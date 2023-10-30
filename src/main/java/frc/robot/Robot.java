@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -60,15 +61,13 @@ public class Robot extends TimedRobot {
 
   DriverUI driverUI = new DriverUI();
 
-  public static Timer timer;
-
   @Override
   public void robotInit() {
       
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
       // Initialize oblarg, which is mainly used in DriverUI
-      Logger.configureLoggingAndConfig(this, false);
+    //   Logger.configureLoggingAndConfig(this, false);
       // Set out log file to be in its own folder
       DataLogManager.start();
       // Log data that is being put to shuffleboard
@@ -94,8 +93,6 @@ public class Robot extends TimedRobot {
       autoPathStorage = new AutoPathStorage();
 
       arduinoController = new ArduinoController();
-
-      timer = new Timer();
 
       Timer.delay(0.25);
       for (CANSparkMax neo : NeoMotorConstants.motors) {
@@ -123,11 +120,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
         
-    Logger.updateEntries();
+    // Logger.updateEntries();
     arduinoController.periodic();
     claw.updateOutputCurrent();
-    arm.logArmData();
-    swerve.logPositions();
+    // arm.logArmData();
+    // swerve.logPositions();
+    DriverUI.currentTimestamp = Timer.getFPGATimestamp();
 
   }
 
@@ -174,7 +172,6 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     FieldConstants.GAME_MODE = FieldConstants.GameMode.AUTONOMOUS;
     // Restart the timer to use at the end of auto
-    timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
     DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.PI;
     autoAlignment.setConeMode(true);
@@ -182,6 +179,7 @@ public class Robot extends TimedRobot {
     // initialize variables for auto
     autoSegmentedWaypoints.init();
     DriverUI.enabled = true;
+    DriverUI.modeStartTimestamp = DriverUI.currentTimestamp;
     // We had a issue where we needed to redeploy before restarting auto
     // So this gives us an indicator to know if we have enabled yet
     // (i lost my mind not knowing if i redeployed or not) - alexander hamilton
@@ -195,13 +193,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    double elapsedTime = DriverUI.currentTimestamp - DriverUI.modeStartTimestamp;
     // Update odometry to know where we are on the field
     // and update our "position"
     swerve.periodic();
     claw.periodic();
     // System.out.printf("Time Left %.1f\n s", Timer.getMatchTime());
     // Force the claw to spit at the start of the match, for preload
-    if (timer.get() < 0.08) {
+    if (elapsedTime < 0.08) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
@@ -213,19 +212,19 @@ public class Robot extends TimedRobot {
 
     // Have the claw outtake at the end of the match,
     // This is for a last second score
-    if (timer.get() > 14.8) {
+    if (elapsedTime > 14.8) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
     }
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CH")) {
+    if (elapsedTime > 14.9 && elapsedTime < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CH")) {
       swerve.setWheelsUp();
       return;
     }
     // Auto is over, stop the claw
     // If we enabled in autonomous, this will stop stuff
     // to give you an indicator of timing
-    if (timer.get() > 15) {
+    if (elapsedTime > 15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
@@ -244,9 +243,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    SmartDashboard.putNumber("Timer/loopOverrunThreshold", 0.02);
+
     FieldConstants.GAME_MODE = FieldConstants.GameMode.TELEOP;
     // Reset the timer for teleopinit 
-    timer.restart();
+    DriverUI.modeStartTimestamp = DriverUI.currentTimestamp;
     autoAlignment.setConeMode(true);
     arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
@@ -259,7 +260,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
+    double startOfPeriodic = Timer.getFPGATimestamp();
     swerve.periodic();
     arm.periodic();
     claw.periodic();
@@ -267,7 +268,8 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 134.9) {
+    double elapsedTime = DriverUI.currentTimestamp - DriverUI.modeStartTimestamp;
+    if (elapsedTime > 134.9 && elapsedTime < 136) {
       swerve.setWheelsUp();
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
       return;
@@ -562,7 +564,7 @@ public class Robot extends TimedRobot {
     } else if (
 		((operator.getRightBumper() || operator.getRightStickButton()) && 
 		!claw.getStartedOuttakingBool()) ||
-		(timer.get() < 0.1 && !(FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST))) 
+		(elapsedTime < 0.1 && !(FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST))) 
 	{
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
@@ -672,6 +674,8 @@ public class Robot extends TimedRobot {
       operator.setRumble(RumbleType.kBothRumble, 0);
     
     }
+
+    SmartDashboard.putNumber("Timer/dT", Timer.getFPGATimestamp() - startOfPeriodic);
   }
 
   @Override
@@ -686,12 +690,41 @@ public class Robot extends TimedRobot {
     // Stop the timer, since this is test mode
     // we want to allow the robot to be enabled as much
     // as we want.
-    timer.reset();
-    timer.stop();
+    DriverUI.modeStartTimestamp = DriverUI.currentTimestamp;
   }
 
+  private int index = 0;
+  private double miniTimer = 0;
   @Override
   public void testPeriodic() {
-    teleopPeriodic();
+    double startOfPeriodic = Timer.getFPGATimestamp();
+    if (Math.round(Timer.getFPGATimestamp()) % 1 == 0 && Timer.getFPGATimestamp() - miniTimer > 1) {
+        index = ((index+1) % 6);
+        miniTimer = Timer.getFPGATimestamp();
+        SmartDashboard.putNumber("Timer/switchCaseIndex", index);
+    }
+    index = 3;
+    switch (index) {
+        case 0:
+            swerve.periodic();
+            break;
+        case 1:
+            arm.periodic();
+            break;
+        case 2:
+            claw.periodic();
+            break;
+        case 3:
+            autoAlignment.calibrateOdometry();
+            break;
+        case 4:
+            swerve.periodic();
+            arm.periodic();
+            claw.periodic();
+            autoAlignment.calibrateOdometry();
+            break;
+
+    }
+    SmartDashboard.putNumber("Timer/dT", Timer.getFPGATimestamp() - startOfPeriodic);
   }
 }

@@ -86,7 +86,7 @@ public class Claw {
                 (-0.25 < claw.getAppliedOutput() && claw.getAppliedOutput() < 0) && 
                 (current > 15 && claw.getOutputCurrent() > 15) &&
                 (desiredSpeed > 0.45) &&
-                (Timer.getFPGATimestamp() - startedIntakingTimestamp > 0.25);
+                (DriverUI.currentTimestamp - startedIntakingTimestamp > 0.25);
         }
 
         // Check if our current current and our current (one loop behind, hasn't updated yet)

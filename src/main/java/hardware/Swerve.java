@@ -17,11 +17,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import calc.ADIS16470_IMU;
 import calc.Pose3dLogger;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.DriverUI;
 import calc.SwerveUtils;
@@ -122,7 +120,7 @@ public class Swerve {
 
   public void periodic() {
 
-    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+    poseEstimator.updateWithTime(DriverUI.currentTimestamp, getGyroAngle(), getModulePositions());
 
   }
 
