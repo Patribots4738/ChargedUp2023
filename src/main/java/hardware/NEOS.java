@@ -7,7 +7,6 @@ import com.revrobotics.*;
 import calc.Constants.NeoMotorConstants;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Robot;
 
 import java.util.ArrayList;
