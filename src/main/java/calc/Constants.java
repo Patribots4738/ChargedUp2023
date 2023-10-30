@@ -148,7 +148,7 @@ public final class Constants {
 
         public static final double MAX_SPEED_METERS_PER_SECOND = 3; // 2.5 has worked very well for us so far
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5; // 2.5; (2.5vel and 2.5accel output 3s runtime on _1_A)
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = MAX_SPEED_METERS_PER_SECOND * Math.PI;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 9;//Math.PI/1.7;
 
         public static final double PX_CONTROLLER = 1;

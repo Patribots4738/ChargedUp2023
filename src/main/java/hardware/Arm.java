@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 
 // Uncomment the following lines to enable logging
 // Mainly used for creating/editing arm position constants
@@ -48,8 +49,9 @@ public class Arm /* implements Loggable */ {
     private double armYReference = 0;
 
     // The DESIRED rotation of the arms
-    private double upperReferenceAngle = Units.degreesToRadians(200);
-    private double lowerReferenceAngle = Units.degreesToRadians(122);
+    // These starting values are purely for log visualization, and serve no other purpose
+    private double lowerReferenceAngle = Units.degreesToRadians(193);
+    private double upperReferenceAngle = Units.degreesToRadians(22);
 
     private boolean armsAtDesiredPosition = false;
     
@@ -72,6 +74,9 @@ public class Arm /* implements Loggable */ {
     private double[] trajectoryFinalAngles;
     private Timer trajectoryTimer;
     private boolean followingTrajectory;
+
+    private double lowerArmEncoderSimPosition = 0;
+    private double upperArmEncoderSimPosition = 0;
 
     private final Mechanism2d armDesiredMechanism = new Mechanism2d(
         Units.inchesToMeters(ArmConstants.MAX_REACH)*2, Units.inchesToMeters(ArmConstants.MAX_REACH)
@@ -180,6 +185,10 @@ public class Arm /* implements Loggable */ {
         upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
         upperArm.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
 
+        
+        lowerArmRight.setCANTimeout(50);
+        upperArm.setCANTimeout(50);
+
         // Save the SPARK MAX configuration. If a SPARK MAX
         // browns out, it will retain the last configuration
         lowerArmLeft.follow(lowerArmRight, true);
@@ -210,7 +219,15 @@ public class Arm /* implements Loggable */ {
         else if (followingTrajectory) { trajectoryPeriodic(); }
         setLowerArmAngle(lowerReferenceAngle);
         setUpperArmAngle(upperReferenceAngle);
-
+        
+        if (Robot.isSimulation()) {
+            if (Math.abs(lowerReferenceAngle - lowerArmEncoderSimPosition) > Units.degreesToRadians(3)) {
+                lowerArmEncoderSimPosition += (lowerReferenceAngle - lowerArmEncoderSimPosition)/10;
+            }
+            if (Math.abs(upperReferenceAngle - upperArmEncoderSimPosition) > Units.degreesToRadians(3)) {
+                upperArmEncoderSimPosition += (upperReferenceAngle - upperArmEncoderSimPosition)/10;
+            }
+        }
         // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) - Units.radiansToDegrees(getUpperArmAngle()));
         // lowerDiff = (Units.radiansToDegrees(lowerReferenceAngle) - Units.radiansToDegrees(getLowerArmAngle()));
         // // Use forward kinematics to get the x and y position of the end effector
@@ -587,7 +604,7 @@ public class Arm /* implements Loggable */ {
      * This unit is in rads
      */
     public double getUpperArmAngle() {
-        return upperArmEncoder.getPosition();
+        return Robot.isReal() ? upperArmEncoder.getPosition() : upperArmEncoderSimPosition;
     }
 
     /**
@@ -597,7 +614,7 @@ public class Arm /* implements Loggable */ {
      * This unit is in rads
      */
     public double getLowerArmAngle() {
-        return lowerArmEncoder.getPosition();
+        return Robot.isReal() ? lowerArmEncoder.getPosition() : lowerArmEncoderSimPosition;
     }
 
     public boolean getAtDesiredPositions() {
@@ -752,13 +769,13 @@ public class Arm /* implements Loggable */ {
                 0.0,
                 0.0,
                 0.29,
-                new Rotation3d(0.0, -lowerArmAngle, 0.0));
+                new Rotation3d(0.0, lowerArmAngle, 0.0));
 
         var upperPose =
             lowerPose.transformBy(
                 new Transform3d(
                     new Translation3d(0.0, 0.0, -Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH)),
-                    new Rotation3d(0.0, -upperArmAngle, 0.0)));
+                    new Rotation3d(0.0, upperArmAngle, 0.0)));
 
         return Pose3dLogger.composePose3ds(lowerPose, upperPose);
     }

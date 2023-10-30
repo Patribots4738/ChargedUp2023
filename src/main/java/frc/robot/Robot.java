@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 
 import auto.AutoAlignment;
 import auto.AutoPathStorage;
@@ -70,7 +71,7 @@ public class Robot extends TimedRobot {
       // Initialize oblarg, which is mainly used in DriverUI
       Logger.configureLoggingAndConfig(this, false);
       // Set out log file to be in its own folder
-      DataLogManager.start();
+      DataLogManager.start(Robot.isSimulation() ? "./robotLogs/" : "");
       // Log data that is being put to shuffleboard
       DataLogManager.logNetworkTables(true);
       // Log the DS data and joysticks
@@ -691,5 +692,10 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     teleopPeriodic();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    REVPhysicsSim.getInstance().run();
   }
 }

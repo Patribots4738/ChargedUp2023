@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -24,6 +25,7 @@ import calc.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.DriverUI;
+import frc.robot.Robot;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 import calc.Constants.FieldConstants;
@@ -40,6 +42,7 @@ public class Swerve {
   private double currentRotation = 0.0;
   private double currentTranslationDir = 0.0;
   private double currentTranslationMag = 0.0;
+  private SlewRateLimiter simRotationLimiter = new SlewRateLimiter(3, -8, 0);
 
   private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
   private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
@@ -65,7 +68,8 @@ public class Swerve {
       DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
       DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-  private double[] desiredModuleStates = new double[6];
+      private double[] desiredModuleStates = new double[6];
+      private double[] realModuleStates = new double[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
   // The gyro sensor
   private final ADIS16470_IMU gyro = new ADIS16470_IMU();
@@ -123,18 +127,48 @@ public class Swerve {
   public void periodic() {
 
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+    
+
+    if (Robot.isSimulation()) {
+        
+        for (MAXSwerveModule mod : swerveModules) {
+            mod.tick();
+        }
+
+        SwerveModuleState[] measuredStates =
+        new SwerveModuleState[] {
+          frontLeft.getSimState(), frontRight.getSimState(), rearLeft.getSimState(), rearRight.getSimState()
+        };
+        
+        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(measuredStates);
+        resetOdometry(
+            getPose().exp(
+                new Twist2d(
+                    0, 0,
+                    speeds.omegaRadiansPerSecond * .02)));
+
+        realModuleStates = new double[] {
+            frontLeft.getSimState().angle.getRadians(), frontLeft.getSimState().speedMetersPerSecond,
+            frontRight.getSimState().angle.getRadians(), frontRight.getSimState().speedMetersPerSecond,
+            rearLeft.getSimState().angle.getRadians(), rearLeft.getSimState().speedMetersPerSecond,
+            rearRight.getSimState().angle.getRadians(), rearRight.getSimState().speedMetersPerSecond
+        };
+    }
+    else {
+        realModuleStates = new double[] {
+            frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
+            frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
+            rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
+            rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
+        };
+    }
 
   }
 
   public void logPositions() {
     DriverUI.field.setRobotPose(getPose());
 
-    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
-        frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
-        rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
-        rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
-    });
+    SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
 
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getYaw().getRadians());
@@ -372,12 +406,36 @@ public class Swerve {
 
   }
 
+  public double getXSpeedMetersPerSecond() {
+    // double velocity = 0;
+    // for (int modNum = 0; modNum < swerveModules.length; modNum++) {
+    // velocity += swerveModules[modNum].getState().speedMetersPerSecond;
+    // }
+    // return (velocity / swerveModules.length);
+
+    // We update the UI at the end of the loop, so this is a way of looking into the past.
+    return (frontLeft.getSimState().speedMetersPerSecond *  frontLeft.getSimState().angle.getCos());
+
+  }
+
+  public double getYSpeedMetersPerSecond() {
+    // double velocity = 0;
+    // for (int modNum = 0; modNum < swerveModules.length; modNum++) {
+    // velocity += swerveModules[modNum].getState().speedMetersPerSecond;
+    // }
+    // return (velocity / swerveModules.length);
+
+    // We update the UI at the end of the loop, so this is a way of looking into the past.
+    return (frontLeft.getSimState().speedMetersPerSecond *  frontLeft.getSimState().angle.getSin());
+
+  }
+
   public SwerveModulePosition[] getModulePositions() {
 
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
 
     for (int modNum = 0; modNum < swerveModules.length; modNum++) {
-      positions[modNum] = swerveModules[modNum].getPosition();
+      positions[modNum] = swerveModules[modNum].getSimPosition();
     }
     return positions;
 
@@ -409,8 +467,17 @@ public class Swerve {
 
   public Rotation2d getPitch() {
 
-    Rotation2d pitchRotation2d = Rotation2d
-        .fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
+    Rotation2d pitchRotation2d;
+
+    if (Robot.isReal()) {
+
+        pitchRotation2d = Rotation2d
+            .fromDegrees(gyro.getXComplementaryAngle() - ((gyro.getXComplementaryAngle() > 0) ? 180 : -180));
+
+    }
+    else {
+        pitchRotation2d = Rotation2d.fromDegrees(simRotationLimiter.calculate(getXSpeedMetersPerSecond()) * 5);
+    }
 
     return pitchRotation2d;
 
@@ -418,8 +485,17 @@ public class Swerve {
 
   public Rotation2d getRoll() {
 
-    Rotation2d rollRotation2d = Rotation2d
-        .fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));
+    Rotation2d rollRotation2d;
+
+    if (Robot.isReal()) {
+
+        rollRotation2d = Rotation2d
+            .fromDegrees(gyro.getYComplementaryAngle() - ((gyro.getYComplementaryAngle() > 0) ? 180 : -180));
+
+    }
+    else {
+        rollRotation2d = Rotation2d.fromDegrees(simRotationLimiter.calculate(getYSpeedMetersPerSecond()) * 5);
+    }
 
     return rollRotation2d;
 

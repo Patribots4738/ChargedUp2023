@@ -6,7 +6,6 @@ package hardware;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
@@ -15,11 +14,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import calc.Constants.ModuleConstants;
-import calc.Constants.NeoMotorConstants;
 
 public class MAXSwerveModule {
-    private final CANSparkMax drivingSparkMax;
-    private final CANSparkMax turningSparkMax;
+    private final NEOS drivingSparkMax;
+    private final NEOS turningSparkMax;
 
     private final RelativeEncoder drivingEncoder;
     private final AbsoluteEncoder turningEncoder;
@@ -37,8 +35,8 @@ public class MAXSwerveModule {
      * Encoder.
      */
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
-        drivingSparkMax = new CANSparkMax(drivingCANId, MotorType.kBrushless);
-        turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
+        drivingSparkMax = new NEOS(drivingCANId);
+        turningSparkMax = new NEOS(turningCANId);
 
         // Factory reset, so we get the SPARKS MAX to a known state before configuring
         // them. This is useful in case a SPARK MAX is swapped out.
@@ -105,12 +103,6 @@ public class MAXSwerveModule {
         turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         turningSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
 
-        // Save the SPARK MAX configurations. If a SPARK MAX browns out during
-        // operation, it will maintain the above configurations.
-
-        NeoMotorConstants.motors.add(drivingSparkMax);
-        NeoMotorConstants.motors.add(turningSparkMax);
-
         this.chassisAngularOffset = chassisAngularOffset;
         desiredState.angle = new Rotation2d(turningEncoder.getPosition());
         drivingEncoder.setPosition(0);
@@ -128,6 +120,14 @@ public class MAXSwerveModule {
                 new Rotation2d(turningEncoder.getPosition() - chassisAngularOffset));
     }
 
+    public SwerveModuleState getSimState() {
+        // Apply chassis angular offset to the encoder position to get the position
+        // relative to the chassis.
+        return new SwerveModuleState(drivingSparkMax.getVelocity(),
+                new Rotation2d(turningSparkMax.getPosition() - chassisAngularOffset));
+
+    }
+
     /**
      * Returns the current position of the module.
      *
@@ -139,6 +139,14 @@ public class MAXSwerveModule {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
                 new Rotation2d(turningEncoder.getPosition() - chassisAngularOffset));
+    }
+
+    public SwerveModulePosition getSimPosition() {
+        // Apply chassis angular offset to the encoder position to get the position
+        // relative to the chassis.
+        return new SwerveModulePosition(
+                drivingSparkMax.getPosition(),
+                new Rotation2d(turningSparkMax.getPosition() - chassisAngularOffset));
     }
 
     /**
@@ -157,8 +165,10 @@ public class MAXSwerveModule {
                 new Rotation2d(turningEncoder.getPosition()));
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
-        drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
-        turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+        // drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+        drivingSparkMax.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
+        // turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+        turningSparkMax.setTargetPosition(correctedDesiredState.angle.getRadians());
 
         this.desiredState = desiredState;
     }
@@ -184,5 +194,10 @@ public class MAXSwerveModule {
     public void setBrakeMode() {
         drivingSparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
         turningSparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    }
+
+    public void tick() {
+        drivingSparkMax.tick();
+        turningSparkMax.tick();
     }
 }
