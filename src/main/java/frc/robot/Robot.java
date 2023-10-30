@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
       // Instantiate our Robot. This acts as a dictionary for all of our subsystems
 
       // Initialize oblarg, which is mainly used in DriverUI
-    //   Logger.configureLoggingAndConfig(this, false);
+      Logger.configureLoggingAndConfig(this, false);
       // Set out log file to be in its own folder
       DataLogManager.start();
       // Log data that is being put to shuffleboard
