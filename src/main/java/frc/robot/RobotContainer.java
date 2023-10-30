@@ -85,7 +85,8 @@ public class RobotContainer {
                         FieldConstants.ALLIANCE == Alliance.Red 
                         ? 0 
                         : 180))
-        ), swerve));
+            ), swerve)
+        );
 
         driver.a().whileFalse(Commands.runOnce(() -> autoAlignment.setNearestValues()));
 
@@ -97,8 +98,6 @@ public class RobotContainer {
                 )
             )
         );
-
-            
 
     }
 
