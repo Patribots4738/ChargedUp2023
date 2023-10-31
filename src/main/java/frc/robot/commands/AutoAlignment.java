@@ -194,9 +194,11 @@ public class AutoAlignment extends CommandBase {
                 targetPose.getRotation().plus(Rotation2d.fromDegrees(180)));
     }
 
-    public void setNearestValues() {
-        this.setTagID(getNearestTag());
-        this.setNearestAlignmentOffset();
+    public Command setNearestValuesCommand() {
+        return Commands.runOnce(() -> {
+            this.setTagID(getNearestTag());
+            this.setNearestAlignmentOffset();
+        });
     }
 
     /**

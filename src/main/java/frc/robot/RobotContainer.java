@@ -88,9 +88,9 @@ public class RobotContainer {
         );
 
         driver.a()
-            .whileFalse(Commands.run(autoAlignment::setNearestValues))
             .whileTrue(
                 Commands.sequence(
+                    autoAlignment.setNearestValuesCommand(),
                     swerve.resetHDC(),
                     swerve.setAlignemntSpeed(),
                     // Run a method to get our desired speeds autonomously
@@ -112,7 +112,7 @@ public class RobotContainer {
             .onFalse(swerve.resetHDC());
 
         driver.leftBumper().whileTrue(Commands.run(swerve::getSetWheelsX));
-
+ 
         driver.rightStick().whileTrue(
             Commands.sequence(
                 swerve.resetHDC(),
@@ -167,7 +167,10 @@ public class RobotContainer {
         operator.rightBumper().or(operator.rightStick().and(arm::getAtPlacementPosition))
             .onTrue(claw.outTakeforXSeconds(() -> PlacementConstants.CONE_MODE ? 0.1 : 0.3)
             .alongWith(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_BLACK))
-            .andThen(arduinoController.setLEDStateCommand(() -> PlacementConstants.CONE_MODE ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE))
+            .alongWith(arduinoController.setLEDStateCommand(
+                () -> PlacementConstants.CONE_MODE ? 
+                    LEDConstants.BELLY_PAN_YELLOW : 
+                    LEDConstants.BELLY_PAN_PURPLE))
             .andThen(arm.getAutoStowCommand()));
         
         operator.leftTrigger().whileTrue(claw.setDesiredSpeedCommand(() -> operator.getLeftTriggerAxis()));
