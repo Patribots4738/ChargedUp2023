@@ -88,7 +88,7 @@ public class AutoAlignment extends CommandBase {
                     targetPose = getModifiedTargetPose(targetPose);
                     currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
                 }
-            }
+            }, photonVision
         );
     }
 
