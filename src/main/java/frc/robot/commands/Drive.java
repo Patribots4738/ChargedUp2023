@@ -5,8 +5,10 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.Constants.FieldConstants;
 
 public class Drive extends CommandBase {
 
@@ -58,9 +60,15 @@ public class Drive extends CommandBase {
 
     @Override
     public void execute() {
+        double x = xSupplier.getAsDouble();
+        double y = ySupplier.getAsDouble();
+        if (!fieldRelativeSupplier.getAsBoolean() && FieldConstants.ALLIANCE == Alliance.Red) {
+            x *= -1;
+            y *= -1;
+        }
         swerve.drive(
-            xSupplier.getAsDouble(),
-            ySupplier.getAsDouble(),
+            x,
+            y,
             rotationSupplier.getAsDouble(), 
             fieldRelativeSupplier.getAsBoolean(), 
             rateLimitSupplier.getAsBoolean()
