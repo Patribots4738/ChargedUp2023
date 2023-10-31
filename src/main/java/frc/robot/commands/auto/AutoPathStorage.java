@@ -1,5 +1,7 @@
 package frc.robot.commands.auto;
 
+import java.util.HashMap;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -10,9 +12,10 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.PlacementConstants;
 
 public class AutoPathStorage {
-    public static Waypoint[] chosenWaypoints;
+    public static PathPlannerTrajectory[] chosenWaypoints;
 
-    public static AutoPose[] myAutoContainer;
+    public static AutoMap[] myAutoContainer;
+
 
     /*
      * Naming convention:
@@ -27,130 +30,130 @@ public class AutoPathStorage {
      * L after 1-9 represents the hybrid placement index for the arm
      */
 
-    public static Waypoint[] _MOBILITY_ONLY;
+    public static PathPlannerTrajectory[] _MOBILITY_ONLY;
 
-    public static Waypoint[] _SQUARE_HALF;
+    public static PathPlannerTrajectory[] _SQUARE_HALF;
 
     // Paths for the bottom of the field:
     // Start at grid index 1, place high, then go to field element A, intake, then
     // go to grid index 2, and place high
-    public static Waypoint[] _1H_A_2H_CHARGE_BLUE;
-    public static Waypoint[] _1H_A_2H_CHARGE_RED;
-    public static Waypoint[] _1H_A_2H;
-    public static Waypoint[] _1H_A_2H_B;
+    public static PathPlannerTrajectory[] _1H_A_2H_CHARGE_BLUE;
+    public static PathPlannerTrajectory[] _1H_A_2H_CHARGE_RED;
+    public static PathPlannerTrajectory[] _1H_A_2H;
+    public static PathPlannerTrajectory[] _1H_A_2H_B;
 
     // Start at grid index 1, place high, then go to field element A, intake, then
     // go to grid index 3, and place high
-    public static Waypoint[] _1H_A;
-    public static Waypoint[] _1H_A_3H_CHARGE;
-    public static Waypoint[] _1H_A_3H;
-    public static Waypoint[] _1H_A_3H_B;
+    public static PathPlannerTrajectory[] _1H_A;
+    public static PathPlannerTrajectory[] _1H_A_3H_CHARGE;
+    public static PathPlannerTrajectory[] _1H_A_3H;
+    public static PathPlannerTrajectory[] _1H_A_3H_B;
 
     // Start at grid index 2, place high, then go to field element A, intake, then
     // go to grid index 1, and place high
-    public static Waypoint[] _2H_A_1H_CHARGE;
-    public static Waypoint[] _2H_A_1H;
-    public static Waypoint[] _2H_A;
-    public static Waypoint[] _2H_A_1H_B;
+    public static PathPlannerTrajectory[] _2H_A_1H_CHARGE;
+    public static PathPlannerTrajectory[] _2H_A_1H;
+    public static PathPlannerTrajectory[] _2H_A;
+    public static PathPlannerTrajectory[] _2H_A_1H_B;
 
     // Start at grid index 2, place high, then go to field element A, intake, then
     // go to grid index 3, and place high
-    public static Waypoint[] _2H_A_3H_CHARGE;
-    public static Waypoint[] _2H_A_3H;
-    public static Waypoint[] _2H_A_3H_B;
+    public static PathPlannerTrajectory[] _2H_A_3H_CHARGE;
+    public static PathPlannerTrajectory[] _2H_A_3H;
+    public static PathPlannerTrajectory[] _2H_A_3H_B;
 
     // Start at grid index 3, place high, then go to field element A, intake, then
     // go to grid index 1, and place high
-    public static Waypoint[] _3H_A_1H_CHARGE;
-    public static Waypoint[] _3H_A_1H;
-    public static Waypoint[] _3H_A;
-    public static Waypoint[] _3H_A_1H_B;
+    public static PathPlannerTrajectory[] _3H_A_1H_CHARGE;
+    public static PathPlannerTrajectory[] _3H_A_1H;
+    public static PathPlannerTrajectory[] _3H_A;
+    public static PathPlannerTrajectory[] _3H_A_1H_B;
 
     // Start at grid index 3, place high, then go to field element A, intake, then
     // go to grid index 2, and place high
-    public static Waypoint[] _3H_A_2H_CHARGE;
-    public static Waypoint[] _3H_A_2H;
-    public static Waypoint[] _3H_A_2H_B;
+    public static PathPlannerTrajectory[] _3H_A_2H_CHARGE;
+    public static PathPlannerTrajectory[] _3H_A_2H;
+    public static PathPlannerTrajectory[] _3H_A_2H_B;
 
     // Paths for the top of the field:
     // Start at grid index 7, place high, then go to field element D, intake, then
     // go to grid index 8, and place high
-    public static Waypoint[] _7H_D_8H_CHARGE;
-    public static Waypoint[] _7H_D_8H;
-    public static Waypoint[] _7H_D;
-    public static Waypoint[] _7H_D_8H_C;
+    public static PathPlannerTrajectory[] _7H_D_8H_CHARGE;
+    public static PathPlannerTrajectory[] _7H_D_8H;
+    public static PathPlannerTrajectory[] _7H_D;
+    public static PathPlannerTrajectory[] _7H_D_8H_C;
 
     // Start at grid index 7, place high, then go to field element D, intake, then
     // go to grid index 9, and place high
-    public static Waypoint[] _7H_D_9H_CHARGE;
-    public static Waypoint[] _7H_D_9H;
-    public static Waypoint[] _7H_D_9H_C;
+    public static PathPlannerTrajectory[] _7H_D_9H_CHARGE;
+    public static PathPlannerTrajectory[] _7H_D_9H;
+    public static PathPlannerTrajectory[] _7H_D_9H_C;
 
     // Start at grid index 8, place high, then go to field element D, intake, then
     // go to grid index 7, and place high
-    public static Waypoint[] _8H_D_7H_CHARGE;
-    public static Waypoint[] _8H_D_7H;
-    public static Waypoint[] _8H_D;
-    public static Waypoint[] _8H_D_7H_C;
+    public static PathPlannerTrajectory[] _8H_D_7H_CHARGE;
+    public static PathPlannerTrajectory[] _8H_D_7H;
+    public static PathPlannerTrajectory[] _8H_D;
+    public static PathPlannerTrajectory[] _8H_D_7H_C;
 
     // Start at grid index 8, place high, then go to field element D, intake, then
     // go to grid index 9, and place high
-    public static Waypoint[] _8H_D_9H_CHARGE;
-    public static Waypoint[] _8H_D_9H;
-    public static Waypoint[] _8H_D_9H_C;
+    public static PathPlannerTrajectory[] _8H_D_9H_CHARGE;
+    public static PathPlannerTrajectory[] _8H_D_9H;
+    public static PathPlannerTrajectory[] _8H_D_9H_C;
 
     // Start at grid index 9, place high, then go to field element D, intake, then
     // go to grid index 7, and place high
-    public static Waypoint[] _9H_D_7H_CHARGE;
-    public static Waypoint[] _9H_D_7H;
-    public static Waypoint[] _9H_D;
-    public static Waypoint[] _9H_D_7H_C;
+    public static PathPlannerTrajectory[] _9H_D_7H_CHARGE;
+    public static PathPlannerTrajectory[] _9H_D_7H;
+    public static PathPlannerTrajectory[] _9H_D;
+    public static PathPlannerTrajectory[] _9H_D_7H_C;
 
     // Start at grid index 9, place high, then go to field element D, intake, then
     // go to grid index 8, and place high
-    public static Waypoint[] _9H_D_8H_CHARGE_BLUE;
-    public static Waypoint[] _9H_D_8H_CHARGE_RED;
-    public static Waypoint[] _9H_D_8H;
-    public static Waypoint[] _9H_D_8H_C;
+    public static PathPlannerTrajectory[] _9H_D_8H_CHARGE_BLUE;
+    public static PathPlannerTrajectory[] _9H_D_8H_CHARGE_RED;
+    public static PathPlannerTrajectory[] _9H_D_8H;
+    public static PathPlannerTrajectory[] _9H_D_8H_C;
 
-    public static Waypoint[] _9H_D_8H_C_8M_RED;
-    public static Waypoint[] _9H_D_8H_C_CHARGE_RED;
+    public static PathPlannerTrajectory[] _9H_D_8H_C_8M_RED;
+    public static PathPlannerTrajectory[] _9H_D_8H_C_CHARGE_RED;
 
-    public static Waypoint[] _9H_D_8H_C_8M_BLUE;
-    public static Waypoint[] _POOF_9H_D_8H_C_CHARGE;
+    public static PathPlannerTrajectory[] _9H_D_8H_C_8M_BLUE;
+    public static PathPlannerTrajectory[] _POOF_9H_D_8H_C_CHARGE;
 
-    public static Waypoint[] _1H_A_2H_B_2M_RED;
-    public static Waypoint[] _POOF_1H_A_2H_B_CHARGE_RED;
+    public static PathPlannerTrajectory[] _1H_A_2H_B_2M_RED;
+    public static PathPlannerTrajectory[] _POOF_1H_A_2H_B_CHARGE_RED;
 
-    public static Waypoint[] _1H_A_2H_B_2M_BLUE;
-    public static Waypoint[] _POOF_1H_A_2H_B_CHARGE_BLUE;
+    public static PathPlannerTrajectory[] _1H_A_2H_B_2M_BLUE;
+    public static PathPlannerTrajectory[] _POOF_1H_A_2H_B_CHARGE_BLUE;
 
-    public static Waypoint[] _4H_MOBILITY;
-    public static Waypoint[] _5H_MOBILITY;
-    public static Waypoint[] _6H_MOBILITY;
-    public static Waypoint[] _6H_ONLY;
-    public static Waypoint[] _4H_MOBILITY_CHARGE;
-    public static Waypoint[] _5H_MOBILITY_CHARGE;
-    public static Waypoint[] _6H_MOBILITY_CHARGE;
+    public static PathPlannerTrajectory[] _4H_MOBILITY;
+    public static PathPlannerTrajectory[] _5H_MOBILITY;
+    public static PathPlannerTrajectory[] _6H_MOBILITY;
+    public static PathPlannerTrajectory[] _6H_ONLY;
+    public static PathPlannerTrajectory[] _4H_MOBILITY_CHARGE;
+    public static PathPlannerTrajectory[] _5H_MOBILITY_CHARGE;
+    public static PathPlannerTrajectory[] _6H_MOBILITY_CHARGE;
 
-    public static Waypoint[] _1H_A_CHARGE;
-    public static Waypoint[] _2H_A_CHARGE;
-    public static Waypoint[] _3H_A_CHARGE;
-    public static Waypoint[] _7H_D_CHARGE;
-    public static Waypoint[] _8H_D_CHARGE;
-    public static Waypoint[] _9H_D_CHARGE;
+    public static PathPlannerTrajectory[] _1H_A_CHARGE;
+    public static PathPlannerTrajectory[] _2H_A_CHARGE;
+    public static PathPlannerTrajectory[] _3H_A_CHARGE;
+    public static PathPlannerTrajectory[] _7H_D_CHARGE;
+    public static PathPlannerTrajectory[] _8H_D_CHARGE;
+    public static PathPlannerTrajectory[] _9H_D_CHARGE;
 
-    public static Waypoint[] _9H_D_7H_REACH;
-    public static Waypoint[] _MOBILITY_CHARGE_TEST_ONLY;
+    public static PathPlannerTrajectory[] _9H_D_7H_REACH;
+    public static PathPlannerTrajectory[] _MOBILITY_CHARGE_TEST_ONLY;
 
-    public static Waypoint[] _POOF_1H_A_2H_B_2MID_BLUE;
-    public static Waypoint[] _POOF_1H_A_2H_B_2LOW_BLUE;
-    public static Waypoint[] _POOF_1H_A_2H_B_2MID_RED;
-    public static Waypoint[] _POOF_1H_A_2H_B_2LOW_RED;
-    public static Waypoint[] _POOF_9H_D_8H_C_8MID;
-    public static Waypoint[] _POOF_9H_D_8H_C_8LOW;
+    public static PathPlannerTrajectory[] _POOF_1H_A_2H_B_2MID_BLUE;
+    public static PathPlannerTrajectory[] _POOF_1H_A_2H_B_2LOW_BLUE;
+    public static PathPlannerTrajectory[] _POOF_1H_A_2H_B_2MID_RED;
+    public static PathPlannerTrajectory[] _POOF_1H_A_2H_B_2LOW_RED;
+    public static PathPlannerTrajectory[] _POOF_9H_D_8H_C_8MID;
+    public static PathPlannerTrajectory[] _POOF_9H_D_8H_C_8LOW;
 
-    public static Waypoint[] _SPIN;
+    public static PathPlannerTrajectory[] _SPIN;
 
     public static PathPlannerTrajectory square1;
     public static PathPlannerTrajectory square2;
@@ -221,6 +224,197 @@ public class AutoPathStorage {
      */
     public AutoPathStorage() {
 
+        loadAutoPaths();
+
+        generateWaypointArrays();
+
+        myAutoContainer = new AutoMap[] {
+                // More commonly used paths first:
+                // 3P 3P 3P 3P
+                new AutoMap("POOF 1A2B2 MID RED", _POOF_1H_A_2H_B_2MID_RED),
+                new AutoMap("POOF 1A2B2 LOW RED", _POOF_1H_A_2H_B_2LOW_RED),
+                new AutoMap("POOF 1A2B2 MID BLUE", _POOF_1H_A_2H_B_2MID_BLUE),
+                new AutoMap("POOF 1A2B2 LOW BLUE", _POOF_1H_A_2H_B_2LOW_BLUE),
+
+                new AutoMap("POOF 9D8C8 MID", _POOF_9H_D_8H_C_8MID),
+                new AutoMap("POOF 9D8C8 LOW", _POOF_9H_D_8H_C_8LOW),
+
+                new AutoMap("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
+                new AutoMap("4H_ONLY", _6H_ONLY),
+
+                new AutoMap("POOF 1A2 B CHARGE RED", _POOF_1H_A_2H_B_CHARGE_RED),
+                new AutoMap("POOF 1A2 B CHARGE BLUE", _POOF_1H_A_2H_B_CHARGE_BLUE),
+
+                new AutoMap("POOF 9D8 C CHARGE", _POOF_9H_D_8H_C_CHARGE),
+
+        };
+
+        for (int i = 0; i < myAutoContainer.length; i++) {
+
+            if (i == 8) {
+                AutoMap MobilityAutoPose = new AutoMap("MOBILITY ONLY!!!!!!", _MOBILITY_ONLY);
+                DriverUI.autoChooser.addOption(MobilityAutoPose.getName(), MobilityAutoPose);
+                DriverUI.autoChooser.addOption(" ".repeat(i), MobilityAutoPose);
+            }
+
+            AutoMap autoMap = myAutoContainer[i];
+
+            DriverUI.autoChooser.addOption(autoMap.getName(), autoMap);
+
+            // Every third index, add a spacer option for simplicity
+            if ((i == 1 || i == 3 || i == 5 || i == 9 || i == 10)
+                    || ((i + 2) % 3 == 0 && i > 10) && (i != myAutoContainer.length - 1)) {
+                DriverUI.autoChooser.addOption(" " + " ".repeat(i), autoMap);
+            }
+        }
+    }
+
+    private void generateWaypointArrays() {
+        /*
+         * The syntax here is as follows:
+         * PATH NAME = new PathPlannerTrajectory[] {
+         * new Waypoint(
+         * PATH,
+         * ARM_PLACEMENT INDEX,
+         * CLAW_SPEED
+         * ),
+         * new Waypoint(
+         * PATH_2,
+         * ARM_PLACEMENT INDEX,
+         * CLAW_SPEED
+         * )
+         * ...
+         * }
+         * If the path is 1/3/7/9, then the arm will go to a cone index
+         * If the path is 2/4/5/8, then the arm will go to a cube index
+         * When going to a number, the claw will outtake, and the arm will go to a
+         * placement position
+         * H = high, M = mid, L = hybrid
+         * When going to a letter, the claw will intake, and the arm will go to the
+         * floor intake
+         * When going to a charge, the claw will stop, and arm stowed
+         * Create waypoint arrays in order as defined from the top of the file
+         */
+
+        _SQUARE_HALF = new PathPlannerTrajectory[] {
+                square1,
+                square2
+        };
+
+        _MOBILITY_ONLY = new PathPlannerTrajectory[] {
+                _MOBILITY
+        };
+
+        _4H_MOBILITY = new PathPlannerTrajectory[] {
+                _4,
+                _4_M_CH
+        };
+
+        _6H_ONLY = new PathPlannerTrajectory[] {
+                _6,
+                _6
+        };
+
+        _6H_MOBILITY = new PathPlannerTrajectory[] {
+                _6,
+                _6_M_CH
+        };
+
+        _4H_MOBILITY_CHARGE = new PathPlannerTrajectory[] {
+                _4,
+                _4_M_CH
+        };
+
+        _5H_MOBILITY_CHARGE = new PathPlannerTrajectory[] {
+                _5,
+                _5_M,
+                _M_CH
+        };
+
+        _6H_MOBILITY_CHARGE = new PathPlannerTrajectory[] {
+                _6,
+                _6_M_CH,
+        };
+
+        _9H_D_8H_C = new PathPlannerTrajectory[] {
+                _9,
+                _9_D_8_RED,
+                _8_C,
+        };
+
+        _9H_D_8H_C_CHARGE_RED = new PathPlannerTrajectory[] {
+                _9,
+                _9_D_8_RED,
+                _8_C_CH_RED,
+        };
+
+        _POOF_9H_D_8H_C_CHARGE = new PathPlannerTrajectory[] {
+                _9,
+                _POOF_9_D_8,
+                _POOF_8_C_CH,
+        };
+
+        _POOF_1H_A_2H_B_CHARGE_BLUE = new PathPlannerTrajectory[] {
+                _1,
+                _1_A_2_BLUE,
+                _POOF_2_B_CH_BLUE,
+        };
+
+        _POOF_1H_A_2H_B_CHARGE_RED = new PathPlannerTrajectory[] {
+                _1,
+                _POOF_1_A_2_RED,
+                _POOF_2_B_CH_RED,
+        };
+
+        _POOF_1H_A_2H_B_2MID_RED = new PathPlannerTrajectory[] {
+                _1,
+                _POOF_1_A_2_RED,
+                _POOF_2_B_2_RED,
+                _2_B
+        };
+
+        _POOF_1H_A_2H_B_2MID_BLUE = new PathPlannerTrajectory[] {
+                _1,
+                _1_A_2_BLUE,
+                _POOF_2_B_2,
+                _2_B
+        };
+
+        _POOF_9H_D_8H_C_8MID = new PathPlannerTrajectory[] {
+                _9,
+                _POOF_9_D_8,
+                _POOF_8_C_8,
+                _8_D
+        };
+
+        _POOF_1H_A_2H_B_2LOW_RED = new PathPlannerTrajectory[] {
+                _1,
+                _POOF_1_A_2_RED,
+                _POOF_2_B_2_RED,
+                _2_B
+        };
+
+        _POOF_1H_A_2H_B_2LOW_BLUE = new PathPlannerTrajectory[] {
+                _1,
+                _1_A_2_BLUE,
+                _POOF_2_B_2,
+                _2_B
+        };
+
+        _POOF_9H_D_8H_C_8LOW = new PathPlannerTrajectory[] {
+                _9,
+                _POOF_9_D_8,
+                _POOF_8_C_8,
+                _8_D
+        };
+
+        _SPIN = new PathPlannerTrajectory[] {
+                _1,
+                _CCWSPIN
+        };
+    }
+
+    private void loadAutoPaths() {
         square1 = PathPlanner.loadPath("Square1", AutoConstants.MAX_SPEED_METERS_PER_SECOND,
                 AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
         square2 = PathPlanner.loadPath("Square2", AutoConstants.MAX_SPEED_METERS_PER_SECOND,
@@ -399,265 +593,17 @@ public class AutoPathStorage {
                 new PathPoint(_9_D_8_RED.getInitialState().poseMeters.getTranslation(),
                         _9_D_8_RED.getInitialState().poseMeters.getRotation(),
                         _9_D_8_RED.getInitialHolonomicPose().getRotation()));
-
-        /*
-         * The syntax here is as follows:
-         * PATH NAME = new Waypoint[] {
-         * new Waypoint(
-         * PATH,
-         * ARM_PLACEMENT INDEX,
-         * CLAW_SPEED
-         * ),
-         * new Waypoint(
-         * PATH_2,
-         * ARM_PLACEMENT INDEX,
-         * CLAW_SPEED
-         * )
-         * ...
-         * }
-         * If the path is 1/3/7/9, then the arm will go to a cone index
-         * If the path is 2/4/5/8, then the arm will go to a cube index
-         * When going to a number, the claw will outtake, and the arm will go to a
-         * placement position
-         * H = high, M = mid, L = hybrid
-         * When going to a letter, the claw will intake, and the arm will go to the
-         * floor intake
-         * When going to a charge, the claw will stop, and arm stowed
-         * Create waypoint arrays in order as defined from the top of the file
-         */
-
-        _SQUARE_HALF = new Waypoint[] {
-                new Waypoint(square1, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-                new Waypoint(square2, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _MOBILITY_ONLY = new Waypoint[] {
-                new Waypoint(_MOBILITY, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _4H_MOBILITY = new Waypoint[] {
-                new Waypoint(_4, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_4_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _6H_ONLY = new Waypoint[] {
-                new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_6, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _6H_MOBILITY = new Waypoint[] {
-                new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_6_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _4H_MOBILITY_CHARGE = new Waypoint[] {
-                new Waypoint(_4, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_4_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _5H_MOBILITY_CHARGE = new Waypoint[] {
-                new Waypoint(_5, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_5_M, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-                new Waypoint(_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _6H_MOBILITY_CHARGE = new Waypoint[] {
-                new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_6_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-        };
-
-        _9H_D_8H_C = new Waypoint[] {
-                new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_8_C, PlacementConstants.CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        };
-
-        _9H_D_8H_C_CHARGE_RED = new Waypoint[] {
-                new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_8_C_CH_RED, PlacementConstants.AUTO_CUBE_INTAKE_INDEX,
-                        PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        };
-
-        _POOF_9H_D_8H_C_CHARGE = new Waypoint[] {
-                new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_9_D_8, PlacementConstants.AUTO_CUBE_HIGH_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_8_C_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        };
-
-        _POOF_1H_A_2H_B_CHARGE_BLUE = new Waypoint[] {
-                new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_2_B_CH_BLUE, PlacementConstants.STOWED_INDEX,
-                        PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        };
-
-        _POOF_1H_A_2H_B_CHARGE_RED = new Waypoint[] {
-                new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_2_B_CH_RED, PlacementConstants.STOWED_INDEX,
-                        PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-        };
-
-        _POOF_1H_A_2H_B_2MID_RED = new Waypoint[] {
-                new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_2_B_2_RED, PlacementConstants.AUTO_CUBE_MID_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
-                new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _POOF_1H_A_2H_B_2MID_BLUE = new Waypoint[] {
-                new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_2_B_2, PlacementConstants.AUTO_CUBE_MID_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
-                new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _POOF_9H_D_8H_C_8MID = new Waypoint[] {
-                new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_POOF_9_D_8, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_8_C_8, PlacementConstants.AUTO_CUBE_MID_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_8_D, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _POOF_1H_A_2H_B_2LOW_RED = new Waypoint[] {
-                new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_POOF_1_A_2_RED, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_2_B_2_RED, PlacementConstants.STOWED_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
-                new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _POOF_1H_A_2H_B_2LOW_BLUE = new Waypoint[] {
-                new Waypoint(_1, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_1_A_2_BLUE, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_2_B_2, PlacementConstants.STOWED_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE_FAST),
-                new Waypoint(_2_B, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _POOF_9H_D_8H_C_8LOW = new Waypoint[] {
-                new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-                new Waypoint(_POOF_9_D_8, PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
-                        PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_POOF_8_C_8, PlacementConstants.STOWED_INDEX,
-                        PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE),
-                new Waypoint(_8_D, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        _SPIN = new Waypoint[] {
-                new Waypoint(_1, 0, 0),
-                new Waypoint(_CCWSPIN, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-        };
-
-        myAutoContainer = new AutoPose[] {
-                // More commonly used paths first:
-                // 3P 3P 3P 3P
-                new AutoPose("POOF 1A2B2 MID RED", _POOF_1H_A_2H_B_2MID_RED),
-                new AutoPose("POOF 1A2B2 LOW RED", _POOF_1H_A_2H_B_2LOW_RED),
-                new AutoPose("POOF 1A2B2 MID BLUE", _POOF_1H_A_2H_B_2MID_BLUE),
-                new AutoPose("POOF 1A2B2 LOW BLUE", _POOF_1H_A_2H_B_2LOW_BLUE),
-
-                new AutoPose("POOF 9D8C8 MID", _POOF_9H_D_8H_C_8MID),
-                new AutoPose("POOF 9D8C8 LOW", _POOF_9H_D_8H_C_8LOW),
-
-                new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
-                new AutoPose("4H_ONLY", _6H_ONLY),
-
-                new AutoPose("POOF 1A2 B CHARGE RED", _POOF_1H_A_2H_B_CHARGE_RED),
-                new AutoPose("POOF 1A2 B CHARGE BLUE", _POOF_1H_A_2H_B_CHARGE_BLUE),
-
-                new AutoPose("POOF 9D8 C CHARGE", _POOF_9H_D_8H_C_CHARGE),
-
-        };
-
-        for (int i = 0; i < myAutoContainer.length; i++) {
-
-            if (i == 8) {
-                AutoPose MobilityAutoPose = new AutoPose("MOBILITY ONLY!!!!!!", _MOBILITY_ONLY);
-                DriverUI.autoChooser.addOption(MobilityAutoPose.getName(), MobilityAutoPose);
-                DriverUI.autoChooser.addOption(" ".repeat(i), MobilityAutoPose);
-            }
-
-            AutoPose AutoPose = myAutoContainer[i];
-
-            DriverUI.autoChooser.addOption(AutoPose.getName(), AutoPose);
-
-            // Every third index, add a spacer option for simplicity
-            if ((i == 1 || i == 3 || i == 5 || i == 9 || i == 10)
-                    || ((i + 2) % 3 == 0 && i > 10) && (i != myAutoContainer.length - 1)) {
-                DriverUI.autoChooser.addOption(" " + " ".repeat(i), AutoPose);
-            }
-        }
     }
-
-    // The waypoint class is used to create a waypoint set
-    // This is so we can create a larger path using multiple waypoints
-    public static class Waypoint {
-
-        private final PathPlannerTrajectory pathPlannerSegment;
-        private final int armPosIndex;
-        private final double clawDirection;
-
-        public Waypoint(PathPlannerTrajectory _PPS, int _index, double _clawDirection) {
-            armPosIndex = _index;
-            clawDirection = _clawDirection;
-            pathPlannerSegment = _PPS;
-        }
-
-        public PathPlannerTrajectory getPathPlannerSegment() {
-            return pathPlannerSegment;
-        }
-
-        public int getArmPosIndex() {
-            return armPosIndex;
-        }
-
-        public double getClawDirection() {
-            return clawDirection;
-        }
-    }
-
     // The auto pose class is used to create a waypoint set with a string
     // This is so we can have it in a drop-down menu in shuffleboard
     @SuppressWarnings({ "CanBeFinal", "SameParameterValue" })
-    public static class AutoPose {
+    public static class AutoMap {
 
         private final String name;
-        private final Waypoint[] thisWPset;
+        private final PathPlannerTrajectory[] trajectories;
 
-        AutoPose(String _S, Waypoint[] _WP) {
-            thisWPset = _WP;
+        AutoMap(String _S, PathPlannerTrajectory[] trajectories) {
+            this.trajectories = trajectories;
             name = _S;
         }
 
@@ -665,8 +611,8 @@ public class AutoPathStorage {
             return name;
         }
 
-        public Waypoint[] getWaypointSet() {
-            return thisWPset;
+        public PathPlannerTrajectory[] getTrajectories() {
+            return trajectories;
         }
     }
 }

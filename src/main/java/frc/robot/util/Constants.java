@@ -5,7 +5,9 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import com.pathplanner.lib.auto.PIDConstants;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -21,6 +23,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 
 /**
@@ -166,9 +169,9 @@ public final class Constants {
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 2.5;// 7;
-        public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0.2;
+        public static final double XY_CORRECTION_P = 2.5;// 7;
+        public static final double XY_CORRECTION_I = 0;
+        public static final double XY_CORRECTION_D = 0.2;
 
         public static final double Y_CORRECTION_P = 2.5;// 6.03;
         public static final double Y_CORRECTION_I = 0;
@@ -178,26 +181,39 @@ public final class Constants {
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0.0025;
 
+        public static final PIDConstants XY_PID_CONSTANTS = 
+            new PIDConstants(
+                XY_CORRECTION_P, XY_CORRECTION_I, XY_CORRECTION_D
+            );
+
+        public static final PIDConstants THETA_PID_CONSTANTS = 
+            new PIDConstants(
+                ROTATION_CORRECTION_P, ROTATION_CORRECTION_I, ROTATION_CORRECTION_D
+            );
+
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
         public static final HolonomicDriveController HDC = new HolonomicDriveController(
-                new PIDController(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
-                new PIDController(
-                        AutoConstants.Y_CORRECTION_P,
-                        AutoConstants.Y_CORRECTION_I,
-                        AutoConstants.Y_CORRECTION_D),
-                new ProfiledPIDController(
-                        AutoConstants.ROTATION_CORRECTION_P,
-                        AutoConstants.ROTATION_CORRECTION_I,
-                        AutoConstants.ROTATION_CORRECTION_D,
-                        new TrapezoidProfile.Constraints(
-                                AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                                AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
+            new PIDController(
+                    AutoConstants.XY_CORRECTION_P,
+                    AutoConstants.XY_CORRECTION_I,
+                    AutoConstants.XY_CORRECTION_D),
+            new PIDController(
+                    AutoConstants.XY_CORRECTION_P,
+                    AutoConstants.XY_CORRECTION_I,
+                    AutoConstants.XY_CORRECTION_D),
+            new ProfiledPIDController(
+                    AutoConstants.ROTATION_CORRECTION_P,
+                    AutoConstants.ROTATION_CORRECTION_I,
+                    AutoConstants.ROTATION_CORRECTION_D,
+                    new TrapezoidProfile.Constraints(
+                            AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                            AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
+
+        public static HashMap<String, Command> EVENT_MAP = new HashMap<>();
+        
     }
 
     public static final class ClawConstants {
@@ -556,7 +572,7 @@ public final class Constants {
         public static final int CONE_MID_PLACEMENT_INDEX = 2;
         public static final int CONE_HIGH_PLACEMENT_INDEX = 3;
         public static final int HUMAN_TAG_PICKUP_INDEX = 4;
-        public static final int CUBE_MID_INDEX = 5;
+        public static final int CUBE_MID_PLACEMENT_INDEX = 5;
         public static final int CUBE_HIGH_PLACEMENT_INDEX = 6;
         public static final int FLOOR_INTAKE_INDEX = 7;
         @Deprecated // Please use ARM_FLIP_INDEX instead...
@@ -782,6 +798,7 @@ public final class Constants {
 
         public static final Trajectory HIGH_CONE_TRAJECTORY = ArmCalculations.generateHighConeTrajectory();
         public static final Trajectory MID_CONE_TRAJECTORY = ArmCalculations.generateMidConeTrajectory();
+        public static final Trajectory MID_CUBE_TRAJECTORY = ArmCalculations.generateMidCubeTrajectory();
         public static final Trajectory HIGH_CUBE_TRAJECTORY = ArmCalculations.generateHighCubeTrajectory();
         public static final Trajectory HIGH_PLACE_TRAJECTORY = ArmCalculations.generateHighPlacementTrajectory();
         public static final Trajectory HIGH_CONE_TO_STOWED_TRAJECTORY = ArmCalculations.generateHighToStowTrajectory();

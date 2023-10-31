@@ -12,20 +12,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AutoAlignment;
 import frc.robot.commands.Drive;
-import frc.robot.commands.auto.AutoSegmentedWaypoints;
 import frc.robot.commands.auto.AutoPathStorage;
-import frc.robot.commands.auto.AutoPathStorage.AutoPose;
+import frc.robot.commands.auto.AutoPathStorage.AutoMap;
 import frc.robot.subsystems.ArduinoController;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.PhotonCameraUtil;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.PlacementConstants;
+import io.github.oblarg.oblog.Logger;
 
 public class RobotContainer {
 
@@ -41,9 +42,10 @@ public class RobotContainer {
     @SuppressWarnings("unused")
     private final AutoPathStorage autoPathStorage;
     @SuppressWarnings("unused")
-    private final DriverUI driverUI;
+    private final DriverUI driverUI = new DriverUI();
     
     public RobotContainer() {
+        Logger.configureLoggingAndConfig(this, false);
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
 
@@ -51,10 +53,9 @@ public class RobotContainer {
         arm = new Arm();
         claw = new Claw();
         photonVision = new PhotonCameraUtil();
+        autoPathStorage = new AutoPathStorage();
         autoAlignment = new AutoAlignment(swerve, photonVision);
         arduinoController = new ArduinoController();
-        autoPathStorage = new AutoPathStorage();
-        driverUI = new DriverUI();
 
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -62,13 +63,15 @@ public class RobotContainer {
             driver::getLeftX,
             () -> -driver.getRightX(),
             () -> !driver.y().getAsBoolean(),
-            () -> !driver.y().getAsBoolean()
+            () -> !driver.y().getAsBoolean(),
+            () -> (driver.y().getAsBoolean() && FieldConstants.ALLIANCE == Alliance.Blue)
         ));
 
         photonVision.setDefaultCommand(autoAlignment.calibrateOdometry());
 
         incinerateMotors();
         configureButtonBindings();
+        generateEventMap();
 
         // Wait wait wait wait for the DS to connect
         // then assign our alliance color
@@ -77,6 +80,12 @@ public class RobotContainer {
         }
 
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
+
+        Commands.runOnce(() -> DriverUI.currentTimestamp = Timer.getFPGATimestamp())
+            .andThen(Logger::updateEntries)
+            .ignoringDisable(true)
+            .repeatedly()
+            .schedule();
     }
 
     private void configureButtonBindings() {
@@ -113,8 +122,7 @@ public class RobotContainer {
                         }
                     )
                 )
-            )
-            .onFalse(swerve.resetHDC());
+            );
 
         driver.leftBumper().whileTrue(Commands.run(swerve::getSetWheelsX));
  
@@ -159,11 +167,11 @@ public class RobotContainer {
         operator.a().whileTrue(arm.finishPlacmentCommand());
         
         operator.b()
-            .onTrue(arm.getDriveCommand(() -> PlacementConstants.CONE_FLIP_INDEX)
+            .onTrue(arm.setArmIndexCommand(() -> PlacementConstants.CONE_FLIP_INDEX)
             .until(arm::halfwayFinishedWithConeFlip)
             .andThen(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_INTAKE_SPEED_CONE)));
 
-        operator.rightStick().and(() -> !arm.getAtPlacementPosition()).onTrue(arm.getDriveCommand(() -> PlacementConstants.STOWED_INDEX));
+        operator.rightStick().and(() -> !arm.getAtPlacementPosition()).onTrue(arm.setArmIndexCommand(() -> PlacementConstants.STOWED_INDEX));
 
         operator.back().or(operator.start()).onTrue(arm.getUnflipCommand());
 
@@ -213,23 +221,44 @@ public class RobotContainer {
             .andThen(operator.setRumble(() -> 0)));
     }
 
+    public void generateEventMap() {
+
+        AutoConstants.EVENT_MAP.put("Stow", arm.getAutoStowCommand());
+
+        AutoConstants.EVENT_MAP.put("CubeIntake", 
+            arm.setArmIndexCommand(() -> PlacementConstants.CUBE_INTAKE_INDEX)
+            .alongWith(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_INTAKE_SPEED_CUBE))
+        );
+
+        AutoConstants.EVENT_MAP.put("PlaceHighCube", arm.placeHighCubeCommand());
+        AutoConstants.EVENT_MAP.put("PlaceHighCone", arm.getPOVHighCommand());
+        AutoConstants.EVENT_MAP.put("PlaceMidCube", arm.getPOVLeftCommand(() -> swerve.getPose().getX()));        
+
+        AutoConstants.EVENT_MAP.put("PlaceCube", 
+            claw.outTakeforXSeconds(() -> 0.15)
+            .andThen(arm.getAutoStowCommand())
+        );
+
+    }
+
     public Command getAutonomousCommand() {
-        boolean unfinished = true;
-        if (unfinished) {
-            return null;
-        }
-        AutoPose chosenAutoPath;
+        AutoMap chosenAutoPath;
 
         if (DriverUI.autoChooser.getSelected() == null) {
             chosenAutoPath = AutoPathStorage.myAutoContainer[0];
         } else {
             chosenAutoPath = DriverUI.autoChooser.getSelected();
         }
-        return new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment, chosenAutoPath);
+        return swerve.fullAuto(() -> chosenAutoPath.getTrajectories());
     }
 
     public Command getDisabledCommand() {
         return Commands.run(() -> FieldConstants.ALLIANCE = DriverStation.getAlliance()).ignoringDisable(true);
+    }
+
+    public void onEnabled() {
+        Commands.runOnce(() -> DriverUI.modeStartTimestamp = DriverUI.currentTimestamp)
+            .schedule();
     }
 
     private void incinerateMotors() {

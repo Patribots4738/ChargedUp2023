@@ -7,7 +7,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriverUI;
@@ -26,7 +25,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class AutoAlignment extends CommandBase {
+public class AutoAlignment {
 
     /**
      * A visual representation of the apriltag positions
@@ -48,7 +47,6 @@ public class AutoAlignment extends CommandBase {
     private int tagID;
     private int coneOffset = 0;
     private int substationOffset = -1;
-    private double startedChargePad = -1;
     private Timer alignmentTimer = new Timer();
 
     // This variable is used to tell us how far away we currently are from an april
@@ -58,8 +56,6 @@ public class AutoAlignment extends CommandBase {
     public AutoAlignment(Swerve swerve, PhotonCameraUtil photonVision) {
         this.swerve = swerve;
         this.photonVision = photonVision;
-
-        addRequirements(swerve, photonVision);
     }
 
     /**
@@ -189,7 +185,7 @@ public class AutoAlignment extends CommandBase {
                 new Pose2d(
                         swerve.getPose().getX(),
                         adjustedY,
-                        targetPose.getRotation().plus(Rotation2d.fromDegrees(180))),
+                        targetPose.getRotation()),
                 // Notice the 0 m/s here
                 // This is because we want the robot to end at a stop,
                 // This might be funky when we manually drive it on the X axis

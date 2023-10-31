@@ -1,6 +1,6 @@
 package frc.robot;
 
-import frc.robot.commands.auto.AutoPathStorage.AutoPose;
+import frc.robot.commands.auto.AutoPathStorage.AutoMap;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import io.github.oblarg.oblog.Loggable;
@@ -14,7 +14,7 @@ public class DriverUI implements Loggable {
     // Be sure to look through https://oblog-docs.readthedocs.io/en/latest :')
 
     @Log(name="Select Auto:", rowIndex = 0, columnIndex = 4, height = 1, width = 2)
-    public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
+    public static SendableChooser<AutoMap> autoChooser = new SendableChooser<>();
     
     @BooleanBox(name = "Fresh Code", rowIndex = 0, columnIndex = 10, height = 1, width = 1, colorWhenTrue = "lime")
     public static boolean freshCode = true;
@@ -40,6 +40,10 @@ public class DriverUI implements Loggable {
 
     @Log(name = "Starting rotation", rowIndex = 5, columnIndex = 0, height = 1, width = 1)
     public static double startingRotation = 0;
+
+    public static double currentTimestamp = 0;
+    public static double modeStartTimestamp = 0;
+    public static int overrunCount = 0;
 
     public DriverUI() {}
 }

@@ -6,6 +6,9 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -26,6 +29,7 @@ import frc.robot.util.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriverUI;
@@ -37,8 +41,6 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.PlacementConstants;
 
 public class Swerve extends SubsystemBase {
-
-    public static double twistScalar = 4;
 
     private double speedMultiplier = 1;
 
@@ -74,7 +76,7 @@ public class Swerve extends SubsystemBase {
     private double[] desiredModuleStates = new double[6];
     private double[] realModuleStates = new double[6];
 
-    
+    private SwerveAutoBuilder swerveAutoBuilder;
 
     // The gyro sensor
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
@@ -126,6 +128,16 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
         SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
         SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
+        DriverUI.field.setRobotPose(new Pose2d());
+
+        swerveAutoBuilder = new SwerveAutoBuilder(
+            this::getPose, 
+            this::resetOdometry, 
+            AutoConstants.XY_PID_CONSTANTS, 
+            AutoConstants.THETA_PID_CONSTANTS, 
+            this::driveInAuto, 
+            AutoConstants.EVENT_MAP, 
+            this);
 
 
     }
@@ -144,7 +156,7 @@ public class Swerve extends SubsystemBase {
     
             SwerveModuleState[] measuredStates =
             new SwerveModuleState[] {
-              frontLeft.getSimState(), frontRight.getSimState(), rearLeft.getSimState(), rearRight.getSimState()
+              frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
             };
             
             ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(measuredStates);
@@ -155,10 +167,10 @@ public class Swerve extends SubsystemBase {
                         speeds.omegaRadiansPerSecond * .02)));
     
             realModuleStates = new double[] {
-                frontLeft.getSimState().angle.getRadians(), frontLeft.getSimState().speedMetersPerSecond,
-                frontRight.getSimState().angle.getRadians(), frontRight.getSimState().speedMetersPerSecond,
-                rearLeft.getSimState().angle.getRadians(), rearLeft.getSimState().speedMetersPerSecond,
-                rearRight.getSimState().angle.getRadians(), rearRight.getSimState().speedMetersPerSecond
+                frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
+                frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
+                rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
+                rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
             };
         }
 
@@ -300,6 +312,9 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    public void driveInAuto(ChassisSpeeds speeds) {
+        drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, false, false);
+    }
     /**
      * This is the most theoretical thing that is in the code.
      * It takes our current position and then adds an offset to it, knowing that the
@@ -527,11 +542,11 @@ public class Swerve extends SubsystemBase {
                 controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond,
                 controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond
             );
-        }, () -> false, () -> false);
+        }, () -> false, () -> false, () -> false);
     }
 
     public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, boolean fieldRelative, boolean rateLimit) {
-        return new Drive(this, speeds, () -> fieldRelative, () -> rateLimit);
+        return new Drive(this, speeds, () -> fieldRelative, () -> rateLimit, () -> false);
     }
 
     public Rotation2d getClosest180Rotation2d() {
@@ -544,5 +559,13 @@ public class Swerve extends SubsystemBase {
 
     public Trigger getTiltedTrigger() {
         return new Trigger(() -> Math.abs(getPitch().getDegrees()) > 35);
+    }
+
+    public Command fullAuto(Supplier<PathPlannerTrajectory[]> trajectories) {
+        Command[] commands = new Command[trajectories.get().length];
+        for (int i = 0; i < trajectories.get().length; i++) {
+            commands[i] = swerveAutoBuilder.fullAuto(trajectories.get()[i]);
+        }
+        return Commands.sequence(commands);
     }
 }

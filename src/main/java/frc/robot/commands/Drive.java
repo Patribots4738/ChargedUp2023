@@ -19,6 +19,7 @@ public class Drive extends CommandBase {
     private final DoubleSupplier rotationSupplier;
     private final BooleanSupplier fieldRelativeSupplier;
     private final BooleanSupplier rateLimitSupplier;
+    private final BooleanSupplier shouldMirror;
     
     public Drive(
             Swerve swerve, 
@@ -26,7 +27,8 @@ public class Drive extends CommandBase {
             DoubleSupplier ySupplier,
             DoubleSupplier rotationsSupplier, 
             BooleanSupplier rateLimitSupplier, 
-            BooleanSupplier fieldRelativeSupplier) 
+            BooleanSupplier fieldRelativeSupplier,
+            BooleanSupplier shouldMirror) 
     {
 
         this.swerve = swerve;
@@ -37,11 +39,12 @@ public class Drive extends CommandBase {
 
         this.fieldRelativeSupplier = fieldRelativeSupplier;
         this.rateLimitSupplier = rateLimitSupplier;
+        this.shouldMirror = shouldMirror;
 
         addRequirements(swerve);
     }
 
-    public Drive (Swerve swerve, Supplier<ChassisSpeeds> speeds, BooleanSupplier rateLimitSupplier, BooleanSupplier fieldRelativeSupplier) {
+    public Drive (Swerve swerve, Supplier<ChassisSpeeds> speeds, BooleanSupplier rateLimitSupplier, BooleanSupplier fieldRelativeSupplier, BooleanSupplier shouldMirror) {
         
         this.swerve = swerve;
         
@@ -51,6 +54,7 @@ public class Drive extends CommandBase {
 
         this.fieldRelativeSupplier = fieldRelativeSupplier;
         this.rateLimitSupplier = rateLimitSupplier;
+        this.shouldMirror = shouldMirror;
 
         addRequirements(swerve);
     }
@@ -62,7 +66,7 @@ public class Drive extends CommandBase {
     public void execute() {
         double x = xSupplier.getAsDouble();
         double y = ySupplier.getAsDouble();
-        if (!fieldRelativeSupplier.getAsBoolean() && FieldConstants.ALLIANCE == Alliance.Red) {
+        if (shouldMirror.getAsBoolean()) {
             x *= -1;
             y *= -1;
         }

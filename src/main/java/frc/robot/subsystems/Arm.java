@@ -655,7 +655,7 @@ public class Arm extends SubsystemBase {
                 armPosDimension1 == PlacementConstants.AUTO_CUBE_HIGH_INDEX ||
                 armPosDimension1 == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
                 armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-                armPosDimension1 == PlacementConstants.CUBE_MID_INDEX ||
+                armPosDimension1 == PlacementConstants.CUBE_MID_PLACEMENT_INDEX ||
                 armPosDimension1 == PlacementConstants.AUTO_CUBE_MID_INDEX ||
                 armPosDimension1 == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
                 armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
@@ -668,6 +668,19 @@ public class Arm extends SubsystemBase {
                 armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_INDEX ||
                 armPosDimension1 == PlacementConstants.CONE_MID_PREP_INDEX ||
                 followingTrajectory);
+    }
+
+    public boolean getHotReload(int index) {
+
+        switch (index) {
+            case (PlacementConstants.CONE_HIGH_PREP_INDEX):
+                return getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
+            case (PlacementConstants.CONE_MID_PREP_INDEX):
+                return getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
+        }
+
+        return false;
+        
     }
 
     // If we are at a prep index,
@@ -689,29 +702,29 @@ public class Arm extends SubsystemBase {
     public Command getAutoStowCommand() {
         return runOnce(() -> {
             if (getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
-            getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-            getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX) 
-        {
-      
-            setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
-            startTrajectory(
-                PlacementConstants.CONE_MODE
-                    ? PlacementConstants.HIGH_CONE_TO_STOWED_TRAJECTORY
-                    : PlacementConstants.HIGH_CUBE_TO_STOWED_TRAJECTORY
-            );
-
-        } else if (getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
-                getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
-                getArmIndex() == PlacementConstants.CUBE_MID_INDEX) 
-        {
-
-            setArmIndex(PlacementConstants.MID_TO_STOWED_INDEX);
-
-        } else {
-
-            setArmIndex(PlacementConstants.STOWED_INDEX);
+                getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
+                getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX) 
+            {
         
-        }
+                setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+                startTrajectory(
+                    PlacementConstants.CONE_MODE
+                        ? PlacementConstants.HIGH_CONE_TO_STOWED_TRAJECTORY
+                        : PlacementConstants.HIGH_CUBE_TO_STOWED_TRAJECTORY
+                );
+
+            } else if (getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
+                        getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
+                        getArmIndex() == PlacementConstants.CUBE_MID_PLACEMENT_INDEX) 
+            {
+
+                setArmIndex(PlacementConstants.MID_TO_STOWED_INDEX);
+
+            } else {
+
+                setArmIndex(PlacementConstants.STOWED_INDEX);
+            
+            }
         });
     }
 
@@ -726,13 +739,27 @@ public class Arm extends SubsystemBase {
     public Command getPOVHighCommand() {
         return runOnce(() -> {
             // Hot reload means that we are inputting prep to place -> prep
-            boolean hotReloadHigh = getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
-            setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX);
-            if (!hotReloadHigh) { 
-                startTrajectory((PlacementConstants.CONE_MODE) ? PlacementConstants.HIGH_CONE_TRAJECTORY : PlacementConstants.HIGH_CUBE_TRAJECTORY); 
-            }
+            startTrajectoryCommand(
+                (PlacementConstants.CONE_MODE) ? 
+                    PlacementConstants.CONE_HIGH_PREP_INDEX : 
+                    PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
+                (PlacementConstants.CONE_MODE) ? 
+                    PlacementConstants.HIGH_CONE_TRAJECTORY : 
+                    PlacementConstants.HIGH_CUBE_TRAJECTORY);
         });
     }
+
+    private void startTrajectoryCommand(int index, Trajectory trajectory) {
+        setArmIndex(index);
+        if (!getHotReload(index)) { 
+            startTrajectory(trajectory); 
+        }
+    }
+
+    public Command placeHighCubeCommand() {
+        return runOnce(() -> startTrajectory(PlacementConstants.MID_CUBE_TRAJECTORY))
+            .until(this::getAtDesiredPositions);
+    } 
 
     public Command getPOVDownCommand() {
         return runOnce(() -> {
@@ -743,11 +770,13 @@ public class Arm extends SubsystemBase {
     public Command getPOVLeftCommand(DoubleSupplier xPosition) {
         return runOnce(() -> {
             if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST) {
-                boolean hotReloadMid = getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
-                setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
-                if (!hotReloadMid && PlacementConstants.CONE_MODE) { 
-                    startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); 
-                }
+                startTrajectoryCommand(
+                    (PlacementConstants.CONE_MODE) ? 
+                        PlacementConstants.CONE_MID_PREP_INDEX : 
+                        PlacementConstants.CUBE_MID_PLACEMENT_INDEX,
+                    (PlacementConstants.CONE_MODE) ? 
+                        PlacementConstants.MID_CONE_TRAJECTORY : 
+                        PlacementConstants.MID_CUBE_TRAJECTORY);
             }
             else {
                 setArmMidOrHumanPlayer(xPosition.getAsDouble());
@@ -766,7 +795,7 @@ public class Arm extends SubsystemBase {
         });
     }
 
-    public Command getDriveCommand(IntSupplier index) {
+    public Command setArmIndexCommand(IntSupplier index) {
         return runOnce(() -> setArmIndex(index.getAsInt()));
     }
 
@@ -781,7 +810,7 @@ public class Arm extends SubsystemBase {
         }
         else {
             boolean hotReloadMid = getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
-            setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
+            setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_PLACEMENT_INDEX);
             if (!hotReloadMid && PlacementConstants.CONE_MODE) { startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
         }
     }
@@ -802,14 +831,14 @@ public class Arm extends SubsystemBase {
                     case PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX:
                         setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX, true);
                         break;
-                    case PlacementConstants.CUBE_MID_INDEX:
+                    case PlacementConstants.CUBE_MID_PLACEMENT_INDEX:
                         setArmIndex(PlacementConstants.CONE_MID_PREP_INDEX, true);
                         break;
                     case PlacementConstants.CONE_HIGH_PREP_INDEX:
                         setArmIndex(PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX, true);
                         break;
                     case PlacementConstants.CONE_MID_PREP_INDEX:
-                        setArmIndex(PlacementConstants.CUBE_MID_INDEX, true);
+                        setArmIndex(PlacementConstants.CUBE_MID_PLACEMENT_INDEX, true);
                         break;
                     case PlacementConstants.CONE_INTAKE_INDEX:
                         setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX, true);
