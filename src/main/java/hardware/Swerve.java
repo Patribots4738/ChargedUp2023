@@ -20,7 +20,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import calc.ADIS16470_IMU;
 import calc.Pose3dLogger;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.DriverUI;
 import frc.robot.util.Logger.SwerveLogBuilder;
 import frc.robot.util.Logger.SwerveLogger;
@@ -118,7 +117,7 @@ public class Swerve {
 
   public void periodic() {
 
-    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+    poseEstimator.updateWithTime(DriverUI.currentTimestamp, getGyroAngle(), getModulePositions());
 
   }
 
