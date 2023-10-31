@@ -1,9 +1,14 @@
 package frc.robot.util;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.OIConstants;
@@ -107,14 +112,17 @@ public class PatriBoxController extends CommandXboxController {
         distance = (distance > 1) ? 1 : distance;
 
         output = new Translation2d(Math.signum(x) * distance, new Rotation2d(Math.atan(y / x)));
-
         return output;
     }
 
-    public static double getDistance(double x1, double y1, double x2, double y2) {
+    private double getDistance(double x1, double y1, double x2, double y2) {
         return Math.sqrt(
                 (Math.pow(x1, 2) + Math.pow(y1, 2)) /
                         (Math.pow(x2, 2) + Math.pow(y2, 2)));
+    }
+
+    public Command setRumble(DoubleSupplier rumble) {
+        return Commands.runOnce(() -> this.getHID().setRumble(RumbleType.kBothRumble, rumble.getAsDouble()));
     }
 
 }

@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriverUI;
 import frc.robot.commands.Drive;
 import frc.robot.util.SwerveUtils;
@@ -539,5 +540,9 @@ public class Swerve extends SubsystemBase {
 
     public Command resetHDC() {
         return runOnce(() -> AutoConstants.HDC.getThetaController().reset(getYaw().getRadians()));
+    }
+
+    public Trigger getTiltedTrigger() {
+        return new Trigger(() -> Math.abs(getPitch().getDegrees()) > 35);
     }
 }

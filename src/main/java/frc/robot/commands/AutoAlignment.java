@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -8,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriverUI;
 import frc.robot.subsystems.PhotonCameraUtil;
 import frc.robot.subsystems.Swerve;
@@ -430,8 +432,22 @@ public class AutoAlignment extends CommandBase {
         }
     }
 
+    public Command setConeModeTrue() {
+        return Commands.runOnce(() -> setConeMode(true));
+    }
+
+    public Command setConeModeFalse() {
+        return Commands.runOnce(() -> setConeMode(false));
+    }
+
     public double getCurrentNorm() {
         return this.currentNorm;
+    }
+
+    public Trigger getAlignedTrigger(DoubleSupplier threshold) {
+        return new Trigger(() -> 
+            getCurrentNorm() < (threshold.getAsDouble()) && (getCurrentNorm() != -1)
+        );
     }
 
     public double getAngleSnapThetaSpeed(Rotation2d desiredAngle) {

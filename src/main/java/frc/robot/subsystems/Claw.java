@@ -1,12 +1,16 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriverUI;
 import frc.robot.util.Constants.ClawConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -16,15 +20,9 @@ import frc.robot.util.Constants.PlacementConstants;
 public class Claw extends SubsystemBase {
 
     private final CANSparkMax claw;
-    private final RelativeEncoder clawEncoder;
     private double desiredSpeed = 0;
     private boolean intakeMode = false;
 
-    // Timer values to have the claw auto outtake for X seconds
-    private boolean startedOuttakingBool = false;
-    private boolean finishedOuttaking = false;
-    private double outtakeSeconds = 0;
-    private double startedOuttakingTimestamp = 0;
     private double startedIntakingTimestamp = 0;
     private boolean hasGameElement = false;
     private boolean hasGameElementOneLoopBehind = false;
@@ -36,9 +34,6 @@ public class Claw extends SubsystemBase {
         claw = new CANSparkMax(ClawConstants.CLAW_CAN_ID, MotorType.kBrushless);
         claw.restoreFactoryDefaults();
 
-        clawEncoder = claw.getEncoder();
-        clawEncoder.setPositionConversionFactor(ClawConstants.CLAW_POSITION_CONVERSION_FACTOR);
-
         claw.setSmartCurrentLimit(ClawConstants.CLAW_CURRENT_LIMIT);
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
         claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
@@ -49,10 +44,6 @@ public class Claw extends SubsystemBase {
 
         setBrakeMode();
 
-    }
-
-    public void resetEncoder() {
-        clawEncoder.setPosition(0);
     }
 
     @Override
@@ -105,10 +96,6 @@ public class Claw extends SubsystemBase {
 
         if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) {
 
-            // This is for automatically outtaking the game piece
-            if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
-                finishedOuttaking = true;
-            }
             // Slow down claw for cube mode
             if (!PlacementConstants.CONE_MODE &&
                     (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP
@@ -169,29 +156,13 @@ public class Claw extends SubsystemBase {
         return this.desiredSpeed;
     }
 
-    public void outTakeforXSeconds(double X) {
-        setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
-        this.startedOuttakingBool = true;
-        this.outtakeSeconds = X;
-        this.finishedOuttaking = false;
-        this.startedOuttakingTimestamp = Timer.getFPGATimestamp();
+    public Command outTakeforXSeconds(DoubleSupplier X) {
+        return runOnce(() -> {
+            setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
+        }).andThen(Commands.waitSeconds(X.getAsDouble())
+        .andThen(runOnce(() -> setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED))));
     }
 
-    public boolean getFinishedOuttaking() {
-        return this.finishedOuttaking;
-    }
-
-    public void setStartedOuttakingBool(boolean startedOuttakingBool) {
-        this.startedOuttakingBool = startedOuttakingBool;
-    }
-
-    public boolean getStartedOuttakingBool() {
-        return this.startedOuttakingBool;
-    }
-
-    public void setFinishedOuttaking(boolean finishedOuttaking) {
-        this.finishedOuttaking = finishedOuttaking;
-    }
 
     public void updateOutputCurrent() {
         current = claw.getOutputCurrent();
@@ -204,6 +175,14 @@ public class Claw extends SubsystemBase {
 
     public boolean justAquiredGameElement() {
         return !hasGameElementOneLoopBehind && hasGameElement;
+    }
+
+    public Command setDesiredSpeedCommand(DoubleSupplier desiredSpeed) {
+        return runOnce(() -> setDesiredSpeed(desiredSpeed.getAsDouble()));
+    }
+
+    public Trigger hasGameElementTrigger() {
+        return new Trigger(() -> hasGameElement);
     }
 
 }

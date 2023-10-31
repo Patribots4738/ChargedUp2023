@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -17,10 +21,12 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.ArmCalculations;
 import frc.robot.util.Constants.ArmConstants;
@@ -75,6 +81,9 @@ public class Arm extends SubsystemBase {
     private double[] trajectoryFinalAngles;
     private Timer trajectoryTimer;
     private boolean followingTrajectory;
+
+    private double lowerArmEncoderSimPosition = 0;
+    private double upperArmEncoderSimPosition = 0;
 
     private final Mechanism2d armDesiredMechanism = new Mechanism2d(
             Units.inchesToMeters(ArmConstants.MAX_REACH) * 2, Units.inchesToMeters(ArmConstants.MAX_REACH));
@@ -211,6 +220,15 @@ public class Arm extends SubsystemBase {
             trajectoryPeriodic();
         }
 
+        if ((FieldConstants.IS_SIMULATION)) {
+            if (Math.abs(lowerReferenceAngle - lowerArmEncoderSimPosition) > Units.degreesToRadians(3)) {
+                lowerArmEncoderSimPosition += (lowerReferenceAngle - lowerArmEncoderSimPosition)/10;
+            }
+            if (Math.abs(upperReferenceAngle - upperArmEncoderSimPosition) > Units.degreesToRadians(3)) {
+                upperArmEncoderSimPosition += (upperReferenceAngle - upperArmEncoderSimPosition)/10;
+            }
+        }
+
         // Check if we want to use secondary PID gains
         // Slot 1 is used to make the arm go super fast
         // Slot 2 is an in-between gain set which
@@ -218,12 +236,6 @@ public class Arm extends SubsystemBase {
         boolean upperPIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
         boolean upperPIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP)
                 && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
-
-        // If by chance our desired PID slot for the upper arm changes,
-        // update our upper arm's desired PID inputs
-        if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
-            setUpperArmAngle(upperReferenceAngle);
-        }
 
         // On either PID slot boolean change
         // update both, then ask the SparkMAX to change its ff
@@ -244,6 +256,8 @@ public class Arm extends SubsystemBase {
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI / 2))))
                 + (ArmConstants.UPPER_ARM_LENGTH
                         * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI / 2)))));
+
+        logArmData();
     }
 
     public void trajectoryPeriodic() {
@@ -600,24 +614,24 @@ public class Arm extends SubsystemBase {
         lowerArmPIDController.setReference(position, ControlType.kPosition);
     }
 
-    /**
+        /**
      * Get the current position of the upper arm
      *
      * @return the current position of the upper arm
-     *         This unit is in rads
+     * This unit is in rads
      */
     public double getUpperArmAngle() {
-        return upperArmEncoder.getPosition();
+        return (!FieldConstants.IS_SIMULATION) ? upperArmEncoder.getPosition() : upperArmEncoderSimPosition;
     }
 
     /**
      * Get the current position of the lower arm
      *
      * @return the current position of the lower arm
-     *         This unit is in rads
+     * This unit is in rads
      */
     public double getLowerArmAngle() {
-        return lowerArmEncoder.getPosition();
+        return (!FieldConstants.IS_SIMULATION) ? lowerArmEncoder.getPosition() : lowerArmEncoderSimPosition;
     }
 
     public boolean getAtDesiredPositions() {
@@ -672,6 +686,106 @@ public class Arm extends SubsystemBase {
         }
     }
 
+    public Command getAutoStowCommand() {
+        return runOnce(() -> {
+            if (getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
+            getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
+            getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX) 
+        {
+      
+            setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
+            startTrajectory(
+                PlacementConstants.CONE_MODE
+                    ? PlacementConstants.HIGH_CONE_TO_STOWED_TRAJECTORY
+                    : PlacementConstants.HIGH_CUBE_TO_STOWED_TRAJECTORY
+            );
+
+        } else if (getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
+                getArmIndex() == PlacementConstants.CONE_MID_PLACEMENT_INDEX ||
+                getArmIndex() == PlacementConstants.CUBE_MID_INDEX) 
+        {
+
+            setArmIndex(PlacementConstants.MID_TO_STOWED_INDEX);
+
+        } else {
+
+            setArmIndex(PlacementConstants.STOWED_INDEX);
+        
+        }
+        });
+    }
+
+    public Command finishPlacmentCommand() {
+        return runOnce(() -> finishPlacement());
+    }
+
+    public Command getUnflipCommand() {
+        return runOnce(() -> setArmIndex(PlacementConstants.ARM_FLIP_INDEX));
+    }
+
+    public Command getPOVHighCommand() {
+        return runOnce(() -> {
+            // Hot reload means that we are inputting prep to place -> prep
+            boolean hotReloadHigh = getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
+            setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX);
+            if (!hotReloadHigh) { 
+                startTrajectory((PlacementConstants.CONE_MODE) ? PlacementConstants.HIGH_CONE_TRAJECTORY : PlacementConstants.HIGH_CUBE_TRAJECTORY); 
+            }
+        });
+    }
+
+    public Command getPOVDownCommand() {
+        return runOnce(() -> {
+            setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_INTAKE_INDEX : PlacementConstants.CUBE_INTAKE_INDEX);
+        });
+    }
+
+    public Command getPOVLeftCommand(DoubleSupplier xPosition) {
+        return runOnce(() -> {
+            if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST) {
+                boolean hotReloadMid = getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
+                setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
+                if (!hotReloadMid && PlacementConstants.CONE_MODE) { 
+                    startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); 
+                }
+            }
+            else {
+                setArmMidOrHumanPlayer(xPosition.getAsDouble());
+            }
+        });
+    }
+
+    public Command getPOVRightCommand(DoubleSupplier xPosition) {
+        return runOnce(() -> {
+            if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST) {
+                setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+            }
+            else {
+                setArmMidOrHumanPlayer(xPosition.getAsDouble());
+            }
+        });
+    }
+
+    public Command getDriveCommand(IntSupplier index) {
+        return runOnce(() -> setArmIndex(index.getAsInt()));
+    }
+
+    public void setArmMidOrHumanPlayer(double xPosition) {
+        /*
+         * If we are on blue alliance, make it so that the left and right buttons set the arm to human tag
+         *   when the robot is halfway across the field
+         * this code is in place due to our operator confusing the buttons and clicking the wrong one.
+         */
+        if ((FieldConstants.ALLIANCE == Alliance.Blue) ? (xPosition > FieldConstants.FIELD_WIDTH_METERS/2) : (xPosition < FieldConstants.FIELD_WIDTH_METERS/2)) {
+            setArmIndex(PlacementConstants.HUMAN_TAG_PICKUP_INDEX);
+        }
+        else {
+            boolean hotReloadMid = getArmIndex() == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX;
+            setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_MID_PREP_INDEX : PlacementConstants.CUBE_MID_INDEX);
+            if (!hotReloadMid && PlacementConstants.CONE_MODE) { startTrajectory(PlacementConstants.MID_CONE_TRAJECTORY); }
+        }
+    }
+
     /**
      * If we are at some placement index,
      * (or intake index)
@@ -679,34 +793,41 @@ public class Arm extends SubsystemBase {
      * set the index to the equivelent index in the new mode
      * to reduce the need to input another button
      */
-    public void handleConeModeChange() {
-        // Notice all of the trues here,
-        // These make sure that the arm doesn't go back to the transition position
-        // which speeds up the process of changing modes
-        switch (armPosDimension1) {
-            case PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX:
-                setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX, true);
-                break;
-            case PlacementConstants.CUBE_MID_INDEX:
-                setArmIndex(PlacementConstants.CONE_MID_PREP_INDEX, true);
-                break;
-            case PlacementConstants.CONE_HIGH_PREP_INDEX:
-                setArmIndex(PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX, true);
-                break;
-            case PlacementConstants.CONE_MID_PREP_INDEX:
-                setArmIndex(PlacementConstants.CUBE_MID_INDEX, true);
-                break;
-            case PlacementConstants.CONE_INTAKE_INDEX:
-                setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX, true);
-                break;
-            case PlacementConstants.CUBE_INTAKE_INDEX:
-                setArmIndex(PlacementConstants.CONE_INTAKE_INDEX, true);
-                break;
-        }
+    public Command handleConeModeChange() {
+        return runOnce(() -> {
+                // Notice all of the trues here,
+                // These make sure that the arm doesn't go back to the transition position
+                // which speeds up the process of changing modes
+                switch (armPosDimension1) {
+                    case PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX:
+                        setArmIndex(PlacementConstants.CONE_HIGH_PREP_INDEX, true);
+                        break;
+                    case PlacementConstants.CUBE_MID_INDEX:
+                        setArmIndex(PlacementConstants.CONE_MID_PREP_INDEX, true);
+                        break;
+                    case PlacementConstants.CONE_HIGH_PREP_INDEX:
+                        setArmIndex(PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX, true);
+                        break;
+                    case PlacementConstants.CONE_MID_PREP_INDEX:
+                        setArmIndex(PlacementConstants.CUBE_MID_INDEX, true);
+                        break;
+                    case PlacementConstants.CONE_INTAKE_INDEX:
+                        setArmIndex(PlacementConstants.CUBE_INTAKE_INDEX, true);
+                        break;
+                    case PlacementConstants.CUBE_INTAKE_INDEX:
+                        setArmIndex(PlacementConstants.CONE_INTAKE_INDEX, true);
+                        break;
+                }
+            }
+        );
     }
 
-    public void toggleOperatorOverride() {
-        this.operatorOverride = !operatorOverride;
+    public Command toggleOperatorOverride() {
+        return runOnce(() -> this.operatorOverride = !operatorOverride);
+    }
+
+    public Command getOperatorOverrideDriveCommand(Supplier<Translation2d> operatorLeftAxis) {
+        return run(() -> drive(new Translation2d(operatorLeftAxis.get().getX(), -operatorLeftAxis.get().getY())));
     }
 
     public boolean getOperatorOverride() {

@@ -1,11 +1,14 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.LEDConstants;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.function.IntSupplier;
 
 public class ArduinoController extends SubsystemBase {
 
@@ -89,4 +92,11 @@ public class ArduinoController extends SubsystemBase {
     public void setArmState(int state) {
         this.currentArmState = state;
     }
+
+    public Command setLEDStateCommand(IntSupplier state) {
+        return Commands.runOnce(() -> setLEDState(state.getAsInt()));
+    }
+
+
+
 }
