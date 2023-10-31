@@ -12,11 +12,13 @@ public class Logger {
         public Mechanism2d armDesired2D;
         public double[] armDesired3D;
         public double[] armActual3D;
+        public double[] armRealXY;
 
         public ArmLog(ArmLogBuilder armLogBuilder) {
             this.armDesired2D = armLogBuilder.armDesired2D;
             this.armDesired3D = armLogBuilder.armDesired3D;
             this.armActual3D = armLogBuilder.armActual3D;
+            this.armRealXY = armLogBuilder.armRealXY;
         }
     }
     public static class ArmLogBuilder {
@@ -24,6 +26,7 @@ public class Logger {
         public Mechanism2d armDesired2D = new Mechanism2d(0, 0);
         public double[] armDesired3D = new double[3];
         public double[] armActual3D = new double[3];
+        private double[] armRealXY = new double[2];
 
         public ArmLogBuilder() { }
 
@@ -42,20 +45,28 @@ public class Logger {
             return this;
         }
 
+        public ArmLogBuilder addArmRealXY(double armXPos, double armYPos) {
+            this.armRealXY = new double[] {armXPos, armYPos};
+            return this;
+        }
+
         public ArmLog build() {
             return new ArmLog(this);
         }
+
     }
     public static class ArmLogger {
 
         private static Mechanism2d armDesired2D = new Mechanism2d(0, 0);
         private static double[] armDesired3D = new double[3];
         private static double[] armActual3D = new double[3];
+        private static double[] armRealXY = new double[2];
     
         public static void update(ArmLog armLog) {
             armDesired2D = armLog.armDesired2D;
             armDesired3D = armLog.armDesired3D;
             armActual3D = armLog.armActual3D;
+            armRealXY = armLog.armRealXY;
     
             log();
         }
@@ -64,6 +75,7 @@ public class Logger {
             logArmDesired2D();
             logArmDesired3D();
             logArmActual3D();
+            logArmRealXY();
         }
     
         private static void logArmDesired2D() {
@@ -74,6 +86,9 @@ public class Logger {
         }
         private static void logArmActual3D() {
             SmartDashboard.putNumberArray("Arm/ArmActual3D", armActual3D);
+        }
+        private static void logArmRealXY() {
+            SmartDashboard.putNumberArray("Arm/ArmRealXY", armRealXY);
         }
     }
     
