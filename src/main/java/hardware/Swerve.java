@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import calc.ADIS16470_IMU;
 import calc.Pose3dLogger;
 import frc.robot.util.DriverUI;
@@ -124,6 +125,10 @@ public class Swerve {
   public void logPositions() {
     SwerveLogBuilder logs = new SwerveLogBuilder();
     DriverUI.field.setRobotPose(getPose());
+    
+    logs.addRealModuleStates(new double[]{ 0, 0, 0, 0, 0, 0, 0, 0 });
+    logs.addRobotRotation(getPose().getRotation().getDegrees());
+
     logs.addRobotRotation(getYaw().getRadians());
     logs.addDesiredModuleStates(desiredModuleStates);
     logs.addRealModuleStates(new double[] {

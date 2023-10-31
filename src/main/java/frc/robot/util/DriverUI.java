@@ -16,7 +16,7 @@ public class DriverUI implements Loggable {
     @Log(name="Select Auto:", rowIndex = 0, columnIndex = 4, height = 1, width = 2)
     public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
     
-    @Log(name="Field", rowIndex = 0, columnIndex = 0, height = 6, width = 6)
+    @Log(name="Field", rowIndex = 0, columnIndex = 0, height = 4, width = 10)
     public static Field2d field = new Field2d();
     
     @BooleanBox(name = "Fresh Code", rowIndex = 0, columnIndex = 10, height = 1, width = 1, colorWhenTrue = "lime")
