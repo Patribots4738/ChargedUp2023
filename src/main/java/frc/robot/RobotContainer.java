@@ -62,6 +62,8 @@ public class RobotContainer {
             () -> !driver.y().getAsBoolean()
         ));
 
+        photonVision.setDefaultCommand(autoAlignment.calibrateOdometry());
+
         incinerateMotors();
         configureButtonBindings();
 

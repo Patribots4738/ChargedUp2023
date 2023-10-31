@@ -65,28 +65,31 @@ public class AutoAlignment extends CommandBase {
     /**
      * Calibrate the odometry for the swerve
      */
-    public void calibrateOdometry() {
+    public Command calibrateOdometry() {
 
-        // Create an "Optional" object that contains the estimated pose of the robot
-        // This can be present (see's tag) or not present (does not see tag)
-        Optional<EstimatedRobotPose> result = photonVision.getEstimatedRobotPose();
+        return Commands.run(() -> {
+                // Create an "Optional" object that contains the estimated pose of the robot
+                // This can be present (see's tag) or not present (does not see tag)
+                Optional<EstimatedRobotPose> result = photonVision.getEstimatedRobotPose();
 
-        // If the result of the estimatedRobotPose exists, and the skew of the tag is
-        // less than 3 degrees (to prevent false results)
-        if (result.isPresent()) {
-            EstimatedRobotPose camEstimatedPose = result.get();
-            // Add the vision measurement to the pose estimator to update the odometry
-            swerve.getPoseEstimator().addVisionMeasurement(
-                    camEstimatedPose.estimatedPose.toPose2d(),
-                    Timer.getFPGATimestamp() - VisionConstants.LATENCY);
-        }
+                // If the result of the estimatedRobotPose exists, and the skew of the tag is
+                // less than 3 degrees (to prevent false results)
+                if (result.isPresent()) {
+                    EstimatedRobotPose camEstimatedPose = result.get();
+                    // Add the vision measurement to the pose estimator to update the odometry
+                    swerve.getPoseEstimator().addVisionMeasurement(
+                            camEstimatedPose.estimatedPose.toPose2d(),
+                            Timer.getFPGATimestamp() - VisionConstants.LATENCY);
+                }
 
-        if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
-            // Get the target pose (the pose of the tag we want to go to)
-            Pose2d targetPose = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
-            targetPose = getModifiedTargetPose(targetPose);
-            currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-        }
+                if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+                    // Get the target pose (the pose of the tag we want to go to)
+                    Pose2d targetPose = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+                    targetPose = getModifiedTargetPose(targetPose);
+                    currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
+                }
+            }
+        );
     }
 
     public void setNearestAlignmentOffset() {
