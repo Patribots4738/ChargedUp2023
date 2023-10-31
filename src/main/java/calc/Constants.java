@@ -496,7 +496,7 @@ public final class Constants {
       public static final int CONE_HIGH_PLACEMENT_INDEX = 3;
       public static final int HUMAN_TAG_PICKUP_INDEX = 4;
       public static final int CUBE_MID_INDEX = 5;
-      public static final int CUBE_HIGH_INDEX = 6;
+      public static final int CUBE_HIGH_PLACEMENT_INDEX = 6;
       public static final int FLOOR_INTAKE_INDEX = 7;
       @Deprecated // Please use ARM_FLIP_INDEX instead...
       public static final int SOLUTION_FLIP_INDEX_POSITIVE = 8;
