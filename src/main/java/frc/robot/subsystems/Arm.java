@@ -67,6 +67,9 @@ public class Arm extends SubsystemBase {
     private final SparkMaxPIDController lowerArmPIDController;
     private final SparkMaxPIDController upperArmPIDController;
 
+    private boolean upperPIDSlot1;
+    private boolean upperPIDSlot2;
+
     private final ArmCalculations armCalculations;
     private Trajectory currentTrajectory;
     private double[] trajectoryFinalAngles;
@@ -201,15 +204,34 @@ public class Arm extends SubsystemBase {
 
     }
 
-    @Override
     public void periodic() {
         if (!operatorOverride && !followingTrajectory) {
             indexPeriodic();
         } else if (followingTrajectory) {
             trajectoryPeriodic();
         }
-        setLowerArmAngle(lowerReferenceAngle);
-        setUpperArmAngle(upperReferenceAngle);
+
+        // Check if we want to use secondary PID gains
+        // Slot 1 is used to make the arm go super fast
+        // Slot 2 is an in-between gain set which
+        // slows the arm down just enough to not overshoot
+        boolean upperPIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
+        boolean upperPIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP)
+                && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+
+        // If by chance our desired PID slot for the upper arm changes,
+        // update our upper arm's desired PID inputs
+        if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
+            setUpperArmAngle(upperReferenceAngle);
+        }
+
+        // On either PID slot boolean change
+        // update both, then ask the SparkMAX to change its ff
+        // We do this becuase we want to limit our communications with the spark
+        // as much as possible, to reduce loop overruns.
+        if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
+            setUpperArmAngle(upperReferenceAngle);
+        }
 
         // upperDiff = (Units.radiansToDegrees(upperReferenceAngle) -
         // Units.radiansToDegrees(getUpperArmAngle()));
@@ -222,8 +244,6 @@ public class Arm extends SubsystemBase {
         armYPos = ((ArmConstants.LOWER_ARM_LENGTH * Math.sin((getLowerArmAngle() - (Math.PI / 2))))
                 + (ArmConstants.UPPER_ARM_LENGTH
                         * Math.sin((getUpperArmAngle() - Math.PI) + (getLowerArmAngle() - (Math.PI / 2)))));
-
-        logArmData();
     }
 
     public void trajectoryPeriodic() {
@@ -505,10 +525,12 @@ public class Arm extends SubsystemBase {
 
     public void setLowerArmReference(double reference) {
         this.lowerReferenceAngle = reference;
+        setLowerArmAngle(lowerReferenceAngle);
     }
 
     public void setUpperArmReference(double reference) {
         this.upperReferenceAngle = reference;
+        setUpperArmAngle(upperReferenceAngle);
     }
 
     /**
@@ -526,15 +548,7 @@ public class Arm extends SubsystemBase {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = ArmConstants.upperfeedForward.calculate((angle), 0);
-
-        // Check if we want to use secondary PID gains
-        // Slot 1 is used to make the arm go super fast
-        // Slot 2 is an in-between gain set which
-        // slows the arm down just enough to not overshoot
-        boolean usePIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
-        boolean usePIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP)
-                && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+        double FF = ArmConstants.upperfeedForward.calculate(angle, 0);
 
         upperArmPIDController.setFF(
                 FF,
@@ -542,8 +556,8 @@ public class Arm extends SubsystemBase {
                 // If we should use slot 1 and 2, use 2
                 // else, use 1
                 // else, use 0 (default)
-                usePIDSlot1
-                        ? usePIDSlot2
+                upperPIDSlot1
+                        ? upperPIDSlot2
                                 ? 2
                                 : 1
                         : 0);
@@ -557,8 +571,8 @@ public class Arm extends SubsystemBase {
                 // If we should use slot 1 and 2, use 2
                 // else, use 1
                 // else, use 0 (default)
-                usePIDSlot1
-                        ? usePIDSlot2
+                upperPIDSlot1
+                        ? upperPIDSlot2
                                 ? 2
                                 : 1
                         : 0);
@@ -579,11 +593,11 @@ public class Arm extends SubsystemBase {
 
         // Get the feedforward value for the position,
         // Using a predictive formula with sysID given data of the motor
-        double FF = ArmConstants.lowerfeedForward.calculate((position), 0);
+        double FF = ArmConstants.lowerfeedForward.calculate(position, 0);
         lowerArmPIDController.setFF(FF);
         // Set the position of the neo controlling the upper arm to
         // the converted position, neoPosition
-        lowerArmPIDController.setReference((position), ControlType.kPosition);
+        lowerArmPIDController.setReference(position, ControlType.kPosition);
     }
 
     /**
