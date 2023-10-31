@@ -206,6 +206,10 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
+        boolean unfinished = true;
+        if (unfinished) {
+            return null;
+        }
         AutoPose chosenAutoPath;
 
         if (DriverUI.autoChooser.getSelected() == null) {
