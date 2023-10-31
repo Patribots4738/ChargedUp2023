@@ -13,6 +13,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
 
 public class MAXSwerveModule {
@@ -160,15 +161,17 @@ public class MAXSwerveModule {
         correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
         correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(chassisAngularOffset));
 
-        // Optimize the reference state to avoid spinning further than 90 degrees.
-        SwerveModuleState optimizedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
-                new Rotation2d(turningEncoder.getPosition()));
-
         // Command driving and turning SPARKS MAX towards their respective setpoints.
-        // drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
-        drivingSparkMax.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
-        // turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
-        turningSparkMax.setTargetPosition(correctedDesiredState.angle.getRadians());
+        if (FieldConstants.IS_SIMULATION) {
+            drivingSparkMax.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
+            turningSparkMax.setTargetPosition(correctedDesiredState.angle.getRadians());
+        } else {
+            // Optimize the reference state to avoid spinning further than 90 degrees.
+            SwerveModuleState optimizedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
+                new Rotation2d(turningEncoder.getPosition()));
+            drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+            turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+        }
 
         this.desiredState = desiredState;
     }
