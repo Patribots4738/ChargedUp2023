@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.util.DriverUI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -61,8 +62,6 @@ public class Robot extends TimedRobot {
 
   DriverUI driverUI = new DriverUI();
 
-  public static Timer timer;
-
   @Override
   public void robotInit() {
       
@@ -96,8 +95,6 @@ public class Robot extends TimedRobot {
 
       arduinoController = new ArduinoController();
 
-      timer = new Timer();
-
       Timer.delay(0.25);
       for (CANSparkMax neo : NeoMotorConstants.motors) {
         neo.burnFlash();
@@ -123,12 +120,22 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    double dt = Timer.getFPGATimestamp() - DriverUI.currentTimestamp;
+    SmartDashboard.putNumber("Timer/dTPrelog", dt);
         
     Logger.updateEntries();
     arduinoController.periodic();
     claw.updateOutputCurrent();
     arm.logArmData();
     swerve.logPositions();
+    
+    dt = Timer.getFPGATimestamp() - DriverUI.currentTimestamp;
+    
+    if (dt > 0.02) DriverUI.overrunCount++;
+    
+    SmartDashboard.putNumber("Timer/dTPostlog", dt);
+    DriverUI.currentTimestamp = Timer.getFPGATimestamp();
 
   }
 
@@ -175,13 +182,14 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     FieldConstants.GAME_MODE = FieldConstants.GameMode.AUTONOMOUS;
     // Restart the timer to use at the end of auto
-    timer.restart();
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+    DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED = AutoConstants.MAX_SPEED_METERS_PER_SECOND * Math.PI;
     autoAlignment.setConeMode(true);
     arm.setBrakeMode();
     // initialize variables for auto
     autoSegmentedWaypoints.init();
     DriverUI.enabled = true;
+    DriverUI.modeStartTimestamp = DriverUI.currentTimestamp;
     // We had a issue where we needed to redeploy before restarting auto
     // So this gives us an indicator to know if we have enabled yet
     // (i lost my mind not knowing if i redeployed or not) - alexander hamilton
@@ -195,13 +203,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    double elapsedTime = DriverUI.currentTimestamp - DriverUI.modeStartTimestamp;
     // Update odometry to know where we are on the field
     // and update our "position"
     swerve.periodic();
     claw.periodic();
     // System.out.printf("Time Left %.1f\n s", Timer.getMatchTime());
     // Force the claw to spit at the start of the match, for preload
-    if (timer.get() < 0.08) {
+    if (elapsedTime < 0.08) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_INTAKE_SPEED_CONE);
       return;
     }
@@ -213,22 +222,23 @@ public class Robot extends TimedRobot {
 
     // Have the claw outtake at the end of the match,
     // This is for a last second score
-    if (timer.get() > 14.8) {
+    if (elapsedTime > 14.8) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE);
     }
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 14.9 && timer.get() < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CHARGE")) {
+    if (elapsedTime > 14.9 && elapsedTime < 15 && autoSegmentedWaypoints.chosenAutoPath.getName().contains("CH")) {
       swerve.setWheelsUp();
       return;
     }
     // Auto is over, stop the claw
     // If we enabled in autonomous, this will stop stuff
     // to give you an indicator of timing
-    if (timer.get() > 15) {
+    if (elapsedTime > 15) {
       claw.setDesiredSpeed(PlacementConstants.CLAW_STOPPED_SPEED);
       return;
     }
+
     // Keep the autonomous states updated
     autoSegmentedWaypoints.periodic();
     // If we are close to the grid, allow the camera to modify odometry
@@ -243,9 +253,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    SmartDashboard.putNumber("Timer/loopOverrunThreshold", 0.02);
+
     FieldConstants.GAME_MODE = FieldConstants.GameMode.TELEOP;
     // Reset the timer for teleopinit 
-    timer.restart();
+    DriverUI.modeStartTimestamp = DriverUI.currentTimestamp;
     autoAlignment.setConeMode(true);
     arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
@@ -258,7 +270,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
     swerve.periodic();
     arm.periodic();
     claw.periodic();
@@ -266,7 +277,8 @@ public class Robot extends TimedRobot {
 
     // If we are in the last 100 ms of the match, set the wheels up
     // This is to prevent any charge pad sliding
-    if (timer.get() > 134.9) {
+    double elapsedTime = DriverUI.currentTimestamp - DriverUI.modeStartTimestamp;
+    if (elapsedTime > 134.9 && elapsedTime < 136) {
       swerve.setWheelsUp();
       claw.setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
       return;
@@ -338,22 +350,10 @@ public class Robot extends TimedRobot {
         SwerveTrajectory.resetTrajectoryStatus();
         // This resets the "rotational momentum" of the integerals
         SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
-        // Reset the autoAlignment timer
-        // This is so that the robot can change its "closest" node 
-        // in the first second of aligning
-        autoAlignment.resetTimer();
-        
+
       }
       
       autoAlignment.alignToTag(driverLeftAxis.getY());
-      
-      // Since we reset the timer when AButtonPressed(), for the first one second of alignment, 
-      // correct for any error in the odometry by resetting the nearest alignment offset. 
-      // This will work since the robot will be rotating, 
-      // and the camera will be writing the actual position of the robot.
-      if (autoAlignment.getAlignmentTimer() < 1) {
-        autoAlignment.setNearestAlignmentOffset();
-      }
 
     } else if (driver.getRightBumper()) {
 
@@ -413,15 +413,19 @@ public class Robot extends TimedRobot {
 
     // The moment the robot takes in a cone/cube,
     // The operator can set the robot into the desired mode
-    if (operator.getXButton()) {
-      autoAlignment.setConeMode(false);
-      arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
+    // Note that this stuff only runs if we actually
+    // change our mode, so we don't have to worry about
+    // handleConeMode calling twice if a button was spammed
+    if (operator.getXButtonPressed() && AutoAlignment.coneMode) {
+        arm.handleConeModeChange();
+        autoAlignment.setConeMode(false);
+        arduinoController.setLEDState(LEDConstants.ARM_PURPLE);
     }
-    else if (operator.getYButton()) {
-      autoAlignment.setConeMode(true);
-      arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
+    else if (operator.getYButtonPressed() && !AutoAlignment.coneMode) {
+        arm.handleConeModeChange();
+        autoAlignment.setConeMode(true);
+        arduinoController.setLEDState(LEDConstants.ARM_YELLOW);
     }
-
     // POV = D-Pad...
     switch (OICalc.getDriverPOVPressed(driver.getPOV())) {
       // Not clicked
@@ -447,6 +451,7 @@ public class Robot extends TimedRobot {
         }
         break;
 
+
       // Clicking right
       case 90:
         // If we are focusing on a substation, change the substation offset multiplier, not the cone offset multiplier.
@@ -468,7 +473,7 @@ public class Robot extends TimedRobot {
       // Clicking up
       case 0:
         boolean hotReloadHigh = arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX;
-        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_INDEX);
+        arm.setArmIndex((AutoAlignment.coneMode) ? PlacementConstants.CONE_HIGH_PREP_INDEX : PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX);
         if (!hotReloadHigh) { arm.startTrajectory((AutoAlignment.coneMode) ? PlacementConstants.HIGH_CONE_TRAJECTORY : PlacementConstants.HIGH_CUBE_TRAJECTORY); }
         break;
 
@@ -566,7 +571,7 @@ public class Robot extends TimedRobot {
     } else if (
 		((operator.getRightBumper() || operator.getRightStickButton()) && 
 		!claw.getStartedOuttakingBool()) ||
-		(timer.get() < 0.1 && !(FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST))) 
+		(elapsedTime < 0.1 && !(FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST))) 
 	{
       // Check if the arm has completed the path to place an object
       if (arm.getAtPlacementPosition()) {
@@ -587,7 +592,7 @@ public class Robot extends TimedRobot {
 
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX ||
             arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-            arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX) 
+            arm.getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX) 
         {
       
             arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
@@ -690,12 +695,9 @@ public class Robot extends TimedRobot {
     // Stop the timer, since this is test mode
     // we want to allow the robot to be enabled as much
     // as we want.
-    timer.reset();
-    timer.stop();
+    DriverUI.modeStartTimestamp = DriverUI.currentTimestamp;
   }
 
   @Override
-  public void testPeriodic() {
-    teleopPeriodic();
-  }
+  public void testPeriodic() {}
 }
