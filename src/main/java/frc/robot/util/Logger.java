@@ -1,7 +1,5 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -69,13 +67,13 @@ public class Logger {
         }
     
         private static void logArmDesired2D() {
-            SmartDashboard.putData("ArmDesired2D", armDesired2D);
+            SmartDashboard.putData("Arm/ArmDesired2D", armDesired2D);
         }
         private static void logArmDesired3D() {
-            SmartDashboard.putNumberArray("ArmDesired3D", armDesired3D);
+            SmartDashboard.putNumberArray("Arm/ArmDesired3D", armDesired3D);
         }
         private static void logArmActual3D() {
-            SmartDashboard.putNumberArray("ArmActual3D", armActual3D);
+            SmartDashboard.putNumberArray("Arm/ArmActual3D", armActual3D);
         }
     }
     
@@ -151,16 +149,16 @@ public class Logger {
         }
     
         private static void logPose3d() {
-            SmartDashboard.putNumberArray("Pose3d", pose3d);
+            SmartDashboard.putNumberArray("Robot/Pose3d", pose3d);
         }
         private static void logRobotRotation() {
-            SmartDashboard.putNumber("RobotRotation", robotRotation);
+            SmartDashboard.putNumber("Robot/RobotRotation", robotRotation);
         }
         private static void logDesiredStates() {
-            SmartDashboard.putNumberArray("DesiredStates", desiredModuleStates);
+            SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
         }
         private static void logRealStates() {
-            SmartDashboard.putNumberArray("RealStates", realModuleStates);
+            SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
         }
     
     }
