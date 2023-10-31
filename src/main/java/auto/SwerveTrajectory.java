@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
+import frc.robot.util.DriverUI;
 import hardware.Swerve;
 import calc.Constants;
 import calc.Constants.FieldConstants;
@@ -127,12 +127,12 @@ public class SwerveTrajectory {
    */
   public static void PathPlannerRunner(PathPlannerTrajectory pathTraj, Swerve swerve, boolean longWait) {
 
-    elapsedTime = Timer.getFPGATimestamp() - timeTrajectoryStarted;
+    elapsedTime = DriverUI.currentTimestamp - timeTrajectoryStarted;
 
     switch (trajectoryStatus) {
 
       case "setup":
-        timeTrajectoryStarted = Timer.getFPGATimestamp();
+        timeTrajectoryStarted = DriverUI.currentTimestamp;
         trajectoryStatus = "execute";
         break;
 

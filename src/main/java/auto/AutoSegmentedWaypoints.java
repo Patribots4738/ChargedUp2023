@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.util.DriverUI;
-import edu.wpi.first.wpilibj.Timer;
 import hardware.Arm;
 import hardware.Claw;
 import hardware.Swerve;
@@ -153,10 +152,10 @@ public class AutoSegmentedWaypoints {
            * 
            * In other words, break out of this if statement
            */
-          !((chosenAutoPath.getName().contains("A_CHARGE") ||
-            chosenAutoPath.getName().contains("B_CHARGE") ||
-            chosenAutoPath.getName().contains("C_CHARGE") ||
-            chosenAutoPath.getName().contains("D_CHARGE")) && 
+          !((chosenAutoPath.getName().contains("A_CH") ||
+            chosenAutoPath.getName().contains("B_CH") ||
+            chosenAutoPath.getName().contains("C_CH") ||
+            chosenAutoPath.getName().contains("D_CH")) && 
             currentWaypointNumber == chosenWaypoints.length - 1))
       {
         // Prepare the arm for the next waypoint before the path is done
@@ -167,7 +166,7 @@ public class AutoSegmentedWaypoints {
             arm.startTrajectory(PlacementConstants.HIGH_CONE_TRAJECTORY);
             break;
           // Tuen the high cube index into a traj
-          case PlacementConstants.CUBE_HIGH_INDEX:
+          case PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX:
             arm.setArmIndex(armIndex);
             arm.startTrajectory(PlacementConstants.HIGH_CUBE_TRAJECTORY);
             break;
@@ -237,14 +236,14 @@ public class AutoSegmentedWaypoints {
       if (!clawHasStarted && (clawSpeed != PlacementConstants.CLAW_STOPPED_SPEED)) { 
         // Set autoDelay to the current time,
         // This is to allow the claw to move for a bit before moving on.
-        autoDelay = Timer.getFPGATimestamp();
+        autoDelay = DriverUI.currentTimestamp;
         claw.setDesiredSpeed(clawSpeed);
         // Prevent the autoDelay from being reset
         clawHasStarted = true;
       }
 
       // 0.2 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.15 || currentWaypointNumber == 0) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
+      if ((DriverUI.currentTimestamp - autoDelay > 0.15 || currentWaypointNumber == 0) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
         stateHasFinished = true;
       }
     }
@@ -305,11 +304,11 @@ public class AutoSegmentedWaypoints {
       // using the high-to-stow index
       if (arm.getArmIndex() == PlacementConstants.CONE_HIGH_PLACEMENT_INDEX || 
           arm.getArmIndex() == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX || 
-          arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX)
+          arm.getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX)
       { 
         arm.setArmIndex(PlacementConstants.HIGH_TO_STOWED_INDEX);
         arm.startTrajectory(
-            (arm.getArmIndex() == PlacementConstants.CUBE_HIGH_INDEX)
+            (arm.getArmIndex() == PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX)
                 ? PlacementConstants.HIGH_CUBE_TO_STOWED_TRAJECTORY 
                 : PlacementConstants.HIGH_CONE_TO_STOWED_TRAJECTORY
         );
@@ -335,10 +334,10 @@ public class AutoSegmentedWaypoints {
         // But really go from A to MOBILITY to CHARGE
         // And for those paths we want to keep intaking
         if (currentWaypointNumber > 1) {
-          if (chosenAutoPath.getName().contains("A_CHARGE") ||
-              chosenAutoPath.getName().contains("B_CHARGE") ||
-              chosenAutoPath.getName().contains("C_CHARGE") ||
-              chosenAutoPath.getName().contains("D_CHARGE"))
+          if (chosenAutoPath.getName().contains("A_CH") ||
+              chosenAutoPath.getName().contains("B_CH") ||
+              chosenAutoPath.getName().contains("C_CH") ||
+              chosenAutoPath.getName().contains("D_CH"))
           {
             // We can assume that we are holding a cube
             // Since our claw is so strong
@@ -388,10 +387,10 @@ public class AutoSegmentedWaypoints {
          * then break out of this if statement
          */
           !(startedChargePad &&
-              (chosenAutoPath.getName().contains("A_CHARGE") ||
-                  chosenAutoPath.getName().contains("B_CHARGE") ||
-                  chosenAutoPath.getName().contains("C_CHARGE") ||
-                  chosenAutoPath.getName().contains("D_CHARGE")))) 
+              (chosenAutoPath.getName().contains("A_CH") ||
+                  chosenAutoPath.getName().contains("B_CH") ||
+                  chosenAutoPath.getName().contains("C_CH") ||
+                  chosenAutoPath.getName().contains("D_CH")))) 
         {
           // Me when the biggest if statement,
           // in all of code,
