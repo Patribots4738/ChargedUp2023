@@ -104,6 +104,8 @@ public class Swerve {
   // X, Y, theta
   );
 
+    private SwerveLogBuilder logs = new SwerveLogBuilder();
+
   /**
    * Creates a new DriveSu1stem.
    */
@@ -114,6 +116,10 @@ public class Swerve {
     zeroHeading();
     setBrakeMode();
 
+    // Set the initial pose to the origin
+    logs.addRealModuleStates(new double[]{ 0, 0, 0, 0, 0, 0, 0, 0 });
+    logs.addRobotRotation(getPose().getRotation().getDegrees());
+    SwerveLogger.update(logs.build());
   }
 
   public void periodic() {
@@ -123,11 +129,9 @@ public class Swerve {
   }
 
   public void logPositions() {
-    SwerveLogBuilder logs = new SwerveLogBuilder();
+    this.logs = new SwerveLogBuilder();
+
     DriverUI.field.setRobotPose(getPose());
-    
-    logs.addRealModuleStates(new double[]{ 0, 0, 0, 0, 0, 0, 0, 0 });
-    logs.addRobotRotation(getPose().getRotation().getDegrees());
 
     logs.addRobotRotation(getYaw().getRadians());
     logs.addDesiredModuleStates(desiredModuleStates);
