@@ -244,7 +244,7 @@ public class AutoSegmentedWaypoints extends CommandBase {
             // 0.2 seconds since the claw has moved (and if there are more waypoints)
             if ((Timer.getFPGATimestamp() - autoDelay > 0.15 || currentWaypointNumber == 0)
                     || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
-                swerveTrajectoryCommand.end(true);
+                    swerveTrajectoryCommand.cancel();
             }
         }
     }
@@ -253,7 +253,7 @@ public class AutoSegmentedWaypoints extends CommandBase {
         // If we made one round with the state, we have successfully initialized
         if (!stateHasInitialized) {
             if (currentWaypointNumber == 0) {
-                swerveTrajectoryCommand.end(true);
+                swerveTrajectoryCommand.cancel();
             } else {
                 // Only run the path if the robot isn't trying to align
                 // This will give priority to the alignment

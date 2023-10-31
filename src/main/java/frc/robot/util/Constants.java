@@ -21,6 +21,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Robot;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -485,6 +486,8 @@ public final class Constants {
     }
 
     public static final class FieldConstants {
+
+        public static boolean IS_SIMULATION = Robot.isSimulation();
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.revrobotics.REVPhysicsSim;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -13,12 +15,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
 
     private Command autonomousCommand;
+    private Command disabledCommand;
 
     private RobotContainer robotContainer;
 
 
     @Override
-    public void robotInit() { }
+    public void robotInit() { 
+        robotContainer = new RobotContainer();
+    }
 
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like diagnostics
@@ -33,7 +38,13 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void disabledInit() { }
+    public void disabledInit() {
+        disabledCommand = robotContainer.getDisabledCommand();
+        
+        if (disabledCommand != null) {
+            disabledCommand.schedule();
+        }
+    }
 
     @Override
     public void disabledPeriodic() { }
@@ -45,6 +56,9 @@ public class Robot extends TimedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.schedule();
         }
+        if (disabledCommand != null) {
+            disabledCommand.cancel();
+        }
     }
 
     @Override
@@ -55,6 +69,9 @@ public class Robot extends TimedRobot {
         // Stop our autonomous command if it is still running.
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
+        }
+        if (disabledCommand != null) {
+            disabledCommand.cancel();
         }
     }
 
@@ -69,4 +86,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() { }
+
+    @Override
+    public void simulationInit() { }
+
+    @Override
+    public void simulationPeriodic() { 
+        REVPhysicsSim.getInstance().run();
+    }
 }

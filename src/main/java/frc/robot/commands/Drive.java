@@ -2,6 +2,9 @@ package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 
@@ -18,7 +21,7 @@ public class Drive extends CommandBase {
     public Drive(
             Swerve swerve, 
             DoubleSupplier xSupplier,
-            DoubleSupplier ySupplier, 
+            DoubleSupplier ySupplier,
             DoubleSupplier rotationsSupplier, 
             BooleanSupplier rateLimitSupplier, 
             BooleanSupplier fieldRelativeSupplier) 
@@ -36,9 +39,22 @@ public class Drive extends CommandBase {
         addRequirements(swerve);
     }
 
-    @Override
-    public void initialize() {
+    public Drive (Swerve swerve, Supplier<ChassisSpeeds> speeds, BooleanSupplier rateLimitSupplier, BooleanSupplier fieldRelativeSupplier) {
+        
+        this.swerve = swerve;
+        
+        this.xSupplier = () -> speeds.get().vxMetersPerSecond;
+        this.ySupplier = () -> speeds.get().vyMetersPerSecond;
+        this.rotationSupplier = () -> speeds.get().omegaRadiansPerSecond;
+
+        this.fieldRelativeSupplier = fieldRelativeSupplier;
+        this.rateLimitSupplier = rateLimitSupplier;
+
+        addRequirements(swerve);
     }
+
+    @Override
+    public void initialize() { }
 
     @Override
     public void execute() {

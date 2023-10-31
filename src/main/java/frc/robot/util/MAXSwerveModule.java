@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.util;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -13,8 +13,6 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.util.NEOS;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
 
 public class MAXSwerveModule {
@@ -116,9 +114,6 @@ public class MAXSwerveModule {
      * @return The current state of the module.
      */
     public SwerveModuleState getState() {
-        if (FieldConstants.IS_SIMULATION) {
-            return getSimState();
-        }
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
         return new SwerveModuleState(drivingEncoder.getVelocity(),
@@ -139,9 +134,6 @@ public class MAXSwerveModule {
      * @return The current position of the module.
      */
     public SwerveModulePosition getPosition() {
-        if (FieldConstants.IS_SIMULATION) {
-            return getSimPosition();
-        }
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
         return new SwerveModulePosition(
@@ -173,14 +165,10 @@ public class MAXSwerveModule {
                 new Rotation2d(turningEncoder.getPosition()));
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
-        if (FieldConstants.IS_SIMULATION) {
-            drivingSparkMax.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
-            turningSparkMax.setTargetPosition(correctedDesiredState.angle.getRadians());
-        }
-        else {
-            turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
-            drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
-        }
+        // drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+        drivingSparkMax.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
+        // turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+        turningSparkMax.setTargetPosition(correctedDesiredState.angle.getRadians());
 
         this.desiredState = desiredState;
     }

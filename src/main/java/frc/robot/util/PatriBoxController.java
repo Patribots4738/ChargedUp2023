@@ -10,11 +10,6 @@ import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
 
-    private boolean up;
-    private boolean down;
-    private boolean left;
-    private boolean right;
-
     private double deadband;
 
     public PatriBoxController(int port, double deadband) {
@@ -37,7 +32,7 @@ public class PatriBoxController extends CommandXboxController {
         Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
                 MathUtil.applyDeadband(super.getLeftY(), deadband));
 
-        if (FieldConstants.ALLIANCE == Alliance.Red) {
+        if (FieldConstants.ALLIANCE == Alliance.Blue) {
             driverLeftAxis = driverLeftAxis.unaryMinus();
         }
 
@@ -120,49 +115,6 @@ public class PatriBoxController extends CommandXboxController {
         return Math.sqrt(
                 (Math.pow(x1, 2) + Math.pow(y1, 2)) /
                         (Math.pow(x2, 2) + Math.pow(y2, 2)));
-    }
-
-    public int getPOVPressed() {
-        int POV = super.getHID().getPOV();
-        int pressedPOV = -1;
-
-        if (POV == 0) {
-            if (!up) {
-                up = true;
-                pressedPOV = 0;
-            }
-        } else {
-            up = false;
-        }
-
-        if (POV == 180) {
-            if (!down) {
-                down = true;
-                pressedPOV = 180;
-            }
-        } else {
-            down = false;
-        }
-
-        if (POV == 270) {
-            if (!left) {
-                left = true;
-                pressedPOV = 270;
-            }
-        } else {
-            left = false;
-        }
-
-        if (POV == 90) {
-            if (!right) {
-                right = true;
-                pressedPOV = 90;
-            }
-        } else {
-            right = false;
-        }
-
-        return pressedPOV;
     }
 
 }

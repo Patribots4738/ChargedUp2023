@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -13,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -22,9 +25,12 @@ import frc.robot.util.ADIS16470_IMU;
 import frc.robot.util.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriverUI;
+import frc.robot.commands.Drive;
 import frc.robot.util.SwerveUtils;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.PlacementConstants;
@@ -65,6 +71,9 @@ public class Swerve extends SubsystemBase {
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     private double[] desiredModuleStates = new double[6];
+    private double[] realModuleStates = new double[6];
+
+    
 
     // The gyro sensor
     private final ADIS16470_IMU gyro = new ADIS16470_IMU();
@@ -111,11 +120,12 @@ public class Swerve extends SubsystemBase {
         zeroHeading();
         setBrakeMode();
 
-        SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-                0, 0, 0, 0, 0, 0, 0, 0
-        });
+        realModuleStates = new double[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
         SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
         SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
+
 
     }
 
@@ -125,17 +135,38 @@ public class Swerve extends SubsystemBase {
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
         logPositions();
 
+        if (FieldConstants.IS_SIMULATION) {
+        
+            for (MAXSwerveModule mod : swerveModules) {
+                mod.tick();
+            }
+    
+            SwerveModuleState[] measuredStates =
+            new SwerveModuleState[] {
+              frontLeft.getSimState(), frontRight.getSimState(), rearLeft.getSimState(), rearRight.getSimState()
+            };
+            
+            ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(measuredStates);
+            resetOdometry(
+                getPose().exp(
+                    new Twist2d(
+                        0, 0,
+                        speeds.omegaRadiansPerSecond * .02)));
+    
+            realModuleStates = new double[] {
+                frontLeft.getSimState().angle.getRadians(), frontLeft.getSimState().speedMetersPerSecond,
+                frontRight.getSimState().angle.getRadians(), frontRight.getSimState().speedMetersPerSecond,
+                rearLeft.getSimState().angle.getRadians(), rearLeft.getSimState().speedMetersPerSecond,
+                rearRight.getSimState().angle.getRadians(), rearRight.getSimState().speedMetersPerSecond
+            };
+        }
+
     }
 
     public void logPositions() {
         DriverUI.field.setRobotPose(getPose());
 
-        SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-                frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
-                frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
-                rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
-                rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
-        });
+        SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
 
         SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
         SmartDashboard.putNumber("Swerve/RobotRotation", getYaw().getRadians());
@@ -260,7 +291,7 @@ public class Swerve extends SubsystemBase {
             SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                     fieldRelative
                             ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed,
-                                    poseEstimator.getEstimatedPosition().getRotation()))
+                                    getPose().getRotation()))
                             : discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)));
 
             setModuleStates(swerveModuleStates);
@@ -297,7 +328,7 @@ public class Swerve extends SubsystemBase {
         var desiredDeltaPose = new Pose2d(
                 speeds.vxMetersPerSecond * dt,
                 speeds.vyMetersPerSecond * dt,
-                new Rotation2d(speeds.omegaRadiansPerSecond * dt * 4));
+                new Rotation2d(speeds.omegaRadiansPerSecond * dt));
 
         var twist = new Pose2d().log(desiredDeltaPose);
 
@@ -312,6 +343,10 @@ public class Swerve extends SubsystemBase {
         frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
         rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
         rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+    }
+
+    public Command getSetWheelsX() {
+        return runOnce(this::setWheelsX);
     }
 
     public void setWheelsUp() {
@@ -441,12 +476,18 @@ public class Swerve extends SubsystemBase {
         return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
-    public void toggleSpeed() {
-        this.speedMultiplier = (this.speedMultiplier == 1) ? 0.35 : 1;
+    public Command toggleSpeed() {
+        return runOnce(() -> this.speedMultiplier = (this.speedMultiplier == 1) ? 0.35 : 1);
     }
 
     public void setSpeedMultiplier(double speedMultiplier) {
         this.speedMultiplier = speedMultiplier;
+    }
+
+    public Command setAlignemntSpeed() {
+        return runOnce(() -> {
+                DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
+        });
     }
 
     public double getSpeedMultiplier() {
@@ -474,5 +515,29 @@ public class Swerve extends SubsystemBase {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
             mSwerveMod.setCoastMode();
         }
+    }
+    
+    public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds, Supplier<ChassisSpeeds> controllerSpeeds) {
+        return new Drive(this, () -> {
+            ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
+            ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
+            return new ChassisSpeeds(
+                controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond,
+                controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond,
+                controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond
+            );
+        }, () -> false, () -> false);
+    }
+
+    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, boolean fieldRelative, boolean rateLimit) {
+        return new Drive(this, speeds, () -> fieldRelative, () -> rateLimit);
+    }
+
+    public Rotation2d getClosest180Rotation2d() {
+        return Rotation2d.fromDegrees(Math.abs(getYaw().getDegrees()) > 90 ? 180 : 0);
+    }
+
+    public Command resetHDC() {
+        return runOnce(() -> AutoConstants.HDC.getThetaController().reset(getYaw().getRadians()));
     }
 }

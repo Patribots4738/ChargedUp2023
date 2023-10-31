@@ -5,7 +5,9 @@ import java.util.Optional;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.DriverUI;
 import frc.robot.subsystems.PhotonCameraUtil;
 import frc.robot.subsystems.Swerve;
@@ -144,11 +146,11 @@ public class AutoAlignment extends CommandBase {
      * Only do the Y and Theta axis,
      * as we will manually move the robot to the X axis
      */
-    public void alignToTag(double driverX) {
+    public ChassisSpeeds getAutoAlignChassisSpeeds() {
 
         // If we cannot see a tag
         if (tagID == 0) {
-            return;
+            return new ChassisSpeeds(0, 0, 0);
         }
         Pose2d targetPose = swerve.getPose();
 
@@ -177,34 +179,17 @@ public class AutoAlignment extends CommandBase {
 
         adjustedY += swerve.getPose().getY();
 
-        ChassisSpeeds alignmentSpeeds = AutoConstants.HDC.calculate(
+        return AutoConstants.HDC.calculate(
                 swerve.getPose(),
                 new Pose2d(
                         swerve.getPose().getX(),
                         adjustedY,
-                        targetPose.getRotation()),
+                        targetPose.getRotation().plus(Rotation2d.fromDegrees(180))),
                 // Notice the 0 m/s here
                 // This is because we want the robot to end at a stop,
                 // This might be funky when we manually drive it on the X axis
                 0,
-                targetPose.getRotation());
-        ChassisSpeeds controllerSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                driverX,
-                0,
-                0,
-                swerve.getPose().getRotation());
-
-        ChassisSpeeds comboSpeeds = new ChassisSpeeds(
-                controllerSpeeds.vxMetersPerSecond + alignmentSpeeds.vxMetersPerSecond,
-                controllerSpeeds.vyMetersPerSecond + alignmentSpeeds.vyMetersPerSecond,
-                controllerSpeeds.omegaRadiansPerSecond + alignmentSpeeds.omegaRadiansPerSecond);
-
-        swerve.drive(
-                comboSpeeds.vxMetersPerSecond,
-                comboSpeeds.vyMetersPerSecond,
-                comboSpeeds.omegaRadiansPerSecond,
-                false,
-                false);
+                targetPose.getRotation().plus(Rotation2d.fromDegrees(180)));
     }
 
     public void setNearestValues() {
@@ -395,6 +380,30 @@ public class AutoAlignment extends CommandBase {
         }
     }
 
+    public Command coneOffsetLeft() {
+        return Commands.runOnce(() -> {
+                if (getTagID() == 4 || getTagID() == 5) {
+                    setSubstationOffset((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1);
+                }
+                else {
+                    setConeOffset(getConeOffset() + ((FieldConstants.ALLIANCE == Alliance.Blue) ? 1 : -1));
+                }
+            }
+        );
+    }
+
+    public Command coneOffsetRight() {
+        return Commands.runOnce(() -> {
+                if (getTagID() == 4 || getTagID() == 5) {
+                    setSubstationOffset((FieldConstants.ALLIANCE == Alliance.Blue) ? -1 : 1);
+                }
+                else {
+                    setConeOffset(getConeOffset() + ((FieldConstants.ALLIANCE == Alliance.Blue) ? -1 : 1));
+                }
+            }
+        );
+    }
+
     public void resetTimer() {
         alignmentTimer.restart();
     }
@@ -425,73 +434,12 @@ public class AutoAlignment extends CommandBase {
         return this.currentNorm;
     }
 
-    public void chargeAlign() {
-
-        double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
-        // boolean setWheelsUp = false;
-        double tilt = 0;
-
-        // If our heading is within -45 to 45 degrees or within -135 and -180 or within
-        // 135 to 180, use the pitch
-        // Otherwise, use the roll
-        if (-45 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 45) {
-            tilt = -swerve.getPitch().getRadians();
-        } else if (-180 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < -135 ||
-                135 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 180) {
-            tilt = swerve.getPitch().getRadians();
-        } else if (-135 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < -45) {
-            tilt = swerve.getRoll().getRadians();
-        } else if (45 < swerve.getYaw().getDegrees() && swerve.getYaw().getDegrees() < 135) {
-            tilt = -swerve.getRoll().getRadians();
-        }
-
-        // System.out.printf("Elapsed Time: %.1f, Full output: %.2f\n", elapsedTime,
-        // ((AlignmentConstants.CHARGE_PAD_CORRECTION_P * tilt)/(elapsedTime/16)));
-
-        if (tilt > Math.toRadians(7)) {
-            swerve.drive(
-                    MathUtil.clamp(
-                            ((FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
-                                    /
-                                    (elapsedTime /
-                                            (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10
-                                                    : 20))),
-                            0.1, 0.35),
-                    0,
-                    0,
-                    true, false);
-        } else if (tilt < -Math.toRadians(7)) {
-            swerve.drive(
-                    MathUtil.clamp(
-                            ((FieldConstants.CHARGE_PAD_CORRECTION_P * tilt)
-                                    /
-                                    (elapsedTime /
-                                            (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10
-                                                    : 20))),
-                            -0.35, -0.1),
-                    0,
-                    0,
-                    true, false);
-        } else {
-            swerve.setWheelsUp();
-        }
-    }
-
-    public void startChargePad() {
-        startedChargePad = Timer.getFPGATimestamp();
-    }
-
-    public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
+    public double getAngleSnapThetaSpeed(Rotation2d desiredAngle) {
 
         // Use a Holonomic Drive Controller to calculate the speeds for the robot
-        double thetaSpeed = AutoConstants.HDC.getThetaController().calculate(swerve.getYaw().getRadians(),
-                desiredAngle.getRadians());
+        return AutoConstants.HDC.getThetaController().calculate(
+            swerve.getYaw().getRadians(),
+            desiredAngle.getRadians());
 
-        // Notice that only the turning speed is used. We still want to be able to drive
-        // forward and strafe
-        // One strange thing that I noticed is that the HDC generally doesn't use field
-        // relative to drive,
-        // I wonder if that will cause issues in the future.
-        swerve.drive(driverAxis.getY(), driverAxis.getX(), thetaSpeed, true, false);
     }
 }
