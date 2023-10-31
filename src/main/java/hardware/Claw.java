@@ -11,7 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.DriverUI;
+import frc.robot.util.DriverUI;
 
 public class Claw {
 

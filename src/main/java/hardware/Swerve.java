@@ -18,10 +18,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import calc.ADIS16470_IMU;
 import calc.Pose3dLogger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.DriverUI;
+import frc.robot.util.DriverUI;
+import frc.robot.util.Logger.SwerveLogBuilder;
+import frc.robot.util.Logger.SwerveLogger;
 import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 import calc.Constants.FieldConstants;
@@ -102,20 +104,22 @@ public class Swerve {
   // X, Y, theta
   );
 
+    private SwerveLogBuilder logs = new SwerveLogBuilder();
+
   /**
    * Creates a new DriveSu1stem.
    */
+
+
   public Swerve() {
     resetEncoders();
     zeroHeading();
     setBrakeMode();
 
-    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
-        0, 0, 0, 0, 0, 0, 0, 0
-    });
-    SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
-    SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
-
+    // Set the initial pose to the origin
+    logs.addRealModuleStates(new double[]{ 0, 0, 0, 0, 0, 0, 0, 0 });
+    logs.addRobotRotation(getPose().getRotation().getDegrees());
+    SwerveLogger.update(logs.build());
   }
 
   public void periodic() {
@@ -125,34 +129,34 @@ public class Swerve {
   }
 
   public void logPositions() {
+    this.logs = new SwerveLogBuilder();
+
     DriverUI.field.setRobotPose(getPose());
 
-    SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
+    logs.addRobotRotation(getYaw().getRadians());
+    logs.addDesiredModuleStates(desiredModuleStates);
+    logs.addRealModuleStates(new double[] {
         frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
         frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
         rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
         rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
     });
+    logs.addPose3d(Pose3dLogger.composePose3ds(
+        new Pose3d(
+            new Translation3d(
+                getPose().getX(), 
+                getPose().getY(), 
+                Math.hypot(
+                    getRoll().getSin()
+                    * PlacementConstants.ROBOT_LENGTH_METERS/2.0,
 
-    SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
-    SmartDashboard.putNumber("Swerve/RobotRotation", getYaw().getRadians());
+                    getPitch().getSin() *
+                    PlacementConstants.ROBOT_LENGTH_METERS/2.0
+                )), 
+            new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians()))
+    ));
+    SwerveLogger.update(logs.build());
 
-    SmartDashboard.putNumberArray("RobotPose3d", 
-        Pose3dLogger.composePose3ds(
-            new Pose3d(
-                new Translation3d(
-                    getPose().getX(), 
-                    getPose().getY(), 
-                    Math.hypot(
-                        getRoll().getSin()
-                        * PlacementConstants.ROBOT_LENGTH_METERS/2.0
-                    , 
-                        getPitch().getSin() *
-                        PlacementConstants.ROBOT_LENGTH_METERS/2.0
-                    )), 
-                new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians()))
-        )
-    );
   }
 
   /**

@@ -9,7 +9,7 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.DriverUI;
+import frc.robot.util.DriverUI;
 import hardware.Arm;
 import hardware.Claw;
 import hardware.Swerve;
