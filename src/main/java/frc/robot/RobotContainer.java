@@ -38,8 +38,10 @@ public class RobotContainer {
     private final PhotonCameraUtil photonVision;
     private final AutoAlignment autoAlignment;
     private final ArduinoController arduinoController;
+    @SuppressWarnings("unused")
     private final AutoPathStorage autoPathStorage;
-    private final DriverUI driverUI = new DriverUI();
+    @SuppressWarnings("unused")
+    private final DriverUI driverUI;
     
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -52,6 +54,7 @@ public class RobotContainer {
         autoAlignment = new AutoAlignment(swerve, photonVision);
         arduinoController = new ArduinoController();
         autoPathStorage = new AutoPathStorage();
+        driverUI = new DriverUI();
 
         swerve.setDefaultCommand(new Drive(
             swerve,
