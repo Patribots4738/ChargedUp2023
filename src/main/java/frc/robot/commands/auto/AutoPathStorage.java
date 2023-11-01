@@ -1,7 +1,5 @@
 package frc.robot.commands.auto;
 
-import java.util.HashMap;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -9,7 +7,6 @@ import com.pathplanner.lib.PathPoint;
 
 import frc.robot.DriverUI;
 import frc.robot.util.Constants.AutoConstants;
-import frc.robot.util.Constants.PlacementConstants;
 
 public class AutoPathStorage {
     public static PathPlannerTrajectory[] chosenWaypoints;
@@ -162,16 +159,6 @@ public class AutoPathStorage {
 
     public static PathPlannerTrajectory _MOBILITY;
 
-    public static PathPlannerTrajectory _1;
-    public static PathPlannerTrajectory _2;
-    public static PathPlannerTrajectory _3;
-    public static PathPlannerTrajectory _4;
-    public static PathPlannerTrajectory _5;
-    public static PathPlannerTrajectory _6;
-    public static PathPlannerTrajectory _7;
-    public static PathPlannerTrajectory _8;
-    public static PathPlannerTrajectory _9;
-
     public static PathPlannerTrajectory _1_A;
     public static PathPlannerTrajectory _1_B;
     public static PathPlannerTrajectory _2_A;
@@ -306,110 +293,88 @@ public class AutoPathStorage {
         };
 
         _4H_MOBILITY = new PathPlannerTrajectory[] {
-                _4,
                 _4_M_CH
         };
 
-        _6H_ONLY = new PathPlannerTrajectory[] {
-                _6,
-                _6
-        };
-
         _6H_MOBILITY = new PathPlannerTrajectory[] {
-                _6,
                 _6_M_CH
         };
 
         _4H_MOBILITY_CHARGE = new PathPlannerTrajectory[] {
-                _4,
                 _4_M_CH
         };
 
         _5H_MOBILITY_CHARGE = new PathPlannerTrajectory[] {
-                _5,
                 _5_M,
                 _M_CH
         };
 
         _6H_MOBILITY_CHARGE = new PathPlannerTrajectory[] {
-                _6,
                 _6_M_CH,
         };
 
         _9H_D_8H_C = new PathPlannerTrajectory[] {
-                _9,
                 _9_D_8_RED,
                 _8_C,
         };
 
         _9H_D_8H_C_CHARGE_RED = new PathPlannerTrajectory[] {
-                _9,
                 _9_D_8_RED,
                 _8_C_CH_RED,
         };
 
         _POOF_9H_D_8H_C_CHARGE = new PathPlannerTrajectory[] {
-                _9,
                 _POOF_9_D_8,
                 _POOF_8_C_CH,
         };
 
         _POOF_1H_A_2H_B_CHARGE_BLUE = new PathPlannerTrajectory[] {
-                _1,
                 _1_A_2_BLUE,
                 _POOF_2_B_CH_BLUE,
         };
 
         _POOF_1H_A_2H_B_CHARGE_RED = new PathPlannerTrajectory[] {
-                _1,
                 _POOF_1_A_2_RED,
                 _POOF_2_B_CH_RED,
         };
 
         _POOF_1H_A_2H_B_2MID_RED = new PathPlannerTrajectory[] {
-                _1,
                 _POOF_1_A_2_RED,
                 _POOF_2_B_2_RED,
                 _2_B
         };
 
         _POOF_1H_A_2H_B_2MID_BLUE = new PathPlannerTrajectory[] {
-                _1,
                 _1_A_2_BLUE,
                 _POOF_2_B_2,
                 _2_B
         };
 
         _POOF_9H_D_8H_C_8MID = new PathPlannerTrajectory[] {
-                _9,
                 _POOF_9_D_8,
                 _POOF_8_C_8,
                 _8_D
         };
 
         _POOF_1H_A_2H_B_2LOW_RED = new PathPlannerTrajectory[] {
-                _1,
                 _POOF_1_A_2_RED,
                 _POOF_2_B_2_RED,
                 _2_B
         };
 
         _POOF_1H_A_2H_B_2LOW_BLUE = new PathPlannerTrajectory[] {
-                _1,
                 _1_A_2_BLUE,
                 _POOF_2_B_2,
                 _2_B
         };
 
         _POOF_9H_D_8H_C_8LOW = new PathPlannerTrajectory[] {
-                _9,
                 _POOF_9_D_8,
                 _POOF_8_C_8,
                 _8_D
         };
 
         _SPIN = new PathPlannerTrajectory[] {
-                _1,
                 _CCWSPIN
         };
     }
@@ -509,90 +474,6 @@ public class AutoPathStorage {
         _CCWSPIN = PathPlanner.loadPath("SPIN", AutoConstants.MAX_SPEED_METERS_PER_SECOND,
                 AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
-        // Use the initial state of _1_A as the starting point for _1
-        // This is so we can move our arm before we move the robot.
-        _1 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_1_A_2_BLUE.getInitialState().poseMeters.getTranslation(),
-                        _1_A_2_BLUE.getInitialState().poseMeters.getRotation(),
-                        _1_A_2_BLUE.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_1_A_2_BLUE.getInitialState().poseMeters.getTranslation(),
-                        _1_A_2_BLUE.getInitialState().poseMeters.getRotation(),
-                        _1_A_2_BLUE.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _2_A as the starting point for _2
-        // This is so we can move our arm before we move the robot.
-        _2 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(),
-                        _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(),
-                        _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _3_A as the starting point for _3
-        // This is so we can move our arm before we move the robot.
-        _3 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(),
-                        _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(),
-                        _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _4_B as the starting point for _4
-        // This is so we can move our arm before we move the robot.
-        _4 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_4_B.getInitialState().poseMeters.getTranslation(),
-                        _4_B.getInitialState().poseMeters.getRotation(), _4_B.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_4_B.getInitialState().poseMeters.getTranslation(),
-                        _4_B.getInitialState().poseMeters.getRotation(), _4_B.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _5_B as the starting point for _5
-        // This is so we can move our arm before we move the robot.
-        _5 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_5_B.getInitialState().poseMeters.getTranslation(),
-                        _5_B.getInitialState().poseMeters.getRotation(), _5_B.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_5_B.getInitialState().poseMeters.getTranslation(),
-                        _5_B.getInitialState().poseMeters.getRotation(), _5_B.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _6_C as the starting point for _6
-        // This is so we can move our arm before we move the robot.
-        _6 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_6_C.getInitialState().poseMeters.getTranslation(),
-                        _6_C.getInitialState().poseMeters.getRotation(), _6_C.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_6_C.getInitialState().poseMeters.getTranslation(),
-                        _6_C.getInitialState().poseMeters.getRotation(), _6_C.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _7_D as the starting point for _7
-        // This is so we can move our arm before we move the robot.
-        _7 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(),
-                        _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(),
-                        _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _8_D as the starting point for _8
-        // This is so we can move our arm before we move the robot.
-        _8 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(),
-                        _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(),
-                        _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialHolonomicPose().getRotation()));
-
-        // Use the initial state of _9_D as the starting point for _9
-        // This is so we can move our arm before we move the robot.
-        _9 = PathPlanner.generatePath(
-                new PathConstraints(0.1, 0.1),
-                new PathPoint(_9_D_8_RED.getInitialState().poseMeters.getTranslation(),
-                        _9_D_8_RED.getInitialState().poseMeters.getRotation(),
-                        _9_D_8_RED.getInitialHolonomicPose().getRotation()),
-                new PathPoint(_9_D_8_RED.getInitialState().poseMeters.getTranslation(),
-                        _9_D_8_RED.getInitialState().poseMeters.getRotation(),
-                        _9_D_8_RED.getInitialHolonomicPose().getRotation()));
     }
     // The auto pose class is used to create a waypoint set with a string
     // This is so we can have it in a drop-down menu in shuffleboard
