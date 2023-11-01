@@ -17,11 +17,13 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Stow"
+          "IntakeCone",
+          "PlaceHighCone",
+          "PlacePiece"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
-        "waitTime": 0
+        "waitTime": 0.7
       }
     },
     {
