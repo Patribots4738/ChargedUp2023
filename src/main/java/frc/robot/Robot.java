@@ -315,6 +315,89 @@ public class Robot extends TimedRobot {
       autoAlignment.setNearestValues();
     }
 
+        // If the driver hits the start/back button, reset the ROTATION of the bot
+    // to assume that it is directly facing the driver.
+    // This is used in dire situations where we don't want to go as far as to find a tag to align to, 
+    // but something happened at some point which heavily messed up our alignment with the field
+    // For obvious reasons, this should only be used when the robot is facing the driver
+    if (driver.getStartButtonPressed() || driver.getBackButtonPressed()) {
+        // When the robot is facing the red alliance driver station, 
+        // it is considered to be at 0 degrees
+        swerve.resetOdometry(
+            new Pose2d(
+                swerve.getPose().getTranslation(), 
+                Rotation2d.fromDegrees(
+                    FieldConstants.ALLIANCE == Alliance.Red 
+                    ? 0 
+                    : 180))
+        );
+    }
+
+    // When not aligning, reset the max speed to the teleop speed
+    if (driver.getAButtonReleased()) {
+      DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+      SwerveTrajectory.resetTrajectoryStatus();
+      SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+      //autoAlignment.setConeOffset(AutoAlignment.coneMode ? 1 : 0);
+    }
+    else if (driver.getAButton()) {
+
+      if (driver.getAButtonPressed()) {
+        // Slow the drive down for consistency
+        DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
+        // This resets the "momentum" of the path
+        SwerveTrajectory.resetTrajectoryStatus();
+        // This resets the "rotational momentum" of the integerals
+        SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+
+      }
+
+      autoAlignment.alignToTag(driverLeftAxis.getY());
+
+    } else if (driver.getRightBumper()) {
+
+      if (driver.getRightBumperPressed()) {
+
+        autoAlignment.startChargePad();
+
+      }
+
+      autoAlignment.chargeAlign();
+
+    // Use the left bumper as a sort of e-stop for the swerve
+    } else if (driver.getLeftBumper()) {
+
+      swerve.setWheelsX();
+
+    } else {
+      // If the driver holds the left stick button, the robot will snap to the nearest 180 degree angle
+      if (driver.getRightStickButton()) {
+        // Reset the integrals at the start of clicking the auto-rotation button
+        if (driver.getRightStickButtonPressed()) {
+          SwerveTrajectory.HDC.getThetaController().reset(swerve.getYaw().getRadians());
+        }
+        autoAlignment.snapToAngle(driverLeftAxis, Rotation2d.fromDegrees(Math.abs(swerve.getYaw().getDegrees()) > 90 ? 180 : 0));
+      }
+      // If the driver holds the Y button, the robot will drive relative to itself
+      // This is useful for driving in a straight line (backwards to intake!)
+      else if (driver.getYButton()) {
+        if (FieldConstants.ALLIANCE == Alliance.Red) {
+          swerve.drive(-driverLeftAxis.getY(), -driverLeftAxis.getX(), -driverRightX * 0.25, false, false);
+        }
+        else {
+          swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, false, false);
+        }
+      }
+      else {
+        // Flip the X and Y inputs to the swerve drive because going forward (up) is positive Y on a controller joystick
+        swerve.drive(driverLeftAxis.getY(), driverLeftAxis.getX(), -driverRightX * 0.25, true, true);
+      }
+    }
+
+    // Toggle the speed to be 10% of max speed when the driver's left stick is pressed
+    if (driver.getLeftStickButtonPressed()) {
+      swerve.toggleSpeed();
+    }
     
     // Toggle the operator override when the operator's left stick is pressed
     if (operator.getLeftStickButtonPressed()) {
