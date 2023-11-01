@@ -234,8 +234,9 @@ public class RobotContainer {
         AutoConstants.EVENT_MAP.put("PlaceHighCone", arm.getPOVHighCommand());
         AutoConstants.EVENT_MAP.put("PlaceMidCube", arm.getPOVLeftCommand(() -> swerve.getPose().getX()));        
 
-        AutoConstants.EVENT_MAP.put("PlaceCube", 
-            claw.outTakeforXSeconds(() -> 0.15)
+        AutoConstants.EVENT_MAP.put("PlacePiece",
+            arm.finishPlacmentCommand()
+            .andThen(claw.outTakeforXSeconds(() -> 0.15))
             .andThen(arm.getAutoStowCommand())
         );
 
