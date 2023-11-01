@@ -134,6 +134,7 @@ public class Robot extends TimedRobot {
     if (dt > 0.02) DriverUI.overrunCount++;
     
     SmartDashboard.putNumber("Timer/dTPostlog", dt);
+    SmartDashboard.putNumber("Timer/overrunCounter", DriverUI.overrunCount);
     DriverUI.currentTimestamp = Timer.getFPGATimestamp();
 
   }
