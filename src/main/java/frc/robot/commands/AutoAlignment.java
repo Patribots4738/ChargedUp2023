@@ -190,7 +190,7 @@ public class AutoAlignment {
                 // This is because we want the robot to end at a stop,
                 // This might be funky when we manually drive it on the X axis
                 0,
-                targetPose.getRotation().plus(Rotation2d.fromDegrees(180)));
+                targetPose.getRotation());
     }
 
     public Command setNearestValuesCommand() {
