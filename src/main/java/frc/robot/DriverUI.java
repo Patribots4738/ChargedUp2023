@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot;
 
 import auto.AutoPathStorage.AutoPose;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -16,9 +16,6 @@ public class DriverUI implements Loggable {
     @Log(name="Select Auto:", rowIndex = 0, columnIndex = 4, height = 1, width = 2)
     public static SendableChooser<AutoPose> autoChooser = new SendableChooser<>();
     
-    @Log(name="Field", rowIndex = 0, columnIndex = 0, height = 4, width = 10)
-    public static Field2d field = new Field2d();
-    
     @BooleanBox(name = "Fresh Code", rowIndex = 0, columnIndex = 10, height = 1, width = 1, colorWhenTrue = "lime")
     public static boolean freshCode = true;
 
@@ -30,6 +27,9 @@ public class DriverUI implements Loggable {
 
     @BooleanBox(name = "Target Found", rowIndex = 0, columnIndex = 0, height = 1, width = 4, colorWhenTrue = "lime")
     public static boolean hasTargets = false;
+
+    @Log.Field2d(name = "Field", rowIndex = 1, columnIndex = 0, height = 4, width = 10)
+    public static Field2d field = new Field2d();
 
     @BooleanBox(name = "Cone Mode", rowIndex = 1, columnIndex = 10, height = 5, width = 3, 
                 colorWhenTrue = "yellow", colorWhenFalse = "purple")

@@ -5,7 +5,6 @@ import java.util.Optional;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.util.DriverUI;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.math.MathUtil;
@@ -16,6 +15,7 @@ import calc.Constants.FieldConstants;
 import calc.Constants.PlacementConstants;
 import calc.Constants.VisionConstants;
 import calc.Constants.ClawConstants;
+import frc.robot.DriverUI;
 import calc.PhotonCameraUtil;
 
 public class AutoAlignment {
