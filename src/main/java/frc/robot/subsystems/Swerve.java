@@ -137,6 +137,7 @@ public class Swerve extends SubsystemBase {
             AutoConstants.THETA_PID_CONSTANTS, 
             this::driveInAuto, 
             AutoConstants.EVENT_MAP, 
+            false,
             this);
 
 
@@ -160,6 +161,7 @@ public class Swerve extends SubsystemBase {
             };
             
             ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(measuredStates);
+            
             resetOdometry(
                 getPose().exp(
                     new Twist2d(
@@ -481,15 +483,6 @@ public class Swerve extends SubsystemBase {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
             mSwerveMod.resetEncoders();
         }
-    }
-
-    /**
-     * Returns the turn rate of the robot.
-     *
-     * @return The turn rate of the robot, in degrees per second
-     */
-    public double getTurnRate() {
-        return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public Command toggleSpeed() {
