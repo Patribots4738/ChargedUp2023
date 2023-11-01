@@ -729,7 +729,7 @@ public class Arm extends SubsystemBase {
     }
 
     public Command finishPlacmentCommand() {
-        return runOnce(() -> finishPlacement());
+        return runOnce(() -> finishPlacement()).until(this::getAtDesiredPositions);
     }
 
     public Command getUnflipCommand() {
@@ -739,17 +739,17 @@ public class Arm extends SubsystemBase {
     public Command getPOVHighCommand() {
         return runOnce(() -> {
             // Hot reload means that we are inputting prep to place -> prep
-            startTrajectoryCommand(
+            setIndexAndTrajectory(
                 (PlacementConstants.CONE_MODE) ? 
                     PlacementConstants.CONE_HIGH_PREP_INDEX : 
                     PlacementConstants.CUBE_HIGH_PLACEMENT_INDEX,
                 (PlacementConstants.CONE_MODE) ? 
                     PlacementConstants.HIGH_CONE_TRAJECTORY : 
                     PlacementConstants.HIGH_CUBE_TRAJECTORY);
-        });
+        }).until(this::getAtDesiredPositions);
     }
 
-    private void startTrajectoryCommand(int index, Trajectory trajectory) {
+    private void setIndexAndTrajectory(int index, Trajectory trajectory) {
         setArmIndex(index);
         if (!getHotReload(index)) { 
             startTrajectory(trajectory); 
@@ -770,7 +770,7 @@ public class Arm extends SubsystemBase {
     public Command getPOVLeftCommand(DoubleSupplier xPosition) {
         return runOnce(() -> {
             if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST) {
-                startTrajectoryCommand(
+                setIndexAndTrajectory(
                     (PlacementConstants.CONE_MODE) ? 
                         PlacementConstants.CONE_MID_PREP_INDEX : 
                         PlacementConstants.CUBE_MID_PLACEMENT_INDEX,
