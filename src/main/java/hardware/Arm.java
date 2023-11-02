@@ -222,6 +222,8 @@ public class Arm /* implements Loggable */ {
         // If by chance our desired PID slot for the upper arm changes,
         // update our upper arm's desired PID inputs
         if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
+            this.upperPIDSlot1 = upperPIDSlot1;
+            this.upperPIDSlot2 = upperPIDSlot2;
             setUpperArmAngle(upperReferenceAngle);
         }
 
@@ -449,25 +451,25 @@ public class Arm /* implements Loggable */ {
           armPosition = armPosition.times((ArmConstants.MAX_REACH - 0.1) / armPosition.getNorm());
         }
 
-        // If the distance from zero is less than the min reach, cap it at the min reach
-        // This min reach is the lower arm length - the upper arm length
+        // // If the distance from zero is less than the min reach, cap it at the min reach
+        // // This min reach is the lower arm length - the upper arm length
         else if (armPosition.getNorm() < ArmConstants.MIN_REACH) {
           armPosition = armPosition.times((ArmConstants.MIN_REACH + 0.1) / armPosition.getNorm());
         }
 
-        // If the arm is trying to reach higher than 6'6", cap it at 6'6"
-        // The field gives us this limit.
-        if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
-          armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
-        }
-        // If the arm is trying to reach further than 48" out from the chassis, cap it at 48"
-        // The field gives us this limit.
-        if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
-          armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
-        }
-        else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
-          armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
-        }
+        // // If the arm is trying to reach higher than 6'6", cap it at 6'6"
+        // // The field gives us this limit.
+        // if (armPosition.getY() > ArmConstants.MAX_REACH_Y) {
+        //   armPosition = new Translation2d(armPosition.getX(), ArmConstants.MAX_REACH_Y);
+        // }
+        // // If the arm is trying to reach further than 48" out from the chassis, cap it at 48"
+        // // The field gives us this limit.
+        // if (armPosition.getX() > ArmConstants.MAX_REACH_X) {
+        //   armPosition = new Translation2d(ArmConstants.MAX_REACH_X, armPosition.getY());
+        // }
+        // else if (armPosition.getX() < -ArmConstants.MAX_REACH_X) {
+        //   armPosition = new Translation2d(-ArmConstants.MAX_REACH_X, armPosition.getY());
+        // }
 
         // Get lowerArmAngle and upperArmAngle, the angles of the lower and upper arm
         // Q2 must be gotten first, because lowerArmAngle is reliant on upperArmAngle
