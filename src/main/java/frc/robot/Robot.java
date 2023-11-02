@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
       DataLogManager.logNetworkTables(true);
       // Log the DS data and joysticks
       DriverStation.startDataLog(DataLogManager.getLog(), true);
-      DriverStation.silenceJoystickConnectionWarning(false);
+      DriverStation.silenceJoystickConnectionWarning(true);
       
       // Drivetrain instantiation
       swerve = new Swerve();
