@@ -41,5 +41,9 @@ public class DriverUI implements Loggable {
     @Log(name = "Starting rotation", rowIndex = 5, columnIndex = 0, height = 1, width = 1)
     public static double startingRotation = 0;
 
+    public static double currentTimestamp = 0;
+    public static double modeStartTimestamp = 0;
+    public static int overrunCount = 0;
+
     public DriverUI() {}
 }

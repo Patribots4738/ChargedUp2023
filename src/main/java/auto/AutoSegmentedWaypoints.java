@@ -9,7 +9,6 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.DriverUI;
 import hardware.Arm;
 import hardware.Claw;
@@ -237,14 +236,14 @@ public class AutoSegmentedWaypoints {
       if (!clawHasStarted && (clawSpeed != PlacementConstants.CLAW_STOPPED_SPEED)) { 
         // Set autoDelay to the current time,
         // This is to allow the claw to move for a bit before moving on.
-        autoDelay = Timer.getFPGATimestamp();
+        autoDelay = DriverUI.currentTimestamp;
         claw.setDesiredSpeed(clawSpeed);
         // Prevent the autoDelay from being reset
         clawHasStarted = true;
       }
 
       // 0.2 seconds since the claw has moved (and if there are more waypoints)
-      if ((Timer.getFPGATimestamp() - autoDelay > 0.15 || currentWaypointNumber == 0) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
+      if ((DriverUI.currentTimestamp - autoDelay > 0.15 || currentWaypointNumber == 0) || (clawSpeed == PlacementConstants.CLAW_STOPPED_SPEED)) {
         stateHasFinished = true;
       }
     }

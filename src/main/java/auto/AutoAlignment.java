@@ -68,7 +68,7 @@ public class AutoAlignment {
         // Add the vision measurement to the pose estimator to update the odometry
         swerve.getPoseEstimator().addVisionMeasurement(
           camEstimatedPose.estimatedPose.toPose2d(),
-          Timer.getFPGATimestamp() - VisionConstants.LATENCY);
+          DriverUI.currentTimestamp - VisionConstants.LATENCY);
       }
 
       if (photonCameraPose.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
@@ -408,7 +408,7 @@ public class AutoAlignment {
 
     public void chargeAlign() {
 
-      double elapsedTime = Timer.getFPGATimestamp() - startedChargePad;
+      double elapsedTime = DriverUI.currentTimestamp - startedChargePad;
       // boolean setWheelsUp = false;
       double tilt = 0;
 
@@ -462,7 +462,7 @@ public class AutoAlignment {
     }
 
     public void startChargePad() {
-      startedChargePad = Timer.getFPGATimestamp();
+      startedChargePad = DriverUI.currentTimestamp;
     }
 
     public void snapToAngle(Translation2d driverAxis, Rotation2d desiredAngle) {
