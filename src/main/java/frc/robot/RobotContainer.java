@@ -208,7 +208,7 @@ public class RobotContainer {
                     PlacementConstants.CONE_MODE ? 
                         LEDConstants.BELLY_PAN_YELLOW : 
                         LEDConstants.BELLY_PAN_PURPLE)))
-        .negate().and(claw.hasGameElementTrigger())
+        .negate().and(claw::hasGameElement)
             .onTrue(driver.setRumble(() -> 0.25)
             .andThen(operator.setRumble(() -> 0.25)))
             .onFalse(arduinoController.setLEDStateCommand(() ->

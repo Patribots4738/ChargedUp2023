@@ -181,8 +181,4 @@ public class Claw extends SubsystemBase {
         return runOnce(() -> setDesiredSpeed(desiredSpeed.getAsDouble()));
     }
 
-    public Trigger hasGameElementTrigger() {
-        return new Trigger(() -> hasGameElement);
-    }
-
 }
