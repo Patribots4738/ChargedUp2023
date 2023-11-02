@@ -86,7 +86,7 @@ public final class Constants {
         public static final int FRONT_RIGHT_TURNING_CAN_ID = 2;
         public static final int REAR_RIGHT_TURNING_CAN_ID = 8;
 
-        public static final boolean GYRO_REVERSED = true;
+        public static final boolean GYRO_REVERSED = Robot.isReal();
     }
 
     public static final class ModuleConstants {

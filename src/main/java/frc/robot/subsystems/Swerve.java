@@ -146,7 +146,7 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
 
-        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroAngle(), getModulePositions());
+        poseEstimator.updateWithTime(DriverUI.currentTimestamp, getGyroAngle(), getModulePositions());
         logPositions();
 
         if (FieldConstants.IS_SIMULATION) {
@@ -155,8 +155,7 @@ public class Swerve extends SubsystemBase {
                 mod.tick();
             }
     
-            SwerveModuleState[] measuredStates =
-            new SwerveModuleState[] {
+            SwerveModuleState[] measuredStates = new SwerveModuleState[] {
               frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
             };
             
@@ -169,10 +168,10 @@ public class Swerve extends SubsystemBase {
                         speeds.omegaRadiansPerSecond * .02)));
     
             realModuleStates = new double[] {
-                frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
-                frontRight.getState().angle.getRadians(), frontRight.getState().speedMetersPerSecond,
-                rearLeft.getState().angle.getRadians(), rearLeft.getState().speedMetersPerSecond,
-                rearRight.getState().angle.getRadians(), rearRight.getState().speedMetersPerSecond
+                measuredStates[0].angle.getRadians(), measuredStates[0].speedMetersPerSecond,
+                measuredStates[1].angle.getRadians(), measuredStates[1].speedMetersPerSecond,
+                measuredStates[2].angle.getRadians(), measuredStates[2].speedMetersPerSecond,
+                measuredStates[3].angle.getRadians(), measuredStates[3].speedMetersPerSecond
             };
         }
 

@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.ArmCalculations;
 import frc.robot.util.Constants.ArmConstants;
@@ -318,12 +319,12 @@ public class Arm extends SubsystemBase {
 
     public void indexPeriodic() {
 
-        boolean atDesiredCoarse = (Math
-                .abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE &&
+        boolean atDesiredCoarse = (
+                Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_COARSE &&
                 Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_COARSE);
 
-        boolean atDesiredFine = (Math
-                .abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
+        boolean atDesiredFine = (
+                Math.abs(lowerReferenceAngle - getLowerArmAngle()) < ArmConstants.LOWER_ARM_DEADBAND_FINE &&
                 Math.abs(upperReferenceAngle - getUpperArmAngle()) < ArmConstants.UPPER_ARM_DEADBAND_FINE);
 
         boolean finalDeadband = (armPosDimension2 < PlacementConstants.ARM_POSITIONS[armPosDimension1].length - 1)
@@ -729,11 +730,13 @@ public class Arm extends SubsystemBase {
     }
 
     public Command finishPlacmentCommand() {
-        return runOnce(() -> finishPlacement()).until(this::getAtDesiredPositions);
+        return runOnce(() -> finishPlacement())
+            .andThen(waitUntilArmsAtDesiredPositions());
     }
 
     public Command getUnflipCommand() {
-        return runOnce(() -> setArmIndex(PlacementConstants.ARM_FLIP_INDEX));
+        return runOnce(() -> setArmIndex(PlacementConstants.ARM_FLIP_INDEX))
+            .andThen(waitUntilArmsAtDesiredPositions());
     }
 
     public Command getPOVHighCommand() {
@@ -746,7 +749,7 @@ public class Arm extends SubsystemBase {
                 (PlacementConstants.CONE_MODE) ? 
                     PlacementConstants.HIGH_CONE_TRAJECTORY : 
                     PlacementConstants.HIGH_CUBE_TRAJECTORY);
-        }).until(this::getAtDesiredPositions);
+        }).andThen(waitUntilArmsAtDesiredPositions());
     }
 
     private void setIndexAndTrajectory(int index, Trajectory trajectory) {
@@ -757,14 +760,18 @@ public class Arm extends SubsystemBase {
     }
 
     public Command placeHighCubeCommand() {
-        return runOnce(() -> startTrajectory(PlacementConstants.MID_CUBE_TRAJECTORY))
-            .until(this::getAtDesiredPositions);
+        return runOnce(() -> startTrajectory(PlacementConstants.HIGH_CUBE_TRAJECTORY))
+            .andThen(waitUntilArmsAtDesiredPositions());
     } 
 
     public Command getPOVDownCommand() {
         return runOnce(() -> {
             setArmIndex((PlacementConstants.CONE_MODE) ? PlacementConstants.CONE_INTAKE_INDEX : PlacementConstants.CUBE_INTAKE_INDEX);
-        });
+        }).andThen(waitUntilArmsAtDesiredPositions());
+    }
+
+    private Command waitUntilArmsAtDesiredPositions() {
+        return Commands.waitUntil(this::getAtDesiredPositions);
     }
 
     public Command getPOVLeftCommand(DoubleSupplier xPosition) {
@@ -781,7 +788,7 @@ public class Arm extends SubsystemBase {
             else {
                 setArmMidOrHumanPlayer(xPosition.getAsDouble());
             }
-        });
+        }).andThen(waitUntilArmsAtDesiredPositions());
     }
 
     public Command getPOVRightCommand(DoubleSupplier xPosition) {
@@ -792,11 +799,11 @@ public class Arm extends SubsystemBase {
             else {
                 setArmMidOrHumanPlayer(xPosition.getAsDouble());
             }
-        });
+        }).andThen(waitUntilArmsAtDesiredPositions());
     }
 
     public Command setArmIndexCommand(IntSupplier index) {
-        return runOnce(() -> setArmIndex(index.getAsInt()));
+        return runOnce(() -> setArmIndex(index.getAsInt())).andThen(waitUntilArmsAtDesiredPositions());
     }
 
     public void setArmMidOrHumanPlayer(double xPosition) {

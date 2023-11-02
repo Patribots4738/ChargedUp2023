@@ -46,6 +46,9 @@ public class RobotContainer {
     
     public RobotContainer() {
         Logger.configureLoggingAndConfig(this, false);
+
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
 
@@ -230,9 +233,13 @@ public class RobotContainer {
             .alongWith(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_INTAKE_SPEED_CUBE))
         );
 
+        AutoConstants.EVENT_MAP.put("IntakeCone", 
+            claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_INTAKE_SPEED_CONE)
+        );
+
         AutoConstants.EVENT_MAP.put("PlaceHighCube", arm.placeHighCubeCommand());
         AutoConstants.EVENT_MAP.put("PlaceHighCone", arm.getPOVHighCommand());
-        AutoConstants.EVENT_MAP.put("PlaceMidCube", arm.getPOVLeftCommand(() -> swerve.getPose().getX()));        
+        AutoConstants.EVENT_MAP.put("PlaceMidCube", arm.getPOVLeftCommand(() -> swerve.getPose().getX()));
 
         AutoConstants.EVENT_MAP.put("PlacePiece",
             arm.finishPlacmentCommand()
@@ -249,6 +256,11 @@ public class RobotContainer {
             chosenAutoPath = AutoPathStorage.myAutoContainer[0];
         } else {
             chosenAutoPath = DriverUI.autoChooser.getSelected();
+            if (chosenAutoPath.getName().contains("LOW")) {
+                AutoConstants.EVENT_MAP.put("PlaceMidCube", arm.getAutoStowCommand());
+            } else {
+                AutoConstants.EVENT_MAP.put("PlaceMidCube", arm.getPOVLeftCommand(() -> swerve.getPose().getX()));
+            }
         }
         return swerve.fullAuto(() -> chosenAutoPath.getTrajectories());
     }
