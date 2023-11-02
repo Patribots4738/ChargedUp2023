@@ -186,11 +186,11 @@ public class SwerveTrajectory {
           swerve.drive(
               speeds.vxMetersPerSecond,
               speeds.vyMetersPerSecond,
-              speeds.omegaRadiansPerSecond, false, false);
+              speeds.omegaRadiansPerSecond, false);
 
         } else {
 
-          swerve.drive(0, 0, 0, false, true);
+          swerve.drive(0, 0, 0, false);
           trajectoryStatus = "done";
 
         }
@@ -199,7 +199,7 @@ public class SwerveTrajectory {
 
       default:
 
-        swerve.drive(0, 0, 0, false, true);
+        swerve.drive(0, 0, 0, false);
         break;
 
     }

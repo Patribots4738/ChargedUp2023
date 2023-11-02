@@ -7,7 +7,6 @@ package hardware;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,12 +16,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.WPIUtilJNI;
 import calc.ADIS16470_IMU;
 import calc.Pose3dLogger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.DriverUI;
-import calc.SwerveUtils;
 import calc.Constants.DriveConstants;
 import calc.Constants.FieldConstants;
 import calc.Constants.PlacementConstants;
@@ -33,15 +30,6 @@ public class Swerve {
 
 
   private double speedMultiplier = 1;
-
-  // Slew rate filter variables for controlling lateral acceleration
-  private double currentRotation = 0.0;
-  private double currentTranslationDir = 0.0;
-  private double currentTranslationMag = 0.0;
-
-  private SlewRateLimiter magLimiter = new SlewRateLimiter(DriveConstants.MAGNITUDE_SLEW_RATE);
-  private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.ROTATIONAL_SLEW_RATE);
-  private double prevTime = WPIUtilJNI.now() * 1e-6;
 
   private final MAXSwerveModule frontLeft = new MAXSwerveModule(
       DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
@@ -168,102 +156,19 @@ public class Swerve {
     return poseEstimator;
   }
 
-  public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative, boolean rateLimit) {
+  public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
 
-    // Calculate the current time and the time since the last call to this function
-    double currentTime = WPIUtilJNI.now() * 1e-6;
-    double elapsedTime = currentTime - prevTime;
+    xSpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+    ySpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+    rotSpeed *= (DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier);
 
-    if (rateLimit) {
+    SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+    fieldRelative
+            ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation()))
+            : discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)));
 
-      // Make commanded variables
-      double xSpeedCommanded;
-      double ySpeedCommanded;
+    setModuleStates(swerveModuleStates);
 
-      // Convert XY to polar for rate limiting
-      double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
-      double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
-
-      // Calculate the direction slew rate based on an estimate of the lateral
-      // acceleration
-      double directionSlewRate;
-
-      if (currentTranslationMag != 0.0) {
-
-        directionSlewRate = Math.abs(DriveConstants.DIRECTION_SLEW_RATE / currentTranslationMag);
-
-      } else {
-
-        // Some high number that means the slew rate is effectively instantaneous
-        directionSlewRate = 500.0;
-
-      }
-
-      // Calculate the difference in angle between the current and commanded
-      // directions
-      double angleDiff = SwerveUtils.AngleDifference(inputTranslationDir, currentTranslationDir);
-
-      if (angleDiff < 0.45 * Math.PI) {
-        // Step the current direction towards the commanded direction
-        currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir,
-            directionSlewRate * elapsedTime);
-        currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-
-      } else if (angleDiff > 0.85 * Math.PI) {
-
-        // Some small number to avoid floating-point errors with equality checking
-        if (currentTranslationMag > 1e-4) {
-          // Keep currentTranslationDir unchanged if there is very little change in
-          // magnitude
-          currentTranslationMag = magLimiter.calculate(0.0);
-
-        } else {
-          // Step the current direction towards the commanded direction
-          currentTranslationDir = SwerveUtils.WrapAngle(currentTranslationDir + Math.PI);
-          currentTranslationMag = magLimiter.calculate(inputTranslationMag);
-
-        }
-      } else {
-        // Step the current direction towards the commanded direction
-        currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir,
-            directionSlewRate * elapsedTime);
-        currentTranslationMag = magLimiter.calculate(0.0);
-
-      }
-
-      prevTime = currentTime;
-
-      // Calculate the commanded speeds and convert them out of polar
-      xSpeedCommanded = currentTranslationMag * Math.cos(currentTranslationDir);
-      ySpeedCommanded = currentTranslationMag * Math.sin(currentTranslationDir);
-      currentRotation = rotLimiter.calculate(rotSpeed);
-
-      // Convert the commanded speeds into the correct units for the drivetrain
-      double xSpeedDelivered = xSpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-      double ySpeedDelivered = ySpeedCommanded * DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier;
-      double rotDelivered = currentRotation * DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier;
-
-      var swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-        fieldRelative
-            ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getPose().getRotation()))
-            : discretize(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered)));
-
-      setModuleStates(swerveModuleStates);
-
-    } else {
-
-      xSpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-      ySpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-      rotSpeed *= (DriveConstants.DYNAMIC_MAX_ANGULAR_SPEED * speedMultiplier);
-
-      SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-        fieldRelative
-                ? discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, poseEstimator.getEstimatedPosition().getRotation()))
-                : discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)));
-
-      setModuleStates(swerveModuleStates);
-
-    }
   }
 
   

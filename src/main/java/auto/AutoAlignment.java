@@ -193,7 +193,6 @@ public class AutoAlignment {
           comboSpeeds.vxMetersPerSecond,
           comboSpeeds.vyMetersPerSecond,
           comboSpeeds.omegaRadiansPerSecond,
-          false,
           false
       );
     }
@@ -442,7 +441,7 @@ public class AutoAlignment {
                         (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), 0.1, 0.35),
             0, 
             0,
-            true, false);
+            true);
       }
       else if (tilt < -Math.toRadians(7)) {
         swerve.drive(
@@ -454,7 +453,7 @@ public class AutoAlignment {
                         (FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS ? 10 : 20))), -0.35, -0.1),
             0, 
             0, 
-            true, false);
+            true);
       }
       else {
         swerve.setWheelsUp();
@@ -473,6 +472,6 @@ public class AutoAlignment {
       // Notice that only the turning speed is used. We still want to be able to drive forward and strafe
       // One strange thing that I noticed is that the HDC generally doesn't use field relative to drive,
       // I wonder if that will cause issues in the future.
-      swerve.drive(driverAxis.getY(), driverAxis.getX(), thetaSpeed, true, false);
+      swerve.drive(driverAxis.getY(), driverAxis.getX(), thetaSpeed, true);
     }
 }
