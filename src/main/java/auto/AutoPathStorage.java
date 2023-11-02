@@ -34,71 +34,6 @@ public class AutoPathStorage {
 
   public static Waypoint[] _SQUARE_HALF;
 
-  // Paths for the bottom of the field:
-  // Start at grid index 1, place high, then go to field element A, intake, then go to grid index 2, and place high
-  public static Waypoint[] _1H_A_2H_CHARGE_BLUE;
-  public static Waypoint[] _1H_A_2H_CHARGE_RED;
-  public static Waypoint[] _1H_A_2H;
-  public static Waypoint[] _1H_A_2H_B;
-
-  // Start at grid index 1, place high, then go to field element A, intake, then go to grid index 3, and place high
-  public static Waypoint[] _1H_A;
-  public static Waypoint[] _1H_A_3H_CHARGE;
-  public static Waypoint[] _1H_A_3H;
-  public static Waypoint[] _1H_A_3H_B;  
-
-  // Start at grid index 2, place high, then go to field element A, intake, then go to grid index 1, and place high
-  public static Waypoint[] _2H_A_1H_CHARGE;
-  public static Waypoint[] _2H_A_1H;
-  public static Waypoint[] _2H_A;
-  public static Waypoint[] _2H_A_1H_B;
-
-  // Start at grid index 2, place high, then go to field element A, intake, then go to grid index 3, and place high
-  public static Waypoint[] _2H_A_3H_CHARGE;
-  public static Waypoint[] _2H_A_3H;
-  public static Waypoint[] _2H_A_3H_B;
-
-  // Start at grid index 3, place high, then go to field element A, intake, then go to grid index 1, and place high
-  public static Waypoint[] _3H_A_1H_CHARGE;
-  public static Waypoint[] _3H_A_1H;
-  public static Waypoint[] _3H_A;
-  public static Waypoint[] _3H_A_1H_B;
-
-  // Start at grid index 3, place high, then go to field element A, intake, then go to grid index 2, and place high
-  public static Waypoint[] _3H_A_2H_CHARGE;
-  public static Waypoint[] _3H_A_2H;
-  public static Waypoint[] _3H_A_2H_B;
-
-
-  // Paths for the top of the field:
-  // Start at grid index 7, place high, then go to field element D, intake, then go to grid index 8, and place high
-  public static Waypoint[] _7H_D_8H_CHARGE;
-  public static Waypoint[] _7H_D_8H;
-  public static Waypoint[] _7H_D;
-  public static Waypoint[] _7H_D_8H_C;
-
-  // Start at grid index 7, place high, then go to field element D, intake, then go to grid index 9, and place high
-  public static Waypoint[] _7H_D_9H_CHARGE;
-  public static Waypoint[] _7H_D_9H;
-  public static Waypoint[] _7H_D_9H_C;
-
-  // Start at grid index 8, place high, then go to field element D, intake, then go to grid index 7, and place high
-  public static Waypoint[] _8H_D_7H_CHARGE;
-  public static Waypoint[] _8H_D_7H;
-  public static Waypoint[] _8H_D;
-  public static Waypoint[] _8H_D_7H_C;
-
-  // Start at grid index 8, place high, then go to field element D, intake, then go to grid index 9, and place high
-  public static Waypoint[] _8H_D_9H_CHARGE;
-  public static Waypoint[] _8H_D_9H;
-  public static Waypoint[] _8H_D_9H_C;
-
-  // Start at grid index 9, place high, then go to field element D, intake, then go to grid index 7, and place high
-  public static Waypoint[] _9H_D_7H_CHARGE;
-  public static Waypoint[] _9H_D_7H;
-  public static Waypoint[] _9H_D;
-  public static Waypoint[] _9H_D_7H_C;
-
   // Start at grid index 9, place high, then go to field element D, intake, then go to grid index 8, and place high
   public static Waypoint[] _9H_D_8H_CHARGE_BLUE;
   public static Waypoint[] _9H_D_8H_CHARGE_RED;
@@ -117,20 +52,13 @@ public class AutoPathStorage {
   public static Waypoint[] _1H_A_2H_B_2M_BLUE;
   public static Waypoint[] _POOF_1H_A_2H_B_CHARGE_BLUE;
 
-  public static Waypoint[] _4H_MOBILITY;
+  public static Waypoint[] _4H_MOBILITY_CH;
   public static Waypoint[] _5H_MOBILITY;
-  public static Waypoint[] _6H_MOBILITY;
+  public static Waypoint[] _6H_MOBILITY_CH;
   public static Waypoint[] _6H_ONLY;
   public static Waypoint[] _4H_MOBILITY_CHARGE;
   public static Waypoint[] _5H_MOBILITY_CHARGE;
   public static Waypoint[] _6H_MOBILITY_CHARGE;
-
-  public static Waypoint[] _1H_A_CHARGE;
-  public static Waypoint[] _2H_A_CHARGE;
-  public static Waypoint[] _3H_A_CHARGE;
-  public static Waypoint[] _7H_D_CHARGE;
-  public static Waypoint[] _8H_D_CHARGE;
-  public static Waypoint[] _9H_D_CHARGE;
 
   public static Waypoint[] _9H_D_7H_REACH;
   public static Waypoint[] _MOBILITY_CHARGE_TEST_ONLY;
@@ -161,33 +89,14 @@ public class AutoPathStorage {
   public static PathPlannerTrajectory _8;
   public static PathPlannerTrajectory _9;
 
-  public static PathPlannerTrajectory _1_A;
-  public static PathPlannerTrajectory _1_B;
-  public static PathPlannerTrajectory _2_A;
   public static PathPlannerTrajectory _2_B;
-  public static PathPlannerTrajectory _3_A;
   public static PathPlannerTrajectory _3_B;
-  public static PathPlannerTrajectory _4_B;
-  public static PathPlannerTrajectory _5_B;
-  public static PathPlannerTrajectory _5_C;
-  public static PathPlannerTrajectory _6_C;
-
+  public static PathPlannerTrajectory _7_D;
+  public static PathPlannerTrajectory _8_D;
   public static PathPlannerTrajectory _4_M_CH;
   public static PathPlannerTrajectory _5_M;
   public static PathPlannerTrajectory _6_M_CH;
   public static PathPlannerTrajectory _M_CH;
-
-  public static PathPlannerTrajectory _7_C;
-  public static PathPlannerTrajectory _7_D;
-  public static PathPlannerTrajectory _8_C;
-  public static PathPlannerTrajectory _8_D;
-  public static PathPlannerTrajectory _9_C;
-  public static PathPlannerTrajectory _9_D;
-  public static PathPlannerTrajectory _9_D_8_RED;
-  public static PathPlannerTrajectory _9_D_8_BLUE;
-  public static PathPlannerTrajectory _8_C_8_RED;
-  public static PathPlannerTrajectory _8_C_8_BLUE;
-  public static PathPlannerTrajectory _8_C_CH_RED;
   
   public static PathPlannerTrajectory _POOF_1_A_2;
   public static PathPlannerTrajectory _POOF_1_A_2_RED;
@@ -197,10 +106,7 @@ public class AutoPathStorage {
   public static PathPlannerTrajectory _POOF_8_C_8;
 
   public static PathPlannerTrajectory _1_A_2_BLUE;
-  public static PathPlannerTrajectory _1_A_2_RED;
-  public static PathPlannerTrajectory _2_B_2_BLUE;
-  public static PathPlannerTrajectory _2_B_2_RED;
-  
+
   public static PathPlannerTrajectory _POOF_2_B_CH_BLUE;
   public static PathPlannerTrajectory _POOF_2_B_CH_RED;
   public static PathPlannerTrajectory _POOF_8_C_CH;
@@ -220,39 +126,13 @@ public class AutoPathStorage {
 
     _MOBILITY = PathPlanner.loadPath("_MOBILITY", AutoConstants.MAX_SPEED_METERS_PER_SECOND/2.0, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/2.0);
 
-    _1_A = PathPlanner.loadPath("_1_A", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _1_B = PathPlanner.loadPath("_1_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _2_B = PathPlanner.loadPath("_2_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _2_A = PathPlanner.loadPath("_2_A", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _3_A = PathPlanner.loadPath("_3_A", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _3_B = PathPlanner.loadPath("_3_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _4_B = PathPlanner.loadPath("_4_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _4_M_CH = PathPlanner.loadPath("_4_M", 2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _5_B = PathPlanner.loadPath("_5_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _5_C = PathPlanner.loadPath("_5_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _5_M = PathPlanner.loadPath("_5_M", 2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _6_C = PathPlanner.loadPath("_6_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _6_M_CH = PathPlanner.loadPath("_6_M", 2, 1);
     _M_CH = PathPlanner.loadPath("_M_CH", 3, 1);
-    _7_C = PathPlanner.loadPath("_7_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _7_D = PathPlanner.loadPath("_7_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_C = PathPlanner.loadPath("_8_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_D = PathPlanner.loadPath("_8_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _9_C = PathPlanner.loadPath("_9_C", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _9_D = PathPlanner.loadPath("_9_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
-    _9_D_8_RED = PathPlanner.loadPath("9_D_8_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _9_D_8_BLUE = PathPlanner.loadPath("9_D_8_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_C_8_RED = PathPlanner.loadPath("8_C_8_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_C_CH_RED = PathPlanner.loadPath("8_C_CH_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     _1_A_2_BLUE = PathPlanner.loadPath("1_A_2_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _1_A_2_RED = PathPlanner.loadPath("1_A_2_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _2_B_2_BLUE = PathPlanner.loadPath("2_B_2_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _2_B_2_RED = PathPlanner.loadPath("2_B_2_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
-    _8_C_8_BLUE = PathPlanner.loadPath("8_C_8_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    _8_C_CH_RED = PathPlanner.loadPath("8_C_CH_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _POOF_2_B_CH_RED = PathPlanner.loadPath("_POOF_2_B_CH_RED", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _POOF_2_B_CH_BLUE = PathPlanner.loadPath("_POOF_2_B_CH_BLUE", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _POOF_8_C_CH = PathPlanner.loadPath("_POOF_8_C_CH", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -272,8 +152,8 @@ public class AutoPathStorage {
     _1 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_1_A_2_BLUE.getInitialState().poseMeters.getTranslation(), _1_A_2_BLUE.getInitialState().poseMeters.getRotation(), _1_A_2_BLUE.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_1_A_2_BLUE.getInitialState().poseMeters.getTranslation(), _1_A_2_BLUE.getInitialState().poseMeters.getRotation(), _1_A_2_BLUE.getInitialHolonomicPose().getRotation())
+        new PathPoint(_POOF_1_A_2.getInitialState().poseMeters.getTranslation(), _POOF_1_A_2.getInitialState().poseMeters.getRotation(), _POOF_1_A_2.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_POOF_1_A_2.getInitialState().poseMeters.getTranslation(), _POOF_1_A_2.getInitialState().poseMeters.getRotation(), _POOF_1_A_2.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _2_A as the starting point for _2
@@ -281,8 +161,8 @@ public class AutoPathStorage {
     _2 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(), _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_2_A.getInitialState().poseMeters.getTranslation(), _2_A.getInitialState().poseMeters.getRotation(), _2_A.getInitialHolonomicPose().getRotation())
+        new PathPoint(_POOF_2_B_2.getInitialState().poseMeters.getTranslation(), _POOF_2_B_2.getInitialState().poseMeters.getRotation(), _POOF_2_B_2.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_POOF_2_B_2.getInitialState().poseMeters.getTranslation(), _POOF_2_B_2.getInitialState().poseMeters.getRotation(), _POOF_2_B_2.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _3_A as the starting point for _3
@@ -290,8 +170,8 @@ public class AutoPathStorage {
     _3 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_3_A.getInitialState().poseMeters.getTranslation(), _3_A.getInitialState().poseMeters.getRotation(), _3_A.getInitialHolonomicPose().getRotation())
+        new PathPoint(_3_B.getInitialState().poseMeters.getTranslation(), _3_B.getInitialState().poseMeters.getRotation(), _3_B.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_3_B.getInitialState().poseMeters.getTranslation(), _3_B.getInitialState().poseMeters.getRotation(), _3_B.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _4_B as the starting point for _4
@@ -299,8 +179,8 @@ public class AutoPathStorage {
     _4 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_4_B.getInitialState().poseMeters.getTranslation(), _4_B.getInitialState().poseMeters.getRotation(), _4_B.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_4_B.getInitialState().poseMeters.getTranslation(), _4_B.getInitialState().poseMeters.getRotation(), _4_B.getInitialHolonomicPose().getRotation())
+        new PathPoint(_4_M_CH.getInitialState().poseMeters.getTranslation(), _4_M_CH.getInitialState().poseMeters.getRotation(), _4_M_CH.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_4_M_CH.getInitialState().poseMeters.getTranslation(), _4_M_CH.getInitialState().poseMeters.getRotation(), _4_M_CH.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _5_B as the starting point for _5
@@ -308,8 +188,8 @@ public class AutoPathStorage {
     _5 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_5_B.getInitialState().poseMeters.getTranslation(), _5_B.getInitialState().poseMeters.getRotation(), _5_B.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_5_B.getInitialState().poseMeters.getTranslation(), _5_B.getInitialState().poseMeters.getRotation(), _5_B.getInitialHolonomicPose().getRotation())
+        new PathPoint(_5_M.getInitialState().poseMeters.getTranslation(), _5_M.getInitialState().poseMeters.getRotation(), _5_M.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_5_M.getInitialState().poseMeters.getTranslation(), _5_M.getInitialState().poseMeters.getRotation(), _5_M.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _6_C as the starting point for _6
@@ -317,8 +197,8 @@ public class AutoPathStorage {
     _6 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_6_C.getInitialState().poseMeters.getTranslation(), _6_C.getInitialState().poseMeters.getRotation(), _6_C.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_6_C.getInitialState().poseMeters.getTranslation(), _6_C.getInitialState().poseMeters.getRotation(), _6_C.getInitialHolonomicPose().getRotation())
+        new PathPoint(_6_M_CH.getInitialState().poseMeters.getTranslation(), _6_M_CH.getInitialState().poseMeters.getRotation(), _6_M_CH.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_6_M_CH.getInitialState().poseMeters.getTranslation(), _6_M_CH.getInitialState().poseMeters.getRotation(), _6_M_CH.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _7_D as the starting point for _7
@@ -335,8 +215,8 @@ public class AutoPathStorage {
     _8 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(), _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_8_D.getInitialState().poseMeters.getTranslation(), _8_D.getInitialState().poseMeters.getRotation(), _8_D.getInitialHolonomicPose().getRotation())
+        new PathPoint(_POOF_8_C_8.getInitialState().poseMeters.getTranslation(), _POOF_8_C_8.getInitialState().poseMeters.getRotation(), _POOF_8_C_8.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_POOF_8_C_8.getInitialState().poseMeters.getTranslation(), _POOF_8_C_8.getInitialState().poseMeters.getRotation(), _POOF_8_C_8.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _9_D as the starting point for _9
@@ -344,8 +224,8 @@ public class AutoPathStorage {
     _9 = PathPlanner.generatePath
     (
         new PathConstraints(0.1, 0.1),
-        new PathPoint(_9_D_8_RED.getInitialState().poseMeters.getTranslation(), _9_D_8_RED.getInitialState().poseMeters.getRotation(), _9_D_8_RED.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_9_D_8_RED.getInitialState().poseMeters.getTranslation(), _9_D_8_RED.getInitialState().poseMeters.getRotation(), _9_D_8_RED.getInitialHolonomicPose().getRotation())
+        new PathPoint(_POOF_9_D_8.getInitialState().poseMeters.getTranslation(), _POOF_9_D_8.getInitialState().poseMeters.getRotation(), _POOF_9_D_8.getInitialHolonomicPose().getRotation()),
+        new PathPoint(_POOF_9_D_8.getInitialState().poseMeters.getTranslation(), _POOF_9_D_8.getInitialState().poseMeters.getRotation(), _POOF_9_D_8.getInitialHolonomicPose().getRotation())
     );
 
 
@@ -382,19 +262,9 @@ public class AutoPathStorage {
         new Waypoint(_MOBILITY, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
-    _4H_MOBILITY = new Waypoint[] {
-        new Waypoint(_4, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_4_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
-
     _6H_ONLY = new Waypoint[] {
         new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_6, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
-    };
-
-    _6H_MOBILITY = new Waypoint[] {
-        new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_6_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED)
     };
 
     _4H_MOBILITY_CHARGE = new Waypoint[] {
@@ -411,18 +281,6 @@ public class AutoPathStorage {
     _6H_MOBILITY_CHARGE = new Waypoint[] {
         new Waypoint(_6, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
         new Waypoint(_6_M_CH, PlacementConstants.STOWED_INDEX, PlacementConstants.CLAW_STOPPED_SPEED),
-    };
-    
-    _9H_D_8H_C = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_8_C, PlacementConstants.CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
-    };
-
-    _9H_D_8H_C_CHARGE_RED = new Waypoint[] {
-        new Waypoint(_9, PlacementConstants.CONE_HIGH_PLACEMENT_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CONE),
-        new Waypoint(_9_D_8_RED, PlacementConstants.AUTO_CUBE_HIGH_INDEX, PlacementConstants.CLAW_OUTTAKE_SPEED_CUBE),
-        new Waypoint(_8_C_CH_RED, PlacementConstants.AUTO_CUBE_INTAKE_INDEX, PlacementConstants.CLAW_INTAKE_SPEED_CUBE),
     };
 
     _POOF_9H_D_8H_C_CHARGE = new Waypoint[] {
@@ -502,7 +360,7 @@ public class AutoPathStorage {
       new AutoPose("POOF 9D8C8 LOW", _POOF_9H_D_8H_C_8LOW),
 
       new AutoPose("6H_MOBILITY_CHARGE", _6H_MOBILITY_CHARGE),
-      new AutoPose("4H_ONLY", _6H_ONLY),
+    //   new AutoPose("6H_ONLY", _6H_ONLY),
       
       new AutoPose("POOF 1A2 B CHARGE RED", _POOF_1H_A_2H_B_CHARGE_RED),
       new AutoPose("POOF 1A2 B CHARGE BLUE", _POOF_1H_A_2H_B_CHARGE_BLUE),
