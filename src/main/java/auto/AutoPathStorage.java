@@ -85,13 +85,11 @@ public class AutoPathStorage {
   public static PathPlannerTrajectory _4;
   public static PathPlannerTrajectory _5;
   public static PathPlannerTrajectory _6;
-  public static PathPlannerTrajectory _7;
   public static PathPlannerTrajectory _8;
   public static PathPlannerTrajectory _9;
 
   public static PathPlannerTrajectory _2_B;
   public static PathPlannerTrajectory _3_B;
-  public static PathPlannerTrajectory _7_D;
   public static PathPlannerTrajectory _8_D;
   public static PathPlannerTrajectory _4_M_CH;
   public static PathPlannerTrajectory _5_M;
@@ -127,6 +125,8 @@ public class AutoPathStorage {
     _MOBILITY = PathPlanner.loadPath("_MOBILITY", AutoConstants.MAX_SPEED_METERS_PER_SECOND/2.0, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/2.0);
 
     _3_B = PathPlanner.loadPath("_3_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _2_B = PathPlanner.loadPath("_2_B", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    _8_D = PathPlanner.loadPath("_8_D", AutoConstants.MAX_SPEED_METERS_PER_SECOND, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _4_M_CH = PathPlanner.loadPath("_4_M", 2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _5_M = PathPlanner.loadPath("_5_M", 2, AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     _6_M_CH = PathPlanner.loadPath("_6_M", 2, 1);
@@ -199,15 +199,6 @@ public class AutoPathStorage {
         new PathConstraints(0.1, 0.1),
         new PathPoint(_6_M_CH.getInitialState().poseMeters.getTranslation(), _6_M_CH.getInitialState().poseMeters.getRotation(), _6_M_CH.getInitialHolonomicPose().getRotation()),
         new PathPoint(_6_M_CH.getInitialState().poseMeters.getTranslation(), _6_M_CH.getInitialState().poseMeters.getRotation(), _6_M_CH.getInitialHolonomicPose().getRotation())
-    );
-
-    // Use the initial state of _7_D as the starting point for _7
-    // This is so we can move our arm before we move the robot.
-    _7 = PathPlanner.generatePath
-    (
-        new PathConstraints(0.1, 0.1),
-        new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(), _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialHolonomicPose().getRotation()),
-        new PathPoint(_7_D.getInitialState().poseMeters.getTranslation(), _7_D.getInitialState().poseMeters.getRotation(), _7_D.getInitialHolonomicPose().getRotation())
     );
 
     // Use the initial state of _8_D as the starting point for _8
@@ -370,12 +361,6 @@ public class AutoPathStorage {
     };
 
     for (int i = 0; i < myAutoContainer.length; i++) {
-      
-      if (i == 8) {
-        AutoPose MobilityAutoPose = new AutoPose("MOBILITY ONLY!!!!!!", _MOBILITY_ONLY);
-        DriverUI.autoChooser.addOption(MobilityAutoPose.getName(), MobilityAutoPose);
-        DriverUI.autoChooser.addOption(" ".repeat(i), MobilityAutoPose);
-      }
       
       AutoPose AutoPose = myAutoContainer[i];
       
