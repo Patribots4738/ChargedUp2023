@@ -127,7 +127,7 @@ public class Robot extends TimedRobot {
     Logger.updateEntries();
     arduinoController.periodic();
     claw.updateOutputCurrent();
-    arm.logArmData();
+    arm.logPositions();
     swerve.logPositions();
     
     dt = Timer.getFPGATimestamp() - DriverUI.currentTimestamp;

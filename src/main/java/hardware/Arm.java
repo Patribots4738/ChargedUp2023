@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import io.github.oblarg.oblog.annotations.Log;
 
 // We use the black solution as seen in: https://www.desmos.com/calculator/fqyyldertp
-public class Arm /* implements Loggable */ {
+public class Arm {
 
     int armPosDimension1 = PlacementConstants.STOWED_INDEX;
     int armPosDimension2 = 1;
@@ -204,7 +204,7 @@ public class Arm /* implements Loggable */ {
         // Trajectories take around 10ms to create, which may be
         currentTrajectory = PlacementConstants.HIGH_CONE_TRAJECTORY;
         
-        logArmData();
+        logPositions();
 
     }
 
@@ -757,12 +757,12 @@ public class Arm /* implements Loggable */ {
       upperArmEncoder.setZeroOffset(2.7098798+Math.PI);
     }
 
-    public void logArmData() {
-        SmartDashboard.putData("ArmDesired2D", armDesiredMechanism);
-        SmartDashboard.putNumberArray("ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
+    public void logPositions() {
+        SmartDashboard.putData("Arm/ArmDesired2D", armDesiredMechanism);
+        SmartDashboard.putNumberArray("Arm/ArmDesired3D", getPoseData(lowerReferenceAngle, upperReferenceAngle));
 
-        SmartDashboard.putNumberArray("ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
-        SmartDashboard.putNumberArray("ArmREALXY", new double[] {this.armXPos, this.armYPos});
+        SmartDashboard.putNumberArray("Arm/ArmActual3D", getPoseData(getLowerArmAngle(), getUpperArmAngle()));
+        SmartDashboard.putNumberArray("Arm/ArmREALXY", new double[] {this.armXPos, this.armYPos});
     }
 
     private double[] getPoseData(double lowerArmAngle, double upperArmAngle) {

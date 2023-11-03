@@ -103,6 +103,8 @@ public class Swerve {
     });
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
     SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumberArray("Robot/RobotPose3d", Pose3dLogger.composePose3ds(new Pose3d()));
+    SmartDashboard.putNumberArray("Robot/RobotPose2d", new double[] { 0, 0, 0 });
 
   }
 
@@ -113,7 +115,12 @@ public class Swerve {
   }
 
   public void logPositions() {
-    DriverUI.field.setRobotPose(getPose());
+    Pose2d currentPose = getPose();
+    double currentYawRads = currentPose.getRotation().getRadians();
+    double currentPitchRads = getPitch().getRadians();
+    double currentRollRads = getRoll().getRadians();
+
+    DriverUI.field.setRobotPose(currentPose);
 
     SmartDashboard.putNumberArray("Swerve/RealStates", new double[] {
         frontLeft.getState().angle.getRadians(), frontLeft.getState().speedMetersPerSecond,
@@ -123,23 +130,31 @@ public class Swerve {
     });
 
     SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
-    SmartDashboard.putNumber("Swerve/RobotRotation", getYaw().getRadians());
+    SmartDashboard.putNumber("Swerve/RobotRotation", currentYawRads);
 
-    SmartDashboard.putNumberArray("RobotPose3d", 
+    SmartDashboard.putNumberArray("Robot/RobotPose3d", 
         Pose3dLogger.composePose3ds(
             new Pose3d(
                 new Translation3d(
-                    getPose().getX(), 
-                    getPose().getY(), 
+                    currentPose.getX(), 
+                    currentPose.getY(), 
                     Math.hypot(
-                        getRoll().getSin()
+                        Math.sin(currentRollRads)
                         * PlacementConstants.ROBOT_LENGTH_METERS/2.0
                     , 
-                        getPitch().getSin() *
+                        Math.sin(currentPitchRads) *
                         PlacementConstants.ROBOT_LENGTH_METERS/2.0
                     )), 
-                new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians()))
+                new Rotation3d(currentRollRads, currentPitchRads, currentYawRads))
         )
+    );
+
+    SmartDashboard.putNumberArray("Robot/RobotPose2d", 
+        new double[] { 
+            currentPose.getX(), 
+            currentPose.getY(), 
+            currentYawRads
+        }
     );
   }
 
