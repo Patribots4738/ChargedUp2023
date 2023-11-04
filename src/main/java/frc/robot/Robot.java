@@ -145,8 +145,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if (DriverStation.getAlliance() != Alliance.Invalid)
+    if (DriverStation.getAlliance() != Alliance.Invalid && DriverStation.isDSAttached()) {
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
+    }
         
     if (FieldConstants.ALLIANCE != Alliance.Invalid) {
         if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
