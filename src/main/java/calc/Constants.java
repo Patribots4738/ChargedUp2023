@@ -556,6 +556,7 @@ public final class Constants {
       public static final Translation2d HIGH_CONE_POSITION_0 = new Translation2d(29.03, 46.46);
       public static final Translation2d HIGH_CONE_POSITION_1 = new Translation2d(46.35, 33);
       public static final Translation2d HIGH_CONE_POSITION_2 = new Translation2d(48, 25);
+      public static final Translation2d HUMAN_TAG_PREP = new Translation2d(0, 26.75);
       public static final Translation2d HUMAN_TAG_PICKUP = new Translation2d(15, 26.75);
       public static final Translation2d CUBE_HIGH = new Translation2d(40, 34);
       public static final Translation2d CUBE_HIGH_AUTO = new Translation2d(44, 35);//41 on Y
@@ -596,6 +597,7 @@ public final class Constants {
         },
         // Index 4 | Human Tag
         {
+          HUMAN_TAG_PREP,
           HUMAN_TAG_PICKUP
         },
         // Index 5 | Cube Mid
