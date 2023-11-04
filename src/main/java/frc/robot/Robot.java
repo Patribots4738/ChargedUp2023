@@ -102,13 +102,6 @@ public class Robot extends TimedRobot {
       }
       Timer.delay(0.25);
 
-      // Wait wait wait wait for the DS to connect
-      // then assign our alliance color
-      while (DriverStation.getAlliance() == Alliance.Invalid) {
-        DriverStation.refreshData();
-      }
-
-      FieldConstants.ALLIANCE = DriverStation.getAlliance();
   }
 
   /**
@@ -121,22 +114,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    double dt = Timer.getFPGATimestamp() - DriverUI.currentTimestamp;
-    SmartDashboard.putNumber("Timer/dTPrelog", dt);
-        
     Logger.updateEntries();
     arduinoController.periodic();
     claw.updateOutputCurrent();
     arm.logPositions();
     swerve.logPositions();
-    
-    dt = Timer.getFPGATimestamp() - DriverUI.currentTimestamp;
-    
-    if (dt > 0.02) DriverUI.overrunCount++;
-    
-    SmartDashboard.putNumber("Timer/dTPostlog", dt);
-    SmartDashboard.putNumber("Timer/overrunCounter", DriverUI.overrunCount);
-    DriverUI.currentTimestamp = Timer.getFPGATimestamp();
 
   }
 
@@ -163,7 +145,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    FieldConstants.ALLIANCE = DriverStation.getAlliance();
+    if (DriverStation.getAlliance() != Alliance.Invalid && DriverStation.isDSAttached()) {
+        FieldConstants.ALLIANCE = DriverStation.getAlliance();
+    }
+        
     if (FieldConstants.ALLIANCE != Alliance.Invalid) {
         if (Math.abs(swerve.getPitch().getDegrees()) > 35) {
             arduinoController.setLEDState(LEDConstants.BELLY_PAN_CHROMA);
