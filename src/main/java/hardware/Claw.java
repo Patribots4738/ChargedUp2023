@@ -92,7 +92,8 @@ public class Claw {
         // Check if our current current and our current (one loop behind, hasn't updated yet)
         // is in the range that happens when we have a game element, 
         // but the claw is not yet in a stalled state.
-        if (20 < current && current < 30 && 
+        if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP && 
+            20 < current && current < 30 && 
             20 < claw.getOutputCurrent() && claw.getOutputCurrent() < 30 && 
             desiredSpeed > 0.45) 
         {
@@ -107,7 +108,7 @@ public class Claw {
         if (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP) {
 
             // This is for automatically outtaking the game piece
-            if ((Timer.getFPGATimestamp() - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
+            if ((DriverUI.currentTimestamp - startedOuttakingTimestamp) > outtakeSeconds && startedOuttakingBool) {
                 finishedOuttaking = true;
             }
             // Slow down claw for cube mode
@@ -148,7 +149,7 @@ public class Claw {
                 // So start a timer so that we can check if we have stalled
                 //   without taking into account the time it takes to speed up
                 if (this.desiredSpeed <= 0) {
-                    this.startedIntakingTimestamp = Timer.getFPGATimestamp();
+                    this.startedIntakingTimestamp = DriverUI.currentTimestamp;
                 }
 
                 // To prevent damage to game elements, the claw will not intake at full speed
@@ -173,7 +174,7 @@ public class Claw {
         this.startedOuttakingBool = true;
         this.outtakeSeconds = X;
         this.finishedOuttaking = false;
-        this.startedOuttakingTimestamp = Timer.getFPGATimestamp();
+        this.startedOuttakingTimestamp = DriverUI.currentTimestamp;
     }
 
     public boolean getFinishedOuttaking() {
