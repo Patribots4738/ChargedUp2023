@@ -92,6 +92,7 @@ public class Robot extends TimedRobot {
 
       autoSegmentedWaypoints = new AutoSegmentedWaypoints(swerve, arm, claw, autoAlignment);
       autoPathStorage = new AutoPathStorage();
+      Timer.delay(1);
 
       arduinoController = new ArduinoController();
 
@@ -202,6 +203,8 @@ public class Robot extends TimedRobot {
     SwerveTrajectory.resetTrajectoryStatus();
   }
 
+  private boolean nullPosition = false;
+
   @Override
   public void autonomousPeriodic() {
     double elapsedTime = DriverUI.currentTimestamp - DriverUI.modeStartTimestamp;
@@ -219,6 +222,14 @@ public class Robot extends TimedRobot {
     // let the arm move as normal
     else {
       arm.periodic();
+    }
+    if (Double.isNaN(swerve.getPose().getX()) || Double.isNaN(swerve.getPose().getY()) || nullPosition) {
+        swerve.resetOdometry(new Pose2d());
+        swerve.drive(0, 0, 0, false);
+        arm.setArmIndex(PlacementConstants.STOWED_INDEX);
+        claw.setDesiredSpeed(PlacementConstants.AUTO_CLAW_OUTTAKE_SPEED_CUBE);
+        nullPosition = true;
+        return;
     }
 
     // Have the claw outtake at the end of the match,
@@ -272,6 +283,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     swerve.periodic();
+    if (Double.isNaN(swerve.getPose().getX()) || Double.isNaN(swerve.getPose().getY())) {
+        swerve.resetOdometry(new Pose2d());
+        swerve.drive(0, 0, 0, false);
+        return;
+    }
     arm.periodic();
     claw.periodic();
     autoAlignment.calibrateOdometry();
@@ -578,11 +594,11 @@ public class Robot extends TimedRobot {
         arduinoController.setLEDState(LEDConstants.BELLY_PAN_BLACK, true);
         arduinoController.setLEDState(AutoAlignment.coneMode ? LEDConstants.BELLY_PAN_YELLOW : LEDConstants.BELLY_PAN_PURPLE, true);
       }
-    } else if (operator.getLeftTriggerAxis() > 0) {
+    } else if (operator.getLeftTriggerAxis() > 0.25) {
 
       claw.setDesiredSpeed(operator.getLeftTriggerAxis());
 
-    } else if (operator.getRightTriggerAxis() > 0) {
+    } else if (operator.getRightTriggerAxis() > 0.25) {
 
       claw.setDesiredSpeed(-operator.getRightTriggerAxis());
 
