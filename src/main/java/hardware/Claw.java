@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.DriverUI;
 
 public class Claw {
@@ -158,6 +159,7 @@ public class Claw {
         else {
             this.desiredSpeed = speed;
         }
+        SmartDashboard.putNumber("Claw/DesiredSpeed", desiredSpeed);
     }
 
     public void stopClaw() {
