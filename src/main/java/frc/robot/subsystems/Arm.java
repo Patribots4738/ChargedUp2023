@@ -213,7 +213,7 @@ public class Arm extends SubsystemBase {
         logArmData();
 
     }
-
+ 
     @Override
     public void periodic() {
         if (!operatorOverride && !followingTrajectory) {
@@ -244,6 +244,8 @@ public class Arm extends SubsystemBase {
         // We do this becuase we want to limit our communications with the spark
         // as much as possible, to reduce loop overruns.
         if (this.upperPIDSlot1 != upperPIDSlot1 || this.upperPIDSlot2 != upperPIDSlot2) {
+            this.upperPIDSlot1 = upperPIDSlot1;
+            this.upperPIDSlot2 = upperPIDSlot2;
             setUpperArmAngle(upperReferenceAngle);
         }
 
@@ -755,7 +757,7 @@ public class Arm extends SubsystemBase {
 
     private void setIndexAndTrajectory(int index, Trajectory trajectory) {
         setArmIndex(index);
-        if (!getHotReload(index)) { 
+        if (!getHotReload(index)) {
             startTrajectory(trajectory); 
         }
     }
