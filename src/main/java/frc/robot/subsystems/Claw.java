@@ -40,7 +40,7 @@ public class Claw extends SubsystemBase {
         claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         claw.setInverted(false);
 
-        NeoMotorConstants.motors.add(claw);
+        NeoMotorConstants.motorList.add(claw);
 
         setBrakeMode();
 

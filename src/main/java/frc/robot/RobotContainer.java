@@ -276,7 +276,7 @@ public class RobotContainer {
 
     private void incinerateMotors() {
         Timer.delay(0.25);
-        for (CANSparkMax neo : NeoMotorConstants.motors) {
+        for (CANSparkMax neo : NeoMotorConstants.motorList) {
             neo.burnFlash();
             Timer.delay(0.005);
         }

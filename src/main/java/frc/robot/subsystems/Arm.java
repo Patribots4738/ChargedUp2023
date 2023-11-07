@@ -197,9 +197,9 @@ public class Arm extends SubsystemBase {
         // zeroUpperArmEncoder();
         // zeroLowerArmEncoder();
 
-        NeoMotorConstants.motors.add(lowerArmLeft);
-        NeoMotorConstants.motors.add(lowerArmRight);
-        NeoMotorConstants.motors.add(upperArm);
+        NeoMotorConstants.motorList.add(lowerArmLeft);
+        NeoMotorConstants.motorList.add(lowerArmRight);
+        NeoMotorConstants.motorList.add(upperArm);
 
         armCalculations = new ArmCalculations();
         setBrakeMode();
@@ -214,6 +214,7 @@ public class Arm extends SubsystemBase {
 
     }
 
+    @Override
     public void periodic() {
         if (!operatorOverride && !followingTrajectory) {
             indexPeriodic();

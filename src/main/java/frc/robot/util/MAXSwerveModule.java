@@ -17,8 +17,8 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
 
 public class MAXSwerveModule {
-    private final NEOS drivingSparkMax;
-    private final NEOS turningSparkMax;
+    private final Neo drivingSparkMax;
+    private final Neo turningSparkMax;
 
     private final RelativeEncoder drivingEncoder;
     private final AbsoluteEncoder turningEncoder;
@@ -36,8 +36,8 @@ public class MAXSwerveModule {
      * Encoder.
      */
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
-        drivingSparkMax = new NEOS(drivingCANId);
-        turningSparkMax = new NEOS(turningCANId);
+        drivingSparkMax = new Neo(drivingCANId);
+        turningSparkMax = new Neo(turningCANId);
 
         // Factory reset, so we get the SPARKS MAX to a known state before configuring
         // them. This is useful in case a SPARK MAX is swapped out.

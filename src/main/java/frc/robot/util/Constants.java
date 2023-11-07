@@ -238,7 +238,7 @@ public final class Constants {
     public static final class NeoMotorConstants {
         public static final double FREE_SPEED_RPM = 5676;
 
-        public static ArrayList<CANSparkMax> motors = new ArrayList<>();
+        public static ArrayList<CANSparkMax> motorList = new ArrayList<>();
     }
 
     public static final class ArmConstants {
