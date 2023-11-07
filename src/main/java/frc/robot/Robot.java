@@ -145,7 +145,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if (DriverStation.getAlliance() != Alliance.Invalid && DriverStation.isDSAttached()) {
+    if (DriverStation.getAlliance() != Alliance.Invalid) {
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
     }
         
