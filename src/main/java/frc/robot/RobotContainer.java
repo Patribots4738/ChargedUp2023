@@ -167,7 +167,11 @@ public class RobotContainer {
         operator.povLeft().onTrue(arm.getPOVLeftCommand(() -> swerve.getPose().getX()));
         operator.povRight().onTrue(arm.getPOVRightCommand(() -> swerve.getPose().getX()));
         
-        operator.a().whileTrue(arm.finishPlacmentCommand());
+        operator.a().whileTrue(
+            arm.finishPlacmentCommand()
+            .unless(
+                () -> !(arm.getAtPrepIndex() && arm.getAtDesiredPositions()))
+            .repeatedly());
         
         operator.b()
             .onTrue(arm.setArmIndexCommand(() -> PlacementConstants.CONE_FLIP_INDEX)
@@ -180,7 +184,7 @@ public class RobotContainer {
 
         operator.leftBumper().whileTrue(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_STOPPED_SPEED));
 
-        operator.rightBumper().or(operator.rightStick().and(arm::getAtPlacementPosition))
+        operator.rightBumper().or(operator.rightStick()).and(arm::getAtPlacementPosition)
             .onTrue(claw.outTakeforXSeconds(() -> PlacementConstants.CONE_MODE ? 0.1 : 0.3)
             .alongWith(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_BLACK))
             .alongWith(arduinoController.setLEDStateCommand(

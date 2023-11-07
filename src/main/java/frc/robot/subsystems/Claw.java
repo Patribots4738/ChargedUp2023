@@ -127,7 +127,7 @@ public class Claw extends SubsystemBase {
 
         if (speed > 0) {
             intakeMode = true;
-        } else if (speed < 0) {
+        } else if (speed <= 0) {
             intakeMode = false;
         }
 
