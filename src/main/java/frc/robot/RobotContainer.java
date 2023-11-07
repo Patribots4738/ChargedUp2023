@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.lang.ProcessBuilder.Redirect;
+
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -67,7 +69,7 @@ public class RobotContainer {
             () -> -driver.getRightX(),
             () -> !driver.y().getAsBoolean(),
             () -> !driver.y().getAsBoolean(),
-            () -> (driver.y().getAsBoolean() && FieldConstants.ALLIANCE == Alliance.Blue)
+            () -> (driver.y().getAsBoolean() && FieldConstants.ALLIANCE == Alliance.Red)
         ));
 
         photonVision.setDefaultCommand(autoAlignment.calibrateOdometry());
@@ -99,8 +101,8 @@ public class RobotContainer {
                     swerve.getPose().getTranslation(), 
                     Rotation2d.fromDegrees(
                         FieldConstants.ALLIANCE == Alliance.Red 
-                        ? 0 
-                        : 180))
+                        ? 180
+                        : 0))
             ), swerve)
         );
 
@@ -162,8 +164,15 @@ public class RobotContainer {
             .andThen(arduinoController.setLEDStateCommand(() -> LEDConstants.ARM_YELLOW))
             .andThen(arm.handleConeModeChange()));
 
-        operator.povUp().onTrue(arm.getPOVHighCommand());
-        operator.povDown().onTrue(arm.getPOVDownCommand());
+        operator.povUp()
+            .onTrue(
+                arm.footballCommand()
+            .alongWith(
+                Commands.waitUntil(arm::halfwayFinishedWithFootball)
+                .andThen(claw.setDesiredSpeedCommand(() -> -1)))
+            .andThen(claw.setDesiredSpeedCommand(() -> 0)));
+
+        operator.povDown().onTrue(arm.getPushUpCommand());
         operator.povLeft().onTrue(arm.getPOVLeftCommand(() -> swerve.getPose().getX()));
         operator.povRight().onTrue(arm.getPOVRightCommand(() -> swerve.getPose().getX()));
         
@@ -186,46 +195,48 @@ public class RobotContainer {
 
         operator.rightBumper().or(operator.rightStick()).and(arm::getAtPlacementPosition)
             .onTrue(claw.outTakeforXSeconds(() -> PlacementConstants.CONE_MODE ? 0.1 : 0.3)
-            .alongWith(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_BLACK))
-            .alongWith(arduinoController.setLEDStateCommand(
-                () -> PlacementConstants.CONE_MODE ? 
-                    LEDConstants.BELLY_PAN_YELLOW : 
-                    LEDConstants.BELLY_PAN_PURPLE))
+            // .alongWith(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_BLACK))
+            // .alongWith(arduinoController.setLEDStateCommand(
+            //     () -> PlacementConstants.CONE_MODE ? 
+            //         LEDConstants.BELLY_PAN_YELLOW : 
+            //         LEDConstants.BELLY_PAN_PURPLE))
             .andThen(arm.getAutoStowCommand()));
         
         operator.leftTrigger().whileTrue(claw.setDesiredSpeedCommand(() -> operator.getLeftTriggerAxis()));
         operator.rightTrigger().whileTrue(claw.setDesiredSpeedCommand(() -> -operator.getRightTriggerAxis()));
 
-        swerve.getTiltedTrigger().onTrue(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_FLASH_RED));
+        // swerve.getTiltedTrigger()
+        //     .onTrue(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_FLASH_RED))
+        //     .onFalse(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_CHROMA));
 
-        autoAlignment.getAlignedTrigger(() -> PlacementConstants.CONE_BASE_RADIUS)
-            .onTrue(driver.setRumble(() -> 1)
-            .andThen(operator.setRumble(() -> 1))
-            .andThen(arduinoController.setLEDStateCommand(() -> 
-                claw.hasGameElement() ? LEDConstants.BELLY_PAN_GREEN_BLINK :
-                    PlacementConstants.CONE_MODE ? 
-                        LEDConstants.BELLY_PAN_YELLOW : 
-                        LEDConstants.BELLY_PAN_PURPLE)))
-        .negate().and(autoAlignment.getAlignedTrigger(() -> 1)
-            .onTrue(arduinoController.setLEDStateCommand(() -> 
-                claw.hasGameElement() ? LEDConstants.BELLY_PAN_RED :
-                    PlacementConstants.CONE_MODE ? 
-                        LEDConstants.BELLY_PAN_YELLOW : 
-                        LEDConstants.BELLY_PAN_PURPLE)))
-        .negate().and(claw::hasGameElement)
-            .onTrue(driver.setRumble(() -> 0.25)
-            .andThen(operator.setRumble(() -> 0.25)))
-            .onFalse(arduinoController.setLEDStateCommand(() ->
-                PlacementConstants.CONE_MODE 
-                    ? LEDConstants.BELLY_PAN_YELLOW 
-                    : LEDConstants.BELLY_PAN_PURPLE))
-        .and(claw::justAquiredGameElement)
-            .onTrue(arduinoController.setLEDStateCommand(() ->
-                PlacementConstants.CONE_MODE 
-                    ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
-                    : LEDConstants.BELLY_PAN_PURPLE_BLINK))
-            .onFalse(driver.setRumble(() -> 0)
-            .andThen(operator.setRumble(() -> 0)));
+        // autoAlignment.getAlignedTrigger(() -> PlacementConstants.CONE_BASE_RADIUS)
+        //     .onTrue(driver.setRumble(() -> 1)
+        //     .andThen(operator.setRumble(() -> 1))
+        //     .andThen(arduinoController.setLEDStateCommand(() -> 
+        //         claw.hasGameElement() ? LEDConstants.BELLY_PAN_GREEN_BLINK :
+        //             PlacementConstants.CONE_MODE ? 
+        //                 LEDConstants.BELLY_PAN_YELLOW : 
+        //                 LEDConstants.BELLY_PAN_PURPLE)).repeatedly())
+        // .negate().and(autoAlignment.getAlignedTrigger(() -> 1)
+        //     .whileTrue(arduinoController.setLEDStateCommand(() -> 
+        //         claw.hasGameElement() ? LEDConstants.BELLY_PAN_RED :
+        //             PlacementConstants.CONE_MODE ? 
+        //                 LEDConstants.BELLY_PAN_YELLOW : 
+        //                 LEDConstants.BELLY_PAN_PURPLE).repeatedly()))
+        // .negate().and(claw::hasGameElement)
+        //     .onTrue(driver.setRumble(() -> 0.25)
+        //     .andThen(operator.setRumble(() -> 0.25)))
+        //     .whileFalse(arduinoController.setLEDStateCommand(() ->
+        //         PlacementConstants.CONE_MODE 
+        //             ? LEDConstants.BELLY_PAN_YELLOW 
+        //             : LEDConstants.BELLY_PAN_PURPLE).repeatedly())
+        // .and(claw::justAquiredGameElement)
+        //     .whileTrue(arduinoController.setLEDStateCommand(() ->
+        //         PlacementConstants.CONE_MODE 
+        //             ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
+        //             : LEDConstants.BELLY_PAN_PURPLE_BLINK).repeatedly())
+        //     .onFalse(driver.setRumble(() -> 0).repeatedly()
+        //     .andThen(operator.setRumble(() -> 0).repeatedly()));
     }
 
     public void generateEventMap() {
@@ -270,11 +281,22 @@ public class RobotContainer {
     }
 
     public Command getDisabledCommand() {
-        return Commands.run(() -> FieldConstants.ALLIANCE = DriverStation.getAlliance()).ignoringDisable(true);
+        return Commands.runOnce(() -> FieldConstants.ALLIANCE = DriverStation.getAlliance())
+            /*.andThen(arduinoController.setLEDStateCommand(() -> {
+                switch (FieldConstants.ALLIANCE) {
+                    case Red:
+                        return LEDConstants.BELLY_PAN_RED_ALLIANCE;
+                    case Blue:
+                        return LEDConstants.BELLY_PAN_BLUE;
+                    default: 
+                        return LEDConstants.BELLY_PAN_CHROMA;
+                }
+            }))*/.ignoringDisable(true).repeatedly();
     }
 
     public void onEnabled() {
         Commands.runOnce(() -> DriverUI.modeStartTimestamp = DriverUI.currentTimestamp)
+            // .andThen(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_CHROMA))
             .schedule();
     }
 

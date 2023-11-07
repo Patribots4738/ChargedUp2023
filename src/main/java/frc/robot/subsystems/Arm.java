@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -235,9 +236,11 @@ public class Arm extends SubsystemBase {
         // Slot 1 is used to make the arm go super fast
         // Slot 2 is an in-between gain set which
         // slows the arm down just enough to not overshoot
-        boolean upperPIDSlot1 = followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX;
-        boolean upperPIDSlot2 = (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP)
-                && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2);
+        boolean upperPIDSlot1 = 
+            (followingTrajectory && armPosDimension1 != PlacementConstants.CONE_MID_PREP_INDEX);
+        boolean upperPIDSlot2 = 
+                (FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP
+                && trajectoryTimer.hasElapsed(currentTrajectory.getTotalTimeSeconds() / 2));
 
         // On either PID slot boolean change
         // update both, then ask the SparkMAX to change its ff
@@ -356,7 +359,8 @@ public class Arm extends SubsystemBase {
                 armsAtDesiredPosition = true;
                 if (armPosDimension1 == PlacementConstants.ARM_FLIP_INDEX ||
                         armPosDimension1 == PlacementConstants.HIGH_TO_STOWED_INDEX ||
-                        armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX) {
+                        armPosDimension1 == PlacementConstants.MID_TO_STOWED_INDEX ||
+                        armPosDimension1 == PlacementConstants.FOOTBALL_INDEX_1) {
                     armPosDimension1 = PlacementConstants.STOWED_INDEX;
                     armPosDimension2 = PlacementConstants.ARM_POSITIONS[PlacementConstants.STOWED_INDEX].length - 1;
                 }
@@ -392,6 +396,8 @@ public class Arm extends SubsystemBase {
                 index != PlacementConstants.CONE_FLIP_INDEX &&
                 index != PlacementConstants.CONE_INTAKE_INDEX &&
                 index != PlacementConstants.CUBE_INTAKE_INDEX &&
+                index != PlacementConstants.PUSH_UP_UP_INDEX &&
+                index != PlacementConstants.PUSH_UP_DOWN_INDEX &&
                 !operatorOverride) {
             startedTransition = true;
             return;
@@ -404,13 +410,13 @@ public class Arm extends SubsystemBase {
 
         if (index == PlacementConstants.CONE_HIGH_PREP_INDEX &&
                 armPosDimension1 == PlacementConstants.CONE_HIGH_PREP_TO_PLACE_INDEX ||
-                index == PlacementConstants.CONE_MID_PREP_INDEX &&
-                        armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX
-                ||
-                (index == PlacementConstants.STOWED_INDEX &&
-                        armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX ||
-                        armPosDimension1 == PlacementConstants.CONE_INTAKE_INDEX ||
-                        armPosDimension1 == PlacementConstants.CUBE_INTAKE_INDEX)) {
+            index == PlacementConstants.CONE_MID_PREP_INDEX &&
+                armPosDimension1 == PlacementConstants.CONE_MID_PREP_TO_PLACE_INDEX ||
+            (index == PlacementConstants.STOWED_INDEX &&
+                armPosDimension1 == PlacementConstants.CONE_FLIP_INDEX ||
+                armPosDimension1 == PlacementConstants.CONE_INTAKE_INDEX ||
+                armPosDimension1 == PlacementConstants.CUBE_INTAKE_INDEX))
+        {
             armPosDimension2 = PlacementConstants.ARM_POSITIONS[index].length - 1;
         }
 
@@ -465,7 +471,7 @@ public class Arm extends SubsystemBase {
         // Because we cannot reach below the ground.
         // Even though our arm starts 11 inches above the ground,
         // the claw is roughly 11 inches from the arm end
-        armYReference = (armYReference < 0) ? 0 : armYReference;
+        armYReference = (armYReference < -10) ? -10 : armYReference;
 
         Translation2d armPosition = new Translation2d(armXReference, armYReference);
 
@@ -503,8 +509,9 @@ public class Arm extends SubsystemBase {
 
         // If upperArmAngle is NaN, then tell the arm not to change position
         // We only check upperArmAngle because lowerArmAngle is reliant on upperArmAngle
-        if (Double.isNaN(upperArmAngle)) {
+        if (Double.isNaN(upperArmAngle) || Double.isNaN(lowerArmAngle)) {
             System.out.println("Upper angle NAN " + armPosition + " " + armPosition.getNorm());
+            setArmIndex(PlacementConstants.STOWED_INDEX);
             return;
         }
 
@@ -755,6 +762,24 @@ public class Arm extends SubsystemBase {
         }).andThen(waitUntilArmsAtDesiredPositions());
     }
 
+    public Command footballCommand() {
+        return setArmIndexCommand(() -> PlacementConstants.FOOTBALL_INDEX_1)
+        .andThen(Commands.waitSeconds(0.2))
+        .andThen(setArmIndexCommand(() -> PlacementConstants.FOOTBALL_INDEX_2));
+    }
+
+    public Command getPushUpCommand() {
+        return setArmIndexCommand(() -> PlacementConstants.PUSH_UP_UP_INDEX)
+        .andThen(setArmIndexCommand(() -> PlacementConstants.PUSH_UP_DOWN_INDEX))
+        .andThen(Commands.waitSeconds(1))
+        .andThen(setArmIndexCommand(() -> PlacementConstants.PUSH_UP_UP_INDEX));
+    }
+
+    public boolean halfwayFinishedWithFootball() {
+        return armPosDimension1 == PlacementConstants.FOOTBALL_INDEX_2 && 
+                armPosDimension2 > 0;
+    }
+
     private void setIndexAndTrajectory(int index, Trajectory trajectory) {
         setArmIndex(index);
         if (!getHotReload(index)) {
@@ -866,7 +891,7 @@ public class Arm extends SubsystemBase {
     }
 
     public Command getOperatorOverrideDriveCommand(Supplier<Translation2d> operatorLeftAxis) {
-        return run(() -> drive(new Translation2d(operatorLeftAxis.get().getX(), -operatorLeftAxis.get().getY())));
+        return run(() -> drive(new Translation2d(-operatorLeftAxis.get().getX(), operatorLeftAxis.get().getY())));
     }
 
     public boolean getOperatorOverride() {

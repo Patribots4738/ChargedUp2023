@@ -310,7 +310,7 @@ public final class Constants {
         // Add 23 to the lower limit because the upper arm can only start 23* from the
         // lower arm
         public static final double UPPER_ARM_LOWER_LIMIT = Math.toRadians(21);
-        public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(180);
+        public static final double UPPER_ARM_UPPER_LIMIT = Math.toRadians(270);
 
         // The amount of error allowed for the arm's position, in Radians
         // This is primarily used in autonomous
@@ -593,6 +593,10 @@ public final class Constants {
         public static final int AUTO_CUBE_HIGH_INDEX = 22;
         public static final int AUTO_CUBE_MID_INDEX = 23;
         public static final int MID_TO_STOWED_INDEX = 24;
+        public static final int FOOTBALL_INDEX_1 = 25;
+        public static final int FOOTBALL_INDEX_2 = 26;
+        public static final int PUSH_UP_UP_INDEX = 27;
+        public static final int PUSH_UP_DOWN_INDEX = 28;
 
         public static final double CLAW_INTAKE_SPEED_CONE = 1;
         public static final double CLAW_OUTTAKE_SPEED_CONE = -1;
@@ -628,6 +632,8 @@ public final class Constants {
         public static final Translation2d BUMPER_INTAKE_POSITION = new Translation2d(15.4, 3.78);
 
         public static final Translation2d CONE_FLIP_POSITION_0 = new Translation2d(12.6, 5);
+        public static final Translation2d PUSH_UP_POSITION_DOWN = new Translation2d(21, -10);
+        public static final Translation2d PUSH_UP_POSITION_UP = new Translation2d(23, 1);
         // public static final Translation2d CONE_FLIP_POSITION_0 = new
         // Translation2d(25, 5);
 
@@ -655,6 +661,10 @@ public final class Constants {
         public static final Translation2d HIGH_CONE_PREP = new Translation2d(38.92, 39.73);
         public static final Translation2d MID_CONE_PREP = new Translation2d(24, 35);
         public static final Translation2d HIGH_RETRACT = new Translation2d(26.35, 33);
+
+        public static final Translation2d FOOTBALL_0 = new Translation2d(-8, 14.5);
+        public static final Translation2d FOOTBALL_1 = new Translation2d(-36.3, 35);
+        public static final Translation2d FOOTBALL_2 = new Translation2d(20, 50);
 
         public static final Translation2d[][] ARM_POSITIONS = {
                 // Index 0 | Stowed
@@ -793,6 +803,25 @@ public final class Constants {
                 // Index 24 | Mid to Stow
                 {
                         STOWED_POSITION
+                },
+                // Index 25 | Football Index 1
+                {
+                        STOWED_POSITION,    
+                        FOOTBALL_1, 
+                },
+                // Index 26 | Football Index 2
+                {
+                        FOOTBALL_2,
+                        HIGH_CONE_POSITION_1,
+                        STOWED_POSITION
+                },
+                // Index 27 | Push up up
+                {
+                        PUSH_UP_POSITION_UP
+                },
+                // Index 28 | Push up down
+                {
+                        PUSH_UP_POSITION_DOWN
                 }
         };
 
