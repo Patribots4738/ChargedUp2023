@@ -177,6 +177,8 @@ public class RobotContainer {
         operator.povDown().onTrue(arm.getPOVDownCommand());
         operator.povLeft().onTrue(arm.getPOVLeftCommand(() -> swerve.getPose().getX()));
         operator.povRight().onTrue(arm.getPOVRightCommand(() -> swerve.getPose().getX()));
+
+        driver.povLeft().or(driver.povRight()).onTrue(arm.setArmIndexCommand(() -> PlacementConstants.HUMAN_TAG_PICKUP_INDEX));
         
         operator.a().whileTrue(
             arm.finishPlacmentCommand()
@@ -193,7 +195,7 @@ public class RobotContainer {
 
         operator.back().or(operator.start()).onTrue(arm.getUnflipCommand());
 
-        operator.leftBumper().whileTrue(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_STOPPED_SPEED));
+        operator.leftBumper().or(driver.leftBumper()).whileTrue(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_STOPPED_SPEED));
 
         operator.rightBumper().or(operator.rightStick()).and(arm::getAtPlacementPosition)
             .onTrue(claw.outTakeforXSeconds(() -> PlacementConstants.CONE_MODE ? 0.1 : 0.3)
@@ -206,7 +208,10 @@ public class RobotContainer {
         
         operator.leftTrigger().whileTrue(claw.setDesiredSpeedCommand(() -> operator.getLeftTriggerAxis()));
         operator.rightTrigger().whileTrue(claw.setDesiredSpeedCommand(() -> -operator.getRightTriggerAxis()));
-
+        
+        driver.leftTrigger().whileTrue(claw.setDesiredSpeedCommand(() -> driver.getLeftTriggerAxis()));
+        driver.rightTrigger().whileTrue(claw.setDesiredSpeedCommand(() -> -driver.getRightTriggerAxis()));
+        
         // swerve.getTiltedTrigger()
         //     .onTrue(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_FLASH_RED))
         //     .onFalse(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_CHROMA));
