@@ -129,21 +129,21 @@ public class RobotContainer {
                 )
             );
 
-        driver.leftBumper().whileTrue(Commands.run(swerve::getSetWheelsX));
+        driver.leftBumper().whileTrue(swerve.getSetWheelsX());
  
-        driver.rightStick().whileTrue(
-            Commands.sequence(
-                swerve.resetHDC(),
-                swerve.getDriveCommand(
-                    () -> {
-                        return ChassisSpeeds.fromFieldRelativeSpeeds(
-                            driver.getLeftY(),
-                            driver.getLeftX(),
-                            autoAlignment.getAngleSnapThetaSpeed(swerve.getClosest180Rotation2d()),
-                            swerve.getYaw());
-                    }, true, false)
-            )
-        );
+        // driver.rightStick().whileTrue(
+        //     Commands.sequence(
+        //         swerve.resetHDC(),
+        //         swerve.getDriveCommand(
+        //             () -> {
+        //                 return ChassisSpeeds.fromFieldRelativeSpeeds(
+        //                     driver.getLeftY(),
+        //                     driver.getLeftX(),
+        //                     autoAlignment.getAngleSnapThetaSpeed(swerve.getClosest180Rotation2d()),
+        //                     swerve.getYaw());
+        //             }, true, false)
+        //     )
+        // );
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
 
@@ -164,15 +164,17 @@ public class RobotContainer {
             .andThen(arduinoController.setLEDStateCommand(() -> LEDConstants.ARM_YELLOW))
             .andThen(arm.handleConeModeChange()));
 
-        operator.povUp()
-            .onTrue(
-                arm.footballCommand()
+        operator.povUp().onTrue(arm.getPOVHighCommand());
+
+        driver.povDown().onTrue(arm.getPushUpCommand());
+        driver.povUp().onTrue(
+            arm.footballCommand()
             .alongWith(
                 Commands.waitUntil(arm::halfwayFinishedWithFootball)
                 .andThen(claw.setDesiredSpeedCommand(() -> -1)))
-            .andThen(claw.setDesiredSpeedCommand(() -> 0)));
-
-        operator.povDown().onTrue(arm.getPushUpCommand());
+            .andThen(claw.setDesiredSpeedCommand(() -> 0)));       
+        
+        operator.povDown().onTrue(arm.getPOVDownCommand());
         operator.povLeft().onTrue(arm.getPOVLeftCommand(() -> swerve.getPose().getX()));
         operator.povRight().onTrue(arm.getPOVRightCommand(() -> swerve.getPose().getX()));
         
@@ -187,7 +189,7 @@ public class RobotContainer {
             .until(arm::halfwayFinishedWithConeFlip)
             .andThen(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_INTAKE_SPEED_CONE)));
 
-        operator.rightStick().and(() -> !arm.getAtPlacementPosition()).onTrue(arm.setArmIndexCommand(() -> PlacementConstants.STOWED_INDEX));
+        operator.rightStick().or(driver.rightStick()).and(() -> !arm.getAtPlacementPosition()).onTrue(arm.setArmIndexCommand(() -> PlacementConstants.STOWED_INDEX));
 
         operator.back().or(operator.start()).onTrue(arm.getUnflipCommand());
 

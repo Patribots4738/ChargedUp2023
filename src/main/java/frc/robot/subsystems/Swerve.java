@@ -362,7 +362,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public Command getSetWheelsX() {
-        return runOnce(this::setWheelsX);
+        return run(this::setWheelsX);
     }
 
     public void setWheelsUp() {
