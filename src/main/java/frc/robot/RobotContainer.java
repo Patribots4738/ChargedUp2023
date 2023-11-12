@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoAlignment;
 import frc.robot.commands.Drive;
 import frc.robot.commands.auto.AutoPathStorage;
@@ -21,11 +23,13 @@ import frc.robot.subsystems.PhotonCameraUtil;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.PlacementConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
 import io.github.oblarg.oblog.Logger;
 
 public class RobotContainer {
@@ -93,6 +97,16 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
 
+        new Trigger(() -> FieldConstants.GAME_MODE == FieldConstants.GameMode.TELEOP || FieldConstants.GAME_MODE == FieldConstants.GameMode.TEST)
+            .onTrue(
+                setDriveSpeed(DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND)
+            );
+
+        new Trigger(() -> FieldConstants.GAME_MODE == FieldConstants.GameMode.AUTONOMOUS)
+            .onTrue(
+                setDriveSpeed(AutoConstants.MAX_SPEED_METERS_PER_SECOND)
+            );
+
         driver.start().or(driver.back()).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
@@ -107,6 +121,7 @@ public class RobotContainer {
         driver.a()
             .whileTrue(
                 Commands.sequence(
+                    setDriveSpeed(FieldConstants.ALIGNMENT_SPEED),
                     autoAlignment.setNearestValuesCommand(),
                     swerve.resetHDC(),
                     swerve.setAlignemntSpeed(),
@@ -125,6 +140,8 @@ public class RobotContainer {
                         }
                     )
                 )
+            ).onFalse(
+                setDriveSpeed(DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND)
             );
 
         driver.leftBumper().whileTrue(Commands.run(swerve::getSetWheelsX));
@@ -228,6 +245,12 @@ public class RobotContainer {
             .andThen(operator.setRumble(() -> 0)));
     }
 
+    private CommandBase setDriveSpeed(double desiredSpeedMetersPerSecond) {
+        return Commands.runOnce(() -> { 
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND = desiredSpeedMetersPerSecond; 
+        });
+    }
+
     public void generateEventMap() {
 
         AutoConstants.EVENT_MAP.put("Stow", arm.getAutoStowCommand());
@@ -273,8 +296,9 @@ public class RobotContainer {
         return Commands.run(() -> FieldConstants.ALLIANCE = DriverStation.getAlliance()).ignoringDisable(true);
     }
 
-    public void onEnabled() {
+    public void onEnabled(GameMode gameMode) {
         Commands.runOnce(() -> DriverUI.modeStartTimestamp = DriverUI.currentTimestamp)
+            .andThen(Commands.runOnce(() -> FieldConstants.GAME_MODE = gameMode))
             .schedule();
     }
 

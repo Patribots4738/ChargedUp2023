@@ -5,6 +5,7 @@ import com.revrobotics.REVPhysicsSim;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.Constants.FieldConstants.GameMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -50,7 +51,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() { 
 
-        robotContainer.onEnabled();
+        robotContainer.onEnabled(GameMode.AUTONOMOUS);
 
         autonomousCommand = robotContainer.getAutonomousCommand();
         
@@ -64,7 +65,7 @@ public class Robot extends TimedRobot {
     
     @Override
     public void teleopInit() {
-        robotContainer.onEnabled();
+        robotContainer.onEnabled(GameMode.TELEOP);
         // Stop our autonomous command if it is still running.
         if (autonomousCommand != null) autonomousCommand.cancel();
         
@@ -77,7 +78,7 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() { 
         // Cancels all running commands at the start of test mode.
-        robotContainer.onEnabled();
+        robotContainer.onEnabled(GameMode.TEST);
         CommandScheduler.getInstance().cancelAll();
     }
 
