@@ -10,6 +10,8 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
 import java.io.IOException;
 import java.util.Optional;
+
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.VisionConstants;
 
 public class PhotonCameraUtil extends SubsystemBase {
@@ -62,6 +64,11 @@ public class PhotonCameraUtil extends SubsystemBase {
     // the camera that can see a target if only one camera can see a target
     // only if it's ambiguity is lower than the threshold
     public Optional<EstimatedRobotPose> getEstimatedRobotPose() {
+
+        if (FieldConstants.IS_SIMULATION) {
+            return Optional.empty();
+        }
+
         // First, update the pose estimators
         Optional<EstimatedRobotPose> cam1Pose = cam1PoseEstimator.update();
         // Optional<EstimatedRobotPose> cam2Pose = cam2PoseEstimator.update();

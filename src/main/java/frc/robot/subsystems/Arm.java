@@ -936,12 +936,12 @@ public class Arm extends SubsystemBase {
                 0.0,
                 0.0,
                 0.29,
-                new Rotation3d(0.0, -lowerArmAngle, 0.0));
+                new Rotation3d(0.0, lowerArmAngle * ((FieldConstants.IS_SIMULATION) ? 1 : -1), 0.0));
 
         var upperPose = lowerPose.transformBy(
                 new Transform3d(
                         new Translation3d(0.0, 0.0, -Units.inchesToMeters(ArmConstants.LOWER_ARM_LENGTH)),
-                        new Rotation3d(0.0, -upperArmAngle, 0.0)));
+                        new Rotation3d(0.0, upperArmAngle * ((FieldConstants.IS_SIMULATION) ? 1 : -1), 0.0)));
 
         return Pose3dLogger.composePose3ds(lowerPose, upperPose);
     }
