@@ -60,7 +60,7 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     // All calculations can be referenced here
-    // https://www.desmos.com/calculator/e07raajzh5
+    // https://www.desmos.com/calculator/b4oo5nehle
     private Translation2d toCircle(double x, double y) {
 
         Translation2d intercept;
