@@ -72,6 +72,7 @@ public class LimelightCameraUtil extends SubsystemBase{
         // First, update the pose estimators
 
         // TODO: replace nulls with gyro angles and mod positions
+        // TODO: use update or add vision mesurement with respect to tl and cl
         Optional<Pose2d> cam1Pose = 
             Optional.ofNullable( cam1PoseEstimator.update(null, null)) ;
         
