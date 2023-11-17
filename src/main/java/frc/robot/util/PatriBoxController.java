@@ -15,10 +15,13 @@ import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
 
-    private double deadband;
+    private final double deadband;
+    private final boolean isDriverController;
 
     public PatriBoxController(int port, double deadband) {
         super(port);
+
+        isDriverController = (port == OIConstants.DRIVER_CONTROLLER_PORT);
 
         this.deadband = deadband;
     }
@@ -34,14 +37,14 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public Translation2d getLeftAxis() {
-        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
+        Translation2d leftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
                 MathUtil.applyDeadband(super.getLeftY(), deadband));
 
-        if (FieldConstants.ALLIANCE == Alliance.Blue) {
-            driverLeftAxis = driverLeftAxis.unaryMinus();
+        if (isDriverController && FieldConstants.ALLIANCE == Alliance.Blue) {
+            leftAxis = leftAxis.unaryMinus();
         }
 
-        return driverLeftAxis;
+        return leftAxis;
     }
 
     @Override
