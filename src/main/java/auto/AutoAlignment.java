@@ -170,9 +170,6 @@ public class AutoAlignment {
               swerve.getPose().getX(),
               adjustedY,
               targetPose.getRotation()),
-              // Notice the 0 m/s here
-              // This is because we want the robot to end at a stop,
-              // This might be funky when we manually drive it on the X axis
               0,
               targetPose.getRotation()
       );
