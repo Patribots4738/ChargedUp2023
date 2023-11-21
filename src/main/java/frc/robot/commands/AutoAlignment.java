@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -153,12 +154,16 @@ public class AutoAlignment {
         if (tagID == 0) {
             return new ChassisSpeeds(0, 0, 0);
         }
-        Pose2d targetPose = swerve.getPose();
+        Pose2d currentPose = swerve.getPose();
+        Pose2d targetPose;
 
         // Check if our tagID is valid... (Assume it is for logic purposes)
         if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
             // Get the target pose (the pose of the tag we want to go to)
             targetPose = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+        }
+        else {
+            return new ChassisSpeeds(0, 0, 0);
         }
 
         // If we are on the left side of the field: we need to add the grid offset +
@@ -174,16 +179,27 @@ public class AutoAlignment {
         // oh well.
         targetPose = getModifiedTargetPose(targetPose);
 
-        double adjustedY = targetPose.getY() - swerve.getPose().getY();
+        double adjustedY = targetPose.getY() - currentPose.getY();
 
         MathUtil.applyDeadband(adjustedY, (PlacementConstants.CONE_BASE_RADIUS));
 
-        adjustedY += swerve.getPose().getY();
+        adjustedY += currentPose.getY();
+
+        // Logging stuff for AdvantageScope, see https://www.chiefdelphi.com/t/4414-trajectory-creation/444549/15?u=galexy
+        double[] loggedTrajectory = new double[] { 
+            currentPose.getX(), currentPose.getY(), currentPose.getRotation().getDegrees(),
+            currentPose.getX(), adjustedY, targetPose.getRotation().getDegrees()
+        };
+
+        double[] desiredPosition = new double[] { loggedTrajectory[3], loggedTrajectory[4], loggedTrajectory[5] };
+
+        SmartDashboard.putNumberArray("AutoAlignment/DesiredTraj", loggedTrajectory);
+        SmartDashboard.putNumberArray("AutoAlignment/DesiredPos", desiredPosition);
 
         return AutoConstants.HDC.calculate(
-                swerve.getPose(),
+                currentPose,
                 new Pose2d(
-                        swerve.getPose().getX(),
+                        currentPose.getX(),
                         adjustedY,
                         targetPose.getRotation()),
                 // Notice the 0 m/s here
@@ -344,27 +360,19 @@ public class AutoAlignment {
         // It cannot do so if there is no grid in the desired direction
         if (coneOffset < -1) {
             if (tagID == 2 || tagID == 3) {
-                this.tagID--;
+                setTagID(tagID - 1);
                 coneOffset = (PlacementConstants.CONE_MODE) ? 1 : 0;
-                // System.out.println("Case 1: Tag = " + tagID + ", coneOffset = " +
-                // coneOffset);
             } else if (tagID == 6 || tagID == 7) {
-                this.tagID++;
+                setTagID(tagID + 1);
                 coneOffset = (PlacementConstants.CONE_MODE) ? 1 : 0;
-                // System.out.println("Case 2: Tag = " + tagID + ", coneOffset = " +
-                // coneOffset);
             }
         } else if (coneOffset > 1) {
             if (tagID == 1 || tagID == 2) {
-                this.tagID++;
+                setTagID(tagID + 1);
                 coneOffset = (PlacementConstants.CONE_MODE) ? -1 : 0;
-                // System.out.println("Case 3: Tag = " + tagID + ", coneOffset = " +
-                // coneOffset);
             } else if (tagID == 7 || tagID == 8) {
-                this.tagID--;
+                setTagID(tagID - 1);
                 coneOffset = (PlacementConstants.CONE_MODE) ? -1 : 0;
-                // System.out.println("Case 4: Tag = " + tagID + ", coneOffset = " +
-                // coneOffset);
             }
         }
 
@@ -374,12 +382,6 @@ public class AutoAlignment {
         // If we are not on cone mode, ensure the cone offset is zero
         if (!PlacementConstants.CONE_MODE) {
             this.coneOffset = 0;
-        }
-
-        // If we actually changed indexes, reset the auto alignment status,
-        // so we can re-align to the new index
-        if (previousConeOffset != this.coneOffset) {
-            // SwerveTrajectory.resetTrajectoryStatus();
         }
     }
 
