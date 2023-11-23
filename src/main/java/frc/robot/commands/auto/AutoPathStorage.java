@@ -1,10 +1,7 @@
 package frc.robot.commands.auto;
 
-import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
-
 import frc.robot.DriverUI;
 import frc.robot.util.Constants.AutoConstants;
 

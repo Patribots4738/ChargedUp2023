@@ -19,8 +19,8 @@ import frc.robot.commands.auto.AutoPathStorage.AutoMap;
 import frc.robot.subsystems.ArduinoController;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
-import frc.robot.subsystems.PhotonCameraUtil;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.camera.LimelightCamera;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -40,7 +40,7 @@ public class RobotContainer {
     private final Swerve swerve;
     private final Arm arm;
     private final Claw claw;
-    private final PhotonCameraUtil photonVision;
+    private final LimelightCamera limelight;
     private final AutoAlignment autoAlignment;
     private final ArduinoController arduinoController;
     @SuppressWarnings("unused")
@@ -59,9 +59,9 @@ public class RobotContainer {
         swerve = new Swerve();
         arm = new Arm();
         claw = new Claw();
-        photonVision = new PhotonCameraUtil();
+        limelight = new LimelightCamera();
         autoPathStorage = new AutoPathStorage();
-        autoAlignment = new AutoAlignment(swerve, photonVision);
+        autoAlignment = new AutoAlignment(swerve, limelight);
         arduinoController = new ArduinoController();
 
         swerve.setDefaultCommand(new Drive(
@@ -74,7 +74,8 @@ public class RobotContainer {
             () -> (driver.y().getAsBoolean() && FieldConstants.ALLIANCE == Alliance.Blue)
         ));
 
-        photonVision.setDefaultCommand(autoAlignment.calibrateOdometry());
+        limelight.setDefaultCommand(
+            autoAlignment.calibrateOdometry());
 
         incinerateMotors();
         configureButtonBindings();
@@ -124,7 +125,7 @@ public class RobotContainer {
                     setDriveSpeed(FieldConstants.ALIGNMENT_SPEED),
                     autoAlignment.setNearestValuesCommand(),
                     swerve.resetHDC(),
-                    swerve.setAlignemntSpeed(),
+                    swerve.setAlignmentSpeed(),
                     // Run a method to get our desired speeds autonomously
                     // combine that with the driver axis X
                     // then run a swerve drive command with that
@@ -202,7 +203,7 @@ public class RobotContainer {
         operator.leftBumper().whileTrue(claw.setDesiredSpeedCommand(() -> PlacementConstants.CLAW_STOPPED_SPEED));
 
         operator.rightBumper().or(operator.rightStick()).and(arm::getAtPlacementPosition)
-            .onTrue(claw.outTakeforXSeconds(() -> PlacementConstants.CONE_MODE ? 0.1 : 0.3)
+            .onTrue(claw.outTakeForXSeconds(() -> PlacementConstants.CONE_MODE ? 0.1 : 0.3)
             .alongWith(arduinoController.setLEDStateCommand(() -> LEDConstants.BELLY_PAN_BLACK))
             .alongWith(arduinoController.setLEDStateCommand(
                 () -> PlacementConstants.CONE_MODE ? 
@@ -236,7 +237,7 @@ public class RobotContainer {
                 PlacementConstants.CONE_MODE 
                     ? LEDConstants.BELLY_PAN_YELLOW 
                     : LEDConstants.BELLY_PAN_PURPLE))
-        .and(claw::justAquiredGameElement)
+        .and(claw::justAcquiredGameElement)
             .onTrue(arduinoController.setLEDStateCommand(() ->
                 PlacementConstants.CONE_MODE 
                     ? LEDConstants.BELLY_PAN_YELLOW_BLINK 
@@ -270,7 +271,7 @@ public class RobotContainer {
 
         AutoConstants.EVENT_MAP.put("PlacePiece",
             arm.finishPlacmentCommand()
-            .andThen(claw.outTakeforXSeconds(() -> 0.15))
+            .andThen(claw.outTakeForXSeconds(() -> 0.15))
             .andThen(arm.getAutoStowCommand())
         );
 

@@ -328,7 +328,7 @@ public class Swerve extends SubsystemBase {
      */
     /**
      * Credit: WPIlib 2024
-     * Discretizes a continuous-time chassis speed.
+     * Discretize a continuous-time chassis speed.
      *
      * @param vx    Forward velocity.
      * @param vy    Sideways velocity.
@@ -491,7 +491,7 @@ public class Swerve extends SubsystemBase {
         this.speedMultiplier = speedMultiplier;
     }
 
-    public Command setAlignemntSpeed() {
+    public Command setAlignmentSpeed() {
         return runOnce(() -> {
                 DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
         });

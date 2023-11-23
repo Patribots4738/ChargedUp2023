@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriverUI;
 import frc.robot.util.Constants.ClawConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -53,17 +52,17 @@ public class Claw extends SubsystemBase {
          * Output generally is -0.25 < appliedOutput < 0
          * When grabbygrab
          * Current is generally 15 < current < 30
-         * Which is a big range unfortunatly.
-         * I am not sure where the curernt > 30 came from
+         * Which is a big range unfortunately.
+         * I am not sure where the current > 30 came from
          * I am having a hard time getting that read again on the graph anymore
          * Let's just go with > 15 for now
          * 
-         * Laslty, desiredSpeed is ALWAYS > 0.45 when we are intaking
+         * Lastly, desiredSpeed is ALWAYS > 0.45 when we are intaking
          * Which is a good indicator of finding if the claw is just getting up
          * to speed or if it is stalled
          *
          * The problem with having a boolean this sophisticated
-         * Is that there are too many independant variables to check
+         * Is that there are too many independent variables to check
          * And if a single one is off, the boolean will be false
          *
          * Idea: use a startedIntakingTimestamp to check
@@ -156,7 +155,7 @@ public class Claw extends SubsystemBase {
         return this.desiredSpeed;
     }
 
-    public Command outTakeforXSeconds(DoubleSupplier X) {
+    public Command outTakeForXSeconds(DoubleSupplier X) {
         return runOnce(() -> {
             setDesiredSpeed(PlacementConstants.CLAW_OUTTAKE_SPEED_CONE);
         }).andThen(Commands.waitSeconds(X.getAsDouble())
@@ -173,7 +172,7 @@ public class Claw extends SubsystemBase {
         return hasGameElement;
     }
 
-    public boolean justAquiredGameElement() {
+    public boolean justAcquiredGameElement() {
         return !hasGameElementOneLoopBehind && hasGameElement;
     }
 
