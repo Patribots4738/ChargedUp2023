@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
@@ -10,18 +11,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriverUI;
-import frc.robot.subsystems.PhotonCameraUtil;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.camera.LimelightCamera;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.ClawConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.PlacementConstants;
-import frc.robot.util.Constants.VisionConstants;
 import edu.wpi.first.wpilibj.Timer;
-import org.photonvision.EstimatedRobotPose;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -42,7 +45,9 @@ public class AutoAlignment {
      */
 
     Swerve swerve;
-    PhotonCameraUtil photonVision;
+    LimelightCamera frontCam;
+
+    AprilTagFieldLayout aprilTagFieldLayout;
 
     private int tagID;
     private int coneOffset = 0;
@@ -53,9 +58,15 @@ public class AutoAlignment {
     // tag
     private double currentNorm = -1;
 
-    public AutoAlignment(Swerve swerve, PhotonCameraUtil photonVision) {
+    public AutoAlignment(Swerve swerve, LimelightCamera limelight) {
         this.swerve = swerve;
-        this.photonVision = photonVision;
+        this.frontCam = limelight;
+    
+        try {
+            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+        } catch (IOException e) {
+            System.out.println("AprilTag field layout not found!");
+        }
     }
 
     /**
@@ -66,25 +77,39 @@ public class AutoAlignment {
         return Commands.run(() -> {
                 // Create an "Optional" object that contains the estimated pose of the robot
                 // This can be present (see's tag) or not present (does not see tag)
-                Optional<EstimatedRobotPose> result = photonVision.getEstimatedRobotPose();
+                
+                // TODO: I don't think that optionals work because technically the object wont be null
+                // this will probably need to get changed.
+                Optional<Pose2d> result = Optional.ofNullable(frontCam.getBotPose(false).toPose2d());
 
                 // If the result of the estimatedRobotPose exists, and the skew of the tag is
                 // less than 3 degrees (to prevent false results)
                 if (result.isPresent()) {
-                    EstimatedRobotPose camEstimatedPose = result.get();
-                    // Add the vision measurement to the pose estimator to update the odometry
                     swerve.getPoseEstimator().addVisionMeasurement(
-                            camEstimatedPose.estimatedPose.toPose2d(),
-                            Timer.getFPGATimestamp() - VisionConstants.LATENCY);
+                            result.get(),
+                            frontCam.getCaptureLatency());
                 }
 
-                if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+                Optional<double[]> targets = Optional.ofNullable(frontCam.getTargetPose(false));
+
+                if ( targets.isPresent() ) {
                     // Get the target pose (the pose of the tag we want to go to)
-                    Pose2d targetPose = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+                    Pose2d targetPose = new Pose3d(
+                            targets.get()[0], 
+                            targets.get()[1], 
+                            targets.get()[2], 
+                            new Rotation3d(
+                                    targets.get()[3],
+                                    targets.get()[4],
+                                    targets.get()[5]
+                            )
+                    ).toPose2d();
+                    
+                    frontCam.getTargetPose(false);
                     targetPose = getModifiedTargetPose(targetPose);
                     currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
                 }
-            }, photonVision
+            }, frontCam
         );
     }
 
@@ -95,9 +120,9 @@ public class AutoAlignment {
             return;
         }
 
-        if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+        if (aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
 
-            Pose2d aprilTagPose2d = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+            Pose2d aprilTagPose2d = aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
             double tagXOffset = getTagXOffset();
             double tagYOffset = getTagYOffset();
 
@@ -156,9 +181,9 @@ public class AutoAlignment {
         Pose2d targetPose = swerve.getPose();
 
         // Check if our tagID is valid... (Assume it is for logic purposes)
-        if (photonVision.aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
+        if (aprilTagFieldLayout.getTagPose(tagID).isPresent()) {
             // Get the target pose (the pose of the tag we want to go to)
-            targetPose = photonVision.aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
+            targetPose = aprilTagFieldLayout.getTagPose(tagID).get().toPose2d();
         }
 
         // If we are on the left side of the field: we need to add the grid offset +
@@ -227,9 +252,9 @@ public class AutoAlignment {
                 // This if a statement prevents the robot from crashing if we input an absurd
                 // tag ID,
                 // but it should be assumed that the tag location is present.
-                if (photonVision.aprilTagFieldLayout.getTagPose(i).isPresent()) {
+                if (aprilTagFieldLayout.getTagPose(i).isPresent()) {
                     currentDistance = currentPosition.getDistance(
-                            photonVision.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
+                            aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
                 }
                 if (currentDistance < nearestDistance) {
                     nearestDistance = currentDistance;
@@ -249,9 +274,9 @@ public class AutoAlignment {
                 // This if a statement prevents the robot from crashing if we input an absurd
                 // tag ID,
                 // but it should be assumed that the tag location is present.
-                if (photonVision.aprilTagFieldLayout.getTagPose(i).isPresent()) {
+                if (aprilTagFieldLayout.getTagPose(i).isPresent()) {
                     currentDistance = currentPosition.getDistance(
-                            photonVision.aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
+                            aprilTagFieldLayout.getTagPose(i).get().toPose2d().getTranslation());
                 }
                 if (currentDistance < nearestDistance) {
                     nearestDistance = currentDistance;

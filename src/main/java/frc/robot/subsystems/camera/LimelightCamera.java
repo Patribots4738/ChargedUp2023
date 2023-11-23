@@ -1,18 +1,20 @@
 package frc.robot.subsystems.camera;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.camera.LightMode.SnapMode;
 
 import java.util.*;
 
 // https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-public class LimelightCamera {
-
-    private String name;
+public class LimelightCamera extends SubsystemBase{
 
     private NetworkTable table;
 
@@ -25,9 +27,7 @@ public class LimelightCamera {
     public SendableChooser<Boolean> snapshotChooser = new SendableChooser<>();
     public SendableChooser<Boolean> lightChooser = new SendableChooser<>();
 
-    public LimelightCamera(String name) {
-        this.name = name;
-        
+    public LimelightCamera() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
 
         tx = table.getEntry("tx");
@@ -41,16 +41,26 @@ public class LimelightCamera {
         lightChooser.setDefaultOption("Off", false);
         lightChooser.addOption("On", true);
     }
-
-    public String getName() {
-        return name;
-    }
     
     /**
      * @return ID of the primary in-view AprilTag
      */
     public double[] getTagID() {
         return table.getEntry("tid").getDoubleArray(new double[6]);
+    }
+
+    
+
+    public Pose3d convertBotEntry(double[] entry) {
+        return new Pose3d(
+            entry[0], 
+            entry[1], 
+            entry[2],
+            new Rotation3d(
+                Units.degreesToRadians(entry[3]),
+                Units.degreesToRadians(entry[4]),
+                Units.degreesToRadians(entry[5])
+            ));
     }
 
     /**
@@ -62,8 +72,14 @@ public class LimelightCamera {
      * @param targetSpace if the bot pose should be send in targetSpace.
      * @return the robot pose
      */
-    public double[] getBotPose(boolean targetSpace) {
-        return table.getEntry((!targetSpace) ? "botpose" : "botpose_targetspace").getDoubleArray(new double[6]);
+    public Pose3d getBotPose(boolean targetSpace) {
+        return convertBotEntry( getRawBotPose(targetSpace) );
+    }
+
+    public double[] getRawBotPose(boolean targetSpace) {
+        return table.getEntry(
+            (!targetSpace) ? "botpose" 
+            : "botpose_targetspace").getDoubleArray(new double[6]);
     }
 
     /**
@@ -74,6 +90,7 @@ public class LimelightCamera {
      * 
      * @return the robot pose with the blue driverstation WPILIB origin
      */
+    @Deprecated
     public double[] getBluePose() {
         return table.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
     }
@@ -86,6 +103,7 @@ public class LimelightCamera {
      * 
      * @return the robot pose with the red driverstation WPILIB origin
      */
+    @Deprecated
     public double[] getRedPose() {
         return table.getEntry("botpose_wpired").getDoubleArray(new double[6]);
     }
@@ -118,6 +136,14 @@ public class LimelightCamera {
      */
     public double[] getTargetPose(boolean cameraSpace) {
         return table.getEntry((cameraSpace) ? "targetpose_cameraspace" : "targetpose_robotspace").getDoubleArray(new double[6]);
+    }
+    
+    public boolean containsTagID(boolean cameraSpace, int tagID) {
+        double[] targetPose = getTargetPose(cameraSpace);
+        for (double pose : targetPose) {
+            if (pose == tagID) { return true; }
+        }
+        return false;
     }
 
     /**
