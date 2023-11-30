@@ -79,7 +79,9 @@ public class Robot extends TimedRobot {
     public void testInit() { 
         // Cancels all running commands at the start of test mode.
         robotContainer.onEnabled(GameMode.TEST);
-        CommandScheduler.getInstance().cancelAll();
+        if (autonomousCommand != null) autonomousCommand.cancel();
+        
+        if (disabledCommand != null) disabledCommand.cancel();
     }
 
     @Override

@@ -74,6 +74,8 @@ public class RobotContainer {
             () -> (driver.y().getAsBoolean() && FieldConstants.ALLIANCE == Alliance.Blue)
         ));
 
+        limelight.setDefaultCommand(autoAlignment.getCalibrationCommand().ignoringDisable(true));
+
         incinerateMotors();
         configureButtonBindings();
         generateEventMap();
@@ -291,11 +293,7 @@ public class RobotContainer {
     }
 
     public Command getDisabledCommand() {
-        return Commands.run(
-          () -> FieldConstants.ALLIANCE = DriverStation.getAlliance())
-          .andThen(autoAlignment.calibrateOdometry()
-            .ignoringDisable(true))
-          .ignoringDisable(true).repeatedly();
+        return Commands.sequence().ignoringDisable(true).repeatedly();
     }
 
     public void onEnabled(GameMode gameMode) {

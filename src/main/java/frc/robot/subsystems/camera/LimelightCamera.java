@@ -1,5 +1,9 @@
 package frc.robot.subsystems.camera;
 
+import java.util.Arrays;
+import java.util.Optional;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -8,12 +12,11 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.camera.LightMode.SnapMode;
 
-import java.util.*;
-
 // https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-public class LimelightCamera {
+public class LimelightCamera extends SubsystemBase {
 
     private NetworkTable table;
 
@@ -92,8 +95,13 @@ public class LimelightCamera {
         return table.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
     }
 
-    public Pose3d getBluePose2d() {
-      return convertBotEntry(getBluePose());
+    public Optional<Pose2d> getBluePose2d() {
+        Pose2d result = convertBotEntry(getBluePose()).toPose2d();
+        if (result.getX() == 0 && result.getY() == 0) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(result);
+        }
     }
 
     /**
@@ -208,10 +216,10 @@ public class LimelightCamera {
      * Time between the end of the exposure of the middle row 
      * of the sensor to the beginning of the tracking pipeline.
      * 
-     * @return Capture pipeline latency (ms). 
+     * @return Capture pipeline latency (s). 
      */
     public double getCaptureLatency() {
-        return table.getEntry("cl").getDouble(0);
+        return table.getEntry("cl").getDouble(0)/1000.0;
     }
 
     /**
