@@ -8,13 +8,12 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.camera.LightMode.SnapMode;
 
 import java.util.*;
 
 // https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-public class LimelightCamera extends SubsystemBase{
+public class LimelightCamera {
 
     private NetworkTable table;
 
@@ -48,7 +47,6 @@ public class LimelightCamera extends SubsystemBase{
     public double[] getTagID() {
         return table.getEntry("tid").getDoubleArray(new double[6]);
     }
-
     
 
     public Pose3d convertBotEntry(double[] entry) {
@@ -66,8 +64,7 @@ public class LimelightCamera extends SubsystemBase{
     /**
      * Robot transform in field-space. 
      * Translation (X,Y,Z) 
-     * Rotation(Roll,Pitch,Yaw), 
-     * total latency (cl+tl)
+     * Rotation(Roll,Pitch,Yaw)
      * 
      * @param targetSpace if the bot pose should be send in targetSpace.
      * @return the robot pose
@@ -93,6 +90,10 @@ public class LimelightCamera extends SubsystemBase{
     @Deprecated
     public double[] getBluePose() {
         return table.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
+    }
+
+    public Pose3d getBluePose2d() {
+      return convertBotEntry(getBluePose());
     }
 
     /**

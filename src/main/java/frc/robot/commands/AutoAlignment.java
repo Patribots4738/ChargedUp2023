@@ -74,42 +74,19 @@ public class AutoAlignment {
      */
     public Command calibrateOdometry() {
 
-        return Commands.run(() -> {
+        return Commands.runOnce(() -> {
                 // Create an "Optional" object that contains the estimated pose of the robot
                 // This can be present (see's tag) or not present (does not see tag)
                 
-                // TODO: I don't think that optionals work because technically the object wont be null
                 // this will probably need to get changed.
-                Optional<Pose2d> result = Optional.ofNullable(frontCam.getBotPose(false).toPose2d());
-
+                Pose2d result = frontCam.getBluePose2d().toPose2d();
                 // If the result of the estimatedRobotPose exists, and the skew of the tag is
                 // less than 3 degrees (to prevent false results)
-                if (result.isPresent()) {
-                    swerve.getPoseEstimator().addVisionMeasurement(
-                            result.get(),
-                            frontCam.getCaptureLatency());
-                }
-
-                Optional<double[]> targets = Optional.ofNullable(frontCam.getTargetPose(false));
-
-                if ( targets.isPresent() ) {
-                    // Get the target pose (the pose of the tag we want to go to)
-                    Pose2d targetPose = new Pose3d(
-                            targets.get()[0], 
-                            targets.get()[1], 
-                            targets.get()[2], 
-                            new Rotation3d(
-                                    targets.get()[3],
-                                    targets.get()[4],
-                                    targets.get()[5]
-                            )
-                    ).toPose2d();
-                    
-                    frontCam.getTargetPose(false);
-                    targetPose = getModifiedTargetPose(targetPose);
-                    currentNorm = swerve.getPose().minus(targetPose).getTranslation().getNorm();
-                }
-            }, frontCam
+                System.out.println("We know...");
+                swerve.getPoseEstimator().addVisionMeasurement(
+                  result,
+                  DriverUI.currentTimestamp - frontCam.getCaptureLatency());
+            }
         );
     }
 

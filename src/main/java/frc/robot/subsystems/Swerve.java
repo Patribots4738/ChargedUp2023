@@ -176,7 +176,7 @@ public class Swerve extends SubsystemBase {
 
     }
 
-    public void logPositions() {
+    public void   logPositions() {
         DriverUI.field.setRobotPose(getPose());
 
         SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
