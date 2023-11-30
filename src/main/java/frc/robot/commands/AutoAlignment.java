@@ -72,21 +72,22 @@ public class AutoAlignment {
     /**
      * Calibrate the odometry for the swerve
      */
-    public Command calibrateOdometry() {
+    public Command getCalibrationCommand() {
 
-        return Commands.runOnce(() -> {
+        return Commands.run(() -> {
                 // Create an "Optional" object that contains the estimated pose of the robot
                 // This can be present (see's tag) or not present (does not see tag)
                 
                 // this will probably need to get changed.
-                Pose2d result = frontCam.getBluePose2d().toPose2d();
+                Optional<Pose2d> result = frontCam.getBluePose2d();
                 // If the result of the estimatedRobotPose exists, and the skew of the tag is
                 // less than 3 degrees (to prevent false results)
-                System.out.println("We know...");
-                swerve.getPoseEstimator().addVisionMeasurement(
-                  result,
-                  DriverUI.currentTimestamp - frontCam.getCaptureLatency());
-            }
+                if (result.isPresent()) {
+                    swerve.getPoseEstimator().addVisionMeasurement(
+                        result.get(),
+                        DriverUI.currentTimestamp - frontCam.getCaptureLatency());
+                }
+            }, frontCam
         );
     }
 
